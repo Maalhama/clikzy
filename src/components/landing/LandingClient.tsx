@@ -534,14 +534,14 @@ export function LandingClient({
       </section>
 
       {/* PRIZES SHOWCASE */}
-      <section className="relative py-16 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-neon-purple/5 to-transparent" />
+      <section id="lots" className="relative py-16 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-neon-pink/5 to-transparent" />
         <div className="relative max-w-7xl mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-black mb-4">
-              OBJETS <span className="text-neon-pink">A REMPORTER</span>
+              LOTS <span className="text-neon-pink neon-text-pink">À REMPORTER</span>
             </h2>
-            <p className="text-white/50 text-lg">Des produits premium a remporter quotidiennement</p>
+            <p className="text-white/50 text-lg">Des produits premium à remporter quotidiennement</p>
           </div>
           <PrizeCarousel />
         </div>
