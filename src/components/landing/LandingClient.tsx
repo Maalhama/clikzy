@@ -789,13 +789,6 @@ export function LandingClient({
         </div>
       </section>
 
-      {/* TRUST BADGES GRID */}
-      <section className="relative py-16">
-        <div className="max-w-7xl mx-auto px-6">
-          <TrustBadges variant="grid" />
-        </div>
-      </section>
-
       {/* FINAL CTA */}
       <section className="final-cta relative py-24 overflow-hidden">
         {/* Background effects */}
