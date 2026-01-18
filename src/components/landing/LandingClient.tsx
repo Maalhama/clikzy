@@ -803,19 +803,11 @@ export function LandingClient({
         <div className="relative max-w-4xl mx-auto px-6 text-center final-cta-content">
           {/* Badge OFFRE DE BIENVENUE */}
           <div
-            className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-neon-purple/20 to-neon-pink/20 border border-neon-purple/40 rounded-full mb-6 animate-pulse"
+            className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-neon-purple/20 to-neon-pink/20 border border-neon-purple/40 rounded-full mb-8 animate-pulse"
             style={{ boxShadow: '0 0 25px rgba(155, 92, 255, 0.3)' }}
           >
             <GiftIcon className="w-5 h-5 text-neon-pink" />
             <span className="text-white text-sm font-bold tracking-wide">OFFRE DE BIENVENUE</span>
-          </div>
-
-          {/* Urgence/FOMO */}
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-warning/10 border border-warning/30 rounded-full mb-8">
-            <span className="w-2 h-2 bg-warning rounded-full animate-pulse" />
-            <span className="text-warning text-sm font-semibold">
-              🔥 Plus que <span className="font-black">47 places</span> disponibles aujourd'hui
-            </span>
           </div>
 
           <h2 className="text-4xl md:text-6xl lg:text-7xl font-black mb-6">
