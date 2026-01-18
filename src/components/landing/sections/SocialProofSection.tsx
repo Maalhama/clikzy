@@ -101,8 +101,14 @@ export function SocialProofSection({
         <div className="grid lg:grid-cols-2 gap-12 items-start max-w-6xl mx-auto">
           {/* Stats */}
           <div ref={leftRef}>
-            <div className="glass rounded-2xl p-8">
-              <h3 className="text-xl font-bold text-text-primary mb-8">
+            <div
+              className="glass rounded-2xl p-8"
+              style={{ boxShadow: '0 0 30px rgba(155, 92, 255, 0.1)' }}
+            >
+              <h3
+                className="text-xl font-bold text-text-primary mb-8"
+                style={{ textShadow: '0 0 20px rgba(155, 92, 255, 0.3)' }}
+              >
                 Statistiques globales
               </h3>
               <div className="grid grid-cols-2 gap-8">
@@ -131,9 +137,15 @@ export function SocialProofSection({
             </div>
 
             {/* Testimonial */}
-            <div className="mt-8 p-6 rounded-2xl bg-bg-secondary/50 border border-bg-tertiary">
+            <div
+              className="mt-8 p-6 rounded-2xl bg-bg-secondary/50 border border-bg-tertiary hover:border-neon-purple/30 transition-all duration-300"
+              style={{ boxShadow: '0 0 20px rgba(155, 92, 255, 0.1)' }}
+            >
               <div className="flex items-start gap-4">
-                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-neon-purple to-neon-pink flex items-center justify-center text-white font-bold flex-shrink-0">
+                <div
+                  className="w-12 h-12 rounded-full bg-gradient-to-br from-neon-purple to-neon-pink flex items-center justify-center text-white font-bold flex-shrink-0"
+                  style={{ boxShadow: '0 0 15px rgba(155, 92, 255, 0.4)' }}
+                >
                   M
                 </div>
                 <div>
@@ -142,7 +154,12 @@ export function SocialProofSection({
                     et l&apos;adrénaline est au rendez-vous.&rdquo;
                   </p>
                   <div className="flex items-center gap-2">
-                    <span className="font-semibold text-neon-purple">MaxGamer42</span>
+                    <span
+                      className="font-semibold text-neon-purple"
+                      style={{ textShadow: '0 0 10px rgba(155, 92, 255, 0.4)' }}
+                    >
+                      MaxGamer42
+                    </span>
                     <span className="text-text-secondary text-sm">- Gagnant iPhone 15 Pro</span>
                   </div>
                 </div>
@@ -152,10 +169,23 @@ export function SocialProofSection({
 
           {/* Recent winners feed */}
           <div ref={rightRef}>
-            <div className="glass rounded-2xl p-8">
+            <div
+              className="glass rounded-2xl p-8"
+              style={{ boxShadow: '0 0 30px rgba(0, 255, 136, 0.1)' }}
+            >
               <div className="flex items-center justify-between mb-6">
-                <h3 className="text-xl font-bold text-text-primary">Derniers gagnants</h3>
-                <span className="text-xs text-text-secondary">Mise a jour en temps reel</span>
+                <h3
+                  className="text-xl font-bold text-text-primary"
+                  style={{ textShadow: '0 0 20px rgba(0, 255, 136, 0.3)' }}
+                >
+                  Derniers gagnants
+                </h3>
+                <span
+                  className="text-xs text-success font-medium"
+                  style={{ textShadow: '0 0 10px rgba(0, 255, 136, 0.4)' }}
+                >
+                  Mise a jour en temps reel
+                </span>
               </div>
               <WinnersFeed winners={winners} maxDisplay={6} />
             </div>

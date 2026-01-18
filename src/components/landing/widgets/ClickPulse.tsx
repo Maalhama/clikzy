@@ -74,14 +74,14 @@ export function ClickPulse({
     return () => clearTimeout(timeout)
   }, [enabled, intensity, addPulse])
 
-  const getColorClass = (color: PulsePoint['color']) => {
+  const getColorStyles = (color: PulsePoint['color']) => {
     switch (color) {
       case 'purple':
-        return 'bg-neon-purple'
+        return { bg: 'bg-neon-purple', shadow: '0 0 20px rgba(155, 92, 255, 0.8)' }
       case 'blue':
-        return 'bg-neon-blue'
+        return { bg: 'bg-neon-blue', shadow: '0 0 20px rgba(60, 203, 255, 0.8)' }
       case 'pink':
-        return 'bg-neon-pink'
+        return { bg: 'bg-neon-pink', shadow: '0 0 20px rgba(255, 79, 216, 0.8)' }
     }
   }
 
@@ -104,18 +104,30 @@ export function ClickPulse({
               transform: 'translate(-50%, -50%)',
             }}
           >
-            <div className={`w-8 h-8 rounded-full ${getColorClass(pulse.color)} blur-sm`} />
+            <div
+              className={`w-8 h-8 rounded-full ${getColorStyles(pulse.color).bg} blur-sm`}
+              style={{ boxShadow: getColorStyles(pulse.color).shadow }}
+            />
           </motion.div>
         ))}
       </AnimatePresence>
 
       {/* Activity indicator */}
-      <div className="absolute bottom-4 right-4 flex items-center gap-2 px-3 py-1.5 bg-bg-secondary/80 backdrop-blur-sm rounded-full border border-white/10">
+      <div
+        className="absolute bottom-4 right-4 flex items-center gap-2 px-3 py-1.5 bg-bg-secondary/80 backdrop-blur-sm rounded-full border border-neon-purple/30"
+        style={{ boxShadow: '0 0 15px rgba(155, 92, 255, 0.2)' }}
+      >
         <span className="relative flex h-2 w-2">
-          <span className="animate-ping absolute h-full w-full rounded-full bg-neon-purple opacity-75" />
-          <span className="relative rounded-full h-2 w-2 bg-neon-purple" />
+          <span
+            className="animate-ping absolute h-full w-full rounded-full bg-neon-purple opacity-75"
+            style={{ boxShadow: '0 0 10px rgba(155, 92, 255, 0.8)' }}
+          />
+          <span
+            className="relative rounded-full h-2 w-2 bg-neon-purple"
+            style={{ boxShadow: '0 0 8px rgba(155, 92, 255, 0.6)' }}
+          />
         </span>
-        <span className="text-xs text-white/60">
+        <span className="text-xs text-neon-purple/80 font-medium">
           {intensity === 'high' ? 'Tres actif' : intensity === 'medium' ? 'Actif' : 'Normal'}
         </span>
       </div>

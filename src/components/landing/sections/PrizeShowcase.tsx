@@ -126,7 +126,10 @@ export function PrizeShowcase({ item }: PrizeShowcaseProps) {
       />
 
       {/* Spotlight effect */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-neon-purple/20 rounded-full blur-[150px] animate-pulse-slow" />
+      <div
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-neon-purple/20 rounded-full blur-[150px] animate-pulse-slow"
+        style={{ boxShadow: '0 0 100px rgba(155, 92, 255, 0.3)' }}
+      />
 
       {/* Content */}
       <div className="relative z-10 container mx-auto px-6">
@@ -161,7 +164,10 @@ export function PrizeShowcase({ item }: PrizeShowcaseProps) {
             </div>
 
             {/* Neon border glow */}
-            <div className="absolute inset-0 rounded-3xl border-2 border-neon-purple animate-glow pointer-events-none" />
+            <div
+              className="absolute inset-0 rounded-3xl border-2 border-neon-purple animate-glow pointer-events-none"
+              style={{ boxShadow: '0 0 30px rgba(155, 92, 255, 0.4), inset 0 0 30px rgba(155, 92, 255, 0.05)' }}
+            />
           </div>
 
           {/* Text content */}
@@ -182,15 +188,28 @@ export function PrizeShowcase({ item }: PrizeShowcaseProps) {
             <div ref={priceRef} className="mb-8">
               <div className="text-sm text-text-secondary mb-1">Valeur</div>
               <div className="text-5xl md:text-6xl font-bold">
-                <span className="price-value text-neon-pink neon-text-pink">0</span>
-                <span className="text-neon-pink neon-text-pink ml-2">EUR</span>
+                <span
+                  className="price-value text-neon-pink"
+                  style={{ textShadow: '0 0 30px rgba(255, 79, 216, 0.6)' }}
+                >
+                  0
+                </span>
+                <span
+                  className="text-neon-pink ml-2"
+                  style={{ textShadow: '0 0 30px rgba(255, 79, 216, 0.6)' }}
+                >
+                  EUR
+                </span>
               </div>
             </div>
 
             {/* CTA */}
             <a
               href="#live-game"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-neon-purple to-neon-blue text-white font-bold rounded-xl hover:shadow-neon-purple transition-all duration-300 hover:scale-105"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-neon-purple to-neon-blue text-white font-bold rounded-xl transition-all duration-300 hover:scale-105"
+              style={{ boxShadow: '0 0 20px rgba(155, 92, 255, 0.4)' }}
+              onMouseEnter={(e) => e.currentTarget.style.boxShadow = '0 0 40px rgba(155, 92, 255, 0.6)'}
+              onMouseLeave={(e) => e.currentTarget.style.boxShadow = '0 0 20px rgba(155, 92, 255, 0.4)'}
             >
               Voir la partie en cours
               <svg

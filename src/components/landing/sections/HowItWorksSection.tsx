@@ -164,13 +164,17 @@ export function HowItWorksSection() {
           <div
             ref={lineRef}
             className="absolute inset-0 bg-gradient-to-r from-neon-purple via-neon-blue to-neon-pink rounded-full origin-left"
+            style={{ boxShadow: '0 0 15px rgba(155, 92, 255, 0.5)' }}
           />
           {/* Dots */}
           {[0, 1, 2].map((i) => (
             <div
               key={i}
               className="absolute top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-neon-purple border-4 border-bg-primary"
-              style={{ left: `${i * 50}%` }}
+              style={{
+                left: `${i * 50}%`,
+                boxShadow: '0 0 10px rgba(155, 92, 255, 0.6)',
+              }}
             />
           ))}
         </div>
@@ -186,14 +190,19 @@ export function HowItWorksSection() {
               className="group relative"
             >
               {/* Card */}
-              <div className="relative p-6 md:p-8 rounded-2xl bg-bg-secondary/50 border border-bg-tertiary hover:border-neon-purple/50 transition-all duration-300 hover:-translate-y-2">
+              <div className="relative p-6 md:p-8 rounded-2xl bg-bg-secondary/50 border border-bg-tertiary hover:border-neon-purple/50 transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_0_30px_rgba(155,92,255,0.2)]">
                 {/* Number badge */}
-                <div className="absolute -top-4 -left-4 w-12 h-12 bg-gradient-to-br from-neon-purple to-neon-pink rounded-full flex items-center justify-center text-white font-bold text-lg shadow-neon-purple">
+                <div
+                  className="absolute -top-4 -left-4 w-12 h-12 bg-gradient-to-br from-neon-purple to-neon-pink rounded-full flex items-center justify-center text-white font-bold text-lg"
+                  style={{ boxShadow: '0 0 20px rgba(155, 92, 255, 0.5)' }}
+                >
                   {step.number}
                 </div>
 
                 {/* Icon */}
-                <div className="w-16 h-16 rounded-2xl bg-neon-purple/10 border border-neon-purple/30 flex items-center justify-center text-neon-purple mb-6 group-hover:scale-110 group-hover:bg-neon-purple/20 transition-all duration-300">
+                <div
+                  className="w-16 h-16 rounded-2xl bg-neon-purple/10 border border-neon-purple/30 flex items-center justify-center text-neon-purple mb-6 group-hover:scale-110 group-hover:bg-neon-purple/20 transition-all duration-300 group-hover:shadow-[0_0_20px_rgba(155,92,255,0.4)]"
+                >
                   {step.icon}
                 </div>
 

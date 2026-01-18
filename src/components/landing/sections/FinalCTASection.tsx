@@ -73,6 +73,7 @@ export function FinalCTASection({ isLoggedIn }: FinalCTASectionProps) {
         <div
           ref={cardRef}
           className="relative max-w-4xl mx-auto glass rounded-3xl p-8 md:p-16 text-center overflow-hidden"
+          style={{ boxShadow: '0 0 50px rgba(155, 92, 255, 0.2), inset 0 0 30px rgba(155, 92, 255, 0.05)' }}
         >
           {/* Confetti effect on hover */}
           {showConfetti && (
@@ -103,7 +104,10 @@ export function FinalCTASection({ isLoggedIn }: FinalCTASectionProps) {
           )}
 
           {/* Badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-neon-pink/20 border border-neon-pink/30 rounded-full text-neon-pink mb-6">
+          <div
+            className="inline-flex items-center gap-2 px-4 py-2 bg-neon-pink/20 border border-neon-pink/30 rounded-full text-neon-pink mb-6"
+            style={{ boxShadow: '0 0 15px rgba(255, 79, 216, 0.3)' }}
+          >
             <svg
               width="16"
               height="16"
@@ -127,8 +131,13 @@ export function FinalCTASection({ isLoggedIn }: FinalCTASectionProps) {
           {/* Subtitle */}
           <p className="text-text-secondary text-lg md:text-xl max-w-xl mx-auto mb-8">
             Inscris-toi maintenant et recois{' '}
-            <span className="text-neon-purple font-bold">10 credits gratuits</span> pour commencer
-            a jouer.
+            <span
+              className="text-neon-purple font-bold"
+              style={{ textShadow: '0 0 15px rgba(155, 92, 255, 0.5)' }}
+            >
+              10 credits gratuits
+            </span>{' '}
+            pour commencer a jouer.
           </p>
 
           {/* Features list */}
@@ -140,9 +149,15 @@ export function FinalCTASection({ isLoggedIn }: FinalCTASectionProps) {
             ].map((feature, i) => (
               <div
                 key={i}
-                className="flex items-center gap-2 px-3 py-1.5 bg-bg-tertiary/50 rounded-full text-sm"
+                className="flex items-center gap-2 px-3 py-1.5 bg-bg-tertiary/50 rounded-full text-sm border border-success/20 hover:border-success/40 transition-all duration-300"
+                style={{ boxShadow: '0 0 10px rgba(0, 255, 136, 0.1)' }}
               >
-                <span className="text-success">{feature.icon}</span>
+                <span
+                  className="text-success"
+                  style={{ textShadow: '0 0 8px rgba(0, 255, 136, 0.6)' }}
+                >
+                  {feature.icon}
+                </span>
                 <span className="text-text-primary">{feature.text}</span>
               </div>
             ))}
@@ -153,7 +168,8 @@ export function FinalCTASection({ isLoggedIn }: FinalCTASectionProps) {
             ref={buttonRef}
             href={isLoggedIn ? '/lobby' : '/register'}
             onMouseEnter={handleButtonHover}
-            className="inline-block px-10 py-4 bg-gradient-to-r from-neon-purple via-neon-pink to-neon-blue text-white font-bold text-lg rounded-xl hover:shadow-neon-purple transition-all duration-300 animate-gradient bg-[length:200%_200%]"
+            className="inline-block px-10 py-4 bg-gradient-to-r from-neon-purple via-neon-pink to-neon-blue text-white font-bold text-lg rounded-xl transition-all duration-300 animate-gradient bg-[length:200%_200%]"
+            style={{ boxShadow: '0 0 30px rgba(155, 92, 255, 0.5)' }}
           >
             {isLoggedIn ? 'Voir les parties disponibles' : 'Creer mon compte gratuit'}
           </Link>

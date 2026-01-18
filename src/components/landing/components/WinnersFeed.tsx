@@ -86,10 +86,12 @@ export function WinnersFeed({
           ref={(el) => {
             if (el) itemsRef.current[index] = el
           }}
-          className="group flex items-center gap-3 p-3 rounded-xl bg-bg-secondary/50 border border-bg-tertiary hover:border-neon-purple/30 transition-all duration-300"
+          className="group flex items-center gap-3 p-3 rounded-xl bg-bg-secondary/50 border border-bg-tertiary hover:border-neon-purple/40 transition-all duration-300 hover:shadow-[0_0_20px_rgba(155,92,255,0.15)]"
         >
           {/* Avatar */}
-          <div className="relative w-10 h-10 rounded-full bg-gradient-to-br from-neon-purple to-neon-pink flex items-center justify-center text-white font-bold text-sm overflow-hidden flex-shrink-0">
+          <div
+            className="relative w-10 h-10 rounded-full bg-gradient-to-br from-neon-purple to-neon-pink flex items-center justify-center text-white font-bold text-sm overflow-hidden flex-shrink-0 group-hover:shadow-[0_0_15px_rgba(155,92,255,0.5)] transition-shadow duration-300"
+          >
             {winner.avatar_url ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img
@@ -101,8 +103,11 @@ export function WinnersFeed({
               winner.username.charAt(0).toUpperCase()
             )}
             {/* Winner badge */}
-            <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-success rounded-full flex items-center justify-center">
-              <span className="text-[8px]">*</span>
+            <div
+              className="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-success rounded-full flex items-center justify-center"
+              style={{ boxShadow: '0 0 8px rgba(0, 255, 136, 0.6)' }}
+            >
+              <span className="text-[8px]">✓</span>
             </div>
           </div>
 
@@ -114,14 +119,20 @@ export function WinnersFeed({
               </span>
               <span className="text-xs text-success">a gagné</span>
             </div>
-            <div className="text-sm text-neon-purple truncate font-medium">
+            <div
+              className="text-sm text-neon-purple truncate font-medium"
+              style={{ textShadow: '0 0 10px rgba(155, 92, 255, 0.3)' }}
+            >
               {winner.item_name}
             </div>
           </div>
 
           {/* Value & Time */}
           <div className="text-right flex-shrink-0">
-            <div className="text-sm font-bold text-neon-pink">
+            <div
+              className="text-sm font-bold text-neon-pink"
+              style={{ textShadow: '0 0 10px rgba(255, 79, 216, 0.4)' }}
+            >
               {winner.item_value.toLocaleString()} EUR
             </div>
             <div className="text-xs text-text-secondary">
@@ -164,14 +175,26 @@ export function WinnerToast({ winner, onClose }: WinnerToastProps) {
   return (
     <div
       ref={toastRef}
-      className="fixed top-4 right-4 z-50 flex items-center gap-3 p-4 rounded-xl glass border-success/30 shadow-neon-success cursor-pointer"
+      className="fixed top-4 right-4 z-50 flex items-center gap-3 p-4 rounded-xl bg-bg-secondary/90 backdrop-blur-xl border border-success/40 cursor-pointer"
+      style={{ boxShadow: '0 0 30px rgba(0, 255, 136, 0.3), inset 0 0 20px rgba(0, 255, 136, 0.05)' }}
       onClick={onClose}
     >
-      <div className="text-2xl">*</div>
+      <div
+        className="text-2xl"
+        style={{ filter: 'drop-shadow(0 0 8px rgba(0, 255, 136, 0.8))' }}
+      >
+        🏆
+      </div>
       <div>
-        <div className="font-bold text-success">Nouveau gagnant !</div>
+        <div
+          className="font-bold text-success"
+          style={{ textShadow: '0 0 10px rgba(0, 255, 136, 0.5)' }}
+        >
+          Nouveau gagnant !
+        </div>
         <div className="text-sm text-text-primary">
-          {winner.username} remporte {winner.item_name}
+          <span className="text-neon-purple font-semibold">{winner.username}</span> remporte{' '}
+          <span className="text-neon-pink">{winner.item_name}</span>
         </div>
       </div>
     </div>

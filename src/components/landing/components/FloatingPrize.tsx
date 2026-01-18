@@ -89,7 +89,10 @@ export function FloatingPrize({
       style={{ perspective: '1000px' }}
     >
       {/* Glow effect behind */}
-      <div className="absolute inset-0 bg-neon-purple/20 rounded-full blur-3xl animate-pulse-slow" />
+      <div
+        className="absolute inset-0 bg-neon-purple/20 rounded-full blur-3xl animate-pulse-slow"
+        style={{ boxShadow: '0 0 60px rgba(155, 92, 255, 0.4)' }}
+      />
 
       {/* Main image container */}
       <div
@@ -122,12 +125,23 @@ export function FloatingPrize({
         </div>
 
         {/* Neon border glow */}
-        <div className="absolute inset-0 rounded-2xl border-2 border-neon-purple/50 animate-glow" />
+        <div
+          className="absolute inset-0 rounded-2xl border-2 border-neon-purple/50 animate-glow"
+          style={{ boxShadow: '0 0 20px rgba(155, 92, 255, 0.3), inset 0 0 20px rgba(155, 92, 255, 0.05)' }}
+        />
       </div>
 
       {/* Price tag */}
-      <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 px-4 py-2 bg-bg-secondary border border-neon-pink/50 rounded-full shadow-neon-pink">
-        <span className="text-neon-pink font-bold text-lg">{value.toLocaleString()} EUR</span>
+      <div
+        className="absolute -bottom-4 left-1/2 -translate-x-1/2 px-4 py-2 bg-bg-secondary border border-neon-pink/50 rounded-full"
+        style={{ boxShadow: '0 0 20px rgba(255, 79, 216, 0.4)' }}
+      >
+        <span
+          className="text-neon-pink font-bold text-lg"
+          style={{ textShadow: '0 0 10px rgba(255, 79, 216, 0.6)' }}
+        >
+          {value.toLocaleString()} EUR
+        </span>
       </div>
     </div>
   )

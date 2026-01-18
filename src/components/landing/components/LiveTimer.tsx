@@ -103,11 +103,11 @@ export function LiveTimer({
   const isEnded = timeLeft <= 0
 
   const getTimerStyles = () => {
-    if (isEnded) return 'text-text-secondary'
-    if (isCritical) return 'text-danger neon-text-danger'
-    if (isWarning) return 'text-warning timer-warning'
-    if (isUrgent) return 'text-danger neon-text-danger animate-pulse'
-    return 'text-neon-blue neon-text-blue'
+    if (isEnded) return { className: 'text-text-secondary', shadow: 'none' }
+    if (isCritical) return { className: 'text-danger', shadow: '0 0 30px rgba(239, 68, 68, 0.8), 0 0 60px rgba(239, 68, 68, 0.4)' }
+    if (isWarning) return { className: 'text-warning', shadow: '0 0 20px rgba(234, 179, 8, 0.6)' }
+    if (isUrgent) return { className: 'text-danger animate-pulse', shadow: '0 0 25px rgba(239, 68, 68, 0.6)' }
+    return { className: 'text-neon-blue', shadow: '0 0 20px rgba(60, 203, 255, 0.5)' }
   }
 
   const getLabel = () => {
@@ -130,7 +130,8 @@ export function LiveTimer({
       )}
       <div
         ref={timerRef}
-        className={`font-mono font-bold transition-all ${sizeStyles[size]} ${getTimerStyles()}`}
+        className={`font-mono font-bold transition-all ${sizeStyles[size]} ${getTimerStyles().className}`}
+        style={{ textShadow: getTimerStyles().shadow }}
       >
         {formatTime(timeLeft)}
       </div>

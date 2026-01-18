@@ -120,7 +120,10 @@ export function LiveGameSection({ game }: LiveGameSectionProps) {
         {/* Main game display */}
         <div className="max-w-2xl mx-auto">
           {/* Timer */}
-          <div className="glass rounded-3xl p-8 md:p-12 text-center mb-8">
+          <div
+            className="glass rounded-3xl p-8 md:p-12 text-center mb-8"
+            style={{ boxShadow: isUrgent ? '0 0 40px rgba(239, 68, 68, 0.2)' : '0 0 30px rgba(155, 92, 255, 0.15)' }}
+          >
             <LiveTimer
               endTime={displayGame.end_time}
               size="xl"
@@ -132,13 +135,22 @@ export function LiveGameSection({ game }: LiveGameSectionProps) {
               <div className="mt-8 pt-6 border-t border-bg-tertiary">
                 <div className="text-sm text-text-secondary mb-2">Dernier clic par</div>
                 <div className="flex items-center justify-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-neon-purple to-neon-pink flex items-center justify-center text-white font-bold">
+                  <div
+                    className="w-10 h-10 rounded-full bg-gradient-to-br from-neon-purple to-neon-pink flex items-center justify-center text-white font-bold"
+                    style={{ boxShadow: '0 0 15px rgba(155, 92, 255, 0.5)' }}
+                  >
                     {displayGame.last_click_username.charAt(0).toUpperCase()}
                   </div>
-                  <span className="text-xl font-bold text-neon-purple">
+                  <span
+                    className="text-xl font-bold text-neon-purple"
+                    style={{ textShadow: '0 0 15px rgba(155, 92, 255, 0.5)' }}
+                  >
                     {displayGame.last_click_username}
                   </span>
-                  <span className="px-2 py-1 bg-success/20 text-success text-xs rounded-full">
+                  <span
+                    className="px-2 py-1 bg-success/20 text-success text-xs rounded-full font-bold"
+                    style={{ boxShadow: '0 0 10px rgba(0, 255, 136, 0.3)' }}
+                  >
                     Leader
                   </span>
                 </div>
@@ -148,13 +160,19 @@ export function LiveGameSection({ game }: LiveGameSectionProps) {
             {/* Stats */}
             <div className="mt-6 flex justify-center gap-8">
               <div className="text-center">
-                <div className="text-2xl font-bold text-neon-blue">
+                <div
+                  className="text-2xl font-bold text-neon-blue"
+                  style={{ textShadow: '0 0 15px rgba(60, 203, 255, 0.5)' }}
+                >
                   {displayGame.total_clicks.toLocaleString()}
                 </div>
                 <div className="text-xs text-text-secondary">Clics totaux</div>
               </div>
               <div className="text-center">
-                <div className={`text-2xl font-bold ${isUrgent ? 'text-danger' : 'text-neon-purple'}`}>
+                <div
+                  className={`text-2xl font-bold ${isUrgent ? 'text-danger' : 'text-neon-purple'}`}
+                  style={{ textShadow: isUrgent ? '0 0 15px rgba(239, 68, 68, 0.6)' : '0 0 15px rgba(155, 92, 255, 0.5)' }}
+                >
                   {displayGame.status === 'final_phase' ? 'FINALE' : displayGame.status.toUpperCase()}
                 </div>
                 <div className="text-xs text-text-secondary">Phase</div>
