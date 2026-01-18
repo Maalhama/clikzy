@@ -1065,22 +1065,29 @@ body {
   animation: marquee 15s linear infinite;
 }
 
-/* Infinite seamless marquee - uses two identical containers side by side */
-@keyframes marquee-infinite {
+/* Winners marquee - infinite scroll */
+.winners-marquee-track {
+  display: flex;
+  width: max-content;
+  animation: scroll-left 40s linear infinite;
+}
+
+.winners-marquee-track:hover {
+  animation-play-state: paused;
+}
+
+.winners-marquee-content {
+  display: flex;
+  gap: 1rem;
+  flex-shrink: 0;
+  padding-right: 1rem;
+}
+
+@keyframes scroll-left {
   0% {
     transform: translateX(0);
   }
   100% {
     transform: translateX(-50%);
   }
-}
-
-.animate-marquee-infinite {
-  display: flex;
-  width: fit-content;
-  animation: marquee-infinite 30s linear infinite;
-}
-
-.animate-marquee-infinite:hover {
-  animation-play-state: paused;
 }

@@ -76,61 +76,29 @@ interface LandingClientProps {
 // Winner Card Component for marquee
 function WinnerCard({ winner }: { winner: Winner }) {
   return (
-    <div className="winner-item group relative overflow-hidden rounded-2xl transition-all duration-300 flex-shrink-0 w-[280px]">
-      {/* Card background */}
-      <div className="absolute inset-0 backdrop-blur-sm bg-gradient-to-br from-bg-secondary/80 to-bg-secondary/60" />
+    <div className="w-[280px] min-h-[180px] p-5 rounded-2xl bg-bg-secondary/80 border border-white/10 hover:border-success/50 transition-colors">
+      {/* Time badge */}
+      <div className="inline-flex items-center gap-1.5 px-2 py-1 rounded-full bg-white/5 border border-white/10 mb-3 text-xs">
+        <span className="w-1.5 h-1.5 rounded-full bg-success animate-pulse" />
+        <span className="text-white/50">À l'instant</span>
+      </div>
 
-      {/* Border */}
-      <div className="absolute inset-0 rounded-2xl border border-white/10 group-hover:border-success/50 transition-colors duration-300" />
-
-      {/* Content */}
-      <div className="relative p-5">
-        {/* Time badge */}
-        <div className="inline-flex items-center gap-1.5 px-2 py-1 rounded-full bg-white/5 border border-white/10 mb-3 text-xs">
-          <span className="w-1.5 h-1.5 rounded-full bg-success animate-pulse" />
-          <span className="text-white/50">À l'instant</span>
+      {/* Avatar & Username */}
+      <div className="flex items-center gap-3 mb-3">
+        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-neon-purple to-neon-pink flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+          {winner.username.charAt(0).toUpperCase()}
         </div>
-
-        {/* Avatar & Username */}
-        <div className="flex items-center gap-3 mb-3">
-          <div
-            className="w-11 h-11 rounded-full bg-gradient-to-br from-neon-purple to-neon-pink flex items-center justify-center text-white font-bold text-sm flex-shrink-0"
-            style={{ boxShadow: '0 0 15px rgba(155, 92, 255, 0.4)' }}
-          >
-            {winner.username.charAt(0).toUpperCase()}
-          </div>
-          <div>
-            <div className="font-bold text-white text-sm">
-              {winner.username}
-            </div>
-            <div className="text-xs text-success font-medium">vient de remporter</div>
-          </div>
-        </div>
-
-        {/* Item won */}
         <div>
-          <div className="font-bold text-white text-lg mb-1 truncate">
-            {winner.item_name}
-          </div>
-          <div
-            className="font-black text-2xl"
-            style={{
-              background: 'linear-gradient(135deg, #00FF88 0%, #3CCBFF 100%)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              filter: 'drop-shadow(0 0 15px rgba(0, 255, 136, 0.4))',
-            }}
-          >
-            {winner.item_value.toLocaleString()}€
-          </div>
+          <div className="font-bold text-white text-sm">{winner.username}</div>
+          <div className="text-xs text-success font-medium">vient de remporter</div>
         </div>
       </div>
 
-      {/* Hover glow */}
-      <div
-        className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
-        style={{ boxShadow: 'inset 0 0 30px rgba(0, 255, 136, 0.15)' }}
-      />
+      {/* Item won */}
+      <div>
+        <div className="font-bold text-white text-base mb-1 truncate">{winner.item_name}</div>
+        <div className="font-black text-2xl text-success">{winner.item_value.toLocaleString()}€</div>
+      </div>
     </div>
   )
 }
@@ -741,9 +709,9 @@ export function LandingClient({
 
             {/* Scrolling container */}
             <div className="overflow-hidden">
-              <div className="flex animate-marquee-infinite hover:[animation-play-state:paused]">
-                {/* First set of cards */}
-                <div className="flex gap-4 pr-4">
+              <div className="winners-marquee-track">
+                {/* First set */}
+                <div className="winners-marquee-content">
                   {(recentWinners.length > 0 ? recentWinners : [
                     { id: '1', username: 'Alex42', item_name: 'iPhone 15 Pro', item_value: 1299, won_at: new Date().toISOString() },
                     { id: '2', username: 'GamerPro', item_name: 'PS5', item_value: 549, won_at: new Date().toISOString() },
@@ -757,8 +725,8 @@ export function LandingClient({
                     <WinnerCard key={winner.id} winner={winner} />
                   ))}
                 </div>
-                {/* Duplicate set for seamless loop */}
-                <div className="flex gap-4 pr-4">
+                {/* Duplicate set */}
+                <div className="winners-marquee-content">
                   {(recentWinners.length > 0 ? recentWinners : [
                     { id: '1', username: 'Alex42', item_name: 'iPhone 15 Pro', item_value: 1299, won_at: new Date().toISOString() },
                     { id: '2', username: 'GamerPro', item_name: 'PS5', item_value: 549, won_at: new Date().toISOString() },
