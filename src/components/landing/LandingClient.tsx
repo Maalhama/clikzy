@@ -325,17 +325,41 @@ export function LandingClient({
             </div>
 
             {/* Stats */}
-            <div className="hero-stats flex gap-8">
-              <div className="stat-box">
-                <div className="text-3xl font-black text-neon-blue">{stats.totalWinningsValue.toLocaleString()}€</div>
+            <div className="hero-stats flex gap-6">
+              <div
+                className="stat-box p-4 rounded-xl bg-bg-secondary/40 border border-neon-blue/20 backdrop-blur-sm"
+                style={{ boxShadow: '0 0 20px rgba(60, 203, 255, 0.1)' }}
+              >
+                <div
+                  className="text-3xl font-black text-neon-blue"
+                  style={{ textShadow: '0 0 20px rgba(60, 203, 255, 0.5)' }}
+                >
+                  {stats.totalWinningsValue.toLocaleString()}€
+                </div>
                 <div className="text-xs text-white/40 uppercase tracking-wider">De gains distribues</div>
               </div>
-              <div className="stat-box">
-                <div className="text-3xl font-black text-neon-purple">{stats.totalGames}+</div>
+              <div
+                className="stat-box p-4 rounded-xl bg-bg-secondary/40 border border-neon-purple/20 backdrop-blur-sm"
+                style={{ boxShadow: '0 0 20px rgba(155, 92, 255, 0.1)' }}
+              >
+                <div
+                  className="text-3xl font-black text-neon-purple"
+                  style={{ textShadow: '0 0 20px rgba(155, 92, 255, 0.5)' }}
+                >
+                  {stats.totalGames}+
+                </div>
                 <div className="text-xs text-white/40 uppercase tracking-wider">Lots remportes</div>
               </div>
-              <div className="stat-box">
-                <div className="text-3xl font-black text-white">10</div>
+              <div
+                className="stat-box p-4 rounded-xl bg-bg-secondary/40 border border-neon-pink/20 backdrop-blur-sm"
+                style={{ boxShadow: '0 0 20px rgba(255, 79, 216, 0.1)' }}
+              >
+                <div
+                  className="text-3xl font-black text-neon-pink"
+                  style={{ textShadow: '0 0 20px rgba(255, 79, 216, 0.5)' }}
+                >
+                  10
+                </div>
                 <div className="text-xs text-white/40 uppercase tracking-wider">Credits offerts</div>
               </div>
             </div>
@@ -504,23 +528,31 @@ export function LandingClient({
       </section>
 
       {/* STATS SECTION */}
-      <section className="relative py-16 overflow-hidden">
+      <section className="relative py-20 overflow-hidden">
         {/* Background gradient */}
         <div className="absolute inset-0 bg-gradient-to-b from-neon-blue/5 via-transparent to-neon-purple/5" />
 
-        {/* Floating particles */}
+        {/* Glow orbs */}
         <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-10 left-[10%] w-2 h-2 rounded-full bg-neon-purple/40 animate-float" style={{ animationDelay: '0s' }} />
-          <div className="absolute top-20 right-[15%] w-3 h-3 rounded-full bg-neon-blue/30 animate-float" style={{ animationDelay: '1s' }} />
-          <div className="absolute bottom-20 left-[20%] w-2 h-2 rounded-full bg-neon-pink/40 animate-float" style={{ animationDelay: '2s' }} />
-          <div className="absolute bottom-10 right-[25%] w-2 h-2 rounded-full bg-neon-purple/30 animate-float" style={{ animationDelay: '0.5s' }} />
+          <div className="absolute top-1/2 left-1/4 w-[300px] h-[300px] bg-neon-purple/10 rounded-full blur-[100px]" />
+          <div className="absolute top-1/2 right-1/4 w-[300px] h-[300px] bg-neon-blue/10 rounded-full blur-[100px]" />
+        </div>
+
+        {/* Floating particles with glow */}
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-10 left-[10%] w-2 h-2 rounded-full bg-neon-purple animate-float" style={{ animationDelay: '0s', boxShadow: '0 0 10px rgba(155, 92, 255, 0.8)' }} />
+          <div className="absolute top-20 right-[15%] w-3 h-3 rounded-full bg-neon-blue animate-float" style={{ animationDelay: '1s', boxShadow: '0 0 12px rgba(60, 203, 255, 0.8)' }} />
+          <div className="absolute bottom-20 left-[20%] w-2 h-2 rounded-full bg-neon-pink animate-float" style={{ animationDelay: '2s', boxShadow: '0 0 10px rgba(255, 79, 216, 0.8)' }} />
+          <div className="absolute bottom-10 right-[25%] w-2 h-2 rounded-full bg-neon-purple animate-float" style={{ animationDelay: '0.5s', boxShadow: '0 0 10px rgba(155, 92, 255, 0.8)' }} />
+          <div className="absolute top-1/3 left-[5%] w-1.5 h-1.5 rounded-full bg-success animate-float" style={{ animationDelay: '1.5s', boxShadow: '0 0 8px rgba(0, 255, 136, 0.8)' }} />
+          <div className="absolute bottom-1/3 right-[8%] w-2 h-2 rounded-full bg-neon-pink animate-float" style={{ animationDelay: '2.5s', boxShadow: '0 0 10px rgba(255, 79, 216, 0.8)' }} />
         </div>
 
         <div className="relative max-w-7xl mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-black mb-4">
-              <span className="text-neon-purple neon-text">CLIK</span>
-              <span className="text-neon-pink neon-text-pink">ZY</span>
+              <span className="text-neon-purple" style={{ textShadow: '0 0 30px rgba(155, 92, 255, 0.5)' }}>CLIK</span>
+              <span className="text-neon-pink" style={{ textShadow: '0 0 30px rgba(255, 79, 216, 0.5)' }}>ZY</span>
               <span className="text-white"> EN CHIFFRES</span>
             </h2>
             <p className="text-white/50 text-lg">Une communauté active et des gains réels</p>
@@ -534,12 +566,30 @@ export function LandingClient({
       </section>
 
       {/* PRIZES SHOWCASE */}
-      <section id="lots" className="relative py-16 overflow-hidden">
+      <section id="lots" className="relative py-20 overflow-hidden">
+        {/* Background effects */}
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-neon-pink/5 to-transparent" />
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-neon-pink/10 rounded-full blur-[150px]" />
+        </div>
+
         <div className="relative max-w-7xl mx-auto px-6">
           <div className="text-center mb-16">
+            <div
+              className="inline-flex items-center gap-2 px-3 py-1.5 bg-neon-pink/10 border border-neon-pink/30 rounded-full text-neon-pink text-sm font-medium mb-4"
+              style={{ boxShadow: '0 0 20px rgba(255, 79, 216, 0.2)' }}
+            >
+              <span className="text-lg">🎁</span>
+              Premium
+            </div>
             <h2 className="text-4xl md:text-5xl font-black mb-4">
-              LOTS <span className="text-neon-pink neon-text-pink">À REMPORTER</span>
+              LOTS{' '}
+              <span
+                className="text-neon-pink"
+                style={{ textShadow: '0 0 40px rgba(255, 79, 216, 0.5)' }}
+              >
+                À REMPORTER
+              </span>
             </h2>
             <p className="text-white/50 text-lg">Des produits premium à remporter quotidiennement</p>
           </div>
@@ -557,61 +607,177 @@ export function LandingClient({
         </div>
       </section>
 
-      {/* WINNERS SECTION */}
-      <section className="winners-section relative py-20">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
-            {/* Left - Stats */}
-            <div>
-              <h2 className="text-4xl md:text-5xl font-black mb-6">
-                DERNIERS <span className="text-neon-blue">GAGNANTS</span>
-              </h2>
-              <p className="text-white/50 text-lg mb-12 max-w-md">
-                Des gagnants remportent des objets chaque jour. Consulte les gains en temps reel.
-              </p>
+      {/* WINNERS SECTION - Modern Design */}
+      <section id="winners" className="winners-section relative py-24 overflow-hidden">
+        {/* Background glow */}
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-success/5 rounded-full blur-[120px]" />
+        </div>
 
-              <div className="grid grid-cols-2 gap-6">
-                <div className="p-6 bg-white/5 border border-white/10 clip-angle">
-                  <div className="text-4xl font-black text-neon-purple mb-1">
-                    {stats.totalWinningsValue.toLocaleString()}€
-                  </div>
-                  <div className="text-sm text-white/40 uppercase">Total distribue</div>
-                </div>
-                <div className="p-6 bg-white/5 border border-white/10 clip-angle">
-                  <div className="text-4xl font-black text-neon-blue mb-1">
-                    {(recentWinners.length || 4) * 100}+
-                  </div>
-                  <div className="text-sm text-white/40 uppercase">Gagnants</div>
-                </div>
+        <div className="relative max-w-7xl mx-auto px-6">
+          {/* Header row */}
+          <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6 mb-12">
+            <div>
+              <div
+                className="inline-flex items-center gap-2 px-3 py-1.5 bg-success/10 border border-success/30 rounded-full text-success text-sm font-medium mb-4"
+                style={{ boxShadow: '0 0 20px rgba(0, 255, 136, 0.2)' }}
+              >
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-success opacity-75" />
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-success" />
+                </span>
+                Live
               </div>
+              <h2 className="text-4xl md:text-5xl lg:text-6xl font-black">
+                DERNIERS{' '}
+                <span
+                  className="text-success"
+                  style={{ textShadow: '0 0 40px rgba(0, 255, 136, 0.5)' }}
+                >
+                  GAGNANTS
+                </span>
+              </h2>
+              <p className="text-white/50 mt-3 max-w-md">
+                Des gagnants remportent des objets chaque jour. Consulte les gains en temps réel.
+              </p>
             </div>
 
-            {/* Right - Winners feed */}
-            <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-r from-bg-primary via-transparent to-bg-primary z-10 pointer-events-none" />
-              <div className="space-y-4 max-h-[400px] overflow-hidden">
-                {(recentWinners.length > 0 ? recentWinners : [
-                  { id: '1', username: 'Alex42', item_name: 'iPhone 15 Pro', item_value: 1299, won_at: new Date().toISOString() },
-                  { id: '2', username: 'GamerPro', item_name: 'PS5', item_value: 549, won_at: new Date().toISOString() },
-                  { id: '3', username: 'LuckyOne', item_name: 'AirPods Pro', item_value: 279, won_at: new Date().toISOString() },
-                  { id: '4', username: 'WinnerX', item_name: 'Nintendo Switch', item_value: 329, won_at: new Date().toISOString() },
-                ]).map((winner) => (
-                  <div
-                    key={winner.id}
-                    className="winner-item flex items-center gap-4 p-4 bg-white/5 border border-white/10 clip-angle-sm"
-                  >
-                    <div className="w-12 h-12 rounded bg-gradient-to-br from-neon-purple to-neon-pink flex items-center justify-center text-white font-bold">
+            {/* Stats badges */}
+            <div className="flex gap-4">
+              <div
+                className="flex flex-col items-center justify-center px-6 py-4 rounded-2xl bg-bg-secondary/60 border border-neon-purple/30 backdrop-blur-sm"
+                style={{ boxShadow: '0 0 25px rgba(155, 92, 255, 0.15)' }}
+              >
+                <span
+                  className="text-2xl md:text-3xl font-black text-neon-purple"
+                  style={{ textShadow: '0 0 20px rgba(155, 92, 255, 0.5)' }}
+                >
+                  {stats.totalWinningsValue.toLocaleString()}€
+                </span>
+                <span className="text-xs text-white/40 uppercase tracking-wider mt-1">Total distribué</span>
+              </div>
+              <div
+                className="flex flex-col items-center justify-center px-6 py-4 rounded-2xl bg-bg-secondary/60 border border-success/30 backdrop-blur-sm"
+                style={{ boxShadow: '0 0 25px rgba(0, 255, 136, 0.15)' }}
+              >
+                <span
+                  className="text-2xl md:text-3xl font-black text-success"
+                  style={{ textShadow: '0 0 20px rgba(0, 255, 136, 0.5)' }}
+                >
+                  {stats.totalGames}+
+                </span>
+                <span className="text-xs text-white/40 uppercase tracking-wider mt-1">Gagnants</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Winners Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+            {(recentWinners.length > 0 ? recentWinners.slice(0, 5) : [
+              { id: '1', username: 'Alex42', item_name: 'iPhone 15 Pro', item_value: 1299, won_at: new Date().toISOString() },
+              { id: '2', username: 'GamerPro', item_name: 'PS5', item_value: 549, won_at: new Date().toISOString() },
+              { id: '3', username: 'LuckyOne', item_name: 'AirPods Pro', item_value: 279, won_at: new Date().toISOString() },
+              { id: '4', username: 'WinnerX', item_name: 'Nintendo Switch', item_value: 329, won_at: new Date().toISOString() },
+              { id: '5', username: 'ProPlayer', item_name: 'MacBook Air', item_value: 1199, won_at: new Date().toISOString() },
+            ]).map((winner, index) => (
+              <div
+                key={winner.id}
+                className={`winner-item group relative overflow-hidden rounded-2xl transition-all duration-300 hover:scale-[1.02] ${
+                  index === 0 ? 'md:col-span-2 lg:col-span-2 lg:row-span-2' : ''
+                }`}
+              >
+                {/* Card background */}
+                <div
+                  className={`absolute inset-0 backdrop-blur-sm ${
+                    index === 0
+                      ? 'bg-gradient-to-br from-success/20 via-bg-secondary/80 to-bg-secondary/90'
+                      : 'bg-gradient-to-br from-bg-secondary/80 to-bg-secondary/60'
+                  }`}
+                />
+
+                {/* Border */}
+                <div
+                  className={`absolute inset-0 rounded-2xl border ${
+                    index === 0 ? 'border-success/40' : 'border-white/10'
+                  } group-hover:border-success/50 transition-colors duration-300`}
+                />
+
+                {/* Content */}
+                <div className={`relative ${index === 0 ? 'p-6 md:p-8' : 'p-4'}`}>
+                  {/* Time badge */}
+                  <div className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-full bg-white/5 border border-white/10 mb-3 ${index === 0 ? 'text-sm' : 'text-xs'}`}>
+                    <span className="w-1.5 h-1.5 rounded-full bg-success animate-pulse" />
+                    <span className="text-white/50">À l'instant</span>
+                  </div>
+
+                  {/* Avatar & Username */}
+                  <div className={`flex items-center gap-3 ${index === 0 ? 'mb-4' : 'mb-2'}`}>
+                    <div
+                      className={`rounded-full bg-gradient-to-br from-neon-purple to-neon-pink flex items-center justify-center text-white font-bold flex-shrink-0 ${
+                        index === 0 ? 'w-14 h-14 text-xl' : 'w-10 h-10 text-sm'
+                      }`}
+                      style={{ boxShadow: index === 0 ? '0 0 25px rgba(155, 92, 255, 0.5)' : '0 0 15px rgba(155, 92, 255, 0.3)' }}
+                    >
                       {winner.username.charAt(0).toUpperCase()}
                     </div>
-                    <div className="flex-1">
-                      <div className="font-bold">{winner.username}</div>
-                      <div className="text-sm text-white/40">vient de remporter {winner.item_name}</div>
+                    <div>
+                      <div className={`font-bold text-white ${index === 0 ? 'text-lg' : 'text-sm'}`}>
+                        {winner.username}
+                      </div>
+                      <div className="text-xs text-success font-medium">vient de remporter</div>
                     </div>
-                    <div className="text-neon-blue font-bold">{winner.item_value}€</div>
                   </div>
-                ))}
+
+                  {/* Item won */}
+                  <div>
+                    <div className={`font-bold text-white ${index === 0 ? 'text-2xl md:text-3xl mb-2' : 'text-base mb-1'}`}>
+                      {winner.item_name}
+                    </div>
+                    <div
+                      className={`font-black ${index === 0 ? 'text-3xl md:text-4xl' : 'text-xl'}`}
+                      style={{
+                        background: 'linear-gradient(135deg, #00FF88 0%, #3CCBFF 100%)',
+                        WebkitBackgroundClip: 'text',
+                        WebkitTextFillColor: 'transparent',
+                        filter: 'drop-shadow(0 0 20px rgba(0, 255, 136, 0.4))',
+                      }}
+                    >
+                      {winner.item_value.toLocaleString()}€
+                    </div>
+                  </div>
+
+                  {/* Featured badge for first card */}
+                  {index === 0 && (
+                    <>
+                      <div className="absolute top-4 right-4 px-3 py-1 bg-success/20 border border-success/40 rounded-full text-success text-xs font-bold">
+                        RÉCENT
+                      </div>
+                      <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-success/10 rounded-full blur-3xl" />
+                    </>
+                  )}
+                </div>
+
+                {/* Hover glow */}
+                <div
+                  className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+                  style={{ boxShadow: 'inset 0 0 30px rgba(0, 255, 136, 0.1)' }}
+                />
               </div>
-            </div>
+            ))}
+          </div>
+
+          {/* CTA */}
+          <div className="mt-10 text-center">
+            <Link
+              href="/lobby"
+              className="inline-flex items-center gap-2 px-6 py-3 text-sm font-semibold text-success border border-success/30 rounded-full hover:bg-success/10 hover:border-success/50 transition-all duration-300"
+              style={{ boxShadow: '0 0 20px rgba(0, 255, 136, 0.1)' }}
+            >
+              Voir tous les gagnants
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
+            </Link>
           </div>
         </div>
       </section>
@@ -624,14 +790,19 @@ export function LandingClient({
       </section>
 
       {/* FINAL CTA */}
-      <section className="final-cta relative py-20">
+      <section className="final-cta relative py-24 overflow-hidden">
+        {/* Background effects */}
         <div className="absolute inset-0">
-          <div className="absolute inset-0 bg-gradient-to-t from-neon-purple/20 to-transparent" />
-          <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-neon-purple to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-neon-purple/20 via-transparent to-transparent" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-neon-purple/10 rounded-full blur-[150px]" />
+          <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-neon-purple to-transparent" style={{ boxShadow: '0 0 20px rgba(155, 92, 255, 0.5)' }} />
         </div>
 
         <div className="relative max-w-4xl mx-auto px-6 text-center final-cta-content">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-neon-blue/10 border border-neon-blue/30 rounded mb-8 clip-angle-sm">
+          <div
+            className="inline-flex items-center gap-2 px-4 py-2 bg-neon-blue/10 border border-neon-blue/30 rounded-full mb-8"
+            style={{ boxShadow: '0 0 20px rgba(60, 203, 255, 0.2)' }}
+          >
             <span className="text-neon-blue text-sm font-bold flex items-center gap-2">
               <GiftIcon className="w-5 h-5" />
               OFFRE DE BIENVENUE
@@ -639,59 +810,78 @@ export function LandingClient({
           </div>
 
           <h2 className="text-4xl md:text-6xl lg:text-7xl font-black mb-6">
-            PRET A <span className="text-neon-purple">GAGNER</span> ?
+            PRET A{' '}
+            <span
+              className="text-neon-purple"
+              style={{ textShadow: '0 0 50px rgba(155, 92, 255, 0.6)' }}
+            >
+              GAGNER
+            </span>{' '}
+            ?
           </h2>
 
           <p className="text-xl text-white/50 mb-12 max-w-2xl mx-auto">
-            Inscris-toi maintenant et recois <span className="text-white">10 credits offerts</span> pour tenter ta chance.
+            Inscris-toi maintenant et recois{' '}
+            <span
+              className="text-neon-pink font-bold"
+              style={{ textShadow: '0 0 15px rgba(255, 79, 216, 0.5)' }}
+            >
+              10 credits offerts
+            </span>{' '}
+            pour tenter ta chance.
           </p>
 
           <Link
             href={isLoggedIn ? '/lobby' : '/register'}
             className="gaming-btn-large inline-flex"
+            style={{ boxShadow: '0 0 30px rgba(155, 92, 255, 0.4)' }}
           >
             <span className="relative z-10">
               {isLoggedIn ? 'VOIR LES LOTS' : 'CREER MON COMPTE'}
             </span>
           </Link>
 
-          <div className="mt-12 flex justify-center gap-8 text-sm text-white/30">
-            <span className="flex items-center gap-2">
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-              </svg>
-              0€ pour s'inscrire
-            </span>
-            <span className="flex items-center gap-2">
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-              </svg>
-              100% legal
-            </span>
-            <span className="flex items-center gap-2">
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-              </svg>
-              Livraison gratuite
-            </span>
+          <div className="mt-12 flex flex-wrap justify-center gap-6 text-sm">
+            {[
+              { text: "0€ pour s'inscrire", color: 'success' },
+              { text: '100% legal', color: 'neon-blue' },
+              { text: 'Livraison gratuite', color: 'neon-pink' },
+            ].map((item, i) => (
+              <span
+                key={i}
+                className={`flex items-center gap-2 px-3 py-1.5 rounded-full bg-${item.color}/10 border border-${item.color}/30 text-${item.color}`}
+                style={{ boxShadow: `0 0 15px ${item.color === 'success' ? 'rgba(0, 255, 136, 0.15)' : item.color === 'neon-blue' ? 'rgba(60, 203, 255, 0.15)' : 'rgba(255, 79, 216, 0.15)'}` }}
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+                {item.text}
+              </span>
+            ))}
           </div>
         </div>
       </section>
 
       {/* FOOTER */}
       <footer className="relative border-t border-white/10 py-12">
+        {/* Subtle glow line */}
+        <div
+          className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-neon-purple/50 to-transparent"
+          style={{ boxShadow: '0 0 10px rgba(155, 92, 255, 0.3)' }}
+        />
+
         <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="text-2xl font-black">
-            <span className="text-neon-purple">CLIK</span>
-            <span className="text-neon-blue">ZY</span>
+            <span className="text-neon-purple" style={{ textShadow: '0 0 20px rgba(155, 92, 255, 0.4)' }}>CLIK</span>
+            <span className="text-neon-pink" style={{ textShadow: '0 0 20px rgba(255, 79, 216, 0.4)' }}>ZY</span>
           </div>
           <p className="text-white/30 text-sm">
-            © 2025 CLIKZY. Clique. Gagne. Repete.
+            © 2025 CLIKZY. Clique. Gagne. Répète.
           </p>
           <div className="flex gap-6 text-sm text-white/30">
-            <a href="#" className="hover:text-white transition-colors">CGU</a>
-            <a href="#" className="hover:text-white transition-colors">Confidentialite</a>
-            <a href="#" className="hover:text-white transition-colors">Contact</a>
+            <a href="#" className="hover:text-neon-purple transition-colors duration-300">CGU</a>
+            <a href="#" className="hover:text-neon-blue transition-colors duration-300">Confidentialité</a>
+            <a href="#" className="hover:text-neon-pink transition-colors duration-300">Contact</a>
           </div>
         </div>
       </footer>
