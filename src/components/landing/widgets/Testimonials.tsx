@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { FireIcon } from '@/components/ui/GamingIcons'
 
 interface Testimonial {
   id: string
@@ -23,7 +24,7 @@ const MOCK_TESTIMONIALS: Testimonial[] = [
   {
     id: '1',
     username: 'Alex42',
-    text: "J'y croyais pas trop au debut mais j'ai vraiment gagne un iPhone! La livraison a ete super rapide en plus.",
+    text: "Mon pote m'a dit 'c'est une arnaque'. 3 jours plus tard je deballais mon iPhone devant lui. Sa tete. 😂",
     itemWon: 'iPhone 15 Pro',
     rating: 5,
     date: 'Il y a 2 jours',
@@ -31,7 +32,7 @@ const MOCK_TESTIMONIALS: Testimonial[] = [
   {
     id: '2',
     username: 'GamerPro',
-    text: "Le concept est genial, c'est vraiment addictif. J'ai gagne ma PS5 apres seulement 3 parties!",
+    text: "J'ai clique a 0.3 secondes du timer. Mon coeur s'est arrete. Et la... GAGNE. PS5 gratuite frere.",
     itemWon: 'PlayStation 5',
     rating: 5,
     date: 'Il y a 1 semaine',
@@ -39,7 +40,7 @@ const MOCK_TESTIMONIALS: Testimonial[] = [
   {
     id: '3',
     username: 'LuckyOne',
-    text: "Site serieux et transparent. On voit les autres joueurs cliquer en temps reel, c'est excitant!",
+    text: "L'adrenaline quand t'es le dernier a cliquer et le timer descend... Y'a rien de comparable.",
     itemWon: 'AirPods Pro',
     rating: 5,
     date: 'Il y a 3 jours',
@@ -47,7 +48,7 @@ const MOCK_TESTIMONIALS: Testimonial[] = [
   {
     id: '4',
     username: 'WinnerX',
-    text: "Meilleur site du genre, j'ai deja gagne 2 fois. Le support est super reactif aussi.",
+    text: "2 gains en 1 semaine. Je sais pas comment c'est possible mais je me plains pas haha",
     itemWon: 'Nintendo Switch',
     rating: 5,
     date: 'Il y a 5 jours',
@@ -76,8 +77,8 @@ export function Testimonials({
       {/* Header */}
       <div className="p-6 border-b border-white/10">
         <div className="flex items-center gap-3">
-          <span className="text-2xl">⭐</span>
-          <h3 className="text-xl font-black uppercase tracking-wider">TEMOIGNAGES</h3>
+          <FireIcon className="w-7 h-7 text-neon-pink" />
+          <h3 className="text-xl font-black uppercase tracking-wider">ILS L'ONT FAIT</h3>
         </div>
       </div>
 
@@ -118,7 +119,7 @@ export function Testimonials({
               <div>
                 <div className="font-bold">{currentTestimonial.username}</div>
                 <div className="text-sm text-neon-blue">
-                  A gagne: {currentTestimonial.itemWon}
+                  A remporte: {currentTestimonial.itemWon}
                 </div>
                 <div className="text-xs text-white/40">{currentTestimonial.date}</div>
               </div>

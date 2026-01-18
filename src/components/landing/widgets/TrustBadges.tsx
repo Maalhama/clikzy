@@ -1,13 +1,15 @@
 'use client'
 
-import { useRef } from 'react'
+import { useRef, ComponentType } from 'react'
 import { useGSAP } from '@gsap/react'
 import { gsap } from '@/lib/gsap/gsapConfig'
+import { ShieldIcon, GiftIcon, LightningIcon, UsersIcon } from '@/components/ui/GamingIcons'
 
 interface Badge {
-  icon: string
+  Icon: ComponentType<{ className?: string }>
   title: string
   description: string
+  color: string
 }
 
 interface TrustBadgesProps {
@@ -17,24 +19,28 @@ interface TrustBadgesProps {
 
 const BADGES: Badge[] = [
   {
-    icon: '🔒',
-    title: 'Paiement securise',
-    description: 'SSL 256-bit & Stripe',
+    Icon: ShieldIcon,
+    title: 'Zero arnaque',
+    description: 'Paiement Stripe securise',
+    color: 'text-neon-purple',
   },
   {
-    icon: '📦',
-    title: 'Livraison garantie',
-    description: 'Objets neufs & authentiques',
+    Icon: GiftIcon,
+    title: 'Livraison offerte',
+    description: 'Neuf. Emballe. Chez toi.',
+    color: 'text-neon-blue',
   },
   {
-    icon: '⚡',
-    title: 'Temps reel',
-    description: 'Jeu 100% transparent',
+    Icon: LightningIcon,
+    title: '100% live',
+    description: 'Pas de triche possible',
+    color: 'text-neon-pink',
   },
   {
-    icon: '💬',
-    title: 'Support 24/7',
-    description: 'Equipe reactive',
+    Icon: UsersIcon,
+    title: 'On repond',
+    description: '24h/24 - 7j/7',
+    color: 'text-neon-purple',
   },
 ]
 
@@ -75,7 +81,9 @@ export function TrustBadges({ className = '', variant = 'horizontal' }: TrustBad
             key={index}
             className="trust-badge p-6 bg-bg-secondary/30 border border-white/10 rounded-xl text-center hover:border-neon-purple/30 transition-colors group"
           >
-            <div className="text-4xl mb-3 group-hover:scale-110 transition-transform">{badge.icon}</div>
+            <div className="mb-3 flex justify-center group-hover:scale-110 transition-transform">
+              <badge.Icon className={`w-10 h-10 ${badge.color}`} />
+            </div>
             <h4 className="font-bold text-sm mb-1">{badge.title}</h4>
             <p className="text-xs text-white/50">{badge.description}</p>
           </div>
@@ -94,7 +102,9 @@ export function TrustBadges({ className = '', variant = 'horizontal' }: TrustBad
           key={index}
           className="trust-badge flex items-center gap-3 group"
         >
-          <div className="text-2xl group-hover:scale-110 transition-transform">{badge.icon}</div>
+          <div className="group-hover:scale-110 transition-transform">
+            <badge.Icon className={`w-6 h-6 ${badge.color}`} />
+          </div>
           <div>
             <h4 className="font-bold text-sm">{badge.title}</h4>
             <p className="text-xs text-white/50">{badge.description}</p>

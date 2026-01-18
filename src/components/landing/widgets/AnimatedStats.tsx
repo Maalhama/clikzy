@@ -1,8 +1,9 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useRef, useState, ComponentType } from 'react'
 import { useGSAP } from '@gsap/react'
 import { gsap } from '@/lib/gsap/gsapConfig'
+import { CoinsIcon, GamepadIcon, UsersIcon } from '@/components/ui/GamingIcons'
 
 interface StatItem {
   value: number
@@ -10,7 +11,7 @@ interface StatItem {
   prefix?: string
   suffix?: string
   color: 'purple' | 'blue' | 'pink'
-  icon: string
+  Icon: ComponentType<{ className?: string }>
 }
 
 interface AnimatedStatsProps {
@@ -37,23 +38,23 @@ export function AnimatedStats({
   const stats: StatItem[] = [
     {
       value: totalWinnings,
-      label: 'Distribues',
+      label: 'Gagnes par des joueurs',
       suffix: '€',
       color: 'purple',
-      icon: '💰',
+      Icon: CoinsIcon,
     },
     {
       value: totalGames,
-      label: 'Parties jouees',
+      label: 'Objets distribues',
       suffix: '+',
       color: 'blue',
-      icon: '🎮',
+      Icon: GamepadIcon,
     },
     {
       value: playersOnline,
-      label: 'Joueurs en ligne',
+      label: 'Connectes maintenant',
       color: 'pink',
-      icon: '👥',
+      Icon: UsersIcon,
     },
   ]
 
@@ -189,10 +190,10 @@ export function AnimatedStats({
             <div className={`
               absolute top-4 right-4 w-12 h-12 rounded-lg
               ${colors.bg}
-              flex items-center justify-center text-2xl
+              flex items-center justify-center
               group-hover:scale-110 transition-transform
             `}>
-              {stat.icon}
+              <stat.Icon className={`w-6 h-6 ${colors.text}`} />
             </div>
 
             {/* Value */}

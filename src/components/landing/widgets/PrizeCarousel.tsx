@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
+import { GiftIcon } from '@/components/ui/GamingIcons'
 
 interface Prize {
   id: string
@@ -80,14 +81,14 @@ export function PrizeCarousel({
       <div className="p-6 border-b border-white/10">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <span className="text-2xl">🎁</span>
-            <h3 className="text-xl font-black uppercase tracking-wider">A GAGNER</h3>
+            <GiftIcon className="w-7 h-7 text-neon-purple" />
+            <h3 className="text-xl font-black uppercase tracking-wider">EN JEU MAINTENANT</h3>
           </div>
           <Link
             href="/lobby"
             className="text-sm text-neon-purple hover:text-neon-pink transition-colors font-medium"
           >
-            Voir tout →
+            Tout voir →
           </Link>
         </div>
       </div>
@@ -109,7 +110,7 @@ export function PrizeCarousel({
               <div className="relative w-full h-full bg-bg-primary/50 rounded-2xl overflow-hidden border border-white/10">
                 {imageErrors[currentPrize.id] ? (
                   <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-neon-purple/20 to-neon-blue/20">
-                    <span className="text-6xl">🎁</span>
+                    <GiftIcon className="w-16 h-16 text-neon-purple" />
                   </div>
                 ) : (
                   <Image
@@ -134,13 +135,13 @@ export function PrizeCarousel({
               <h4 className="text-2xl font-bold mb-2">{currentPrize.name}</h4>
               <div className="flex items-baseline gap-2 justify-center md:justify-start mb-4">
                 <span className="text-4xl font-black text-neon-blue">{currentPrize.value}€</span>
-                <span className="text-white/40 text-sm">valeur</span>
+                <span className="text-white/40 text-sm">a gagner</span>
               </div>
               <Link
                 href={`/game/${currentPrize.id}`}
                 className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-neon-purple to-neon-pink text-white font-bold clip-angle-sm hover:shadow-[0_0_30px_rgba(155,92,255,0.5)] transition-shadow"
               >
-                PARTICIPER
+                JE LE VEUX
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                 </svg>

@@ -3,12 +3,11 @@
 import { useState, useEffect, useCallback } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 
-interface ActivityNotification {
+interface WinNotification {
   id: string
-  type: 'click' | 'win' | 'join'
   username: string
-  item?: string
-  value?: number
+  item: string
+  value: number
   timestamp: number
 }
 
@@ -30,98 +29,61 @@ interface LiveActivityToastProps {
   maxVisible?: number
 }
 
-export function LiveActivityToast({ enabled = true, maxVisible = 3 }: LiveActivityToastProps) {
-  const [notifications, setNotifications] = useState<ActivityNotification[]>([])
+// Gaming trophy icon SVG
+function TrophyIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <path d="M6 9H4a2 2 0 01-2-2V5a2 2 0 012-2h2" strokeLinecap="round" />
+      <path d="M18 9h2a2 2 0 002-2V5a2 2 0 00-2-2h-2" strokeLinecap="round" />
+      <path d="M6 3h12v6a6 6 0 01-12 0V3z" />
+      <path d="M12 15v4" strokeLinecap="round" />
+      <path d="M8 21h8" strokeLinecap="round" />
+      <circle cx="12" cy="8" r="2" fill="currentColor" stroke="none" />
+    </svg>
+  )
+}
 
-  const addNotification = useCallback((notification: Omit<ActivityNotification, 'id' | 'timestamp'>) => {
+export function LiveActivityToast({ enabled = true, maxVisible = 3 }: LiveActivityToastProps) {
+  const [notifications, setNotifications] = useState<WinNotification[]>([])
+
+  const addWinNotification = useCallback(() => {
     const id = Math.random().toString(36).substring(7)
-    const newNotification: ActivityNotification = {
-      ...notification,
+    const username = MOCK_USERNAMES[Math.floor(Math.random() * MOCK_USERNAMES.length)]
+    const item = MOCK_ITEMS[Math.floor(Math.random() * MOCK_ITEMS.length)]
+
+    const newNotification: WinNotification = {
       id,
+      username,
+      item: item.name,
+      value: item.value,
       timestamp: Date.now(),
     }
 
     setNotifications(prev => [newNotification, ...prev].slice(0, maxVisible))
 
-    // Auto-remove after 4 seconds
+    // Auto-remove after 6 seconds
     setTimeout(() => {
       setNotifications(prev => prev.filter(n => n.id !== id))
-    }, 4000)
+    }, 6000)
   }, [maxVisible])
 
-  // Simulate random activity
+  // Show winners only, every ~15 seconds
   useEffect(() => {
     if (!enabled) return
 
-    const generateActivity = () => {
-      const rand = Math.random()
-      const username = MOCK_USERNAMES[Math.floor(Math.random() * MOCK_USERNAMES.length)]
+    // Initial notification after 3 seconds
+    const initialTimeout = setTimeout(addWinNotification, 3000)
 
-      if (rand < 0.7) {
-        // 70% clicks
-        addNotification({ type: 'click', username })
-      } else if (rand < 0.9) {
-        // 20% joins
-        addNotification({ type: 'join', username })
-      } else {
-        // 10% wins
-        const item = MOCK_ITEMS[Math.floor(Math.random() * MOCK_ITEMS.length)]
-        addNotification({ type: 'win', username, item: item.name, value: item.value })
-      }
-    }
-
-    // Initial delay
-    const initialTimeout = setTimeout(generateActivity, 2000)
-
-    // Random interval between 3-8 seconds
+    // Then every 15 seconds (with small variation)
     const interval = setInterval(() => {
-      generateActivity()
-    }, 3000 + Math.random() * 5000)
+      addWinNotification()
+    }, 15000)
 
     return () => {
       clearTimeout(initialTimeout)
       clearInterval(interval)
     }
-  }, [enabled, addNotification])
-
-  const getNotificationContent = (notification: ActivityNotification) => {
-    switch (notification.type) {
-      case 'click':
-        return (
-          <>
-            <span className="font-bold text-neon-purple">{notification.username}</span>
-            <span className="text-white/60"> vient de cliquer!</span>
-          </>
-        )
-      case 'win':
-        return (
-          <>
-            <span className="font-bold text-neon-pink">{notification.username}</span>
-            <span className="text-white/60"> a gagne </span>
-            <span className="font-bold text-neon-blue">{notification.item}</span>
-            <span className="text-neon-blue font-bold ml-1">({notification.value}€)</span>
-          </>
-        )
-      case 'join':
-        return (
-          <>
-            <span className="font-bold text-neon-blue">{notification.username}</span>
-            <span className="text-white/60"> a rejoint la partie</span>
-          </>
-        )
-    }
-  }
-
-  const getNotificationIcon = (type: ActivityNotification['type']) => {
-    switch (type) {
-      case 'click':
-        return '👆'
-      case 'win':
-        return '🏆'
-      case 'join':
-        return '🎮'
-    }
-  }
+  }, [enabled, addWinNotification])
 
   if (!enabled) return null
 
@@ -137,16 +99,13 @@ export function LiveActivityToast({ enabled = true, maxVisible = 3 }: LiveActivi
             transition={{ type: 'spring', stiffness: 500, damping: 30 }}
             className="pointer-events-auto"
           >
-            <div className={`
-              flex items-center gap-3 px-4 py-3
-              bg-bg-secondary/90 backdrop-blur-xl
-              border border-white/10
-              clip-angle-sm
-              ${notification.type === 'win' ? 'border-neon-pink/50 shadow-[0_0_20px_rgba(255,79,216,0.3)]' : ''}
-            `}>
-              <span className="text-xl">{getNotificationIcon(notification.type)}</span>
+            <div className="flex items-center gap-3 px-4 py-3 bg-bg-secondary/90 backdrop-blur-xl border border-neon-pink/50 shadow-[0_0_20px_rgba(255,79,216,0.3)] clip-angle-sm">
+              <TrophyIcon className="w-6 h-6 text-neon-pink" />
               <p className="text-sm">
-                {getNotificationContent(notification)}
+                <span className="font-bold text-neon-pink">{notification.username}</span>
+                <span className="text-white/60"> a gagné </span>
+                <span className="font-bold text-neon-blue">{notification.item}</span>
+                <span className="text-neon-blue font-bold ml-1">({notification.value}€)</span>
               </p>
             </div>
           </motion.div>

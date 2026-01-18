@@ -3,6 +3,7 @@
 import { useRef } from 'react'
 import { useGSAP } from '@gsap/react'
 import { gsap } from '@/lib/gsap/gsapConfig'
+import { CrownIcon } from '@/components/ui/GamingIcons'
 
 interface LeaderboardEntry {
   rank: number
@@ -29,7 +30,7 @@ const MOCK_LEADERBOARD: LeaderboardEntry[] = [
 
 export function Leaderboard({
   entries = MOCK_LEADERBOARD,
-  title = 'TOP GAGNANTS',
+  title = 'LES PLUS CHANCEUX',
   period = 'week',
   className = '',
 }: LeaderboardProps) {
@@ -113,7 +114,7 @@ export function Leaderboard({
       <div className="p-6 border-b border-white/10">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <span className="text-2xl">🏆</span>
+            <CrownIcon className="w-7 h-7 text-yellow-400" />
             <div>
               <h3 className="text-xl font-black uppercase tracking-wider">{title}</h3>
               <p className="text-xs text-white/50">{getPeriodLabel()}</p>
