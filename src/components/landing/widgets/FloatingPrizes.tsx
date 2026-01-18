@@ -116,98 +116,8 @@ export function FloatingPrizes() {
 
   return (
     <div ref={containerRef} className="relative w-full h-full min-h-[500px]">
-      {/* Geometric shapes background */}
-      <div className="absolute inset-0 overflow-hidden">
-        {/* Large rotating shape with glow */}
-        <div
-          className="absolute top-10 right-10 w-32 h-32 border-2 border-neon-purple/40 rounded-lg"
-          style={{
-            animation: 'spin 20s linear infinite',
-            boxShadow: '0 0 20px rgba(155, 92, 255, 0.2)',
-          }}
-        />
-
-        {/* Small squares with glow */}
-        <div
-          className="absolute top-1/4 left-0 w-16 h-16 border border-neon-blue/50 rotate-12"
-          style={{
-            animation: 'spin 15s linear infinite reverse',
-            boxShadow: '0 0 15px rgba(60, 203, 255, 0.2)',
-          }}
-        />
-        <div
-          className="absolute bottom-1/4 right-1/4 w-12 h-12 bg-neon-pink/10 border border-neon-pink/40"
-          style={{
-            animation: 'pulse 3s ease-in-out infinite',
-            boxShadow: '0 0 15px rgba(255, 79, 216, 0.2)',
-          }}
-        />
-
-        {/* Circles with glow */}
-        <div
-          className="absolute top-20 left-1/3 w-24 h-24 rounded-full border border-neon-purple/30"
-          style={{
-            animation: 'pulse 4s ease-in-out infinite',
-            boxShadow: '0 0 20px rgba(155, 92, 255, 0.15)',
-          }}
-        />
-        <div
-          className="absolute bottom-1/3 right-10 w-16 h-16 rounded-full border-2 border-dashed border-neon-blue/40"
-          style={{
-            animation: 'spin 25s linear infinite',
-            boxShadow: '0 0 15px rgba(60, 203, 255, 0.15)',
-          }}
-        />
-
-        {/* Glowing dots */}
-        <div className="absolute inset-0 opacity-30">
-          {Array.from({ length: 12 }).map((_, i) => (
-            <div
-              key={i}
-              className="absolute w-1.5 h-1.5 rounded-full"
-              style={{
-                left: `${10 + (i % 4) * 25}%`,
-                top: `${10 + Math.floor(i / 4) * 30}%`,
-                backgroundColor: i % 3 === 0 ? '#9B5CFF' : i % 3 === 1 ? '#3CCBFF' : '#FF4FD8',
-                boxShadow: `0 0 8px ${i % 3 === 0 ? '#9B5CFF' : i % 3 === 1 ? '#3CCBFF' : '#FF4FD8'}`,
-                animation: `pulse ${2 + (i % 3)}s ease-in-out infinite`,
-                animationDelay: `${i * 0.2}s`,
-              }}
-            />
-          ))}
-        </div>
-      </div>
-
-      {/* SVG connecting lines */}
-      <svg className="absolute inset-0 w-full h-full pointer-events-none" style={{ zIndex: 1 }}>
-        <defs>
-          <linearGradient id="lineGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#9B5CFF" stopOpacity="0.5" />
-            <stop offset="100%" stopColor="#3CCBFF" stopOpacity="0.5" />
-          </linearGradient>
-        </defs>
-        <path
-          className="connect-line"
-          d="M 50 100 Q 150 50, 250 150 T 450 100"
-          fill="none"
-          stroke="url(#lineGradient)"
-          strokeWidth="1"
-          strokeDasharray="500"
-          strokeDashoffset="500"
-        />
-        <path
-          className="connect-line"
-          d="M 100 300 Q 200 250, 300 350 T 500 300"
-          fill="none"
-          stroke="url(#lineGradient)"
-          strokeWidth="1"
-          strokeDasharray="500"
-          strokeDashoffset="500"
-        />
-      </svg>
-
       {/* Floating prize cards */}
-      <div className="relative z-10 grid grid-cols-3 gap-4 p-4">
+      <div className="relative grid grid-cols-3 gap-4 p-4">
         {PRIZES.map((prize, index) => {
           const colors = getColorStyles(prize.color)
           const isMain = index === 0
@@ -216,8 +126,7 @@ export function FloatingPrizes() {
               key={prize.id}
               className={`prize-float-card relative group ${isMain ? 'col-span-2 row-span-2' : ''}`}
               style={{
-                animation: isVisible ? `float-slow ${3 + (index % 3)}s ease-in-out infinite` : 'none',
-                animationDelay: `${index * 0.2}s`,
+                animation: isVisible ? `float-slow ${3 + (index % 3)}s ease-in-out ${index * 0.2}s infinite` : 'none',
                 opacity: isVisible ? 1 : 0,
                 transform: isVisible ? 'translateY(0)' : 'translateY(20px)',
                 transition: `opacity 0.5s ease ${index * 0.1}s, transform 0.5s ease ${index * 0.1}s`,
@@ -307,29 +216,6 @@ export function FloatingPrizes() {
                 </div>
               </div>
             </div>
-          )
-        })}
-      </div>
-
-      {/* Floating particles */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        {Array.from({ length: 15 }).map((_, i) => {
-          const left = ((i * 17 + 7) % 100)
-          const top = ((i * 23 + 11) % 100)
-          const delay = (i * 0.3) % 5
-          const duration = 3 + (i % 4)
-          return (
-            <div
-              key={i}
-              className="absolute w-1 h-1 rounded-full animate-float-particle"
-              style={{
-                left: `${left}%`,
-                top: `${top}%`,
-                backgroundColor: i % 3 === 0 ? '#9B5CFF' : i % 3 === 1 ? '#3CCBFF' : '#FF4FD8',
-                animationDelay: `${delay}s`,
-                animationDuration: `${duration}s`,
-              }}
-            />
           )
         })}
       </div>

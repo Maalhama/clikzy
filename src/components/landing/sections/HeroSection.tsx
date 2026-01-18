@@ -1,9 +1,6 @@
 'use client'
 
-import { useRef } from 'react'
 import Link from 'next/link'
-import { useGSAP } from '@gsap/react'
-import { gsap, ScrollTrigger } from '@/lib/gsap/gsapConfig'
 import { FloatingPrize } from '../components/FloatingPrize'
 import { PlayerCounter } from '../components/PlayerCounter'
 import { ScrollIndicator } from '../components/ScrollProgressBar'
@@ -23,98 +20,8 @@ export function HeroSection({
   playerCount,
   featuredItem,
 }: HeroSectionProps) {
-  const sectionRef = useRef<HTMLElement>(null)
-  const logoRef = useRef<HTMLHeadingElement>(null)
-  const taglineRef = useRef<HTMLParagraphElement>(null)
-  const ctaRef = useRef<HTMLDivElement>(null)
-  const badgeRef = useRef<HTMLDivElement>(null)
-  const prizeRef = useRef<HTMLDivElement>(null)
-
-  useGSAP(
-    () => {
-      if (!sectionRef.current) return
-
-      const ctx = gsap.context(() => {
-        const tl = gsap.timeline({ defaults: { ease: 'power3.out' } })
-
-        // Badge animation
-        if (badgeRef.current) {
-          tl.fromTo(
-            badgeRef.current,
-            { opacity: 0, y: -20, scale: 0.9 },
-            { opacity: 1, y: 0, scale: 1, duration: 0.6 }
-          )
-        }
-
-        // Headline letter by letter animation - dramatic reveal
-        if (logoRef.current) {
-          const letters = logoRef.current.querySelectorAll('.logo-letter')
-          tl.fromTo(
-            letters,
-            { opacity: 0, y: 80, rotateX: -90, scale: 0.5 },
-            {
-              opacity: 1,
-              y: 0,
-              rotateX: 0,
-              scale: 1,
-              duration: 0.6,
-              stagger: 0.04,
-              ease: 'back.out(1.7)',
-            },
-            '-=0.3'
-          )
-        }
-
-        // Tagline typewriter effect
-        if (taglineRef.current) {
-          tl.fromTo(
-            taglineRef.current,
-            { opacity: 0, y: 20 },
-            { opacity: 1, y: 0, duration: 0.6 },
-            '-=0.4'
-          )
-        }
-
-        // CTA buttons
-        if (ctaRef.current) {
-          const buttons = ctaRef.current.querySelectorAll('a')
-          tl.fromTo(
-            buttons,
-            { opacity: 0, y: 30 },
-            { opacity: 1, y: 0, duration: 0.5, stagger: 0.15 },
-            '-=0.2'
-          )
-        }
-
-        // Prize reveal
-        if (prizeRef.current) {
-          tl.fromTo(
-            prizeRef.current,
-            { opacity: 0, scale: 0.8, rotateY: -30 },
-            { opacity: 1, scale: 1, rotateY: 0, duration: 1, ease: 'back.out(1.7)' },
-            '-=0.5'
-          )
-        }
-
-        // Pin section on scroll (optional - disabled on mobile)
-        if (window.innerWidth >= 768) {
-          ScrollTrigger.create({
-            trigger: sectionRef.current,
-            start: 'top top',
-            end: '+=50%',
-            pin: false,
-          })
-        }
-      }, sectionRef)
-
-      return () => ctx.revert()
-    },
-    { scope: sectionRef }
-  )
-
   return (
     <section
-      ref={sectionRef}
       className="relative min-h-screen flex flex-col items-center justify-center text-center px-6 pt-24 pb-16 md:pt-32 md:pb-24"
     >
       {/* Player count badge */}
@@ -123,51 +30,26 @@ export function HeroSection({
       </div>
 
       {/* Badge */}
-      <div
-        ref={badgeRef}
-        className="mb-6 px-4 py-2 bg-neon-purple/10 border border-neon-purple/30 rounded-full text-sm text-neon-purple backdrop-blur-sm"
-      >
+      <div className="mb-6 px-4 py-2 bg-neon-purple/10 border border-neon-purple/30 rounded-full text-sm text-neon-purple backdrop-blur-sm">
         Le jeu qui rend accro
       </div>
 
       {/* Main headline - Simple & Impactful */}
-      <h1
-        ref={logoRef}
-        className="text-5xl md:text-7xl lg:text-8xl font-black mb-4 leading-tight"
-        style={{ perspective: '1000px' }}
-      >
+      <h1 className="text-5xl md:text-7xl lg:text-8xl font-black mb-4 leading-tight">
         <span className="block">
-          <span className="logo-letter inline-block text-white">T</span>
-          <span className="logo-letter inline-block text-white">U</span>
-          <span className="logo-letter inline-block text-white mx-2"> </span>
-          <span className="logo-letter inline-block text-neon-purple neon-text">C</span>
-          <span className="logo-letter inline-block text-neon-purple neon-text">L</span>
-          <span className="logo-letter inline-block text-neon-purple neon-text">I</span>
-          <span className="logo-letter inline-block text-neon-purple neon-text">Q</span>
-          <span className="logo-letter inline-block text-neon-purple neon-text">U</span>
-          <span className="logo-letter inline-block text-neon-purple neon-text">E</span>
-          <span className="logo-letter inline-block text-neon-purple neon-text">S</span>
-          <span className="logo-letter inline-block text-white">.</span>
+          <span className="text-white">TU </span>
+          <span className="text-neon-purple neon-text">CLIQUES</span>
+          <span className="text-white">.</span>
         </span>
         <span className="block mt-2">
-          <span className="logo-letter inline-block text-white">T</span>
-          <span className="logo-letter inline-block text-white">U</span>
-          <span className="logo-letter inline-block text-white mx-2"> </span>
-          <span className="logo-letter inline-block text-neon-pink neon-text-pink">G</span>
-          <span className="logo-letter inline-block text-neon-pink neon-text-pink">A</span>
-          <span className="logo-letter inline-block text-neon-pink neon-text-pink">G</span>
-          <span className="logo-letter inline-block text-neon-pink neon-text-pink">N</span>
-          <span className="logo-letter inline-block text-neon-pink neon-text-pink">E</span>
-          <span className="logo-letter inline-block text-neon-pink neon-text-pink">S</span>
-          <span className="logo-letter inline-block text-white">.</span>
+          <span className="text-white">TU </span>
+          <span className="text-neon-pink neon-text-pink">GAGNES</span>
+          <span className="text-white">.</span>
         </span>
       </h1>
 
       {/* Tagline */}
-      <p
-        ref={taglineRef}
-        className="text-lg md:text-xl text-text-secondary max-w-xl mb-8"
-      >
+      <p className="text-lg md:text-xl text-text-secondary max-w-xl mb-8">
         Le dernier clic avant la fin du timer remporte le lot.
         <br />
         <span className="text-neon-blue font-semibold">
@@ -177,7 +59,7 @@ export function HeroSection({
 
       {/* Featured prize */}
       {featuredItem && (
-        <div ref={prizeRef} className="mb-10">
+        <div className="mb-10">
           <FloatingPrize
             imageUrl={featuredItem.image_url}
             itemName={featuredItem.name}
@@ -188,7 +70,7 @@ export function HeroSection({
       )}
 
       {/* CTA Buttons */}
-      <div ref={ctaRef} className="flex flex-col sm:flex-row gap-4 mb-12">
+      <div className="flex flex-col sm:flex-row gap-4 mb-12">
         <Link
           href={isLoggedIn ? '/lobby' : '/register'}
           className="group relative px-8 py-4 bg-gradient-to-r from-neon-purple to-neon-pink text-white font-bold text-lg rounded-xl overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-neon-purple"
