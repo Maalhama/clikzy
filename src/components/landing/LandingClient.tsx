@@ -27,6 +27,10 @@ import { PrizeCarousel } from './widgets/PrizeCarousel'
 // Background Effects
 import { BackgroundEffects } from './components/BackgroundEffects'
 
+// Components
+import { PlayerCounter } from './components/PlayerCounter'
+import { ScrollProgressBar, ScrollIndicator } from './components/ScrollProgressBar'
+
 // Logo
 import { Logo } from '@/components/ui/Logo'
 
@@ -186,6 +190,9 @@ export function LandingClient({
 
   return (
     <main ref={mainRef} className="relative bg-bg-primary text-white overflow-hidden">
+      {/* SCROLL PROGRESS BAR */}
+      <ScrollProgressBar color="gradient" height={3} position="top" />
+
       {/* GLOBAL ANIMATED BACKGROUND */}
       <BackgroundEffects />
 
@@ -228,13 +235,9 @@ export function LandingClient({
 
           {/* Right section */}
           <div className="flex items-center gap-4">
-            {/* Live badge */}
-            <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-neon-green/10 border border-neon-green/30 rounded-full">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-neon-green opacity-75" />
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-neon-green" />
-              </span>
-              <span className="text-xs font-medium text-neon-green">{playerCount.toLocaleString('fr-FR')} en ligne</span>
+            {/* Live player counter */}
+            <div className="hidden sm:block">
+              <PlayerCounter count={playerCount} label="en ligne" size="sm" />
             </div>
 
             {isLoggedIn ? (
@@ -372,11 +375,8 @@ export function LandingClient({
         </div>
 
         {/* Scroll indicator */}
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 animate-bounce">
-          <span className="text-white/30 text-xs uppercase tracking-widest">Scroll</span>
-          <svg className="w-6 h-6 text-neon-purple" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-          </svg>
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2">
+          <ScrollIndicator targetId="how-it-works" />
         </div>
       </section>
 
