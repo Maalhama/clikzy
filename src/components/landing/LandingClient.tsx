@@ -73,17 +73,30 @@ interface LandingClientProps {
   }
 }
 
-// Generate random time label for winners (seeded by winner id for consistency)
-function getRandomTimeLabel(id: string): string {
-  // Use id to generate consistent random time for each winner
-  const hash = id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0)
-  const minutes = (hash % 1440) // 0-1439 minutes (24h)
+// Predefined random times for variety (< 24h)
+const RANDOM_TIMES = [
+  'À l\'instant',
+  'Il y a 2 min',
+  'Il y a 14h',
+  'Il y a 47 min',
+  'Il y a 3h',
+  'Il y a 8 min',
+  'Il y a 22h',
+  'Il y a 1h',
+  'Il y a 5 min',
+  'Il y a 19h',
+  'Il y a 33 min',
+  'Il y a 6h',
+  'Il y a 12 min',
+  'Il y a 11h',
+  'Il y a 4h',
+  'Il y a 58 min',
+]
 
-  if (minutes < 2) return 'À l\'instant'
-  if (minutes < 60) return `Il y a ${minutes} min`
-  const hours = Math.floor(minutes / 60)
-  if (hours === 1) return 'Il y a 1h'
-  return `Il y a ${hours}h`
+// Get time label from predefined random list
+function getRandomTimeLabel(id: string): string {
+  const hash = id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0)
+  return RANDOM_TIMES[hash % RANDOM_TIMES.length]
 }
 
 // Winner Card Component for marquee
