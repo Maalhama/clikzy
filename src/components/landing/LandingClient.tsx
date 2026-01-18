@@ -671,99 +671,102 @@ export function LandingClient({
             </div>
           </div>
 
-          {/* Winners Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-            {(recentWinners.length > 0 ? recentWinners.slice(0, 5) : [
-              { id: '1', username: 'Alex42', item_name: 'iPhone 15 Pro', item_value: 1299, won_at: new Date().toISOString() },
-              { id: '2', username: 'GamerPro', item_name: 'PS5', item_value: 549, won_at: new Date().toISOString() },
-              { id: '3', username: 'LuckyOne', item_name: 'AirPods Pro', item_value: 279, won_at: new Date().toISOString() },
-              { id: '4', username: 'WinnerX', item_name: 'Nintendo Switch', item_value: 329, won_at: new Date().toISOString() },
-              { id: '5', username: 'ProPlayer', item_name: 'MacBook Air', item_value: 1199, won_at: new Date().toISOString() },
-            ]).map((winner, index) => (
+          {/* Winners Marquee - Auto scrolling */}
+          <div className="relative">
+            {/* Gradient overlays for fade effect */}
+            <div className="absolute left-0 top-0 bottom-0 w-20 bg-gradient-to-r from-bg-primary to-transparent z-10 pointer-events-none" />
+            <div className="absolute right-0 top-0 bottom-0 w-20 bg-gradient-to-l from-bg-primary to-transparent z-10 pointer-events-none" />
+
+            {/* Scrolling container */}
+            <div className="overflow-hidden">
               <div
-                key={winner.id}
-                className={`winner-item group relative overflow-hidden rounded-2xl transition-all duration-300 hover:scale-[1.02] ${
-                  index === 0 ? 'md:col-span-2 lg:col-span-2 lg:row-span-2' : ''
-                }`}
+                className="flex gap-4 animate-marquee hover:[animation-play-state:paused]"
+                style={{
+                  width: 'max-content',
+                }}
               >
-                {/* Card background */}
-                <div
-                  className={`absolute inset-0 backdrop-blur-sm ${
-                    index === 0
-                      ? 'bg-gradient-to-br from-success/20 via-bg-secondary/80 to-bg-secondary/90'
-                      : 'bg-gradient-to-br from-bg-secondary/80 to-bg-secondary/60'
-                  }`}
-                />
+                {/* First set of cards */}
+                {[...(recentWinners.length > 0 ? recentWinners : [
+                  { id: '1', username: 'Alex42', item_name: 'iPhone 15 Pro', item_value: 1299, won_at: new Date().toISOString() },
+                  { id: '2', username: 'GamerPro', item_name: 'PS5', item_value: 549, won_at: new Date().toISOString() },
+                  { id: '3', username: 'LuckyOne', item_name: 'AirPods Pro', item_value: 279, won_at: new Date().toISOString() },
+                  { id: '4', username: 'WinnerX', item_name: 'Nintendo Switch', item_value: 329, won_at: new Date().toISOString() },
+                  { id: '5', username: 'ProPlayer', item_name: 'MacBook Air', item_value: 1199, won_at: new Date().toISOString() },
+                  { id: '6', username: 'Champion99', item_name: 'iPad Pro', item_value: 999, won_at: new Date().toISOString() },
+                  { id: '7', username: 'Lucky777', item_name: 'Apple Watch', item_value: 449, won_at: new Date().toISOString() },
+                  { id: '8', username: 'TopGamer', item_name: 'Sony WH-1000XM5', item_value: 379, won_at: new Date().toISOString() },
+                ]), ...(recentWinners.length > 0 ? recentWinners : [
+                  { id: '1b', username: 'Alex42', item_name: 'iPhone 15 Pro', item_value: 1299, won_at: new Date().toISOString() },
+                  { id: '2b', username: 'GamerPro', item_name: 'PS5', item_value: 549, won_at: new Date().toISOString() },
+                  { id: '3b', username: 'LuckyOne', item_name: 'AirPods Pro', item_value: 279, won_at: new Date().toISOString() },
+                  { id: '4b', username: 'WinnerX', item_name: 'Nintendo Switch', item_value: 329, won_at: new Date().toISOString() },
+                  { id: '5b', username: 'ProPlayer', item_name: 'MacBook Air', item_value: 1199, won_at: new Date().toISOString() },
+                  { id: '6b', username: 'Champion99', item_name: 'iPad Pro', item_value: 999, won_at: new Date().toISOString() },
+                  { id: '7b', username: 'Lucky777', item_name: 'Apple Watch', item_value: 449, won_at: new Date().toISOString() },
+                  { id: '8b', username: 'TopGamer', item_name: 'Sony WH-1000XM5', item_value: 379, won_at: new Date().toISOString() },
+                ])].map((winner, index) => (
+                  <div
+                    key={winner.id}
+                    className="winner-item group relative overflow-hidden rounded-2xl transition-all duration-300 hover:scale-[1.02] flex-shrink-0 w-[280px]"
+                  >
+                    {/* Card background */}
+                    <div className="absolute inset-0 backdrop-blur-sm bg-gradient-to-br from-bg-secondary/80 to-bg-secondary/60" />
 
-                {/* Border */}
-                <div
-                  className={`absolute inset-0 rounded-2xl border ${
-                    index === 0 ? 'border-success/40' : 'border-white/10'
-                  } group-hover:border-success/50 transition-colors duration-300`}
-                />
+                    {/* Border */}
+                    <div className="absolute inset-0 rounded-2xl border border-white/10 group-hover:border-success/50 transition-colors duration-300" />
 
-                {/* Content */}
-                <div className={`relative ${index === 0 ? 'p-6 md:p-8' : 'p-4'}`}>
-                  {/* Time badge */}
-                  <div className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-full bg-white/5 border border-white/10 mb-3 ${index === 0 ? 'text-sm' : 'text-xs'}`}>
-                    <span className="w-1.5 h-1.5 rounded-full bg-success animate-pulse" />
-                    <span className="text-white/50">À l'instant</span>
-                  </div>
-
-                  {/* Avatar & Username */}
-                  <div className={`flex items-center gap-3 ${index === 0 ? 'mb-4' : 'mb-2'}`}>
-                    <div
-                      className={`rounded-full bg-gradient-to-br from-neon-purple to-neon-pink flex items-center justify-center text-white font-bold flex-shrink-0 ${
-                        index === 0 ? 'w-14 h-14 text-xl' : 'w-10 h-10 text-sm'
-                      }`}
-                      style={{ boxShadow: index === 0 ? '0 0 25px rgba(155, 92, 255, 0.5)' : '0 0 15px rgba(155, 92, 255, 0.3)' }}
-                    >
-                      {winner.username.charAt(0).toUpperCase()}
-                    </div>
-                    <div>
-                      <div className={`font-bold text-white ${index === 0 ? 'text-lg' : 'text-sm'}`}>
-                        {winner.username}
+                    {/* Content */}
+                    <div className="relative p-5">
+                      {/* Time badge */}
+                      <div className="inline-flex items-center gap-1.5 px-2 py-1 rounded-full bg-white/5 border border-white/10 mb-3 text-xs">
+                        <span className="w-1.5 h-1.5 rounded-full bg-success animate-pulse" />
+                        <span className="text-white/50">À l'instant</span>
                       </div>
-                      <div className="text-xs text-success font-medium">vient de remporter</div>
-                    </div>
-                  </div>
 
-                  {/* Item won */}
-                  <div>
-                    <div className={`font-bold text-white ${index === 0 ? 'text-2xl md:text-3xl mb-2' : 'text-base mb-1'}`}>
-                      {winner.item_name}
-                    </div>
-                    <div
-                      className={`font-black ${index === 0 ? 'text-3xl md:text-4xl' : 'text-xl'}`}
-                      style={{
-                        background: 'linear-gradient(135deg, #00FF88 0%, #3CCBFF 100%)',
-                        WebkitBackgroundClip: 'text',
-                        WebkitTextFillColor: 'transparent',
-                        filter: 'drop-shadow(0 0 20px rgba(0, 255, 136, 0.4))',
-                      }}
-                    >
-                      {winner.item_value.toLocaleString()}€
-                    </div>
-                  </div>
-
-                  {/* Featured badge for first card */}
-                  {index === 0 && (
-                    <>
-                      <div className="absolute top-4 right-4 px-3 py-1 bg-success/20 border border-success/40 rounded-full text-success text-xs font-bold">
-                        RÉCENT
+                      {/* Avatar & Username */}
+                      <div className="flex items-center gap-3 mb-3">
+                        <div
+                          className="w-11 h-11 rounded-full bg-gradient-to-br from-neon-purple to-neon-pink flex items-center justify-center text-white font-bold text-sm flex-shrink-0"
+                          style={{ boxShadow: '0 0 15px rgba(155, 92, 255, 0.4)' }}
+                        >
+                          {winner.username.charAt(0).toUpperCase()}
+                        </div>
+                        <div>
+                          <div className="font-bold text-white text-sm">
+                            {winner.username}
+                          </div>
+                          <div className="text-xs text-success font-medium">vient de remporter</div>
+                        </div>
                       </div>
-                      <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-success/10 rounded-full blur-3xl" />
-                    </>
-                  )}
-                </div>
 
-                {/* Hover glow */}
-                <div
-                  className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
-                  style={{ boxShadow: 'inset 0 0 30px rgba(0, 255, 136, 0.1)' }}
-                />
+                      {/* Item won */}
+                      <div>
+                        <div className="font-bold text-white text-lg mb-1 truncate">
+                          {winner.item_name}
+                        </div>
+                        <div
+                          className="font-black text-2xl"
+                          style={{
+                            background: 'linear-gradient(135deg, #00FF88 0%, #3CCBFF 100%)',
+                            WebkitBackgroundClip: 'text',
+                            WebkitTextFillColor: 'transparent',
+                            filter: 'drop-shadow(0 0 15px rgba(0, 255, 136, 0.4))',
+                          }}
+                        >
+                          {winner.item_value.toLocaleString()}€
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Hover glow */}
+                    <div
+                      className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+                      style={{ boxShadow: 'inset 0 0 30px rgba(0, 255, 136, 0.15)' }}
+                    />
+                  </div>
+                ))}
               </div>
-            ))}
+            </div>
           </div>
 
           {/* CTA */}
