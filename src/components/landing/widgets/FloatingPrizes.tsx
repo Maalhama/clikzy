@@ -16,37 +16,37 @@ const PRIZES: Prize[] = [
   {
     id: '1',
     name: 'iPhone 15 Pro',
-    image: 'https://images.unsplash.com/photo-1696446701796-da61225697cc?w=800&q=90',
+    image: 'https://images.unsplash.com/photo-1695048133142-1a20484d2569?w=1200&q=95&fit=crop',
     value: 1479
   },
   {
     id: '2',
     name: 'PlayStation 5',
-    image: 'https://images.unsplash.com/photo-1606813907291-d86efa9b94db?w=800&q=90',
+    image: 'https://images.unsplash.com/photo-1606813907291-d86efa9b94db?w=1200&q=95&fit=crop',
     value: 549
   },
   {
     id: '3',
     name: 'MacBook Pro',
-    image: 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=800&q=90',
+    image: 'https://images.unsplash.com/photo-1611186871348-b1ce696e52c9?w=1200&q=95&fit=crop',
     value: 2499
   },
   {
     id: '4',
     name: 'AirPods Pro',
-    image: 'https://images.unsplash.com/photo-1606220588913-b3aacb4d2f46?w=800&q=90',
+    image: 'https://images.unsplash.com/photo-1600294037681-c80b4cb5b434?w=1200&q=95&fit=crop',
     value: 279
   },
   {
     id: '5',
     name: 'Apple Watch',
-    image: 'https://images.unsplash.com/photo-1546868871-7041f2a55e12?w=800&q=90',
+    image: 'https://images.unsplash.com/photo-1434493789847-2f02dc6ca35d?w=1200&q=95&fit=crop',
     value: 449
   },
   {
     id: '6',
     name: 'iPad Pro',
-    image: 'https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=800&q=90',
+    image: 'https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=1200&q=95&fit=crop',
     value: 1099
   },
 ]

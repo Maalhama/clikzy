@@ -24,14 +24,14 @@ const MOCK_TESTIMONIALS: Testimonial[] = [
   {
     id: '1',
     username: 'Alex42',
-    text: "Le concept est simple mais vraiment addictif. J'ai gagne mon iPhone apres 2 semaines de jeu. Livraison rapide, tout etait conforme.",
+    text: "Le concept est simple mais vraiment addictif. J'ai gagne mon iPhone apres 2 semaines. Livraison rapide, tout etait conforme.",
     itemWon: 'iPhone 15 Pro',
     rating: 5,
     date: 'Il y a 2 jours',
   },
   {
     id: '2',
-    username: 'GamerPro',
+    username: 'MaxClick',
     text: "J'etais sceptique au debut mais le systeme est transparent. On voit les clics en temps reel. Ma PS5 est arrivee en 4 jours.",
     itemWon: 'PlayStation 5',
     rating: 5,
@@ -48,7 +48,7 @@ const MOCK_TESTIMONIALS: Testimonial[] = [
   {
     id: '4',
     username: 'WinnerX',
-    text: "Interface claire et parties regulieres. J'ai gagne ma Switch apres plusieurs essais, le jeu est equilibre.",
+    text: "Interface claire et lots reguliers. J'ai gagne ma Switch apres plusieurs essais, le systeme est equilibre.",
     itemWon: 'Nintendo Switch',
     rating: 5,
     date: 'Il y a 5 jours',

@@ -46,19 +46,20 @@ export function HeroSection({
           )
         }
 
-        // Logo letter by letter animation
+        // Headline letter by letter animation - dramatic reveal
         if (logoRef.current) {
           const letters = logoRef.current.querySelectorAll('.logo-letter')
           tl.fromTo(
             letters,
-            { opacity: 0, y: 50, rotateX: -90 },
+            { opacity: 0, y: 80, rotateX: -90, scale: 0.5 },
             {
               opacity: 1,
               y: 0,
               rotateX: 0,
-              duration: 0.8,
-              stagger: 0.08,
-              ease: 'elastic.out(1, 0.5)',
+              scale: 1,
+              duration: 0.6,
+              stagger: 0.04,
+              ease: 'back.out(1.7)',
             },
             '-=0.3'
           )
@@ -126,32 +127,51 @@ export function HeroSection({
         ref={badgeRef}
         className="mb-6 px-4 py-2 bg-neon-purple/10 border border-neon-purple/30 rounded-full text-sm text-neon-purple backdrop-blur-sm"
       >
-        Le dernier clic gagne tout
+        Le jeu qui rend accro
       </div>
 
-      {/* Logo with letter animation */}
+      {/* Main headline - Simple & Impactful */}
       <h1
         ref={logoRef}
-        className="text-6xl md:text-8xl lg:text-9xl font-bold mb-6"
+        className="text-5xl md:text-7xl lg:text-8xl font-black mb-4 leading-tight"
         style={{ perspective: '1000px' }}
       >
-        <span className="logo-letter inline-block text-neon-purple neon-text">C</span>
-        <span className="logo-letter inline-block text-neon-purple neon-text">L</span>
-        <span className="logo-letter inline-block text-neon-purple neon-text">I</span>
-        <span className="logo-letter inline-block text-neon-purple neon-text">K</span>
-        <span className="logo-letter inline-block text-neon-pink neon-text-pink">Z</span>
-        <span className="logo-letter inline-block text-neon-pink neon-text-pink">Y</span>
+        <span className="block">
+          <span className="logo-letter inline-block text-white">T</span>
+          <span className="logo-letter inline-block text-white">U</span>
+          <span className="logo-letter inline-block text-white mx-2"> </span>
+          <span className="logo-letter inline-block text-neon-purple neon-text">C</span>
+          <span className="logo-letter inline-block text-neon-purple neon-text">L</span>
+          <span className="logo-letter inline-block text-neon-purple neon-text">I</span>
+          <span className="logo-letter inline-block text-neon-purple neon-text">Q</span>
+          <span className="logo-letter inline-block text-neon-purple neon-text">U</span>
+          <span className="logo-letter inline-block text-neon-purple neon-text">E</span>
+          <span className="logo-letter inline-block text-neon-purple neon-text">S</span>
+          <span className="logo-letter inline-block text-white">.</span>
+        </span>
+        <span className="block mt-2">
+          <span className="logo-letter inline-block text-white">T</span>
+          <span className="logo-letter inline-block text-white">U</span>
+          <span className="logo-letter inline-block text-white mx-2"> </span>
+          <span className="logo-letter inline-block text-neon-pink neon-text-pink">G</span>
+          <span className="logo-letter inline-block text-neon-pink neon-text-pink">A</span>
+          <span className="logo-letter inline-block text-neon-pink neon-text-pink">G</span>
+          <span className="logo-letter inline-block text-neon-pink neon-text-pink">N</span>
+          <span className="logo-letter inline-block text-neon-pink neon-text-pink">E</span>
+          <span className="logo-letter inline-block text-neon-pink neon-text-pink">S</span>
+          <span className="logo-letter inline-block text-white">.</span>
+        </span>
       </h1>
 
       {/* Tagline */}
       <p
         ref={taglineRef}
-        className="text-xl md:text-2xl text-text-secondary max-w-2xl mb-8"
+        className="text-lg md:text-xl text-text-secondary max-w-xl mb-8"
       >
-        Clique au bon moment. Remporte des objets incroyables.
+        Le dernier clic avant la fin du timer remporte le lot.
         <br />
-        <span className="text-neon-blue font-medium">
-          Le dernier a cliquer avant la fin du timer gagne.
+        <span className="text-neon-blue font-semibold">
+          iPhone, PS5, MacBook... a toi de jouer.
         </span>
       </p>
 

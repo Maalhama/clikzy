@@ -31,43 +31,78 @@ interface LandingRealtimeData {
   isConnected: boolean
 }
 
+// Constants for participant counter
+const MIN_PARTICIPANTS = 1487
+const MAX_PARTICIPANTS = 2382
+
 export function useLandingRealtime(
   initialWinners: Winner[] = [],
   initialGame: FeaturedGame | null = null
 ): LandingRealtimeData {
-  const [playerCount, setPlayerCount] = useState(0)
+  // Initialize with fixed value to avoid hydration mismatch, then randomize on client
+  const [playerCount, setPlayerCount] = useState(MIN_PARTICIPANTS + 400) // Fixed initial value
   const [recentWinners, setRecentWinners] = useState<Winner[]>(initialWinners)
   const [featuredGame, setFeaturedGame] = useState<FeaturedGame | null>(initialGame)
   const [isConnected, setIsConnected] = useState(false)
+  const [isMounted, setIsMounted] = useState(false)
 
   const channelsRef = useRef<RealtimeChannel[]>([])
+  const trendRef = useRef<number>(1)
+
+  // Set mounted state and initialize random value client-side only
+  useEffect(() => {
+    setIsMounted(true)
+    // Set random initial value only on client
+    setPlayerCount(Math.floor(MIN_PARTICIPANTS + Math.random() * (MAX_PARTICIPANTS - MIN_PARTICIPANTS)))
+    trendRef.current = Math.random() > 0.5 ? 1 : -1
+  }, [])
+
+  // Realistic participant counter that fluctuates (only after mount)
+  useEffect(() => {
+    if (!isMounted) return
+
+    const updateCount = () => {
+      setPlayerCount(prev => {
+        // Change trend direction occasionally (10% chance)
+        if (Math.random() < 0.1) {
+          trendRef.current *= -1
+        }
+
+        // Also reverse trend if we're near boundaries
+        if (prev <= MIN_PARTICIPANTS + 50) trendRef.current = 1
+        if (prev >= MAX_PARTICIPANTS - 50) trendRef.current = -1
+
+        // Calculate change (1-12 in trend direction, occasionally opposite)
+        let change = Math.floor(1 + Math.random() * 12) * trendRef.current
+
+        // 20% chance to go opposite direction for natural feel
+        if (Math.random() < 0.2) {
+          change = -change
+        }
+
+        // Apply change and clamp to range
+        const newCount = Math.max(MIN_PARTICIPANTS, Math.min(MAX_PARTICIPANTS, prev + change))
+        return newCount
+      })
+    }
+
+    // Update every 2-5 seconds randomly
+    const scheduleNextUpdate = () => {
+      const delay = 2000 + Math.random() * 3000
+      return setTimeout(() => {
+        updateCount()
+        timeoutId = scheduleNextUpdate()
+      }, delay)
+    }
+
+    let timeoutId = scheduleNextUpdate()
+    setIsConnected(true)
+
+    return () => clearTimeout(timeoutId)
+  }, [isMounted])
 
   useEffect(() => {
     const supabase = createClient()
-
-    // Presence channel for player count
-    const presenceChannel = supabase.channel('landing-presence', {
-      config: {
-        presence: {
-          key: `visitor-${Math.random().toString(36).substring(7)}`,
-        },
-      },
-    })
-
-    presenceChannel
-      .on('presence', { event: 'sync' }, () => {
-        const state = presenceChannel.presenceState()
-        const count = Object.keys(state).length
-        setPlayerCount(count)
-      })
-      .subscribe(async (status) => {
-        if (status === 'SUBSCRIBED') {
-          await presenceChannel.track({ online_at: new Date().toISOString() })
-          setIsConnected(true)
-        }
-      })
-
-    channelsRef.current.push(presenceChannel)
 
     // Winners channel - listen for new winners
     const winnersChannel = supabase
@@ -190,14 +225,21 @@ export function useClickNotifications(enabled = true) {
   useEffect(() => {
     if (!enabled) return
 
-    const usernames = [
-      'Alex42', 'MarieLucas', 'GamerPro', 'NeonKing',
-      'StarPlayer', 'LuckyOne', 'FastClick', 'WinnerX',
+    // Prenoms francais credibles
+    const firstNames = [
+      'Lucas', 'Hugo', 'Emma', 'Lea', 'Thomas', 'Maxime', 'Camille', 'Nathan',
+      'Chloe', 'Antoine', 'Julie', 'Quentin', 'Clara', 'Florian', 'Marion', 'Romain'
     ]
+    const suffixes = ['', '75', '59', '69', '33', '_off', '_fr', '2k', '93', 'pro', '44']
+
+    const generateUsername = () => {
+      const name = firstNames[Math.floor(Math.random() * firstNames.length)]
+      const suffix = suffixes[Math.floor(Math.random() * suffixes.length)]
+      return Math.random() > 0.5 ? name.toLowerCase() + suffix : name + suffix
+    }
 
     const interval = setInterval(() => {
-      const randomUser = usernames[Math.floor(Math.random() * usernames.length)]
-      addNotification(randomUser)
+      addNotification(generateUsername())
     }, 2000 + Math.random() * 5000)
 
     return () => clearInterval(interval)

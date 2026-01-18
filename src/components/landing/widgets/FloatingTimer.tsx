@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 
@@ -19,43 +19,65 @@ export function FloatingTimer({
 }: FloatingTimerProps) {
   const [timeLeft, setTimeLeft] = useState<number>(0)
   const [isVisible, setIsVisible] = useState(false)
+  const [isClosed, setIsClosed] = useState(false)
   const [isUrgent, setIsUrgent] = useState(false)
+  const [endTime, setEndTime] = useState<number | null>(null)
 
-  // Simulate a game timer if no real data
+  // Close handler
+  const handleClose = useCallback(() => {
+    setIsClosed(true)
+  }, [])
+
+  // Initialize and update timer
   useEffect(() => {
-    if (!enabled) return
+    if (!enabled || isClosed) return
 
-    // Show after 3 seconds scroll or immediately if game exists
+    // Show after 2 seconds
     const showTimeout = setTimeout(() => {
       setIsVisible(true)
-    }, 3000)
+    }, 2000)
 
-    // Simulate timer (5-15 minutes)
-    const simulatedEndTime = initialEndTime || Date.now() + (5 + Math.random() * 10) * 60 * 1000
+    // Use real endTime or simulate one (random 3-20 minutes)
+    const targetEndTime = initialEndTime || Date.now() + (3 + Math.random() * 17) * 60 * 1000
+    setEndTime(targetEndTime)
+
+    return () => {
+      clearTimeout(showTimeout)
+    }
+  }, [enabled, initialEndTime, isClosed])
+
+  // Real-time countdown
+  useEffect(() => {
+    if (!endTime || isClosed) return
 
     const updateTimer = () => {
       const now = Date.now()
-      const remaining = Math.max(0, Math.floor((simulatedEndTime - now) / 1000))
+      const remaining = Math.max(0, Math.floor((endTime - now) / 1000))
       setTimeLeft(remaining)
       setIsUrgent(remaining <= 60)
     }
 
+    // Update immediately
     updateTimer()
+
+    // Update every second
     const interval = setInterval(updateTimer, 1000)
 
-    return () => {
-      clearTimeout(showTimeout)
-      clearInterval(interval)
-    }
-  }, [enabled, initialEndTime])
+    return () => clearInterval(interval)
+  }, [endTime, isClosed])
 
   const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60)
+    const hours = Math.floor(seconds / 3600)
+    const mins = Math.floor((seconds % 3600) / 60)
     const secs = seconds % 60
+
+    if (hours > 0) {
+      return `${hours}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`
+    }
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`
   }
 
-  if (!enabled || !isVisible) return null
+  if (!enabled || !isVisible || isClosed) return null
 
   return (
     <AnimatePresence>
@@ -80,20 +102,31 @@ export function FloatingTimer({
           )}
 
           <div className="relative">
+            {/* Close button */}
+            <button
+              onClick={handleClose}
+              className="absolute -top-1 -right-1 w-6 h-6 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-white/60 hover:text-white transition-colors z-10"
+              aria-label="Fermer"
+            >
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+
             {/* Header */}
-            <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center justify-between mb-3 pr-6">
               <div className="flex items-center gap-2">
                 <span className="relative flex h-2 w-2">
                   <span className={`animate-ping absolute h-full w-full rounded-full opacity-75 ${isUrgent ? 'bg-neon-pink' : 'bg-neon-purple'}`} />
                   <span className={`relative rounded-full h-2 w-2 ${isUrgent ? 'bg-neon-pink' : 'bg-neon-purple'}`} />
                 </span>
                 <span className="text-xs font-bold uppercase tracking-wider text-white/60">
-                  Partie en cours
+                  En cours
                 </span>
               </div>
               {isUrgent && (
                 <span className="px-2 py-0.5 bg-neon-pink/20 text-neon-pink text-xs font-bold rounded">
-                  PHASE FINALE
+                  FINALE
                 </span>
               )}
             </div>
@@ -122,7 +155,7 @@ export function FloatingTimer({
                 clip-angle-sm
               `}
             >
-              {isUrgent ? 'REJOINDRE VITE!' : 'REJOINDRE LA PARTIE'}
+              {isUrgent ? 'PARTICIPER VITE!' : 'PARTICIPER'}
             </Link>
           </div>
 

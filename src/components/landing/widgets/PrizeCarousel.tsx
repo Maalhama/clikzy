@@ -21,11 +21,48 @@ interface PrizeCarouselProps {
 }
 
 const MOCK_PRIZES: Prize[] = [
-  { id: '1', name: 'iPhone 15 Pro Max', image_url: 'https://images.unsplash.com/photo-1695048133142-1a20484d2569?w=400&h=400&fit=crop', value: 1479, status: 'ending_soon' },
-  { id: '2', name: 'PlayStation 5', image_url: 'https://images.unsplash.com/photo-1606144042614-b2417e99c4e3?w=400&h=400&fit=crop', value: 549, status: 'available' },
-  { id: '3', name: 'MacBook Air M3', image_url: 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=400&h=400&fit=crop', value: 1299, status: 'available' },
-  { id: '4', name: 'AirPods Max', image_url: 'https://images.unsplash.com/photo-1625245488600-f03fef636a3c?w=400&h=400&fit=crop', value: 579, status: 'available' },
-  { id: '5', name: 'Apple Watch Ultra', image_url: 'https://images.unsplash.com/photo-1434493789847-2f02dc6ca35d?w=400&h=400&fit=crop', value: 899, status: 'ending_soon' },
+  {
+    id: '1',
+    name: 'iPhone 15 Pro',
+    image_url: 'https://images.unsplash.com/photo-1695048133142-1a20484d2569?w=1200&q=95&fit=crop',
+    value: 1479,
+    status: 'ending_soon'
+  },
+  {
+    id: '2',
+    name: 'PlayStation 5',
+    image_url: 'https://images.unsplash.com/photo-1606813907291-d86efa9b94db?w=1200&q=95&fit=crop',
+    value: 549,
+    status: 'available'
+  },
+  {
+    id: '3',
+    name: 'MacBook Pro',
+    image_url: 'https://images.unsplash.com/photo-1611186871348-b1ce696e52c9?w=1200&q=95&fit=crop',
+    value: 2499,
+    status: 'available'
+  },
+  {
+    id: '4',
+    name: 'AirPods Pro',
+    image_url: 'https://images.unsplash.com/photo-1600294037681-c80b4cb5b434?w=1200&q=95&fit=crop',
+    value: 279,
+    status: 'available'
+  },
+  {
+    id: '5',
+    name: 'Apple Watch',
+    image_url: 'https://images.unsplash.com/photo-1434493789847-2f02dc6ca35d?w=1200&q=95&fit=crop',
+    value: 449,
+    status: 'ending_soon'
+  },
+  {
+    id: '6',
+    name: 'iPad Pro',
+    image_url: 'https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=1200&q=95&fit=crop',
+    value: 1099,
+    status: 'available'
+  },
 ]
 
 export function PrizeCarousel({
@@ -82,7 +119,7 @@ export function PrizeCarousel({
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <GiftIcon className="w-7 h-7 text-neon-purple" />
-            <h3 className="text-xl font-black uppercase tracking-wider">EN JEU MAINTENANT</h3>
+            <h3 className="text-xl font-black uppercase tracking-wider">A REMPORTER</h3>
           </div>
           <Link
             href="/lobby"
@@ -118,7 +155,8 @@ export function PrizeCarousel({
                     alt={currentPrize.name}
                     fill
                     className="object-contain p-4"
-                    sizes="200px"
+                    sizes="(max-width: 768px) 200px, 300px"
+                    quality={90}
                     onError={() => handleImageError(currentPrize.id)}
                   />
                 )}

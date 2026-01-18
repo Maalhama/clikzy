@@ -11,10 +11,43 @@ interface WinNotification {
   timestamp: number
 }
 
-const MOCK_USERNAMES = [
-  'Alex42', 'GamerPro', 'LuckyOne', 'NeonKing', 'StarPlayer',
-  'FastClick', 'WinnerX', 'ProGamer', 'ClickMaster', 'VictoryK'
+// Prenoms francais courants
+const FRENCH_FIRST_NAMES = [
+  'Lucas', 'Hugo', 'Theo', 'Nathan', 'Mathis', 'Enzo', 'Louis', 'Gabriel',
+  'Emma', 'Lea', 'Chloe', 'Manon', 'Camille', 'Sarah', 'Julie', 'Marie',
+  'Thomas', 'Antoine', 'Maxime', 'Alexandre', 'Quentin', 'Nicolas', 'Julien',
+  'Clement', 'Romain', 'Kevin', 'Dylan', 'Florian', 'Alexis', 'Jordan',
+  'Laura', 'Marion', 'Pauline', 'Morgane', 'Clara', 'Oceane', 'Lisa', 'Anais'
 ]
+
+// Suffixes credibles
+const SUFFIXES = [
+  '', '59', '62', '75', '69', '13', '33', '31', '44', '67',
+  '_off', '_fr', '2k', '93', '94', '77', '78', '91', '92', '95',
+  'music', 'pro', 'bzh', 'life', 'x', 'music', '01', '06', '83'
+]
+
+// Genere un pseudo francais credible
+function generateFrenchUsername(): string {
+  const firstName = FRENCH_FIRST_NAMES[Math.floor(Math.random() * FRENCH_FIRST_NAMES.length)]
+  const suffix = SUFFIXES[Math.floor(Math.random() * SUFFIXES.length)]
+
+  // Variations de style
+  const style = Math.random()
+  if (style < 0.3) {
+    // prenom + nombre (ex: Lucas75)
+    return firstName.toLowerCase() + suffix
+  } else if (style < 0.5) {
+    // Prenom avec majuscule + suffix (ex: Emma_off)
+    return firstName + suffix
+  } else if (style < 0.7) {
+    // tout en minuscule (ex: thomasmusic)
+    return firstName.toLowerCase() + suffix.replace('_', '')
+  } else {
+    // avec underscore (ex: hugo_59)
+    return firstName.toLowerCase() + (suffix.startsWith('_') ? suffix : '_' + suffix).replace('__', '_')
+  }
+}
 
 const MOCK_ITEMS = [
   { name: 'iPhone 15 Pro', value: 1299 },
@@ -48,7 +81,7 @@ export function LiveActivityToast({ enabled = true, maxVisible = 3 }: LiveActivi
 
   const addWinNotification = useCallback(() => {
     const id = Math.random().toString(36).substring(7)
-    const username = MOCK_USERNAMES[Math.floor(Math.random() * MOCK_USERNAMES.length)]
+    const username = generateFrenchUsername()
     const item = MOCK_ITEMS[Math.floor(Math.random() * MOCK_ITEMS.length)]
 
     const newNotification: WinNotification = {

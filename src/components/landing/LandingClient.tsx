@@ -24,6 +24,12 @@ import { TargetIcon, CursorClickIcon, TrophyIcon, GiftIcon } from '@/components/
 // Widgets - PrizeCarousel
 import { PrizeCarousel } from './widgets/PrizeCarousel'
 
+// Background Effects
+import { BackgroundEffects } from './components/BackgroundEffects'
+
+// Logo
+import { Logo } from '@/components/ui/Logo'
+
 
 interface Winner {
   id: string
@@ -180,6 +186,9 @@ export function LandingClient({
 
   return (
     <main ref={mainRef} className="relative bg-bg-primary text-white overflow-hidden">
+      {/* GLOBAL ANIMATED BACKGROUND */}
+      <BackgroundEffects />
+
       {/* FLOATING WIDGETS */}
       <LiveActivityToast enabled={true} maxVisible={3} />
       <FloatingTimer
@@ -189,37 +198,18 @@ export function LandingClient({
         itemName={featuredItem?.name}
       />
 
-      {/* Animated background grid */}
-      <div className="fixed inset-0 pointer-events-none">
-        <div
-          className="absolute inset-0 opacity-[0.03]"
-          style={{
-            backgroundImage: `
-              linear-gradient(90deg, #9B5CFF 1px, transparent 1px),
-              linear-gradient(#9B5CFF 1px, transparent 1px)
-            `,
-            backgroundSize: '60px 60px',
-          }}
-        />
-        <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-neon-purple/10 rounded-full blur-[150px]" />
-        <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-neon-blue/10 rounded-full blur-[120px]" />
-      </div>
-
       {/* Header */}
       <header className="fixed top-0 left-0 right-0 z-50 border-b border-white/5">
         <div className="absolute inset-0 bg-bg-primary/80 backdrop-blur-xl" />
         <div className="relative max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          <Link href="/" className="text-2xl font-black tracking-tighter">
-            <span className="text-neon-purple">CLIK</span>
-            <span className="text-neon-blue">ZY</span>
-          </Link>
+          <Logo size="md" animated={true} href="/" />
           <div className="flex items-center gap-4">
             {isLoggedIn ? (
               <Link
                 href="/lobby"
                 className="gaming-btn px-6 py-2.5 text-sm font-bold"
               >
-                JOUER
+                PARTICIPER
               </Link>
             ) : (
               <>
@@ -246,38 +236,38 @@ export function LandingClient({
         {/* Click Pulse Effect */}
         <ClickPulse enabled={true} intensity="medium" />
 
-        <div className="absolute inset-0">
-          {/* Diagonal lines */}
-          <div className="absolute top-20 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-neon-purple/50 to-transparent transform -skew-y-3" />
-          <div className="absolute bottom-40 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-neon-blue/30 to-transparent transform skew-y-2" />
-        </div>
-
         <div className="relative max-w-7xl mx-auto px-6 py-20 grid lg:grid-cols-2 gap-12 items-center">
           {/* Left content */}
           <div>
             {/* Live badge */}
             <div className="hero-badge inline-flex items-center gap-2 px-4 py-2 bg-neon-purple/10 border border-neon-purple/30 rounded mb-6 clip-angle-sm">
               <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-neon-purple opacity-75" />
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-neon-purple" />
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-500 opacity-75" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500" />
               </span>
-              <span className="text-neon-purple text-sm font-bold uppercase tracking-wider">
-                {playerCount} joueurs en ligne
+              <span className="text-white text-sm font-bold uppercase tracking-wider">
+                <span className="text-green-400">{playerCount}</span> participants en ligne
               </span>
             </div>
 
             {/* Title */}
-            <h1 className="hero-title text-5xl md:text-7xl lg:text-8xl font-black leading-[0.9] mb-6" style={{ perspective: '1000px' }}>
-              <span className="block text-white">LE DERNIER</span>
-              <span className="block text-white">CLIC</span>
-              <span className="block glitch-text" data-text="GAGNE">
-                <span className="text-neon-purple">GAGNE</span>
+            <h1 className="hero-title text-4xl md:text-5xl lg:text-6xl font-black leading-[0.9] mb-6" style={{ perspective: '1000px' }}>
+              <span className="block">
+                <span className="text-white">TU </span>
+                <span className="text-neon-purple neon-text">CLIQUES</span>
+                <span className="text-white">.</span>
+              </span>
+              <span className="block glitch-text" data-text="TU GAGNES.">
+                <span className="text-white">TU </span>
+                <span className="text-neon-pink neon-text-pink">GAGNES</span>
+                <span className="text-white">.</span>
               </span>
             </h1>
 
             {/* Subtitle */}
-            <p className="hero-subtitle text-lg md:text-xl text-white/60 max-w-md mb-8 leading-relaxed">
-              Un concept simple : le dernier joueur a cliquer avant la fin du timer remporte l'objet. iPhone, PS5, MacBook et plus encore.
+            <p className="hero-subtitle text-sm md:text-base text-white/60 max-w-lg mb-8">
+              Sois le dernier a cliquer avant la fin du timer et remporte le lot.
+              <span className="block text-neon-blue font-semibold mt-1">iPhone, PS5, MacBook... a toi de cliquer.</span>
             </p>
 
             {/* CTA */}
@@ -287,7 +277,7 @@ export function LandingClient({
                 className="gaming-btn-large group"
               >
                 <span className="relative z-10 flex items-center gap-2">
-                  {isLoggedIn ? 'VOIR LES PARTIES' : 'COMMENCER GRATUITEMENT'}
+                  {isLoggedIn ? 'VOIR LES LOTS' : 'COMMENCER GRATUITEMENT'}
                   <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                   </svg>
@@ -309,7 +299,7 @@ export function LandingClient({
               </div>
               <div className="stat-box">
                 <div className="text-3xl font-black text-neon-purple">{stats.totalGames}+</div>
-                <div className="text-xs text-white/40 uppercase tracking-wider">Parties terminees</div>
+                <div className="text-xs text-white/40 uppercase tracking-wider">Lots remportes</div>
               </div>
               <div className="stat-box">
                 <div className="text-3xl font-black text-white">10</div>
@@ -355,7 +345,7 @@ export function LandingClient({
               {
                 num: '01',
                 title: 'CHOISIS',
-                desc: 'Parcours les parties en cours et selectionne l\'objet qui te fait envie.',
+                desc: 'Parcours les lots disponibles et selectionne l\'objet qui te fait envie.',
                 Icon: TargetIcon,
                 hex: '#9B5CFF',
               },
@@ -418,7 +408,7 @@ export function LandingClient({
             <h2 className="text-4xl md:text-5xl font-black mb-4">
               OBJETS <span className="text-neon-pink">A REMPORTER</span>
             </h2>
-            <p className="text-white/50 text-lg">Des produits premium mis en jeu quotidiennement</p>
+            <p className="text-white/50 text-lg">Des produits premium a remporter quotidiennement</p>
           </div>
           <PrizeCarousel />
         </div>
@@ -444,7 +434,7 @@ export function LandingClient({
                 DERNIERS <span className="text-neon-blue">GAGNANTS</span>
               </h2>
               <p className="text-white/50 text-lg mb-12 max-w-md">
-                Des joueurs remportent des objets chaque jour. Consulte les gains en temps reel.
+                Des gagnants remportent des objets chaque jour. Consulte les gains en temps reel.
               </p>
 
               <div className="grid grid-cols-2 gap-6">
@@ -516,11 +506,11 @@ export function LandingClient({
           </div>
 
           <h2 className="text-4xl md:text-6xl lg:text-7xl font-black mb-6">
-            PRET A <span className="text-neon-purple">JOUER</span> ?
+            PRET A <span className="text-neon-purple">GAGNER</span> ?
           </h2>
 
           <p className="text-xl text-white/50 mb-12 max-w-2xl mx-auto">
-            Inscris-toi maintenant et recois <span className="text-white">10 credits offerts</span> pour tenter ta chance sur nos parties.
+            Inscris-toi maintenant et recois <span className="text-white">10 credits offerts</span> pour tenter ta chance.
           </p>
 
           <Link
@@ -528,7 +518,7 @@ export function LandingClient({
             className="gaming-btn-large inline-flex"
           >
             <span className="relative z-10">
-              {isLoggedIn ? 'VOIR LES PARTIES' : 'CREER MON COMPTE'}
+              {isLoggedIn ? 'VOIR LES LOTS' : 'CREER MON COMPTE'}
             </span>
           </Link>
 
