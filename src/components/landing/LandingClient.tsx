@@ -795,69 +795,130 @@ export function LandingClient({
         <div className="absolute inset-0">
           <div className="absolute inset-0 bg-gradient-to-t from-neon-purple/20 via-transparent to-transparent" />
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-neon-purple/10 rounded-full blur-[150px]" />
+          <div className="absolute top-1/4 left-1/4 w-[400px] h-[400px] bg-neon-pink/5 rounded-full blur-[100px]" />
+          <div className="absolute bottom-1/4 right-1/4 w-[300px] h-[300px] bg-neon-blue/5 rounded-full blur-[80px]" />
           <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-neon-purple to-transparent" style={{ boxShadow: '0 0 20px rgba(155, 92, 255, 0.5)' }} />
         </div>
 
         <div className="relative max-w-4xl mx-auto px-6 text-center final-cta-content">
+          {/* Badge OFFRE DE BIENVENUE */}
           <div
-            className="inline-flex items-center gap-2 px-4 py-2 bg-neon-blue/10 border border-neon-blue/30 rounded-full mb-8"
-            style={{ boxShadow: '0 0 20px rgba(60, 203, 255, 0.2)' }}
+            className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-neon-purple/20 to-neon-pink/20 border border-neon-purple/40 rounded-full mb-6 animate-pulse"
+            style={{ boxShadow: '0 0 25px rgba(155, 92, 255, 0.3)' }}
           >
-            <span className="text-neon-blue text-sm font-bold flex items-center gap-2">
-              <GiftIcon className="w-5 h-5" />
-              OFFRE DE BIENVENUE
+            <GiftIcon className="w-5 h-5 text-neon-pink" />
+            <span className="text-white text-sm font-bold tracking-wide">OFFRE DE BIENVENUE</span>
+          </div>
+
+          {/* Urgence/FOMO */}
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-warning/10 border border-warning/30 rounded-full mb-8">
+            <span className="w-2 h-2 bg-warning rounded-full animate-pulse" />
+            <span className="text-warning text-sm font-semibold">
+              🔥 Plus que <span className="font-black">47 places</span> disponibles aujourd'hui
             </span>
           </div>
 
           <h2 className="text-4xl md:text-6xl lg:text-7xl font-black mb-6">
             PRET A{' '}
             <span
-              className="text-neon-purple"
-              style={{ textShadow: '0 0 50px rgba(155, 92, 255, 0.6)' }}
+              className="text-transparent bg-clip-text bg-gradient-to-r from-neon-purple via-neon-pink to-neon-purple animate-gradient-x"
+              style={{
+                textShadow: '0 0 80px rgba(155, 92, 255, 0.8), 0 0 120px rgba(255, 79, 216, 0.4)',
+                filter: 'drop-shadow(0 0 30px rgba(155, 92, 255, 0.5))'
+              }}
             >
               GAGNER
             </span>{' '}
             ?
           </h2>
 
-          <p className="text-xl text-white/50 mb-12 max-w-2xl mx-auto">
-            Inscris-toi maintenant et recois{' '}
+          <p className="text-xl text-white/60 mb-10 max-w-2xl mx-auto">
+            Inscris-toi maintenant et reçois{' '}
             <span
-              className="text-neon-pink font-bold"
-              style={{ textShadow: '0 0 15px rgba(255, 79, 216, 0.5)' }}
+              className="text-neon-pink font-black text-2xl"
+              style={{ textShadow: '0 0 20px rgba(255, 79, 216, 0.6)' }}
             >
-              10 credits offerts
+              10 crédits offerts
             </span>{' '}
             pour tenter ta chance.
           </p>
 
-          <Link
-            href={isLoggedIn ? '/lobby' : '/register'}
-            className="gaming-btn-large inline-flex"
-            style={{ boxShadow: '0 0 30px rgba(155, 92, 255, 0.4)' }}
-          >
-            <span className="relative z-10">
-              {isLoggedIn ? 'VOIR LES LOTS' : 'CREER MON COMPTE'}
-            </span>
-          </Link>
-
-          <div className="mt-12 flex flex-wrap justify-center gap-6 text-sm">
-            {[
-              { text: "0€ pour s'inscrire", color: 'success' },
-              { text: '100% legal', color: 'neon-blue' },
-              { text: 'Livraison gratuite', color: 'neon-pink' },
-            ].map((item, i) => (
-              <span
-                key={i}
-                className={`flex items-center gap-2 px-3 py-1.5 rounded-full bg-${item.color}/10 border border-${item.color}/30 text-${item.color}`}
-                style={{ boxShadow: `0 0 15px ${item.color === 'success' ? 'rgba(0, 255, 136, 0.15)' : item.color === 'neon-blue' ? 'rgba(60, 203, 255, 0.15)' : 'rgba(255, 79, 216, 0.15)'}` }}
-              >
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-                {item.text}
+          {/* CTA Button avec pulsation */}
+          <div className="relative inline-block">
+            {/* Glow pulsant derrière le bouton */}
+            <div
+              className="absolute inset-0 bg-neon-purple rounded-full blur-xl animate-pulse opacity-60"
+              style={{ transform: 'scale(1.1)' }}
+            />
+            <Link
+              href={isLoggedIn ? '/lobby' : '/register'}
+              className="relative gaming-btn-large inline-flex items-center gap-3 group"
+              style={{ boxShadow: '0 0 40px rgba(155, 92, 255, 0.5), inset 0 0 20px rgba(255, 255, 255, 0.1)' }}
+            >
+              <span className="relative z-10 font-black tracking-wide">
+                {isLoggedIn ? 'VOIR LES LOTS' : 'CRÉER MON COMPTE'}
               </span>
-            ))}
+              <svg
+                className="w-5 h-5 relative z-10 transition-transform group-hover:translate-x-1"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2.5}
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+              </svg>
+            </Link>
+          </div>
+
+          {/* Badges améliorés */}
+          <div className="mt-14 flex flex-wrap justify-center gap-4">
+            {/* Badge 0€ */}
+            <div
+              className="flex items-center gap-3 px-5 py-3 rounded-2xl bg-success/10 border border-success/30"
+              style={{ boxShadow: '0 0 20px rgba(0, 255, 136, 0.15)' }}
+            >
+              <div className="w-10 h-10 rounded-xl bg-success/20 flex items-center justify-center">
+                <svg className="w-5 h-5 text-success" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <div className="text-left">
+                <div className="text-success font-bold text-sm">0€ pour s'inscrire</div>
+                <div className="text-white/40 text-xs">100% gratuit</div>
+              </div>
+            </div>
+
+            {/* Badge 100% légal */}
+            <div
+              className="flex items-center gap-3 px-5 py-3 rounded-2xl bg-neon-blue/10 border border-neon-blue/30"
+              style={{ boxShadow: '0 0 20px rgba(60, 203, 255, 0.15)' }}
+            >
+              <div className="w-10 h-10 rounded-xl bg-neon-blue/20 flex items-center justify-center">
+                <svg className="w-5 h-5 text-neon-blue" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                </svg>
+              </div>
+              <div className="text-left">
+                <div className="text-neon-blue font-bold text-sm">100% légal</div>
+                <div className="text-white/40 text-xs">Conforme CNIL</div>
+              </div>
+            </div>
+
+            {/* Badge Livraison */}
+            <div
+              className="flex items-center gap-3 px-5 py-3 rounded-2xl bg-neon-pink/10 border border-neon-pink/30"
+              style={{ boxShadow: '0 0 20px rgba(255, 79, 216, 0.15)' }}
+            >
+              <div className="w-10 h-10 rounded-xl bg-neon-pink/20 flex items-center justify-center">
+                <svg className="w-5 h-5 text-neon-pink" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+                </svg>
+              </div>
+              <div className="text-left">
+                <div className="text-neon-pink font-bold text-sm">Livraison offerte</div>
+                <div className="text-white/40 text-xs">Partout en France</div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
