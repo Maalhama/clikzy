@@ -76,7 +76,7 @@ interface LandingClientProps {
 // Winner Card Component for marquee
 function WinnerCard({ winner }: { winner: Winner }) {
   return (
-    <div className="winner-item group relative overflow-hidden rounded-2xl transition-all duration-300 hover:scale-[1.02] flex-shrink-0 w-[280px]">
+    <div className="winner-item group relative overflow-hidden rounded-2xl transition-all duration-300 flex-shrink-0 w-[280px]">
       {/* Card background */}
       <div className="absolute inset-0 backdrop-blur-sm bg-gradient-to-br from-bg-secondary/80 to-bg-secondary/60" />
 
