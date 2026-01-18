@@ -55,7 +55,16 @@ const MOCK_ITEMS = [
   { name: 'AirPods Pro', value: 279 },
   { name: 'Nintendo Switch', value: 329 },
   { name: 'MacBook Air', value: 1199 },
+  { name: 'iPad Pro', value: 1099 },
+  { name: 'Apple Watch', value: 449 },
+  { name: 'Samsung S24', value: 899 },
+  { name: 'Xbox Series X', value: 499 },
+  { name: 'Meta Quest 3', value: 549 },
+  { name: 'Sony WH-1000XM5', value: 379 },
+  { name: 'DJI Mini 4', value: 799 },
 ]
+
+const TOAST_DURATION = 6000 // 6 seconds
 
 interface LiveActivityToastProps {
   enabled?: boolean
@@ -94,23 +103,23 @@ export function LiveActivityToast({ enabled = true, maxVisible = 3 }: LiveActivi
 
     setNotifications(prev => [newNotification, ...prev].slice(0, maxVisible))
 
-    // Auto-remove after 6 seconds
+    // Auto-remove after duration
     setTimeout(() => {
       setNotifications(prev => prev.filter(n => n.id !== id))
-    }, 6000)
+    }, TOAST_DURATION)
   }, [maxVisible])
 
-  // Show winners only, every ~15 seconds
+  // Show winners every 1 minute to not be aggressive
   useEffect(() => {
     if (!enabled) return
 
-    // Initial notification after 3 seconds
-    const initialTimeout = setTimeout(addWinNotification, 3000)
+    // Initial notification after 5 seconds
+    const initialTimeout = setTimeout(addWinNotification, 5000)
 
-    // Then every 15 seconds (with small variation)
+    // Then every 60 seconds
     const interval = setInterval(() => {
       addWinNotification()
-    }, 15000)
+    }, 60000)
 
     return () => {
       clearTimeout(initialTimeout)
@@ -122,24 +131,87 @@ export function LiveActivityToast({ enabled = true, maxVisible = 3 }: LiveActivi
 
   return (
     <div className="fixed bottom-6 left-6 z-50 flex flex-col gap-3 pointer-events-none">
-      <AnimatePresence mode="popLayout">
+      <AnimatePresence>
         {notifications.map((notification) => (
           <motion.div
             key={notification.id}
-            initial={{ opacity: 0, x: -100, scale: 0.8 }}
-            animate={{ opacity: 1, x: 0, scale: 1 }}
-            exit={{ opacity: 0, x: -100, scale: 0.8 }}
-            transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-            className="pointer-events-auto"
+            initial={{ opacity: 0, x: -50 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -200 }}
+            transition={{ duration: 0.3, ease: 'easeInOut' }}
+            className="pointer-events-auto group"
           >
-            <div className="flex items-center gap-3 px-4 py-3 bg-bg-secondary/90 backdrop-blur-xl border border-neon-pink/50 shadow-[0_0_20px_rgba(255,79,216,0.3)] clip-angle-sm">
-              <TrophyIcon className="w-6 h-6 text-neon-pink" />
-              <p className="text-sm">
-                <span className="font-bold text-neon-pink">{notification.username}</span>
-                <span className="text-white/60"> a gagné </span>
-                <span className="font-bold text-neon-blue">{notification.item}</span>
-                <span className="text-neon-blue font-bold ml-1">({notification.value}€)</span>
-              </p>
+            <div className="relative overflow-hidden rounded-xl">
+              {/* Main container */}
+              <div className="relative flex items-center gap-3 px-4 py-3 bg-bg-secondary/95 backdrop-blur-xl border border-success/40 rounded-xl">
+                {/* Glow effect */}
+                <div
+                  className="absolute inset-0 rounded-xl pointer-events-none opacity-50"
+                  style={{
+                    boxShadow: '0 0 30px rgba(0, 255, 136, 0.2), inset 0 0 20px rgba(0, 255, 136, 0.05)',
+                  }}
+                />
+
+                {/* Avatar with glow */}
+                <div className="relative flex-shrink-0">
+                  <div className="absolute inset-0 bg-gradient-to-br from-neon-purple/50 to-neon-pink/50 rounded-full blur-md" />
+                  <div className="relative w-10 h-10 rounded-full bg-gradient-to-br from-neon-purple to-neon-pink flex items-center justify-center font-bold text-sm border-2 border-white/20">
+                    {notification.username.charAt(0).toUpperCase()}
+                  </div>
+                  {/* Winner badge */}
+                  <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-success rounded-full flex items-center justify-center border-2 border-bg-secondary">
+                    <TrophyIcon className="w-3 h-3 text-bg-primary" />
+                  </div>
+                </div>
+
+                {/* Content */}
+                <div className="relative flex-1 min-w-0">
+                  <p className="text-sm">
+                    <span
+                      className="font-bold text-white"
+                      style={{ textShadow: '0 0 10px rgba(255, 255, 255, 0.3)' }}
+                    >
+                      {notification.username}
+                    </span>
+                    <span className="text-success font-medium"> a gagné</span>
+                  </p>
+                  <p className="text-sm truncate">
+                    <span
+                      className="font-bold text-neon-blue"
+                      style={{ textShadow: '0 0 10px rgba(60, 203, 255, 0.5)' }}
+                    >
+                      {notification.item}
+                    </span>
+                    <span
+                      className="text-success font-bold ml-2"
+                      style={{ textShadow: '0 0 10px rgba(0, 255, 136, 0.5)' }}
+                    >
+                      {notification.value}€
+                    </span>
+                  </p>
+                </div>
+
+                {/* Live indicator */}
+                <div className="relative flex-shrink-0">
+                  <span className="relative flex h-2 w-2">
+                    <span className="animate-ping absolute h-full w-full rounded-full bg-success opacity-75" />
+                    <span className="relative rounded-full h-2 w-2 bg-success" />
+                  </span>
+                </div>
+              </div>
+
+              {/* Progress bar */}
+              <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-white/10">
+                <motion.div
+                  className="h-full bg-gradient-to-r from-success to-neon-blue"
+                  initial={{ width: '100%' }}
+                  animate={{ width: '0%' }}
+                  transition={{ duration: TOAST_DURATION / 1000, ease: 'linear' }}
+                  style={{
+                    boxShadow: '0 0 10px rgba(0, 255, 136, 0.5)',
+                  }}
+                />
+              </div>
             </div>
           </motion.div>
         ))}
