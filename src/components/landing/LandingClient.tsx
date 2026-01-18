@@ -2,6 +2,7 @@
 
 import { useRef } from 'react'
 import Link from 'next/link'
+import dynamic from 'next/dynamic'
 import { useGSAP } from '@gsap/react'
 import { gsap } from '@/lib/gsap/gsapConfig'
 import { useLandingRealtime } from '@/hooks/landing/useLandingRealtime'
@@ -12,7 +13,6 @@ import {
   FloatingTimer,
   AnimatedStats,
   Leaderboard,
-  PrizeCarousel,
   ClickPulse,
   TrustBadges,
   Testimonials,
@@ -21,6 +21,19 @@ import {
 
 // Gaming Icons
 import { TargetIcon, CursorClickIcon, TrophyIcon, GiftIcon } from '@/components/ui/GamingIcons'
+
+// 3D Components - Dynamic import to avoid SSR issues
+const ProductShowcase3D = dynamic(
+  () => import('@/components/3d/ProductShowcase3D').then((mod) => mod.ProductShowcase3D),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="h-[500px] flex items-center justify-center">
+        <div className="w-12 h-12 border-2 border-neon-purple border-t-transparent rounded-full animate-spin" />
+      </div>
+    ),
+  }
+)
 
 interface Winner {
   id: string
@@ -407,17 +420,17 @@ export function LandingClient({
         </div>
       </section>
 
-      {/* PRIZES & GAMES SECTION */}
-      <section className="relative py-24">
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-neon-blue/5 to-transparent" />
-        <div className="relative max-w-7xl mx-auto px-6">
-          <div className="text-center mb-16">
+      {/* 3D PRIZES SHOWCASE */}
+      <section className="relative py-24 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-neon-purple/5 to-transparent" />
+        <div className="relative max-w-5xl mx-auto px-6">
+          <div className="text-center mb-8">
             <h2 className="text-4xl md:text-5xl font-black mb-4">
               OBJETS <span className="text-neon-pink">A REMPORTER</span>
             </h2>
             <p className="text-white/50 text-lg">Des produits premium mis en jeu quotidiennement</p>
           </div>
-          <PrizeCarousel />
+          <ProductShowcase3D />
         </div>
       </section>
 
