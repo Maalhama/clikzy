@@ -27,6 +27,9 @@ const config: Config = {
         'success': '#00FF88',
         'danger': '#FF4757',
         'warning': '#FFB800',
+
+        // Live indicator
+        'neon-green': '#00FF88',
       },
       fontFamily: {
         sans: ['var(--font-inter)', 'system-ui', 'sans-serif'],
@@ -47,6 +50,7 @@ const config: Config = {
         'float': 'float 3s ease-in-out infinite',
         'spin-slow': 'spin 20s linear infinite',
         'bounce-subtle': 'bounce-subtle 2s ease-in-out infinite',
+        'border-scan': 'border-scan 3s linear infinite',
       },
       keyframes: {
         glow: {
@@ -64,6 +68,10 @@ const config: Config = {
         'bounce-subtle': {
           '0%, 100%': { transform: 'translateY(0)' },
           '50%': { transform: 'translateY(-5px)' },
+        },
+        'border-scan': {
+          '0%': { transform: 'translateX(-100%)' },
+          '100%': { transform: 'translateX(100%)' },
         },
       },
     },

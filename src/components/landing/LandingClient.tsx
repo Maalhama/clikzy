@@ -199,15 +199,51 @@ export function LandingClient({
       />
 
       {/* Header */}
-      <header className="fixed top-0 left-0 right-0 z-50 border-b border-white/5">
+      <header className="fixed top-0 left-0 right-0 z-50 group/header">
+        {/* Background with glassmorphism */}
         <div className="absolute inset-0 bg-bg-primary/80 backdrop-blur-xl" />
+
+        {/* Animated gradient border */}
+        <div className="absolute bottom-0 left-0 right-0 h-[1px] overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-neon-purple to-transparent animate-border-scan" />
+          <div className="absolute inset-0 bg-gradient-to-r from-neon-purple/20 via-neon-pink/40 to-neon-purple/20" />
+        </div>
+
         <div className="relative max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+          {/* Logo */}
           <Logo size="md" animated={true} href="/" />
+
+          {/* Navigation centrale */}
+          <nav className="hidden md:flex items-center gap-8">
+            <a href="#lots" className="nav-link-neon text-sm font-medium text-white/60 hover:text-white transition-all duration-300 relative group">
+              Lots
+              <span className="absolute -bottom-1 left-0 w-0 h-[2px] bg-gradient-to-r from-neon-purple to-neon-pink group-hover:w-full transition-all duration-300" />
+            </a>
+            <a href="#how-it-works" className="nav-link-neon text-sm font-medium text-white/60 hover:text-white transition-all duration-300 relative group">
+              Comment ça marche
+              <span className="absolute -bottom-1 left-0 w-0 h-[2px] bg-gradient-to-r from-neon-purple to-neon-pink group-hover:w-full transition-all duration-300" />
+            </a>
+            <a href="#winners" className="nav-link-neon text-sm font-medium text-white/60 hover:text-white transition-all duration-300 relative group">
+              Gagnants
+              <span className="absolute -bottom-1 left-0 w-0 h-[2px] bg-gradient-to-r from-neon-purple to-neon-pink group-hover:w-full transition-all duration-300" />
+            </a>
+          </nav>
+
+          {/* Right section */}
           <div className="flex items-center gap-4">
+            {/* Live badge */}
+            <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-neon-green/10 border border-neon-green/30 rounded-full">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-neon-green opacity-75" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-neon-green" />
+              </span>
+              <span className="text-xs font-medium text-neon-green">{playerCount.toLocaleString('fr-FR')} en ligne</span>
+            </div>
+
             {isLoggedIn ? (
               <Link
                 href="/lobby"
-                className="gaming-btn px-6 py-2.5 text-sm font-bold"
+                className="neon-btn-primary px-6 py-2.5 text-sm font-bold"
               >
                 PARTICIPER
               </Link>
@@ -215,13 +251,13 @@ export function LandingClient({
               <>
                 <Link
                   href="/login"
-                  className="text-white/60 hover:text-white text-sm font-medium transition-colors"
+                  className="neon-btn-ghost px-4 py-2 text-sm font-medium"
                 >
                   Connexion
                 </Link>
                 <Link
                   href="/register"
-                  className="gaming-btn px-6 py-2.5 text-sm font-bold"
+                  className="neon-btn-primary px-6 py-2.5 text-sm font-bold"
                 >
                   S'INSCRIRE
                 </Link>

@@ -37,14 +37,17 @@ export function FloatingTimer({
       setIsVisible(true)
     }, 2000)
 
-    // Use real endTime or simulate one (random 3-20 minutes)
-    const targetEndTime = initialEndTime || Date.now() + (3 + Math.random() * 17) * 60 * 1000
+    // Use real endTime or simulate one close to 0 for urgency (15-45 seconds)
+    const targetEndTime = initialEndTime || Date.now() + (15 + Math.random() * 30) * 1000
     setEndTime(targetEndTime)
 
     return () => {
       clearTimeout(showTimeout)
     }
   }, [enabled, initialEndTime, isClosed])
+
+  // Track if we're using simulated time
+  const isSimulated = !initialEndTime
 
   // Real-time countdown
   useEffect(() => {
@@ -55,6 +58,13 @@ export function FloatingTimer({
       const remaining = Math.max(0, Math.floor((endTime - now) / 1000))
       setTimeLeft(remaining)
       setIsUrgent(remaining <= 60)
+
+      // Reset timer when it reaches 0 to maintain urgency (only for simulated timers)
+      if (remaining === 0 && isSimulated) {
+        setTimeout(() => {
+          setEndTime(Date.now() + (15 + Math.random() * 30) * 1000)
+        }, 2000)
+      }
     }
 
     // Update immediately
@@ -64,7 +74,7 @@ export function FloatingTimer({
     const interval = setInterval(updateTimer, 1000)
 
     return () => clearInterval(interval)
-  }, [endTime, isClosed])
+  }, [endTime, isClosed, isSimulated])
 
   const formatTime = (seconds: number) => {
     const hours = Math.floor(seconds / 3600)
