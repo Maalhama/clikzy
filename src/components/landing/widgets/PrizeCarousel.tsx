@@ -141,7 +141,7 @@ export function PrizeCarousel({
                 href={`/game/${currentPrize.id}`}
                 className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-neon-purple to-neon-pink text-white font-bold clip-angle-sm hover:shadow-[0_0_30px_rgba(155,92,255,0.5)] transition-shadow"
               >
-                JE LE VEUX
+                PARTICIPER
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                 </svg>

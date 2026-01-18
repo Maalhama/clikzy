@@ -259,24 +259,22 @@ export function LandingClient({
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-neon-purple" />
               </span>
               <span className="text-neon-purple text-sm font-bold uppercase tracking-wider">
-                {playerCount} joueurs en ce moment
+                {playerCount} joueurs en ligne
               </span>
             </div>
 
             {/* Title */}
             <h1 className="hero-title text-5xl md:text-7xl lg:text-8xl font-black leading-[0.9] mb-6" style={{ perspective: '1000px' }}>
-              <span className="block text-white">1 CLIC.</span>
-              <span className="block text-white">1 GAGNANT.</span>
-              <span className="block glitch-text" data-text="C'EST TOI?">
-                <span className="text-neon-purple">C'EST</span>{' '}
-                <span className="text-neon-blue">TOI?</span>
+              <span className="block text-white">LE DERNIER</span>
+              <span className="block text-white">CLIC</span>
+              <span className="block glitch-text" data-text="GAGNE">
+                <span className="text-neon-purple">GAGNE</span>
               </span>
             </h1>
 
             {/* Subtitle */}
             <p className="hero-subtitle text-lg md:text-xl text-white/60 max-w-md mb-8 leading-relaxed">
-              Le dernier a cliquer gagne. iPhone, PS5, MacBook...
-              <span className="text-neon-pink font-bold"> Gratuit si tu gagnes.</span>
+              Un concept simple : le dernier joueur a cliquer avant la fin du timer remporte l'objet. iPhone, PS5, MacBook et plus encore.
             </p>
 
             {/* CTA */}
@@ -286,7 +284,7 @@ export function LandingClient({
                 className="gaming-btn-large group"
               >
                 <span className="relative z-10 flex items-center gap-2">
-                  {isLoggedIn ? 'JOUER MAINTENANT' : 'JE VEUX GAGNER'}
+                  {isLoggedIn ? 'VOIR LES PARTIES' : 'COMMENCER GRATUITEMENT'}
                   <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                   </svg>
@@ -296,7 +294,7 @@ export function LandingClient({
                 href="#how"
                 className="px-8 py-4 border-2 border-white/20 text-white font-bold hover:border-neon-blue/50 hover:text-neon-blue transition-all clip-angle"
               >
-                C'EST QUOI CE DELIRE?
+                COMMENT CA MARCHE
               </a>
             </div>
 
@@ -304,15 +302,15 @@ export function LandingClient({
             <div className="hero-stats flex gap-8">
               <div className="stat-box">
                 <div className="text-3xl font-black text-neon-blue">{stats.totalWinningsValue.toLocaleString()}€</div>
-                <div className="text-xs text-white/40 uppercase tracking-wider">Deja gagnes</div>
+                <div className="text-xs text-white/40 uppercase tracking-wider">De gains distribues</div>
               </div>
               <div className="stat-box">
                 <div className="text-3xl font-black text-neon-purple">{stats.totalGames}+</div>
-                <div className="text-xs text-white/40 uppercase tracking-wider">Objets distribues</div>
+                <div className="text-xs text-white/40 uppercase tracking-wider">Parties terminees</div>
               </div>
               <div className="stat-box">
                 <div className="text-3xl font-black text-white">10</div>
-                <div className="text-xs text-white/40 uppercase tracking-wider">Credits gratuits</div>
+                <div className="text-xs text-white/40 uppercase tracking-wider">Credits offerts</div>
               </div>
             </div>
           </div>
@@ -342,10 +340,10 @@ export function LandingClient({
         <div className="relative max-w-7xl mx-auto px-6">
           <div className="text-center mb-20">
             <h2 className="section-title text-4xl md:text-6xl font-black mb-4">
-              ULTRA <span className="text-neon-purple">SIMPLE</span>
+              COMMENT <span className="text-neon-purple">CA MARCHE</span>
             </h2>
             <p className="text-white/50 text-lg max-w-2xl mx-auto">
-              Meme ton petit frere peut comprendre
+              Un systeme transparent en 3 etapes
             </p>
           </div>
 
@@ -353,22 +351,22 @@ export function LandingClient({
             {[
               {
                 num: '01',
-                title: 'VISE',
-                desc: 'iPhone? PS5? MacBook? Tu choisis. Tu veux, tu cliques.',
+                title: 'CHOISIS',
+                desc: 'Parcours les parties en cours et selectionne l\'objet qui te fait envie.',
                 Icon: TargetIcon,
                 hex: '#9B5CFF',
               },
               {
                 num: '02',
                 title: 'CLIQUE',
-                desc: '1 clic = 1 credit. Le timer repart. Tu restes le dernier? Tu gagnes.',
+                desc: 'Chaque clic coute 1 credit et relance le timer. Sois strategique.',
                 Icon: CursorClickIcon,
                 hex: '#3CCBFF',
               },
               {
                 num: '03',
-                title: 'ENCAISSE',
-                desc: 'Timer a zero et t\'es le dernier? L\'objet est a toi. Livre chez toi.',
+                title: 'GAGNE',
+                desc: 'Si tu es le dernier a avoir clique quand le timer atteint zero, l\'objet est a toi.',
                 Icon: TrophyIcon,
                 hex: '#FF4FD8',
               },
@@ -397,9 +395,9 @@ export function LandingClient({
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-black mb-4">
-              EUX <span className="text-neon-blue">L'ONT FAIT</span>
+              CLIKZY <span className="text-neon-blue">EN CHIFFRES</span>
             </h2>
-            <p className="text-white/50 text-lg">Pourquoi pas toi?</p>
+            <p className="text-white/50 text-lg">Une communaute active et des gains reels</p>
           </div>
           <AnimatedStats
             totalWinnings={stats.totalWinningsValue}
@@ -415,9 +413,9 @@ export function LandingClient({
         <div className="relative max-w-7xl mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-black mb-4">
-              CA POURRAIT <span className="text-neon-pink">ETRE A TOI</span>
+              OBJETS <span className="text-neon-pink">A REMPORTER</span>
             </h2>
-            <p className="text-white/50 text-lg">Nouveaux objets chaque jour. Tu rates, tu pleures.</p>
+            <p className="text-white/50 text-lg">Des produits premium mis en jeu quotidiennement</p>
           </div>
           <PrizeCarousel />
         </div>
@@ -440,10 +438,10 @@ export function LandingClient({
             {/* Left - Stats */}
             <div>
               <h2 className="text-4xl md:text-5xl font-black mb-6">
-                PENDANT QUE <span className="text-neon-blue">TU HESITES...</span>
+                DERNIERS <span className="text-neon-blue">GAGNANTS</span>
               </h2>
               <p className="text-white/50 text-lg mb-12 max-w-md">
-                Eux ils cliquent. Et ils gagnent. <span className="text-neon-pink">En ce moment meme.</span>
+                Des joueurs remportent des objets chaque jour. Consulte les gains en temps reel.
               </p>
 
               <div className="grid grid-cols-2 gap-6">
@@ -451,13 +449,13 @@ export function LandingClient({
                   <div className="text-4xl font-black text-neon-purple mb-1">
                     {stats.totalWinningsValue.toLocaleString()}€
                   </div>
-                  <div className="text-sm text-white/40 uppercase">Distribues</div>
+                  <div className="text-sm text-white/40 uppercase">Total distribue</div>
                 </div>
                 <div className="p-6 bg-white/5 border border-white/10 clip-angle">
                   <div className="text-4xl font-black text-neon-blue mb-1">
                     {(recentWinners.length || 4) * 100}+
                   </div>
-                  <div className="text-sm text-white/40 uppercase">Chanceux</div>
+                  <div className="text-sm text-white/40 uppercase">Gagnants</div>
                 </div>
               </div>
             </div>
@@ -510,16 +508,16 @@ export function LandingClient({
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-neon-blue/10 border border-neon-blue/30 rounded mb-8 clip-angle-sm">
             <span className="text-neon-blue text-sm font-bold flex items-center gap-2">
               <GiftIcon className="w-5 h-5" />
-              10 CREDITS OFFERTS - MAINTENANT
+              OFFRE DE BIENVENUE
             </span>
           </div>
 
           <h2 className="text-4xl md:text-6xl lg:text-7xl font-black mb-6">
-            TON <span className="text-neon-purple">IPHONE</span> T'ATTEND
+            PRET A <span className="text-neon-purple">JOUER</span> ?
           </h2>
 
           <p className="text-xl text-white/50 mb-12 max-w-2xl mx-auto">
-            10 credits gratuits a l'inscription. <span className="text-white">Zero risque. Que du gain.</span>
+            Inscris-toi maintenant et recois <span className="text-white">10 credits offerts</span> pour tenter ta chance sur nos parties.
           </p>
 
           <Link
@@ -527,7 +525,7 @@ export function LandingClient({
             className="gaming-btn-large inline-flex"
           >
             <span className="relative z-10">
-              {isLoggedIn ? 'JE JOUE' : 'JE TENTE MA CHANCE'}
+              {isLoggedIn ? 'VOIR LES PARTIES' : 'CREER MON COMPTE'}
             </span>
           </Link>
 
