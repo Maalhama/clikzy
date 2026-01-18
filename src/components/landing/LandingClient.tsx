@@ -73,14 +73,30 @@ interface LandingClientProps {
   }
 }
 
+// Generate random time label for winners (seeded by winner id for consistency)
+function getRandomTimeLabel(id: string): string {
+  // Use id to generate consistent random time for each winner
+  const hash = id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0)
+  const minutes = (hash % 1440) // 0-1439 minutes (24h)
+
+  if (minutes < 2) return 'À l\'instant'
+  if (minutes < 60) return `Il y a ${minutes} min`
+  const hours = Math.floor(minutes / 60)
+  if (hours === 1) return 'Il y a 1h'
+  return `Il y a ${hours}h`
+}
+
 // Winner Card Component for marquee
 function WinnerCard({ winner }: { winner: Winner }) {
+  const timeLabel = getRandomTimeLabel(winner.id)
+  const isRecent = timeLabel === 'À l\'instant' || timeLabel.includes('min')
+
   return (
     <div className="w-[280px] min-h-[180px] p-5 rounded-2xl bg-bg-secondary/80 border border-white/10 hover:border-success/50 transition-colors">
       {/* Time badge */}
       <div className="inline-flex items-center gap-1.5 px-2 py-1 rounded-full bg-white/5 border border-white/10 mb-3 text-xs">
-        <span className="w-1.5 h-1.5 rounded-full bg-success animate-pulse" />
-        <span className="text-white/50">À l'instant</span>
+        {isRecent && <span className="w-1.5 h-1.5 rounded-full bg-success animate-pulse" />}
+        <span className="text-white/50">{timeLabel}</span>
       </div>
 
       {/* Avatar & Username */}
