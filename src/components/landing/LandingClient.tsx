@@ -326,29 +326,31 @@ export function LandingClient({
                   Live
                 </div>
 
-                {featuredItem ? (
-                  <>
-                    <div className="relative w-full aspect-square mb-6 bg-black/30 rounded-lg overflow-hidden">
-                      <Image
-                        src={featuredItem.image_url}
-                        alt={featuredItem.name}
-                        fill
-                        className="object-contain p-6"
-                        sizes="(max-width: 768px) 100vw, 50vw"
-                      />
-                    </div>
-                    <h3 className="text-2xl font-bold mb-2">{featuredItem.name}</h3>
-                    <div className="flex items-baseline gap-2">
-                      <span className="text-4xl font-black text-neon-blue">{featuredItem.retail_value}€</span>
-                      <span className="text-white/40">valeur</span>
-                    </div>
-                  </>
-                ) : (
-                  <div className="text-center py-12">
-                    <div className="text-6xl mb-4">🎮</div>
-                    <p className="text-white/60">Prochain objet bientot...</p>
-                  </div>
-                )}
+                {(() => {
+                  const item = featuredItem || {
+                    name: 'iPhone 15 Pro Max',
+                    image_url: 'https://images.unsplash.com/photo-1695048133142-1a20484d2569?w=800&h=800&fit=crop',
+                    retail_value: 1479,
+                  }
+                  return (
+                    <>
+                      <div className="relative w-full aspect-square mb-6 bg-black/30 rounded-lg overflow-hidden">
+                        <Image
+                          src={item.image_url}
+                          alt={item.name}
+                          fill
+                          className="object-contain p-6"
+                          sizes="(max-width: 768px) 100vw, 50vw"
+                        />
+                      </div>
+                      <h3 className="text-2xl font-bold mb-2">{item.name}</h3>
+                      <div className="flex items-baseline gap-2">
+                        <span className="text-4xl font-black text-neon-blue">{item.retail_value}€</span>
+                        <span className="text-white/40">valeur</span>
+                      </div>
+                    </>
+                  )
+                })()}
               </div>
 
               {/* Decorative elements */}
