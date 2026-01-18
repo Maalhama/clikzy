@@ -579,7 +579,7 @@ export function LandingClient({
               className="inline-flex items-center gap-2 px-3 py-1.5 bg-neon-pink/10 border border-neon-pink/30 rounded-full text-neon-pink text-sm font-medium mb-4"
               style={{ boxShadow: '0 0 20px rgba(255, 79, 216, 0.2)' }}
             >
-              <span className="text-lg">🎁</span>
+              <GiftIcon className="w-5 h-5" />
               Premium
             </div>
             <h2 className="text-4xl md:text-5xl font-black mb-4">

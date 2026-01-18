@@ -2,6 +2,7 @@
 
 import { useRef, useState, useEffect, useCallback } from 'react'
 import Image from 'next/image'
+import { GiftIcon } from '@/components/ui/GamingIcons'
 
 interface Prize {
   id: string
@@ -172,7 +173,7 @@ export function FloatingPrizes() {
 
                   {imageErrors[prize.id] ? (
                     <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-neon-purple/20 to-neon-blue/20">
-                      <span className={`${isMain ? 'text-4xl' : 'text-2xl'}`}>🎁</span>
+                      <GiftIcon className={`${isMain ? 'w-16 h-16' : 'w-10 h-10'} text-neon-purple`} />
                     </div>
                   ) : (
                     <Image
