@@ -1,8 +1,6 @@
 'use client'
 
-import { useRef, useState, ComponentType } from 'react'
-import { useGSAP } from '@gsap/react'
-import { gsap } from '@/lib/gsap/gsapConfig'
+import { useRef, useState, useEffect, ComponentType } from 'react'
 import { CoinsIcon, GamepadIcon, UsersIcon } from '@/components/ui/GamingIcons'
 
 interface StatItem {
@@ -28,6 +26,7 @@ export function AnimatedStats({
   className = '',
 }: AnimatedStatsProps) {
   const containerRef = useRef<HTMLDivElement>(null)
+  const [isVisible, setIsVisible] = useState(false)
   const [hasAnimated, setHasAnimated] = useState(false)
   const [displayValues, setDisplayValues] = useState({
     winnings: 0,
@@ -38,97 +37,88 @@ export function AnimatedStats({
   const stats: StatItem[] = [
     {
       value: totalWinnings,
-      label: 'Gagnes par des joueurs',
+      label: 'Gagnés par les utilisateurs',
       suffix: '€',
       color: 'purple',
       Icon: CoinsIcon,
     },
     {
       value: totalGames,
-      label: 'Objets distribues',
+      label: 'Lots distribués',
       suffix: '+',
       color: 'blue',
       Icon: GamepadIcon,
     },
     {
       value: playersOnline,
-      label: 'Connectes maintenant',
+      label: 'Connectés maintenant',
       color: 'pink',
       Icon: UsersIcon,
     },
   ]
 
-  useGSAP(() => {
-    if (!containerRef.current || hasAnimated) return
+  // Intersection Observer for visibility
+  useEffect(() => {
+    if (!containerRef.current) return
 
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          if (entry.isIntersecting && !hasAnimated) {
-            setHasAnimated(true)
-
-            // Animate numbers
-            const duration = 2
-
-            // Winnings
-            gsap.to({ val: 0 }, {
-              val: totalWinnings,
-              duration,
-              ease: 'power2.out',
-              onUpdate: function() {
-                setDisplayValues(prev => ({
-                  ...prev,
-                  winnings: Math.floor(this.targets()[0].val),
-                }))
-              },
-            })
-
-            // Games
-            gsap.to({ val: 0 }, {
-              val: totalGames,
-              duration,
-              ease: 'power2.out',
-              onUpdate: function() {
-                setDisplayValues(prev => ({
-                  ...prev,
-                  games: Math.floor(this.targets()[0].val),
-                }))
-              },
-            })
-
-            // Players
-            gsap.to({ val: 0 }, {
-              val: playersOnline,
-              duration: 1,
-              ease: 'power2.out',
-              onUpdate: function() {
-                setDisplayValues(prev => ({
-                  ...prev,
-                  players: Math.floor(this.targets()[0].val),
-                }))
-              },
-            })
-
-            // Animate cards
-            gsap.from('.stat-card', {
-              y: 40,
-              opacity: 0,
-              stagger: 0.15,
-              duration: 0.6,
-              ease: 'power3.out',
-            })
-
+          if (entry.isIntersecting && !isVisible) {
+            setIsVisible(true)
             observer.disconnect()
           }
         })
       },
-      { threshold: 0.3 }
+      { threshold: 0.2 }
     )
 
     observer.observe(containerRef.current)
-
     return () => observer.disconnect()
-  }, { scope: containerRef, dependencies: [hasAnimated, totalWinnings, totalGames, playersOnline] })
+  }, [isVisible])
+
+  // Animate numbers ONCE when visible
+  useEffect(() => {
+    if (!isVisible || hasAnimated) return
+
+    setHasAnimated(true)
+
+    const duration = 2000 // 2 seconds
+    const startTime = Date.now()
+    const targetWinnings = totalWinnings
+    const targetGames = totalGames
+    const targetPlayers = playersOnline
+
+    const animate = () => {
+      const elapsed = Date.now() - startTime
+      const progress = Math.min(elapsed / duration, 1)
+
+      // Easing function (ease-out)
+      const eased = 1 - Math.pow(1 - progress, 3)
+
+      setDisplayValues({
+        winnings: Math.floor(targetWinnings * eased),
+        games: Math.floor(targetGames * eased),
+        players: Math.floor(targetPlayers * eased),
+      })
+
+      if (progress < 1) {
+        requestAnimationFrame(animate)
+      }
+    }
+
+    requestAnimationFrame(animate)
+  }, [isVisible, hasAnimated, totalWinnings, totalGames, playersOnline])
+
+  // Update players count in real-time AFTER initial animation
+  useEffect(() => {
+    if (hasAnimated) {
+      setDisplayValues(prev => ({
+        ...prev,
+        players: playersOnline,
+      }))
+    }
+  }, [playersOnline, hasAnimated])
 
   const getColorClasses = (color: StatItem['color']) => {
     switch (color) {
@@ -136,22 +126,31 @@ export function AnimatedStats({
         return {
           text: 'text-neon-purple',
           border: 'border-neon-purple/30',
-          glow: 'shadow-[0_0_30px_rgba(155,92,255,0.2)]',
+          hoverBorder: 'group-hover:border-neon-purple/60',
+          glow: 'group-hover:shadow-[0_0_40px_rgba(155,92,255,0.4)]',
           bg: 'bg-neon-purple/10',
+          iconGlow: 'group-hover:shadow-[0_0_20px_rgba(155,92,255,0.6)]',
+          hex: '#9B5CFF',
         }
       case 'blue':
         return {
           text: 'text-neon-blue',
           border: 'border-neon-blue/30',
-          glow: 'shadow-[0_0_30px_rgba(60,203,255,0.2)]',
+          hoverBorder: 'group-hover:border-neon-blue/60',
+          glow: 'group-hover:shadow-[0_0_40px_rgba(60,203,255,0.4)]',
           bg: 'bg-neon-blue/10',
+          iconGlow: 'group-hover:shadow-[0_0_20px_rgba(60,203,255,0.6)]',
+          hex: '#3CCBFF',
         }
       case 'pink':
         return {
           text: 'text-neon-pink',
           border: 'border-neon-pink/30',
-          glow: 'shadow-[0_0_30px_rgba(255,79,216,0.2)]',
+          hoverBorder: 'group-hover:border-neon-pink/60',
+          glow: 'group-hover:shadow-[0_0_40px_rgba(255,79,216,0.4)]',
           bg: 'bg-neon-pink/10',
+          iconGlow: 'group-hover:shadow-[0_0_20px_rgba(255,79,216,0.6)]',
+          hex: '#FF4FD8',
         }
     }
   }
@@ -177,27 +176,50 @@ export function AnimatedStats({
           <div
             key={index}
             className={`
-              stat-card relative p-6
+              stat-card relative p-8 rounded-lg
               bg-bg-secondary/50 backdrop-blur-sm
-              border ${colors.border}
-              clip-angle
-              hover:${colors.glow}
-              transition-shadow duration-500
+              border ${colors.border} ${colors.hoverBorder}
+              ${colors.glow}
+              transition-all duration-500
               group
+              ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}
             `}
+            style={{
+              transitionDelay: isVisible ? `${index * 150}ms` : '0ms',
+            }}
           >
-            {/* Icon */}
+            {/* Gradient border glow on hover */}
+            <div
+              className="absolute inset-0 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10"
+              style={{
+                background: `radial-gradient(ellipse at center, ${colors.hex}15 0%, transparent 70%)`,
+              }}
+            />
+
+            {/* Icon with pulse effect */}
             <div className={`
-              absolute top-4 right-4 w-12 h-12 rounded-lg
+              absolute top-6 right-6 w-14 h-14 rounded-xl
               ${colors.bg}
               flex items-center justify-center
-              group-hover:scale-110 transition-transform
+              transition-all duration-300
+              ${colors.iconGlow}
+              group-hover:scale-110
             `}>
-              <stat.Icon className={`w-6 h-6 ${colors.text}`} />
+              {/* Pulse ring */}
+              <div
+                className="absolute inset-0 rounded-xl animate-ping opacity-0 group-hover:opacity-30"
+                style={{ backgroundColor: colors.hex }}
+              />
+              <stat.Icon className={`w-7 h-7 ${colors.text} relative z-10`} />
             </div>
 
-            {/* Value */}
-            <div className={`text-4xl md:text-5xl font-black ${colors.text} mb-2`}>
+            {/* Value with text glow */}
+            <div
+              className={`text-4xl md:text-5xl font-black ${colors.text} mb-2 transition-all duration-300`}
+              style={{
+                textShadow: isVisible ? `0 0 20px ${colors.hex}40` : 'none',
+              }}
+            >
               {stat.prefix}
               {getDisplayValue(index)}
               {stat.suffix}
@@ -208,12 +230,15 @@ export function AnimatedStats({
               {stat.label}
             </div>
 
-            {/* Animated underline */}
-            <div className={`
-              absolute bottom-0 left-0 h-1 w-0
-              bg-gradient-to-r from-transparent ${colors.text.replace('text-', 'via-')} to-transparent
-              group-hover:w-full transition-all duration-700
-            `} />
+            {/* Animated bottom border */}
+            <div className="absolute bottom-0 left-0 right-0 h-[2px] overflow-hidden rounded-b-lg">
+              <div
+                className="h-full w-0 group-hover:w-full transition-all duration-700"
+                style={{
+                  background: `linear-gradient(90deg, transparent, ${colors.hex}, transparent)`,
+                }}
+              />
+            </div>
           </div>
         )
       })}

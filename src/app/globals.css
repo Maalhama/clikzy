@@ -891,3 +891,18 @@ body {
 .nav-link-neon:hover {
   text-shadow: 0 0 10px rgba(155, 92, 255, 0.3);
 }
+
+/* Animated gradient for progress line */
+@keyframes gradient-x {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+.animate-gradient-x {
+  background-size: 200% 200%;
+  animation: gradient-x 3s ease infinite;
+}

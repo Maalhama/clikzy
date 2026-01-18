@@ -215,17 +215,14 @@ export function LandingClient({
 
           {/* Navigation centrale */}
           <nav className="hidden md:flex items-center gap-8">
-            <a href="#lots" className="nav-link-neon text-sm font-medium text-white/60 hover:text-white transition-all duration-300 relative group">
+            <a href="#lots" className="nav-link-neon text-sm font-medium text-white/60 hover:text-white transition-all duration-300">
               Lots
-              <span className="absolute -bottom-1 left-0 w-0 h-[2px] bg-gradient-to-r from-neon-purple to-neon-pink group-hover:w-full transition-all duration-300" />
             </a>
-            <a href="#how-it-works" className="nav-link-neon text-sm font-medium text-white/60 hover:text-white transition-all duration-300 relative group">
+            <a href="#how-it-works" className="nav-link-neon text-sm font-medium text-white/60 hover:text-white transition-all duration-300">
               Comment ça marche
-              <span className="absolute -bottom-1 left-0 w-0 h-[2px] bg-gradient-to-r from-neon-purple to-neon-pink group-hover:w-full transition-all duration-300" />
             </a>
-            <a href="#winners" className="nav-link-neon text-sm font-medium text-white/60 hover:text-white transition-all duration-300 relative group">
+            <a href="#winners" className="nav-link-neon text-sm font-medium text-white/60 hover:text-white transition-all duration-300">
               Gagnants
-              <span className="absolute -bottom-1 left-0 w-0 h-[2px] bg-gradient-to-r from-neon-purple to-neon-pink group-hover:w-full transition-all duration-300" />
             </a>
           </nav>
 
@@ -363,70 +360,170 @@ export function LandingClient({
       <TrustBadges variant="horizontal" />
 
       {/* HOW IT WORKS */}
-      <section id="how" className="how-section relative py-32">
+      <section id="how-it-works" className="how-section relative py-20 overflow-hidden">
+        {/* Background gradient */}
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-neon-purple/5 to-transparent" />
 
         <div className="relative max-w-7xl mx-auto px-6">
+          {/* Section header */}
           <div className="text-center mb-20">
             <h2 className="section-title text-4xl md:text-6xl font-black mb-4">
-              COMMENT <span className="text-neon-purple">CA MARCHE</span>
+              COMMENT <span className="text-neon-purple neon-text">ÇA MARCHE</span>
             </h2>
             <p className="text-white/50 text-lg max-w-2xl mx-auto">
-              Un systeme transparent en 3 etapes
+              Un système simple et transparent en 3 étapes
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
-            {[
-              {
-                num: '01',
-                title: 'CHOISIS',
-                desc: 'Parcours les lots disponibles et selectionne l\'objet qui te fait envie.',
-                Icon: TargetIcon,
-                hex: '#9B5CFF',
-              },
-              {
-                num: '02',
-                title: 'CLIQUE',
-                desc: 'Chaque clic coute 1 credit et relance le timer. Sois strategique.',
-                Icon: CursorClickIcon,
-                hex: '#3CCBFF',
-              },
-              {
-                num: '03',
-                title: 'GAGNE',
-                desc: 'Si tu es le dernier a avoir clique quand le timer atteint zero, l\'objet est a toi.',
-                Icon: TrophyIcon,
-                hex: '#FF4FD8',
-              },
-            ].map((step, i) => (
-              <div key={i} className="step-card group relative">
-                <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                <div className="relative p-8 border border-white/10 hover:border-white/20 transition-colors clip-angle-lg">
-                  <div className="text-7xl font-black opacity-10 absolute top-4 right-4" style={{ color: step.hex }}>
-                    {step.num}
+          {/* Steps container with progress line */}
+          <div className="relative">
+            {/* Progress line - desktop only */}
+            <div className="hidden md:block absolute top-24 left-[16.666%] right-[16.666%] h-[2px]">
+              <div className="absolute inset-0 bg-white/10" />
+              <div className="absolute inset-0 bg-gradient-to-r from-neon-purple via-neon-blue to-neon-pink animate-gradient-x" />
+              {/* Animated glow on line */}
+              <div className="absolute inset-0 bg-gradient-to-r from-neon-purple via-neon-blue to-neon-pink blur-sm opacity-50" />
+            </div>
+
+            {/* Steps grid */}
+            <div className="grid md:grid-cols-3 gap-8 md:gap-12">
+              {[
+                {
+                  num: '1',
+                  title: 'CHOISIS',
+                  desc: 'Parcours les lots disponibles et sélectionne celui qui te fait envie.',
+                  Icon: TargetIcon,
+                  color: 'neon-purple',
+                  hex: '#9B5CFF',
+                  shadow: 'shadow-[0_0_30px_rgba(155,92,255,0.3)]',
+                  hoverShadow: 'group-hover:shadow-[0_0_50px_rgba(155,92,255,0.5)]',
+                },
+                {
+                  num: '2',
+                  title: 'CLIQUE',
+                  desc: 'Chaque clic coûte 1 crédit et relance le timer. Sois stratégique.',
+                  Icon: CursorClickIcon,
+                  color: 'neon-blue',
+                  hex: '#3CCBFF',
+                  shadow: 'shadow-[0_0_30px_rgba(60,203,255,0.3)]',
+                  hoverShadow: 'group-hover:shadow-[0_0_50px_rgba(60,203,255,0.5)]',
+                },
+                {
+                  num: '3',
+                  title: 'GAGNE',
+                  desc: 'Sois le dernier à cliquer quand le timer atteint zéro et remporte le lot.',
+                  Icon: TrophyIcon,
+                  color: 'neon-pink',
+                  hex: '#FF4FD8',
+                  shadow: 'shadow-[0_0_30px_rgba(255,79,216,0.3)]',
+                  hoverShadow: 'group-hover:shadow-[0_0_50px_rgba(255,79,216,0.5)]',
+                },
+              ].map((step, i) => (
+                <div
+                  key={i}
+                  className="step-card group relative"
+                  style={{ animationDelay: `${i * 150}ms` }}
+                >
+                  {/* Neon badge number - positioned above card */}
+                  <div className="relative z-10 flex justify-center mb-6">
+                    <div
+                      className={`
+                        w-12 h-12 rounded-full flex items-center justify-center
+                        font-black text-xl text-white
+                        border-2 transition-all duration-300
+                        ${step.shadow} ${step.hoverShadow}
+                      `}
+                      style={{
+                        backgroundColor: `${step.hex}20`,
+                        borderColor: step.hex,
+                      }}
+                    >
+                      {step.num}
+                    </div>
                   </div>
-                  <div className="mb-6">
-                    <step.Icon className="w-14 h-14" style={{ color: step.hex }} />
+
+                  {/* Card */}
+                  <div
+                    className={`
+                      relative p-8 rounded-lg
+                      bg-bg-secondary/50 backdrop-blur-sm
+                      border border-white/10
+                      transition-all duration-300
+                      group-hover:border-opacity-50
+                      ${step.hoverShadow}
+                    `}
+                    style={{
+                      ['--hover-border-color' as string]: step.hex,
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.borderColor = step.hex
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'
+                    }}
+                  >
+                    {/* Icon with glow */}
+                    <div className="mb-6 relative">
+                      {/* Glow behind icon */}
+                      <div
+                        className="absolute inset-0 blur-xl opacity-0 group-hover:opacity-50 transition-opacity duration-300"
+                        style={{ backgroundColor: step.hex }}
+                      />
+                      <step.Icon
+                        className="w-14 h-14 relative z-10 transition-transform duration-300 group-hover:scale-110"
+                        style={{ color: step.hex }}
+                      />
+                    </div>
+
+                    {/* Title */}
+                    <h3
+                      className="text-2xl font-black mb-3 transition-all duration-300"
+                      style={{ color: step.hex }}
+                    >
+                      {step.title}
+                    </h3>
+
+                    {/* Description */}
+                    <p className="text-white/60 leading-relaxed">
+                      {step.desc}
+                    </p>
+
+                    {/* Bottom line accent */}
+                    <div
+                      className="absolute bottom-0 left-0 right-0 h-[2px] opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                      style={{
+                        background: `linear-gradient(90deg, transparent, ${step.hex}, transparent)`,
+                      }}
+                    />
                   </div>
-                  <h3 className="text-2xl font-black mb-3" style={{ color: step.hex }}>{step.title}</h3>
-                  <p className="text-white/50 leading-relaxed">{step.desc}</p>
-                  <div className="absolute bottom-0 left-0 h-1 w-0 group-hover:w-full transition-all duration-500" style={{ backgroundColor: step.hex }} />
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
       </section>
 
       {/* STATS SECTION */}
-      <section className="relative py-24">
-        <div className="max-w-7xl mx-auto px-6">
+      <section className="relative py-16 overflow-hidden">
+        {/* Background gradient */}
+        <div className="absolute inset-0 bg-gradient-to-b from-neon-blue/5 via-transparent to-neon-purple/5" />
+
+        {/* Floating particles */}
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-10 left-[10%] w-2 h-2 rounded-full bg-neon-purple/40 animate-float" style={{ animationDelay: '0s' }} />
+          <div className="absolute top-20 right-[15%] w-3 h-3 rounded-full bg-neon-blue/30 animate-float" style={{ animationDelay: '1s' }} />
+          <div className="absolute bottom-20 left-[20%] w-2 h-2 rounded-full bg-neon-pink/40 animate-float" style={{ animationDelay: '2s' }} />
+          <div className="absolute bottom-10 right-[25%] w-2 h-2 rounded-full bg-neon-purple/30 animate-float" style={{ animationDelay: '0.5s' }} />
+        </div>
+
+        <div className="relative max-w-7xl mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-black mb-4">
-              CLIKZY <span className="text-neon-blue">EN CHIFFRES</span>
+              <span className="text-neon-purple neon-text">CLIK</span>
+              <span className="text-neon-pink neon-text-pink">ZY</span>
+              <span className="text-white"> EN CHIFFRES</span>
             </h2>
-            <p className="text-white/50 text-lg">Une communaute active et des gains reels</p>
+            <p className="text-white/50 text-lg">Une communauté active et des gains réels</p>
           </div>
           <AnimatedStats
             totalWinnings={stats.totalWinningsValue}
@@ -437,7 +534,7 @@ export function LandingClient({
       </section>
 
       {/* PRIZES SHOWCASE */}
-      <section className="relative py-24 overflow-hidden">
+      <section className="relative py-16 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-neon-purple/5 to-transparent" />
         <div className="relative max-w-7xl mx-auto px-6">
           <div className="text-center mb-16">
@@ -451,7 +548,7 @@ export function LandingClient({
       </section>
 
       {/* LEADERBOARD & TESTIMONIALS */}
-      <section className="relative py-24">
+      <section className="relative py-16">
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid lg:grid-cols-2 gap-8">
             <Leaderboard />
@@ -461,7 +558,7 @@ export function LandingClient({
       </section>
 
       {/* WINNERS SECTION */}
-      <section className="winners-section relative py-32">
+      <section className="winners-section relative py-20">
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             {/* Left - Stats */}
@@ -527,7 +624,7 @@ export function LandingClient({
       </section>
 
       {/* FINAL CTA */}
-      <section className="final-cta relative py-32">
+      <section className="final-cta relative py-20">
         <div className="absolute inset-0">
           <div className="absolute inset-0 bg-gradient-to-t from-neon-purple/20 to-transparent" />
           <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-neon-purple to-transparent" />
