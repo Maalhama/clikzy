@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useEffect } from 'react'
+import { useRef } from 'react'
 import Image from 'next/image'
 import { useGSAP } from '@gsap/react'
 import { gsap } from '@/lib/gsap/gsapConfig'
@@ -13,12 +13,42 @@ interface Prize {
 }
 
 const PRIZES: Prize[] = [
-  { id: '1', name: 'iPhone 15 Pro', image: 'https://images.unsplash.com/photo-1695048133142-1a20484d2569?w=300&h=300&fit=crop', value: 1479 },
-  { id: '2', name: 'PS5', image: 'https://images.unsplash.com/photo-1606144042614-b2417e99c4e3?w=300&h=300&fit=crop', value: 549 },
-  { id: '3', name: 'MacBook Air', image: 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=300&h=300&fit=crop', value: 1299 },
-  { id: '4', name: 'AirPods Pro', image: 'https://images.unsplash.com/photo-1600294037681-c80b4cb5b434?w=300&h=300&fit=crop', value: 279 },
-  { id: '5', name: 'Apple Watch', image: 'https://images.unsplash.com/photo-1434493789847-2f02dc6ca35d?w=300&h=300&fit=crop', value: 449 },
-  { id: '6', name: 'iPad Pro', image: 'https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=300&h=300&fit=crop', value: 1099 },
+  {
+    id: '1',
+    name: 'iPhone 15 Pro',
+    image: 'https://images.unsplash.com/photo-1696446701796-da61225697cc?w=800&q=90',
+    value: 1479
+  },
+  {
+    id: '2',
+    name: 'PlayStation 5',
+    image: 'https://images.unsplash.com/photo-1606813907291-d86efa9b94db?w=800&q=90',
+    value: 549
+  },
+  {
+    id: '3',
+    name: 'MacBook Pro',
+    image: 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=800&q=90',
+    value: 2499
+  },
+  {
+    id: '4',
+    name: 'AirPods Pro',
+    image: 'https://images.unsplash.com/photo-1606220588913-b3aacb4d2f46?w=800&q=90',
+    value: 279
+  },
+  {
+    id: '5',
+    name: 'Apple Watch',
+    image: 'https://images.unsplash.com/photo-1546868871-7041f2a55e12?w=800&q=90',
+    value: 449
+  },
+  {
+    id: '6',
+    name: 'iPad Pro',
+    image: 'https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=800&q=90',
+    value: 1099
+  },
 ]
 
 export function FloatingPrizes() {
@@ -31,9 +61,9 @@ export function FloatingPrizes() {
       // Animate prize cards with different delays and movements
       gsap.utils.toArray<HTMLElement>('.prize-float-card').forEach((card, i) => {
         const delay = i * 0.15
-        const yMove = 15 + Math.random() * 20
-        const duration = 3 + Math.random() * 2
-        const rotation = (Math.random() - 0.5) * 10
+        const yMove = 15 + ((i * 7) % 20)
+        const duration = 3 + (i % 3)
+        const rotation = ((i * 3) % 10) - 5
 
         // Entry animation
         gsap.from(card, {
@@ -59,7 +89,7 @@ export function FloatingPrizes() {
 
       // Animate geometric shapes
       gsap.utils.toArray<HTMLElement>('.geo-shape').forEach((shape, i) => {
-        const duration = 4 + Math.random() * 4
+        const duration = 4 + (i % 4) * 2
         const rotation = 360 * (i % 2 === 0 ? 1 : -1)
 
         gsap.to(shape, {
@@ -70,7 +100,7 @@ export function FloatingPrizes() {
         })
 
         gsap.to(shape, {
-          scale: 1 + Math.random() * 0.3,
+          scale: 1 + (i % 3) * 0.1,
           duration: duration / 2,
           ease: 'power1.inOut',
           yoyo: true,
@@ -191,7 +221,8 @@ export function FloatingPrizes() {
                   alt={prize.name}
                   fill
                   className="object-cover hover:scale-110 transition-transform duration-500"
-                  sizes={index === 0 ? '300px' : '150px'}
+                  sizes={index === 0 ? '400px' : '200px'}
+                  quality={90}
                 />
               </div>
 
@@ -224,10 +255,9 @@ export function FloatingPrizes() {
         ))}
       </div>
 
-      {/* Floating particles - deterministic positions to avoid hydration mismatch */}
+      {/* Floating particles */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         {Array.from({ length: 15 }).map((_, i) => {
-          // Deterministic pseudo-random based on index
           const left = ((i * 17 + 7) % 100)
           const top = ((i * 23 + 11) % 100)
           const delay = (i * 0.3) % 5
