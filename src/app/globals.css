@@ -1064,3 +1064,23 @@ body {
 .animate-marquee-fast {
   animation: marquee 15s linear infinite;
 }
+
+/* Infinite seamless marquee - uses two identical containers side by side */
+@keyframes marquee-infinite {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee-infinite {
+  display: flex;
+  width: fit-content;
+  animation: marquee-infinite 30s linear infinite;
+}
+
+.animate-marquee-infinite:hover {
+  animation-play-state: paused;
+}
