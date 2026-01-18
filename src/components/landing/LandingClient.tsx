@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
 import Link from 'next/link'
 import { useGSAP } from '@gsap/react'
 import { gsap } from '@/lib/gsap/gsapConfig'
@@ -10,7 +10,6 @@ import { useLandingRealtime } from '@/hooks/landing/useLandingRealtime'
 import {
   LiveActivityToast,
   FloatingTimer,
-  AnimatedStats,
   Leaderboard,
   ClickPulse,
   TrustBadges,
@@ -140,6 +139,7 @@ export function LandingClient({
   stats,
 }: LandingClientProps) {
   const mainRef = useRef<HTMLElement>(null)
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   const { playerCount, recentWinners } = useLandingRealtime(
     initialWinners,
@@ -279,15 +279,15 @@ export function LandingClient({
           {/* Logo */}
           <Logo size="md" animated={true} href="/" />
 
-          {/* Navigation centrale */}
+          {/* Navigation centrale - Desktop */}
           <nav className="hidden md:flex items-center gap-8">
-            <a href="#lots" className="nav-link-neon text-sm font-medium text-white/60 hover:text-white transition-all duration-300">
+            <a href="#lots" className="nav-link-neon text-sm font-medium text-white/70 hover:text-white transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-neon-purple/50 rounded">
               Lots
             </a>
-            <a href="#how-it-works" className="nav-link-neon text-sm font-medium text-white/60 hover:text-white transition-all duration-300">
+            <a href="#how-it-works" className="nav-link-neon text-sm font-medium text-white/70 hover:text-white transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-neon-purple/50 rounded">
               Comment ça marche
             </a>
-            <a href="#winners" className="nav-link-neon text-sm font-medium text-white/60 hover:text-white transition-all duration-300">
+            <a href="#winners" className="nav-link-neon text-sm font-medium text-white/70 hover:text-white transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-neon-purple/50 rounded">
               Gagnants
             </a>
           </nav>
@@ -299,31 +299,109 @@ export function LandingClient({
               <PlayerCounter count={playerCount} label="en ligne" size="sm" />
             </div>
 
-            {isLoggedIn ? (
-              <Link
-                href="/lobby"
-                className="neon-btn-primary px-6 py-2.5 text-sm font-bold"
-              >
-                PARTICIPER
-              </Link>
-            ) : (
-              <>
+            {/* Desktop buttons */}
+            <div className="hidden md:flex items-center gap-4">
+              {isLoggedIn ? (
                 <Link
-                  href="/login"
-                  className="neon-btn-ghost px-4 py-2 text-sm font-medium"
+                  href="/lobby"
+                  className="neon-btn-primary px-6 py-2.5 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-neon-purple/50"
                 >
-                  Connexion
+                  PARTICIPER
                 </Link>
-                <Link
-                  href="/register"
-                  className="neon-btn-primary px-6 py-2.5 text-sm font-bold"
-                >
-                  S'INSCRIRE
-                </Link>
-              </>
-            )}
+              ) : (
+                <>
+                  <Link
+                    href="/login"
+                    className="neon-btn-ghost px-4 py-2 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-neon-purple/50"
+                  >
+                    Connexion
+                  </Link>
+                  <Link
+                    href="/register"
+                    className="neon-btn-primary px-6 py-2.5 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-neon-purple/50"
+                  >
+                    S'INSCRIRE
+                  </Link>
+                </>
+              )}
+            </div>
+
+            {/* Mobile menu button */}
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="md:hidden p-2 rounded-lg bg-white/5 border border-white/10 hover:border-neon-purple/50 transition-colors focus:outline-none focus:ring-2 focus:ring-neon-purple/50"
+              aria-label={mobileMenuOpen ? 'Fermer le menu' : 'Ouvrir le menu'}
+              aria-expanded={mobileMenuOpen}
+            >
+              {mobileMenuOpen ? (
+                <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              ) : (
+                <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+              )}
+            </button>
           </div>
         </div>
+
+        {/* Mobile menu overlay */}
+        {mobileMenuOpen && (
+          <div className="md:hidden absolute top-full left-0 right-0 bg-bg-primary/95 backdrop-blur-xl border-t border-white/10">
+            <nav className="flex flex-col p-6 gap-4">
+              <a
+                href="#lots"
+                onClick={() => setMobileMenuOpen(false)}
+                className="text-lg font-medium text-white/70 hover:text-neon-purple transition-colors py-2"
+              >
+                Lots
+              </a>
+              <a
+                href="#how-it-works"
+                onClick={() => setMobileMenuOpen(false)}
+                className="text-lg font-medium text-white/70 hover:text-neon-purple transition-colors py-2"
+              >
+                Comment ça marche
+              </a>
+              <a
+                href="#winners"
+                onClick={() => setMobileMenuOpen(false)}
+                className="text-lg font-medium text-white/70 hover:text-neon-purple transition-colors py-2"
+              >
+                Gagnants
+              </a>
+              <div className="border-t border-white/10 pt-4 mt-2 flex flex-col gap-3">
+                {isLoggedIn ? (
+                  <Link
+                    href="/lobby"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="neon-btn-primary px-6 py-3 text-center text-sm font-bold"
+                  >
+                    PARTICIPER
+                  </Link>
+                ) : (
+                  <>
+                    <Link
+                      href="/login"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="neon-btn-ghost px-6 py-3 text-center text-sm font-medium"
+                    >
+                      Connexion
+                    </Link>
+                    <Link
+                      href="/register"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="neon-btn-primary px-6 py-3 text-center text-sm font-bold"
+                    >
+                      S'INSCRIRE
+                    </Link>
+                  </>
+                )}
+              </div>
+            </nav>
+          </div>
+        )}
       </header>
 
       {/* HERO SECTION */}
@@ -360,7 +438,7 @@ export function LandingClient({
             </h1>
 
             {/* Subtitle */}
-            <p className="hero-subtitle text-sm md:text-base text-white/60 max-w-lg mb-8">
+            <p className="hero-subtitle text-sm md:text-base text-white/70 max-w-lg mb-8">
               Sois le dernier a cliquer avant la fin du timer et remporte le lot.
               <span className="block text-neon-blue font-semibold mt-1">iPhone, PS5, MacBook... a toi de cliquer.</span>
             </p>
@@ -379,8 +457,8 @@ export function LandingClient({
                 </span>
               </Link>
               <a
-                href="#how"
-                className="px-8 py-4 border-2 border-white/20 text-white font-bold hover:border-neon-blue/50 hover:text-neon-blue transition-all clip-angle"
+                href="#how-it-works"
+                className="px-8 py-4 border-2 border-white/20 text-white font-bold hover:border-neon-blue/50 hover:text-neon-blue transition-all clip-angle focus:outline-none focus:ring-2 focus:ring-neon-blue/50"
               >
                 COMMENT CA MARCHE
               </a>
@@ -453,7 +531,7 @@ export function LandingClient({
             <h2 className="section-title text-4xl md:text-6xl font-black mb-4">
               COMMENT <span className="text-neon-purple neon-text">ÇA MARCHE</span>
             </h2>
-            <p className="text-white/50 text-lg max-w-2xl mx-auto">
+            <p className="text-white/70 text-lg max-w-2xl mx-auto">
               Un système simple et transparent en 3 étapes
             </p>
           </div>
@@ -567,7 +645,7 @@ export function LandingClient({
                     </h3>
 
                     {/* Description */}
-                    <p className="text-white/60 leading-relaxed">
+                    <p className="text-white/70 leading-relaxed">
                       {step.desc}
                     </p>
 
@@ -583,44 +661,6 @@ export function LandingClient({
               ))}
             </div>
           </div>
-        </div>
-      </section>
-
-      {/* STATS SECTION */}
-      <section className="relative py-20 overflow-hidden">
-        {/* Background gradient */}
-        <div className="absolute inset-0 bg-gradient-to-b from-neon-blue/5 via-transparent to-neon-purple/5" />
-
-        {/* Glow orbs */}
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-1/2 left-1/4 w-[300px] h-[300px] bg-neon-purple/10 rounded-full blur-[100px]" />
-          <div className="absolute top-1/2 right-1/4 w-[300px] h-[300px] bg-neon-blue/10 rounded-full blur-[100px]" />
-        </div>
-
-        {/* Floating particles with glow */}
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-10 left-[10%] w-2 h-2 rounded-full bg-neon-purple animate-float" style={{ animationDelay: '0s', boxShadow: '0 0 10px rgba(155, 92, 255, 0.8)' }} />
-          <div className="absolute top-20 right-[15%] w-3 h-3 rounded-full bg-neon-blue animate-float" style={{ animationDelay: '1s', boxShadow: '0 0 12px rgba(60, 203, 255, 0.8)' }} />
-          <div className="absolute bottom-20 left-[20%] w-2 h-2 rounded-full bg-neon-pink animate-float" style={{ animationDelay: '2s', boxShadow: '0 0 10px rgba(255, 79, 216, 0.8)' }} />
-          <div className="absolute bottom-10 right-[25%] w-2 h-2 rounded-full bg-neon-purple animate-float" style={{ animationDelay: '0.5s', boxShadow: '0 0 10px rgba(155, 92, 255, 0.8)' }} />
-          <div className="absolute top-1/3 left-[5%] w-1.5 h-1.5 rounded-full bg-success animate-float" style={{ animationDelay: '1.5s', boxShadow: '0 0 8px rgba(0, 255, 136, 0.8)' }} />
-          <div className="absolute bottom-1/3 right-[8%] w-2 h-2 rounded-full bg-neon-pink animate-float" style={{ animationDelay: '2.5s', boxShadow: '0 0 10px rgba(255, 79, 216, 0.8)' }} />
-        </div>
-
-        <div className="relative max-w-7xl mx-auto px-6">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-black mb-4">
-              <span className="text-neon-purple" style={{ textShadow: '0 0 30px rgba(155, 92, 255, 0.5)' }}>CLIK</span>
-              <span className="text-neon-pink" style={{ textShadow: '0 0 30px rgba(255, 79, 216, 0.5)' }}>ZY</span>
-              <span className="text-white"> EN CHIFFRES</span>
-            </h2>
-            <p className="text-white/50 text-lg">Une communauté active et des gains réels</p>
-          </div>
-          <AnimatedStats
-            totalWinnings={stats.totalWinningsValue}
-            totalGames={stats.totalGames}
-            playersOnline={playerCount || 42}
-          />
         </div>
       </section>
 
@@ -650,14 +690,14 @@ export function LandingClient({
                 À REMPORTER
               </span>
             </h2>
-            <p className="text-white/50 text-lg">Des produits premium à remporter quotidiennement</p>
+            <p className="text-white/70 text-lg">Des produits premium à remporter quotidiennement</p>
           </div>
           <PrizeCarousel />
         </div>
       </section>
 
       {/* LEADERBOARD & TESTIMONIALS */}
-      <section className="relative py-16">
+      <section className="relative py-20">
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid lg:grid-cols-2 gap-8">
             <Leaderboard />
@@ -667,7 +707,7 @@ export function LandingClient({
       </section>
 
       {/* WINNERS SECTION - Modern Design */}
-      <section id="winners" className="winners-section relative py-24 overflow-hidden">
+      <section id="winners" className="winners-section relative py-20 overflow-hidden">
         {/* Background glow */}
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-success/5 rounded-full blur-[120px]" />
@@ -696,7 +736,7 @@ export function LandingClient({
                   GAGNANTS
                 </span>
               </h2>
-              <p className="text-white/50 mt-3 max-w-md">
+              <p className="text-white/70 mt-3 max-w-md">
                 Des gagnants remportent des objets chaque jour. Consulte les gains en temps réel.
               </p>
             </div>
@@ -790,7 +830,7 @@ export function LandingClient({
       </section>
 
       {/* FINAL CTA */}
-      <section className="final-cta relative py-24 overflow-hidden">
+      <section className="final-cta relative py-20 overflow-hidden">
         {/* Background effects */}
         <div className="absolute inset-0">
           <div className="absolute inset-0 bg-gradient-to-t from-neon-purple/20 via-transparent to-transparent" />
@@ -824,7 +864,7 @@ export function LandingClient({
             ?
           </h2>
 
-          <p className="text-xl text-white/60 mb-10 max-w-2xl mx-auto">
+          <p className="text-xl text-white/70 mb-10 max-w-2xl mx-auto">
             Inscris-toi maintenant et reçois{' '}
             <span
               className="text-neon-pink font-black text-2xl"
@@ -932,44 +972,48 @@ export function LandingClient({
                 <span className="text-neon-purple" style={{ textShadow: '0 0 20px rgba(155, 92, 255, 0.4)' }}>CLIK</span>
                 <span className="text-neon-pink" style={{ textShadow: '0 0 20px rgba(255, 79, 216, 0.4)' }}>ZY</span>
               </div>
-              <p className="text-white/50 text-sm mb-6 leading-relaxed">
+              <p className="text-white/70 text-sm mb-6 leading-relaxed">
                 La plateforme de jeu où le dernier clic gagne. Tente ta chance et repars avec des lots incroyables.
               </p>
               {/* Social Links */}
-              <div className="flex gap-3">
+              <nav className="flex gap-3" aria-label="Réseaux sociaux">
                 <a
                   href="#"
-                  className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:border-neon-purple/50 hover:bg-neon-purple/10 transition-all duration-300 group"
+                  className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:border-neon-purple/50 hover:bg-neon-purple/10 transition-all duration-300 group focus:outline-none focus:ring-2 focus:ring-neon-purple/50"
+                  aria-label="Twitter"
                 >
-                  <svg className="w-5 h-5 text-white/50 group-hover:text-neon-purple transition-colors" fill="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-5 h-5 text-white/60 group-hover:text-neon-purple transition-colors" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                     <path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"/>
                   </svg>
                 </a>
                 <a
                   href="#"
-                  className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:border-neon-pink/50 hover:bg-neon-pink/10 transition-all duration-300 group"
+                  className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:border-neon-pink/50 hover:bg-neon-pink/10 transition-all duration-300 group focus:outline-none focus:ring-2 focus:ring-neon-pink/50"
+                  aria-label="Instagram"
                 >
-                  <svg className="w-5 h-5 text-white/50 group-hover:text-neon-pink transition-colors" fill="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-5 h-5 text-white/60 group-hover:text-neon-pink transition-colors" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                     <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
                   </svg>
                 </a>
                 <a
                   href="#"
-                  className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:border-neon-blue/50 hover:bg-neon-blue/10 transition-all duration-300 group"
+                  className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:border-neon-blue/50 hover:bg-neon-blue/10 transition-all duration-300 group focus:outline-none focus:ring-2 focus:ring-neon-blue/50"
+                  aria-label="TikTok"
                 >
-                  <svg className="w-5 h-5 text-white/50 group-hover:text-neon-blue transition-colors" fill="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-5 h-5 text-white/60 group-hover:text-neon-blue transition-colors" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                     <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/>
                   </svg>
                 </a>
                 <a
                   href="#"
-                  className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:border-success/50 hover:bg-success/10 transition-all duration-300 group"
+                  className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:border-success/50 hover:bg-success/10 transition-all duration-300 group focus:outline-none focus:ring-2 focus:ring-success/50"
+                  aria-label="Discord"
                 >
-                  <svg className="w-5 h-5 text-white/50 group-hover:text-success transition-colors" fill="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-5 h-5 text-white/60 group-hover:text-success transition-colors" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                     <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/>
                   </svg>
                 </a>
-              </div>
+              </nav>
             </div>
 
             {/* Navigation */}

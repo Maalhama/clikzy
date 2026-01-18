@@ -1,59 +1,58 @@
 'use client'
 
-import { useRef, useState, useEffect, useCallback } from 'react'
-import Image from 'next/image'
-import { GiftIcon } from '@/components/ui/GamingIcons'
+import { useRef, useState, useEffect } from 'react'
+import { GiftIcon, TrophyIcon, CursorClickIcon } from '@/components/ui/GamingIcons'
 
 interface Prize {
   id: string
   name: string
-  image: string
   value: number
   color: 'purple' | 'blue' | 'pink'
+  Icon: React.ComponentType<{ className?: string }>
 }
 
 const PRIZES: Prize[] = [
   {
     id: '1',
     name: 'iPhone 15 Pro',
-    image: 'https://images.unsplash.com/photo-1695048133142-1a20484d2569?w=1200&q=95&fit=crop',
     value: 1479,
-    color: 'purple'
+    color: 'purple',
+    Icon: GiftIcon,
   },
   {
     id: '2',
     name: 'PlayStation 5',
-    image: 'https://images.unsplash.com/photo-1606813907291-d86efa9b94db?w=1200&q=95&fit=crop',
     value: 549,
-    color: 'blue'
+    color: 'blue',
+    Icon: TrophyIcon,
   },
   {
     id: '3',
     name: 'MacBook Pro',
-    image: 'https://images.unsplash.com/photo-1611186871348-b1ce696e52c9?w=1200&q=95&fit=crop',
     value: 2499,
-    color: 'pink'
+    color: 'pink',
+    Icon: GiftIcon,
   },
   {
     id: '4',
     name: 'AirPods Pro',
-    image: 'https://images.unsplash.com/photo-1600294037681-c80b4cb5b434?w=1200&q=95&fit=crop',
     value: 279,
-    color: 'purple'
+    color: 'purple',
+    Icon: CursorClickIcon,
   },
   {
     id: '5',
     name: 'Apple Watch',
-    image: 'https://images.unsplash.com/photo-1434493789847-2f02dc6ca35d?w=1200&q=95&fit=crop',
     value: 449,
-    color: 'blue'
+    color: 'blue',
+    Icon: GiftIcon,
   },
   {
     id: '6',
     name: 'iPad Pro',
-    image: 'https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=1200&q=95&fit=crop',
     value: 1099,
-    color: 'pink'
+    color: 'pink',
+    Icon: TrophyIcon,
   },
 ]
 
@@ -89,11 +88,6 @@ const getColorStyles = (color: Prize['color']) => {
 export function FloatingPrizes() {
   const containerRef = useRef<HTMLDivElement>(null)
   const [isVisible, setIsVisible] = useState(false)
-  const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({})
-
-  const handleImageError = useCallback((prizeId: string) => {
-    setImageErrors(prev => ({ ...prev, [prizeId]: true }))
-  }, [])
 
   useEffect(() => {
     if (!containerRef.current) return
@@ -163,29 +157,23 @@ export function FloatingPrizes() {
                   }}
                 />
 
-                {/* Image container */}
+                {/* Icon container */}
                 <div className={`
                   relative rounded-xl overflow-hidden mb-3 group/image
                   ${isMain ? 'h-40' : 'h-20'}
                 `}>
-                  {/* Image glow */}
+                  {/* Icon glow */}
                   <div className={`absolute inset-0 ${colors.glow} blur-2xl opacity-0 group-hover:opacity-50 transition-opacity duration-500`} />
 
-                  {imageErrors[prize.id] ? (
-                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-neon-purple/20 to-neon-blue/20">
-                      <GiftIcon className={`${isMain ? 'w-16 h-16' : 'w-10 h-10'} text-neon-purple`} />
-                    </div>
-                  ) : (
-                    <Image
-                      src={prize.image}
-                      alt={prize.name}
-                      fill
-                      className="object-cover transition-transform duration-500 group-hover/image:scale-110"
-                      sizes={isMain ? '400px' : '200px'}
-                      quality={90}
-                      onError={() => handleImageError(prize.id)}
+                  <div
+                    className="w-full h-full flex items-center justify-center"
+                    style={{ background: `linear-gradient(135deg, ${colors.hex}15, ${colors.hex}05)` }}
+                  >
+                    <prize.Icon
+                      className={`${isMain ? 'w-20 h-20' : 'w-10 h-10'} transition-transform duration-300 group-hover:scale-110`}
+                      style={{ color: colors.hex }}
                     />
-                  )}
+                  </div>
 
                   {/* Shine effect */}
                   <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out" />
