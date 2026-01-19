@@ -11,7 +11,12 @@ const NEON_COLORS = {
   pink: '#FF4FD8',
 }
 
-export function BackgroundEffects() {
+interface BackgroundEffectsProps {
+  /** Reduce effects for better performance on secondary pages */
+  simplified?: boolean
+}
+
+export function BackgroundEffects({ simplified = false }: BackgroundEffectsProps) {
   const containerRef = useRef<HTMLDivElement>(null)
 
   useGSAP(() => {
@@ -125,6 +130,8 @@ export function BackgroundEffects() {
     return () => ctx.revert()
   }, { scope: containerRef })
 
+  const particleCount = simplified ? 15 : 25
+
   return (
     <div ref={containerRef} className="fixed inset-0 pointer-events-none overflow-hidden z-0">
       {/* Grid pattern with neon glow */}
@@ -139,50 +146,66 @@ export function BackgroundEffects() {
         }}
       />
 
-      {/* Glow orbs - reduced */}
-      <div className="bg-glow-orb absolute top-[15%] left-[20%] w-[500px] h-[500px] bg-neon-purple/8 rounded-full blur-[150px]" />
-      <div className="bg-glow-orb absolute bottom-[25%] right-[15%] w-[400px] h-[400px] bg-neon-blue/8 rounded-full blur-[120px]" />
+      {/* Glow orbs */}
+      <div className="bg-glow-orb absolute top-[15%] left-[20%] w-[300px] h-[300px] md:w-[500px] md:h-[500px] bg-neon-purple/8 rounded-full blur-[100px] md:blur-[150px]" />
+      <div className="bg-glow-orb absolute bottom-[25%] right-[15%] w-[250px] h-[250px] md:w-[400px] md:h-[400px] bg-neon-blue/8 rounded-full blur-[80px] md:blur-[120px]" />
 
-      {/* Geometric shapes - reduced by half */}
-      {/* Top area */}
-      <div
-        className="bg-geo-shape absolute top-[5%] right-[15%] w-24 h-24 border border-neon-purple/30 rotate-45"
-        style={{ boxShadow: '0 0 15px rgba(155, 92, 255, 0.2)' }}
-      />
-      <div
-        className="bg-geo-shape absolute top-[8%] left-[10%] w-16 h-16 rounded-full border border-neon-blue/25"
-        style={{ boxShadow: '0 0 12px rgba(60, 203, 255, 0.15)' }}
-      />
+      {/* Geometric shapes - hidden on mobile for performance */}
+      <div className="hidden md:block">
+        {/* Top area */}
+        <div
+          className="bg-geo-shape absolute top-[5%] right-[15%] w-24 h-24 border border-neon-purple/30 rotate-45"
+          style={{ boxShadow: '0 0 15px rgba(155, 92, 255, 0.2)' }}
+        />
+        <div
+          className="bg-geo-shape absolute top-[8%] left-[10%] w-16 h-16 rounded-full border border-neon-blue/25"
+          style={{ boxShadow: '0 0 12px rgba(60, 203, 255, 0.15)' }}
+        />
 
-      {/* Middle */}
-      <div
-        className="bg-geo-shape absolute top-[30%] right-[8%] w-12 h-12 bg-neon-blue/10 border border-neon-blue/30 rotate-45"
-        style={{ boxShadow: '0 0 15px rgba(60, 203, 255, 0.2)' }}
-      />
-      <div className="bg-geo-shape absolute top-[50%] left-[15%] w-20 h-20 rounded-full border border-neon-blue/20" />
-      <div
-        className="bg-geo-shape absolute top-[55%] right-[5%] w-24 h-24 border border-neon-purple/20 rotate-[15deg]"
-        style={{ boxShadow: '0 0 15px rgba(155, 92, 255, 0.15)' }}
-      />
+        {/* Middle */}
+        <div
+          className="bg-geo-shape absolute top-[30%] right-[8%] w-12 h-12 bg-neon-blue/10 border border-neon-blue/30 rotate-45"
+          style={{ boxShadow: '0 0 15px rgba(60, 203, 255, 0.2)' }}
+        />
+        <div className="bg-geo-shape absolute top-[50%] left-[15%] w-20 h-20 rounded-full border border-neon-blue/20" />
+        <div
+          className="bg-geo-shape absolute top-[55%] right-[5%] w-24 h-24 border border-neon-purple/20 rotate-[15deg]"
+          style={{ boxShadow: '0 0 15px rgba(155, 92, 255, 0.15)' }}
+        />
 
-      {/* Bottom */}
-      <div
-        className="bg-geo-shape absolute top-[70%] right-[20%] w-28 h-28 rounded-full border-2 border-dashed border-neon-blue/15"
-      />
-      <div
-        className="bg-geo-shape absolute bottom-[10%] right-[35%] w-20 h-20 border border-neon-blue/25 rotate-12"
-        style={{ boxShadow: '0 0 12px rgba(60, 203, 255, 0.15)' }}
-      />
-      <div className="bg-geo-shape absolute bottom-[5%] left-[20%] w-24 h-24 rounded-full border border-neon-pink/20" />
+        {/* Bottom */}
+        <div
+          className="bg-geo-shape absolute top-[70%] right-[20%] w-28 h-28 rounded-full border-2 border-dashed border-neon-blue/15"
+        />
+        <div
+          className="bg-geo-shape absolute bottom-[10%] right-[35%] w-20 h-20 border border-neon-blue/25 rotate-12"
+          style={{ boxShadow: '0 0 12px rgba(60, 203, 255, 0.15)' }}
+        />
+        <div className="bg-geo-shape absolute bottom-[5%] left-[20%] w-24 h-24 rounded-full border border-neon-pink/20" />
 
-      {/* Triangle */}
-      <div
-        className="bg-geo-shape absolute top-[20%] right-[25%] w-0 h-0 border-l-[25px] border-l-transparent border-r-[25px] border-r-transparent border-b-[40px] border-b-neon-purple/20"
-        style={{ filter: 'drop-shadow(0 0 8px rgba(155, 92, 255, 0.3))' }}
-      />
+        {/* Triangle */}
+        <div
+          className="bg-geo-shape absolute top-[20%] right-[25%] w-0 h-0 border-l-[25px] border-l-transparent border-r-[25px] border-r-transparent border-b-[40px] border-b-neon-purple/20"
+          style={{ filter: 'drop-shadow(0 0 8px rgba(155, 92, 255, 0.3))' }}
+        />
+      </div>
 
-      {/* SVG connecting lines with glow filter */}
-      <svg className="absolute inset-0 w-full h-full" style={{ zIndex: 1 }}>
+      {/* Mobile geometric shapes - simplified */}
+      <div className="md:hidden">
+        <div
+          className="bg-geo-shape absolute top-[10%] right-[10%] w-16 h-16 border border-neon-purple/20 rotate-45"
+          style={{ boxShadow: '0 0 10px rgba(155, 92, 255, 0.15)' }}
+        />
+        <div
+          className="bg-geo-shape absolute bottom-[20%] left-[10%] w-12 h-12 rounded-full border border-neon-blue/20"
+        />
+        <div
+          className="bg-geo-shape absolute top-[60%] right-[5%] w-14 h-14 border border-neon-pink/15 rotate-12"
+        />
+      </div>
+
+      {/* SVG connecting lines with glow filter - hidden on mobile */}
+      <svg className="absolute inset-0 w-full h-full hidden md:block" style={{ zIndex: 1 }}>
         <defs>
           <linearGradient id="bgLineGradient1" x1="0%" y1="0%" x2="100%" y2="100%">
             <stop offset="0%" stopColor="#9B5CFF" stopOpacity="0.2" />
@@ -202,7 +225,7 @@ export function BackgroundEffects() {
             </feMerge>
           </filter>
         </defs>
-        {/* Curved lines with draw effect - reduced */}
+        {/* Curved lines with draw effect */}
         <path
           className="bg-connect-line"
           d="M 0 300 Q 400 200, 800 350 T 1600 250"
@@ -225,8 +248,8 @@ export function BackgroundEffects() {
         />
       </svg>
 
-      {/* Floating particles with glow - reduced for performance */}
-      {Array.from({ length: 25 }).map((_, i) => {
+      {/* Floating particles with glow */}
+      {Array.from({ length: particleCount }).map((_, i) => {
         const left = ((i * 17 + 5) % 95)
         const top = ((i * 23 + 7) % 90)
         const size = 1 + (i % 4)
@@ -248,7 +271,7 @@ export function BackgroundEffects() {
         )
       })}
 
-      {/* Diagonal accent lines - reduced */}
+      {/* Diagonal accent lines */}
       <div
         className="bg-accent-line absolute top-[30%] left-0 w-full h-[1px] transform -skew-y-3"
         style={{
@@ -264,16 +287,16 @@ export function BackgroundEffects() {
         }}
       />
 
-      {/* Ambient glow spots - reduced */}
+      {/* Ambient glow spots */}
       <div
-        className="bg-ambient-glow absolute top-[35%] left-[60%] w-3 h-3 rounded-full bg-neon-purple"
+        className="bg-ambient-glow absolute top-[35%] left-[60%] w-2 h-2 md:w-3 md:h-3 rounded-full bg-neon-purple"
         style={{
           boxShadow: '0 0 20px 10px rgba(155, 92, 255, 0.2)',
           opacity: 0.4,
         }}
       />
       <div
-        className="bg-ambient-glow absolute top-[65%] right-[40%] w-3 h-3 rounded-full bg-neon-blue"
+        className="bg-ambient-glow absolute top-[65%] right-[40%] w-2 h-2 md:w-3 md:h-3 rounded-full bg-neon-blue"
         style={{
           boxShadow: '0 0 20px 10px rgba(60, 203, 255, 0.2)',
           opacity: 0.4,

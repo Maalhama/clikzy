@@ -29,7 +29,7 @@ import { TargetIcon, CursorClickIcon, TrophyIcon, GiftIcon } from '@/components/
 import { PrizeCarousel } from './widgets/PrizeCarousel'
 
 // Background Effects
-import { BackgroundEffects } from './components/BackgroundEffects'
+import { BackgroundEffects } from '@/components/ui/BackgroundEffects'
 
 // Components
 import { PlayerCounter } from './components/PlayerCounter'
