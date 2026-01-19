@@ -17,6 +17,7 @@ import {
   Testimonials,
   FloatingPrizes,
   FAQ,
+  TodayWinsCounter,
 } from './widgets'
 
 // Gaming Icons
@@ -617,6 +618,9 @@ export function LandingClient({
 
       {/* TRUST BADGES */}
       <TrustBadges variant="horizontal" />
+
+      {/* TODAY'S WINS COUNTER */}
+      <TodayWinsCounter />
 
       {/* HOW IT WORKS */}
       {/* === MOBILE HOW IT WORKS === */}
