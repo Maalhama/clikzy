@@ -160,58 +160,88 @@ export function TrustBadges({ className = '', variant = 'horizontal' }: TrustBad
 
   // Horizontal variant
   return (
-    <div
-      ref={containerRef}
-      className={`relative flex flex-wrap items-center justify-center gap-6 md:gap-10 py-8 px-4 bg-bg-secondary/30 backdrop-blur-sm border-y border-white/10 ${className}`}
-    >
-      {/* Subtle gradient overlay */}
-      <div className="absolute inset-0 bg-gradient-to-r from-neon-purple/5 via-transparent to-neon-pink/5 pointer-events-none" />
-
-      {BADGES.map((badge, index) => {
-        const colors = getColorStyles(badge.color)
-        return (
-          <div
-            key={index}
-            className={`
-              trust-badge relative flex items-center gap-3 px-4 py-2 rounded-lg
-              transition-all duration-500 group
-              hover:bg-white/5
-              ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}
-            `}
-            style={{
-              transitionDelay: isVisible ? `${index * 100}ms` : '0ms',
-            }}
-          >
-            {/* Icon with glow */}
-            <div className="relative">
-              <div className={`absolute inset-0 ${colors.glow} blur-lg rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300`} />
-              <div className="relative group-hover:scale-110 transition-transform duration-300">
-                <badge.Icon className={`w-7 h-7 ${colors.text}`} />
-              </div>
-            </div>
-
-            <div>
-              <h4
-                className="font-bold text-sm transition-all duration-300"
+    <>
+      {/* === MOBILE VERSION === */}
+      <div
+        ref={containerRef}
+        className={`md:hidden relative py-4 px-4 bg-bg-secondary/30 border-y border-white/10 ${className}`}
+      >
+        <div className="flex justify-between gap-2">
+          {BADGES.map((badge, index) => {
+            const colors = getColorStyles(badge.color)
+            return (
+              <div
+                key={index}
+                className={`
+                  trust-badge flex flex-col items-center text-center flex-1
+                  transition-all duration-500
+                  ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}
+                `}
                 style={{
-                  textShadow: 'none',
+                  transitionDelay: isVisible ? `${index * 50}ms` : '0ms',
                 }}
               >
-                <span className="group-hover:hidden">{badge.title}</span>
-                <span
-                  className="hidden group-hover:inline"
+                <badge.Icon className={`w-5 h-5 ${colors.text} mb-1`} />
+                <span className="text-[10px] font-bold text-white/80 leading-tight">{badge.title}</span>
+              </div>
+            )
+          })}
+        </div>
+      </div>
+
+      {/* === DESKTOP VERSION === */}
+      <div
+        className={`hidden md:flex relative flex-wrap items-center justify-center gap-10 py-8 px-4 bg-bg-secondary/30 backdrop-blur-sm border-y border-white/10 ${className}`}
+      >
+        {/* Subtle gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-r from-neon-purple/5 via-transparent to-neon-pink/5 pointer-events-none" />
+
+        {BADGES.map((badge, index) => {
+          const colors = getColorStyles(badge.color)
+          return (
+            <div
+              key={index}
+              className={`
+                trust-badge relative flex items-center gap-3 px-4 py-2 rounded-lg
+                transition-all duration-500 group
+                hover:bg-white/5
+                ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}
+              `}
+              style={{
+                transitionDelay: isVisible ? `${index * 100}ms` : '0ms',
+              }}
+            >
+              {/* Icon with glow */}
+              <div className="relative">
+                <div className={`absolute inset-0 ${colors.glow} blur-lg rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300`} />
+                <div className="relative group-hover:scale-110 transition-transform duration-300">
+                  <badge.Icon className={`w-7 h-7 ${colors.text}`} />
+                </div>
+              </div>
+
+              <div>
+                <h4
+                  className="font-bold text-sm transition-all duration-300"
                   style={{
-                    textShadow: `0 0 10px ${colors.hex}60`,
+                    textShadow: 'none',
                   }}
                 >
-                  {badge.title}
-                </span>
-              </h4>
-              <p className="text-xs text-white/50 group-hover:text-white/70 transition-colors">{badge.description}</p>
+                  <span className="group-hover:hidden">{badge.title}</span>
+                  <span
+                    className="hidden group-hover:inline"
+                    style={{
+                      textShadow: `0 0 10px ${colors.hex}60`,
+                    }}
+                  >
+                    {badge.title}
+                  </span>
+                </h4>
+                <p className="text-xs text-white/50 group-hover:text-white/70 transition-colors">{badge.description}</p>
+              </div>
             </div>
-          </div>
-        )
-      })}
-    </div>
+          )
+        })}
+      </div>
+    </>
   )
 }

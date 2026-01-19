@@ -448,10 +448,28 @@ export function LandingClient({
           </h1>
 
           {/* Subtitle - Short */}
-          <p className="hero-subtitle text-sm text-white/60 mb-6 max-w-[280px]">
-            Le dernier clic gagne le lot.<br />
-            <span className="text-neon-blue font-semibold">iPhone, PS5, MacBook...</span>
+          <p className="hero-subtitle text-sm text-white/60 mb-4 max-w-[280px]">
+            Le dernier clic gagne le lot.
           </p>
+
+          {/* Mini Prize Showcase - Mobile */}
+          <div className="hero-prize mb-6 flex gap-2 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">
+            {[
+              { name: 'iPhone 15 Pro', value: 1479, color: '#9B5CFF' },
+              { name: 'PlayStation 5', value: 549, color: '#3CCBFF' },
+              { name: 'MacBook Pro', value: 2499, color: '#FF4FD8' },
+            ].map((prize, i) => (
+              <div
+                key={i}
+                className="flex-shrink-0 w-[100px] p-3 rounded-xl bg-bg-secondary/60 border text-center"
+                style={{ borderColor: `${prize.color}30` }}
+              >
+                <GiftIcon className="w-8 h-8 mx-auto mb-1" style={{ color: prize.color }} />
+                <div className="text-[10px] text-white/70 truncate">{prize.name}</div>
+                <div className="text-sm font-black" style={{ color: prize.color }}>{prize.value}€</div>
+              </div>
+            ))}
+          </div>
 
           {/* Single CTA - Full width */}
           <Link
