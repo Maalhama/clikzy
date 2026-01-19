@@ -18,6 +18,7 @@ import {
   FloatingPrizes,
   FAQ,
   TodayWinsCounter,
+  Guarantees,
 } from './widgets'
 
 // Gaming Icons
@@ -971,6 +972,9 @@ export function LandingClient({
           </div>
         </div>
       </section>
+
+      {/* GUARANTEES SECTION - Mobile & Desktop handled internally */}
+      <Guarantees />
 
       {/* FAQ SECTION */}
       {/* === MOBILE FAQ === */}
