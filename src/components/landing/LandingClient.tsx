@@ -144,6 +144,16 @@ export function LandingClient({
 }: LandingClientProps) {
   const mainRef = useRef<HTMLElement>(null)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [menuClosing, setMenuClosing] = useState(false)
+
+  const closeMenu = () => {
+    if (menuClosing) return
+    setMenuClosing(true)
+    setTimeout(() => {
+      setMobileMenuOpen(false)
+      setMenuClosing(false)
+    }, 300)
+  }
 
   const { playerCount, recentWinners } = useLandingRealtime(
     initialWinners,
@@ -212,6 +222,7 @@ export function LandingClient({
   )
 
   return (
+    <>
     <main ref={mainRef} className="relative bg-bg-primary text-white overflow-hidden">
       {/* SCROLL PROGRESS BAR */}
       <ScrollProgressBar color="gradient" height={3} position="top" />
@@ -252,12 +263,42 @@ export function LandingClient({
           <div className="absolute inset-0 bg-gradient-to-r from-neon-purple/20 via-neon-pink/40 to-neon-purple/20" />
         </div>
 
-        <div className="relative max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+        {/* Mobile Header */}
+        <div className="md:hidden relative px-4 py-3 flex items-center justify-between">
+          {/* Mobile menu button - Left */}
+          <button
+            onClick={() => mobileMenuOpen ? closeMenu() : setMobileMenuOpen(true)}
+            className="p-2 rounded-lg bg-white/5 border border-white/10 hover:border-neon-purple/50 transition-colors focus:outline-none focus:ring-2 focus:ring-neon-purple/50"
+            aria-label={mobileMenuOpen ? 'Fermer le menu' : 'Ouvrir le menu'}
+            aria-expanded={mobileMenuOpen}
+          >
+            {mobileMenuOpen ? (
+              <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            ) : (
+              <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            )}
+          </button>
+
+          {/* Logo - Center */}
+          <div className="absolute left-1/2 -translate-x-1/2">
+            <Logo size="md" animated={true} href="/" />
+          </div>
+
+          {/* Placeholder for balance - Right */}
+          <div className="w-9 h-9" />
+        </div>
+
+        {/* Desktop Header */}
+        <div className="hidden md:flex relative max-w-7xl mx-auto px-6 py-4 items-center justify-between">
           {/* Logo */}
           <Logo size="md" animated={true} href="/" />
 
           {/* Navigation centrale - Desktop */}
-          <nav className="hidden md:flex items-center gap-8">
+          <nav className="flex items-center gap-8">
             <a href="#lots" className="nav-link-neon text-sm font-medium text-white/70 hover:text-white transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-neon-purple/50 rounded">
               Lots
             </a>
@@ -272,12 +313,10 @@ export function LandingClient({
           {/* Right section */}
           <div className="flex items-center gap-4">
             {/* Live player counter */}
-            <div className="hidden sm:block">
-              <PlayerCounter count={playerCount} label="en ligne" size="sm" />
-            </div>
+            <PlayerCounter count={playerCount} label="en ligne" size="sm" />
 
             {/* Desktop buttons */}
-            <div className="hidden md:flex items-center gap-4">
+            <div className="flex items-center gap-4">
               {isLoggedIn ? (
                 <Link
                   href="/lobby"
@@ -302,83 +341,9 @@ export function LandingClient({
                 </>
               )}
             </div>
-
-            {/* Mobile menu button */}
-            <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden p-2 rounded-lg bg-white/5 border border-white/10 hover:border-neon-purple/50 transition-colors focus:outline-none focus:ring-2 focus:ring-neon-purple/50"
-              aria-label={mobileMenuOpen ? 'Fermer le menu' : 'Ouvrir le menu'}
-              aria-expanded={mobileMenuOpen}
-            >
-              {mobileMenuOpen ? (
-                <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              ) : (
-                <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-                </svg>
-              )}
-            </button>
           </div>
         </div>
 
-        {/* Mobile menu overlay */}
-        {mobileMenuOpen && (
-          <div className="md:hidden absolute top-full left-0 right-0 bg-bg-primary/95 backdrop-blur-xl border-t border-white/10">
-            <nav className="flex flex-col p-6 gap-4">
-              <a
-                href="#lots"
-                onClick={() => setMobileMenuOpen(false)}
-                className="text-lg font-medium text-white/70 hover:text-neon-purple transition-colors py-2"
-              >
-                Lots
-              </a>
-              <a
-                href="#how-it-works"
-                onClick={() => setMobileMenuOpen(false)}
-                className="text-lg font-medium text-white/70 hover:text-neon-purple transition-colors py-2"
-              >
-                Comment ça marche
-              </a>
-              <a
-                href="#winners"
-                onClick={() => setMobileMenuOpen(false)}
-                className="text-lg font-medium text-white/70 hover:text-neon-purple transition-colors py-2"
-              >
-                Gagnants
-              </a>
-              <div className="border-t border-white/10 pt-4 mt-2 flex flex-col gap-3">
-                {isLoggedIn ? (
-                  <Link
-                    href="/lobby"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="neon-btn-primary px-6 py-3 text-center text-sm font-bold"
-                  >
-                    PARTICIPER
-                  </Link>
-                ) : (
-                  <>
-                    <Link
-                      href="/login"
-                      onClick={() => setMobileMenuOpen(false)}
-                      className="neon-btn-ghost px-6 py-3 text-center text-sm font-medium"
-                    >
-                      Connexion
-                    </Link>
-                    <Link
-                      href="/register"
-                      onClick={() => setMobileMenuOpen(false)}
-                      className="neon-btn-primary px-6 py-3 text-center text-sm font-bold"
-                    >
-                      S'INSCRIRE
-                    </Link>
-                  </>
-                )}
-              </div>
-            </nav>
-          </div>
-        )}
       </header>
 
       {/* HERO SECTION */}
@@ -386,7 +351,7 @@ export function LandingClient({
       <section className="md:hidden relative min-h-[100svh] flex flex-col justify-center pt-16 pb-6 px-4">
         {/* Mobile Hero Content - Centered & Compact */}
         <div className="flex-1 flex flex-col justify-center">
-          {/* Live badge - Compact */}
+          {/* Live badge */}
           <div className="hero-badge inline-flex items-center gap-1.5 px-3 py-1.5 bg-neon-purple/10 border border-neon-purple/30 rounded-full mb-4 self-start">
             <span className="relative flex h-1.5 w-1.5">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-500 opacity-75" />
@@ -1170,7 +1135,12 @@ export function LandingClient({
         {/* Copyright */}
         <div className="flex items-center justify-between text-[10px] text-white/30">
           <span>© 2025 CLIKZY</span>
-          <span>🎮 Clique. Gagne. Répète.</span>
+          <span className="flex items-center gap-1">
+            <svg className="w-3 h-3 text-neon-purple" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122" />
+            </svg>
+            Clique. Joue. Gagne.
+          </span>
         </div>
       </footer>
 
@@ -1249,10 +1219,89 @@ export function LandingClient({
         <div className="border-t border-white/5">
           <div className="max-w-7xl mx-auto px-6 py-6 flex items-center justify-between">
             <p className="text-white/30 text-sm">© 2025 CLIKZY. Tous droits réservés.</p>
-            <p className="text-white/20 text-xs">🎮 Clique. Gagne. Répète.</p>
+            <p className="text-white/20 text-xs flex items-center gap-1">
+              <svg className="w-3 h-3 text-neon-purple" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122" />
+              </svg>
+              Clique. Joue. Gagne.
+            </p>
           </div>
         </div>
       </footer>
     </main>
+
+    {/* Mobile Slide Menu */}
+    {mobileMenuOpen && (
+      <>
+        <div
+          className={`fixed inset-0 bg-black/50 z-[9998] md:hidden ${menuClosing ? 'animate-fade-out' : 'animate-fade-in'}`}
+          onClick={closeMenu}
+        />
+        <div
+          className={`fixed top-0 left-0 w-64 z-[9999] md:hidden rounded-br-2xl ${menuClosing ? 'animate-slide-out-left' : 'animate-slide-in-left'}`}
+          style={{
+            backgroundColor: '#0a0a0f',
+            border: '1px solid rgba(155, 92, 255, 0.5)',
+            borderLeft: 'none',
+            borderTop: 'none',
+            boxShadow: '0 0 20px rgba(155, 92, 255, 0.3), inset 0 0 30px rgba(155, 92, 255, 0.05)'
+          }}
+        >
+
+          <div className="p-4 pt-16 pb-6">
+            <a href="#lots" onClick={closeMenu} className="flex items-center gap-2.5 py-2.5 text-sm text-white/80 hover:text-neon-purple transition-colors">
+              <svg className="w-4 h-4 text-neon-pink" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
+              </svg>
+              <span>Lots</span>
+            </a>
+            <a href="#how-it-works" onClick={closeMenu} className="flex items-center gap-2.5 py-2.5 text-sm text-white/80 hover:text-neon-blue transition-colors">
+              <svg className="w-4 h-4 text-neon-blue" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+              <span>Comment ça marche</span>
+            </a>
+            <a href="#winners" onClick={closeMenu} className="flex items-center gap-2.5 py-2.5 text-sm text-white/80 hover:text-success transition-colors">
+              <svg className="w-4 h-4 text-success" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+              </svg>
+              <span>Gagnants</span>
+            </a>
+
+            <div className="mt-5 pt-5 border-t border-white/10 space-y-2">
+              {isLoggedIn ? (
+                <Link
+                  href="/lobby"
+                  onClick={closeMenu}
+                  className="block w-full py-2.5 text-center text-sm bg-gradient-to-r from-neon-purple to-neon-pink text-white font-bold rounded-lg"
+                  style={{ boxShadow: '0 0 15px rgba(155, 92, 255, 0.3)' }}
+                >
+                  PARTICIPER
+                </Link>
+              ) : (
+                <>
+                  <Link
+                    href="/register"
+                    onClick={closeMenu}
+                    className="block w-full py-2.5 text-center text-sm bg-gradient-to-r from-neon-purple to-neon-pink text-white font-bold rounded-lg"
+                    style={{ boxShadow: '0 0 15px rgba(155, 92, 255, 0.3)' }}
+                  >
+                    S'INSCRIRE
+                  </Link>
+                  <Link
+                    href="/login"
+                    onClick={closeMenu}
+                    className="block w-full py-2 text-center text-xs text-white/60 hover:text-white transition-colors"
+                  >
+                    Connexion
+                  </Link>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      </>
+    )}
+    </>
   )
 }
