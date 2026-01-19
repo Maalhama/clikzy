@@ -160,10 +160,9 @@ export function TrustBadges({ className = '', variant = 'horizontal' }: TrustBad
 
   // Horizontal variant
   return (
-    <>
+    <div ref={containerRef}>
       {/* === MOBILE VERSION === */}
       <div
-        ref={containerRef}
         className={`md:hidden relative py-4 px-4 bg-bg-secondary/30 border-y border-white/10 ${className}`}
       >
         <div className="flex justify-between gap-2">
@@ -242,6 +241,6 @@ export function TrustBadges({ className = '', variant = 'horizontal' }: TrustBad
           )
         })}
       </div>
-    </>
+    </div>
   )
 }
