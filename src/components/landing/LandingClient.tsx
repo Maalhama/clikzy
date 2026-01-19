@@ -230,7 +230,7 @@ export function LandingClient({
 
   return (
     <>
-    <main ref={mainRef} className="relative bg-bg-primary text-white overflow-hidden">
+    <main ref={mainRef} id="main-content" className="relative bg-bg-primary text-white overflow-hidden">
       {/* SCROLL PROGRESS BAR */}
       <ScrollProgressBar color="gradient" height={3} position="top" />
 

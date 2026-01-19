@@ -29,6 +29,8 @@ interface LandingRealtimeData {
   recentWinners: Winner[]
   featuredGame: FeaturedGame | null
   isConnected: boolean
+  error: Error | null
+  isLoading: boolean
 }
 
 // Constants for participant counter
@@ -45,6 +47,8 @@ export function useLandingRealtime(
   const [featuredGame, setFeaturedGame] = useState<FeaturedGame | null>(initialGame)
   const [isConnected, setIsConnected] = useState(false)
   const [isMounted, setIsMounted] = useState(false)
+  const [error, setError] = useState<Error | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
 
   const channelsRef = useRef<RealtimeChannel[]>([])
   const trendRef = useRef<number>(1)
@@ -52,6 +56,7 @@ export function useLandingRealtime(
   // Set mounted state and initialize random value client-side only
   useEffect(() => {
     setIsMounted(true)
+    setIsLoading(false)
     // Set random initial value only on client
     setPlayerCount(Math.floor(MIN_PARTICIPANTS + Math.random() * (MAX_PARTICIPANTS - MIN_PARTICIPANTS)))
     trendRef.current = Math.random() > 0.5 ? 1 : -1
@@ -102,7 +107,14 @@ export function useLandingRealtime(
   }, [isMounted])
 
   useEffect(() => {
-    const supabase = createClient()
+    let supabase: ReturnType<typeof createClient>
+
+    try {
+      supabase = createClient()
+    } catch (err) {
+      setError(err instanceof Error ? err : new Error('Failed to create Supabase client'))
+      return
+    }
 
     // Winners channel - listen for new winners
     const winnersChannel = supabase
@@ -124,12 +136,19 @@ export function useLandingRealtime(
           }
 
           // Fetch username for the winner
-          supabase
-            .from('profiles')
-            .select('username, avatar_url')
-            .eq('id', newWinner.user_id)
-            .single()
-            .then(({ data }) => {
+          const fetchProfile = async () => {
+            try {
+              const { data, error: profileError } = await supabase
+                .from('profiles')
+                .select('username, avatar_url')
+                .eq('id', newWinner.user_id)
+                .single()
+
+              if (profileError) {
+                console.error('Error fetching winner profile:', profileError)
+                return
+              }
+
               const profileData = data as { username: string; avatar_url: string | null } | null
               if (profileData) {
                 const winner: Winner = {
@@ -142,10 +161,18 @@ export function useLandingRealtime(
                 }
                 setRecentWinners((prev) => [winner, ...prev.slice(0, 9)])
               }
-            })
+            } catch (err) {
+              console.error('Error fetching winner profile:', err)
+            }
+          }
+          fetchProfile()
         }
       )
-      .subscribe()
+      .subscribe((status) => {
+        if (status === 'CHANNEL_ERROR') {
+          setError(new Error('Failed to connect to winners channel'))
+        }
+      })
 
     channelsRef.current.push(winnersChannel)
 
@@ -202,6 +229,8 @@ export function useLandingRealtime(
     recentWinners,
     featuredGame,
     isConnected,
+    error,
+    isLoading,
   }
 }
 
