@@ -24,7 +24,7 @@ const MOCK_TESTIMONIALS: Testimonial[] = [
   {
     id: '1',
     username: 'Alex42',
-    text: "Le concept est simple mais vraiment addictif. J'ai gagne mon iPhone apres 2 semaines. Livraison rapide, tout etait conforme.",
+    text: "Le concept est simple mais vraiment addictif. J'ai gagné mon iPhone après 2 semaines. Livraison rapide, tout était conforme.",
     itemWon: 'iPhone 15 Pro',
     rating: 5,
     date: 'Il y a 2 jours',
@@ -32,7 +32,7 @@ const MOCK_TESTIMONIALS: Testimonial[] = [
   {
     id: '2',
     username: 'MaxClick',
-    text: "J'etais sceptique au debut mais le systeme est transparent. On voit les clics en temps reel. Ma PS5 est arrivee en 4 jours.",
+    text: "J'étais sceptique au début mais le système est transparent. On voit les clics en temps réel. Ma PS5 est arrivée en 4 jours.",
     itemWon: 'PlayStation 5',
     rating: 5,
     date: 'Il y a 1 semaine',
@@ -40,7 +40,7 @@ const MOCK_TESTIMONIALS: Testimonial[] = [
   {
     id: '3',
     username: 'LuckyOne',
-    text: "Le support repond vite et les paiements sont securises. Bonne experience globale, je recommande.",
+    text: "Le support répond vite et les paiements sont sécurisés. Bonne expérience globale, je recommande.",
     itemWon: 'AirPods Pro',
     rating: 5,
     date: 'Il y a 3 jours',
@@ -48,7 +48,7 @@ const MOCK_TESTIMONIALS: Testimonial[] = [
   {
     id: '4',
     username: 'WinnerX',
-    text: "Interface claire et lots reguliers. J'ai gagne ma Switch apres plusieurs essais, le systeme est equilibre.",
+    text: "Interface claire et lots réguliers. J'ai gagné ma Switch après plusieurs essais, le système est équilibré.",
     itemWon: 'Nintendo Switch',
     rating: 5,
     date: 'Il y a 5 jours',
@@ -64,7 +64,7 @@ const MOCK_TESTIMONIALS: Testimonial[] = [
   {
     id: '6',
     username: 'ThomasGamer',
-    text: "Enfin un jeu honnete ou tout le monde a sa chance. J'ai recu mon Apple Watch en parfait etat. Je rejoue tous les jours !",
+    text: "Enfin un jeu honnête où tout le monde a sa chance. J'ai reçu mon Apple Watch en parfait état. Je rejoue tous les jours !",
     itemWon: 'Apple Watch',
     rating: 5,
     date: 'Il y a 6 jours',
@@ -188,7 +188,7 @@ export function Testimonials({
                   className="text-sm text-neon-blue font-medium"
                   style={{ textShadow: '0 0 10px rgba(60, 203, 255, 0.4)' }}
                 >
-                  A remporte: {currentTestimonial.itemWon}
+                  A remporté : {currentTestimonial.itemWon}
                 </div>
                 <div className="text-xs text-white/40">{currentTestimonial.date}</div>
               </div>
