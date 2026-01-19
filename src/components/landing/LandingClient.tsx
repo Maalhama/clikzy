@@ -870,6 +870,13 @@ export function LandingClient({
         </div>
       </section>
 
+      {/* === MOBILE TESTIMONIALS === */}
+      <section className="md:hidden relative py-8 px-4">
+        <div className="relative">
+          <Testimonials className="border-neon-pink/20" />
+        </div>
+      </section>
+
       {/* === DESKTOP WINNERS === */}
       <section className="hidden md:block winners-section relative py-20 overflow-hidden">
         <div className="absolute inset-0 pointer-events-none">

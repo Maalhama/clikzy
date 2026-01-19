@@ -53,6 +53,22 @@ const MOCK_TESTIMONIALS: Testimonial[] = [
     rating: 5,
     date: 'Il y a 5 jours',
   },
+  {
+    id: '5',
+    username: 'Clara_75',
+    text: "Mes 10 clics gratuits quotidiens m'ont suffi pour gagner ! Le timer qui reset ajoute vraiment du suspense. Super concept.",
+    itemWon: 'MacBook Air',
+    rating: 5,
+    date: 'Il y a 4 jours',
+  },
+  {
+    id: '6',
+    username: 'ThomasGamer',
+    text: "Enfin un jeu honnete ou tout le monde a sa chance. J'ai recu mon Apple Watch en parfait etat. Je rejoue tous les jours !",
+    itemWon: 'Apple Watch',
+    rating: 5,
+    date: 'Il y a 6 jours',
+  },
 ]
 
 export function Testimonials({
