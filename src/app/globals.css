@@ -1091,3 +1091,193 @@ body {
     transform: translateX(-50%);
   }
 }
+
+/* ========================================
+   MOBILE LIGHTWEIGHT BACKGROUND
+   ======================================== */
+
+/* Grid pattern for mobile - CSS only, no JS animations */
+.mobile-grid-bg {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image:
+    linear-gradient(rgba(155, 92, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(155, 92, 255, 0.03) 1px, transparent 1px);
+  background-size: 50px 50px;
+}
+
+/* Geometric shapes - CSS only, positioned with transform */
+.mobile-geo-shapes {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.mobile-geo-shapes::before,
+.mobile-geo-shapes::after {
+  content: '';
+  position: absolute;
+  border: 1px solid rgba(155, 92, 255, 0.15);
+  border-radius: 0;
+}
+
+/* Top-right square */
+.mobile-geo-shapes::before {
+  width: 60px;
+  height: 60px;
+  top: 15%;
+  right: 10%;
+  transform: rotate(45deg);
+  border-color: rgba(155, 92, 255, 0.12);
+}
+
+/* Bottom-left square */
+.mobile-geo-shapes::after {
+  width: 40px;
+  height: 40px;
+  bottom: 30%;
+  left: 8%;
+  transform: rotate(15deg);
+  border-color: rgba(60, 203, 255, 0.12);
+}
+
+/* Additional shapes via pseudo elements on container */
+.mobile-geo-circle {
+  position: fixed;
+  width: 80px;
+  height: 80px;
+  border: 1px solid rgba(255, 79, 216, 0.1);
+  border-radius: 50%;
+  top: 40%;
+  right: 5%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.mobile-geo-triangle {
+  position: fixed;
+  width: 0;
+  height: 0;
+  border-left: 25px solid transparent;
+  border-right: 25px solid transparent;
+  border-bottom: 40px solid rgba(155, 92, 255, 0.08);
+  bottom: 20%;
+  right: 20%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Soft glow spots - static, no animation */
+.mobile-glow-spot {
+  position: fixed;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+  filter: blur(60px);
+}
+
+.mobile-glow-spot-1 {
+  width: 200px;
+  height: 200px;
+  background: rgba(155, 92, 255, 0.08);
+  top: 10%;
+  left: -50px;
+}
+
+.mobile-glow-spot-2 {
+  width: 150px;
+  height: 150px;
+  background: rgba(60, 203, 255, 0.06);
+  bottom: 20%;
+  right: -30px;
+}
+
+.mobile-glow-spot-3 {
+  width: 180px;
+  height: 180px;
+  background: rgba(255, 79, 216, 0.05);
+  top: 50%;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* ========================================
+   MOBILE HORIZONTAL SCROLL SECTIONS
+   ======================================== */
+
+/* Horizontal scroll container */
+.mobile-scroll-x {
+  display: flex;
+  gap: 1rem;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  padding: 1rem 0;
+  margin: 0 -1.5rem;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+}
+
+.mobile-scroll-x::-webkit-scrollbar {
+  display: none;
+}
+
+.mobile-scroll-x > * {
+  scroll-snap-align: start;
+  flex-shrink: 0;
+}
+
+/* Scroll indicator dots */
+.scroll-dots {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.scroll-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.scroll-dot.active {
+  background: var(--neon-purple);
+  box-shadow: 0 0 8px var(--neon-purple);
+}
+
+/* ========================================
+   MOBILE COMPACT CARD STYLES
+   ======================================== */
+
+/* Compact step card for How It Works */
+.step-card-compact {
+  width: 260px;
+  padding: 1.25rem;
+  background: rgba(20, 27, 45, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 1rem;
+}
+
+/* Compact winner card */
+.winner-card-compact {
+  width: 200px;
+  padding: 0.875rem;
+  background: rgba(20, 27, 45, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 0.75rem;
+}
+
+/* Hide desktop scroll indicator on mobile */
+@media (max-width: 767px) {
+  .desktop-scroll-indicator {
+    display: none !important;
+  }
+}

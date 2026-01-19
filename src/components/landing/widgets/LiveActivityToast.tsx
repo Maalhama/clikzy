@@ -130,7 +130,7 @@ export function LiveActivityToast({ enabled = true, maxVisible = 3 }: LiveActivi
   if (!enabled) return null
 
   return (
-    <div className="fixed bottom-6 left-6 z-50 flex flex-col gap-3 pointer-events-none">
+    <div className="fixed bottom-3 md:bottom-6 left-2 md:left-6 z-50 flex flex-col gap-2 md:gap-3 pointer-events-none">
       <AnimatePresence>
         {notifications.map((notification) => (
           <motion.div
@@ -141,56 +141,50 @@ export function LiveActivityToast({ enabled = true, maxVisible = 3 }: LiveActivi
             transition={{ duration: 0.3, ease: 'easeInOut' }}
             className="pointer-events-auto group"
           >
-            <div className="relative overflow-hidden rounded-xl">
-              {/* Main container */}
-              <div className="relative flex items-center gap-3 px-4 py-3 bg-bg-secondary/95 backdrop-blur-xl border border-success/40 rounded-xl">
-                {/* Glow effect */}
-                <div
-                  className="absolute inset-0 rounded-xl pointer-events-none opacity-50"
-                  style={{
-                    boxShadow: '0 0 30px rgba(0, 255, 136, 0.2), inset 0 0 20px rgba(0, 255, 136, 0.05)',
-                  }}
-                />
+            {/* MOBILE VERSION - Ultra compact */}
+            <div className="md:hidden relative overflow-hidden rounded-lg">
+              <div className="relative flex items-center gap-2 px-2 py-1.5 bg-bg-secondary/95 border border-success/30 rounded-lg max-w-[180px]">
+                {/* Tiny avatar */}
+                <div className="relative flex-shrink-0">
+                  <div className="w-6 h-6 rounded-full bg-gradient-to-br from-neon-purple to-neon-pink flex items-center justify-center font-bold text-[10px]">
+                    {notification.username.charAt(0).toUpperCase()}
+                  </div>
+                </div>
+                {/* Content - minimal */}
+                <div className="flex-1 min-w-0">
+                  <p className="text-[10px] truncate">
+                    <span className="font-bold text-white">{notification.username.slice(0, 8)}</span>
+                    <span className="text-success"> 🎉</span>
+                  </p>
+                  <p className="text-[10px] font-bold text-success">{notification.value}€</p>
+                </div>
+              </div>
+            </div>
 
+            {/* DESKTOP VERSION - Full */}
+            <div className="hidden md:block relative overflow-hidden rounded-xl">
+              <div className="relative flex items-center gap-3 px-4 py-3 bg-bg-secondary/95 backdrop-blur-xl border border-success/40 rounded-xl">
                 {/* Avatar with glow */}
                 <div className="relative flex-shrink-0">
                   <div className="absolute inset-0 bg-gradient-to-br from-neon-purple/50 to-neon-pink/50 rounded-full blur-md" />
                   <div className="relative w-10 h-10 rounded-full bg-gradient-to-br from-neon-purple to-neon-pink flex items-center justify-center font-bold text-sm border-2 border-white/20">
                     {notification.username.charAt(0).toUpperCase()}
                   </div>
-                  {/* Winner badge */}
                   <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-success rounded-full flex items-center justify-center border-2 border-bg-secondary">
                     <TrophyIcon className="w-3 h-3 text-bg-primary" />
                   </div>
                 </div>
-
                 {/* Content */}
                 <div className="relative flex-1 min-w-0">
                   <p className="text-sm">
-                    <span
-                      className="font-bold text-white"
-                      style={{ textShadow: '0 0 10px rgba(255, 255, 255, 0.3)' }}
-                    >
-                      {notification.username}
-                    </span>
+                    <span className="font-bold text-white">{notification.username}</span>
                     <span className="text-success font-medium"> a gagné</span>
                   </p>
                   <p className="text-sm truncate">
-                    <span
-                      className="font-bold text-neon-blue"
-                      style={{ textShadow: '0 0 10px rgba(60, 203, 255, 0.5)' }}
-                    >
-                      {notification.item}
-                    </span>
-                    <span
-                      className="text-success font-bold ml-2"
-                      style={{ textShadow: '0 0 10px rgba(0, 255, 136, 0.5)' }}
-                    >
-                      {notification.value}€
-                    </span>
+                    <span className="font-bold text-neon-blue">{notification.item}</span>
+                    <span className="text-success font-bold ml-2">{notification.value}€</span>
                   </p>
                 </div>
-
                 {/* Live indicator */}
                 <div className="relative flex-shrink-0">
                   <span className="relative flex h-2 w-2">
@@ -199,7 +193,6 @@ export function LiveActivityToast({ enabled = true, maxVisible = 3 }: LiveActivi
                   </span>
                 </div>
               </div>
-
               {/* Progress bar */}
               <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-white/10">
                 <motion.div
@@ -207,9 +200,6 @@ export function LiveActivityToast({ enabled = true, maxVisible = 3 }: LiveActivi
                   initial={{ width: '100%' }}
                   animate={{ width: '0%' }}
                   transition={{ duration: TOAST_DURATION / 1000, ease: 'linear' }}
-                  style={{
-                    boxShadow: '0 0 10px rgba(0, 255, 136, 0.5)',
-                  }}
                 />
               </div>
             </div>

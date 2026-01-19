@@ -98,34 +98,34 @@ function getRandomTimeLabel(id: string): string {
   return RANDOM_TIMES[hash % RANDOM_TIMES.length]
 }
 
-// Winner Card Component for marquee
+// Winner Card Component for marquee - Responsive
 function WinnerCard({ winner }: { winner: Winner }) {
   const timeLabel = getRandomTimeLabel(winner.id)
   const isRecent = timeLabel === 'À l\'instant' || timeLabel.includes('min')
 
   return (
-    <div className="w-[280px] min-h-[180px] p-5 rounded-2xl bg-bg-secondary/80 border border-white/10 hover:border-success/50 transition-colors">
+    <div className="w-[220px] sm:w-[280px] min-h-[150px] sm:min-h-[180px] p-3 sm:p-5 rounded-xl sm:rounded-2xl bg-bg-secondary/80 border border-white/10">
       {/* Time badge */}
-      <div className="inline-flex items-center gap-1.5 px-2 py-1 rounded-full bg-white/5 border border-white/10 mb-3 text-xs">
+      <div className="inline-flex items-center gap-1.5 px-2 py-1 rounded-full bg-white/5 border border-white/10 mb-2 sm:mb-3 text-[10px] sm:text-xs">
         {isRecent && <span className="w-1.5 h-1.5 rounded-full bg-success animate-pulse" />}
         <span className="text-white/50">{timeLabel}</span>
       </div>
 
       {/* Avatar & Username */}
-      <div className="flex items-center gap-3 mb-3">
-        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-neon-purple to-neon-pink flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+      <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
+        <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-neon-purple to-neon-pink flex items-center justify-center text-white font-bold text-xs sm:text-sm flex-shrink-0">
           {winner.username.charAt(0).toUpperCase()}
         </div>
         <div>
-          <div className="font-bold text-white text-sm">{winner.username}</div>
-          <div className="text-xs text-success font-medium">vient de remporter</div>
+          <div className="font-bold text-white text-xs sm:text-sm">{winner.username}</div>
+          <div className="text-[10px] sm:text-xs text-success font-medium">a remporté</div>
         </div>
       </div>
 
       {/* Item won */}
       <div>
-        <div className="font-bold text-white text-base mb-1 truncate">{winner.item_name}</div>
-        <div className="font-black text-2xl text-success">{winner.item_value.toLocaleString()}€</div>
+        <div className="font-bold text-white text-sm sm:text-base mb-1 truncate">{winner.item_name}</div>
+        <div className="font-black text-xl sm:text-2xl text-success">{winner.item_value.toLocaleString()}€</div>
       </div>
     </div>
   )
@@ -252,8 +252,21 @@ export function LandingClient({
       {/* SCROLL PROGRESS BAR */}
       <ScrollProgressBar color="gradient" height={3} position="top" />
 
-      {/* GLOBAL ANIMATED BACKGROUND */}
-      <BackgroundEffects />
+      {/* MOBILE LIGHTWEIGHT BACKGROUND - CSS only, no JS */}
+      <div className="md:hidden">
+        <div className="mobile-grid-bg" />
+        <div className="mobile-geo-shapes" />
+        <div className="mobile-geo-circle" />
+        <div className="mobile-geo-triangle" />
+        <div className="mobile-glow-spot mobile-glow-spot-1" />
+        <div className="mobile-glow-spot mobile-glow-spot-2" />
+        <div className="mobile-glow-spot mobile-glow-spot-3" />
+      </div>
+
+      {/* DESKTOP ANIMATED BACKGROUND - Hidden on mobile for performance */}
+      <div className="hidden md:block">
+        <BackgroundEffects />
+      </div>
 
       {/* FLOATING WIDGETS */}
       <LiveActivityToast enabled={true} maxVisible={3} />
@@ -405,7 +418,78 @@ export function LandingClient({
       </header>
 
       {/* HERO SECTION */}
-      <section className="relative min-h-screen flex items-center pt-20">
+      {/* === MOBILE HERO === */}
+      <section className="md:hidden relative min-h-[100svh] flex flex-col justify-center pt-16 pb-6 px-4">
+        {/* Mobile Hero Content - Centered & Compact */}
+        <div className="flex-1 flex flex-col justify-center">
+          {/* Live badge - Compact */}
+          <div className="hero-badge inline-flex items-center gap-1.5 px-3 py-1.5 bg-neon-purple/10 border border-neon-purple/30 rounded-full mb-4 self-start">
+            <span className="relative flex h-1.5 w-1.5">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-500 opacity-75" />
+              <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-green-500" />
+            </span>
+            <span className="text-white text-xs font-bold">
+              <span className="text-green-400">{playerCount}</span> en ligne
+            </span>
+          </div>
+
+          {/* Title - Big & Bold */}
+          <h1 className="hero-title text-[2.75rem] leading-[0.9] font-black mb-4">
+            <span className="block">
+              <span className="text-white">TU </span>
+              <span className="text-neon-purple neon-text">CLIQUES</span>
+              <span className="text-white">.</span>
+            </span>
+            <span className="block">
+              <span className="text-white">TU </span>
+              <span className="text-neon-pink neon-text-pink">GAGNES</span>
+              <span className="text-white">.</span>
+            </span>
+          </h1>
+
+          {/* Subtitle - Short */}
+          <p className="hero-subtitle text-sm text-white/60 mb-6 max-w-[280px]">
+            Le dernier clic gagne le lot.<br />
+            <span className="text-neon-blue font-semibold">iPhone, PS5, MacBook...</span>
+          </p>
+
+          {/* Single CTA - Full width */}
+          <Link
+            href={isLoggedIn ? '/lobby' : '/register'}
+            className="hero-cta w-full py-4 bg-gradient-to-r from-neon-purple to-neon-pink text-white font-black text-base rounded-xl text-center mb-6"
+            style={{ boxShadow: '0 0 30px rgba(155, 92, 255, 0.4)' }}
+          >
+            {isLoggedIn ? 'VOIR LES LOTS' : 'COMMENCER MAINTENANT'}
+          </Link>
+
+          {/* Stats - Horizontal compact */}
+          <div className="hero-stats flex justify-between gap-2">
+            <div className="flex-1 py-3 px-2 rounded-lg bg-bg-secondary/60 border border-neon-blue/20 text-center">
+              <div className="text-lg font-black text-neon-blue">{stats.totalWinningsValue.toLocaleString()}€</div>
+              <div className="text-[9px] text-white/40 uppercase">Gains</div>
+            </div>
+            <div className="flex-1 py-3 px-2 rounded-lg bg-bg-secondary/60 border border-neon-purple/20 text-center">
+              <div className="text-lg font-black text-neon-purple">{stats.totalGames}+</div>
+              <div className="text-[9px] text-white/40 uppercase">Lots</div>
+            </div>
+            <div className="flex-1 py-3 px-2 rounded-lg bg-bg-secondary/60 border border-neon-pink/20 text-center">
+              <div className="text-lg font-black text-neon-pink">10</div>
+              <div className="text-[9px] text-white/40 uppercase">Offerts</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Scroll hint */}
+        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 opacity-50">
+          <span className="text-[10px] text-white/40 uppercase tracking-wider">Scroll</span>
+          <svg className="w-4 h-4 text-white/40 animate-bounce" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+          </svg>
+        </div>
+      </section>
+
+      {/* === DESKTOP HERO === */}
+      <section className="hidden md:flex relative min-h-screen items-center pt-20">
         {/* Click Pulse Effect */}
         <ClickPulse enabled={true} intensity="medium" />
 
@@ -424,7 +508,7 @@ export function LandingClient({
             </div>
 
             {/* Title */}
-            <h1 className="hero-title text-4xl md:text-5xl lg:text-6xl font-black leading-[0.9] mb-6" style={{ perspective: '1000px' }}>
+            <h1 className="hero-title text-5xl lg:text-6xl font-black leading-[0.9] mb-6" style={{ perspective: '1000px' }}>
               <span className="block">
                 <span className="text-white">TU </span>
                 <span className="text-neon-purple neon-text">CLIQUES</span>
@@ -438,19 +522,19 @@ export function LandingClient({
             </h1>
 
             {/* Subtitle */}
-            <p className="hero-subtitle text-sm md:text-base text-white/70 max-w-lg mb-8">
+            <p className="hero-subtitle text-base text-white/70 max-w-lg mb-8">
               Sois le dernier a cliquer avant la fin du timer et remporte le lot.
               <span className="block text-neon-blue font-semibold mt-1">iPhone, PS5, MacBook... a toi de cliquer.</span>
             </p>
 
             {/* CTA */}
-            <div className="hero-cta flex flex-wrap gap-4 mb-12">
+            <div className="hero-cta flex gap-4 mb-12">
               <Link
                 href={isLoggedIn ? '/lobby' : '/register'}
-                className="gaming-btn-large group"
+                className="gaming-btn-large group text-center"
               >
-                <span className="relative z-10 flex items-center gap-2">
-                  {isLoggedIn ? 'VOIR LES LOTS' : 'COMMENCER GRATUITEMENT'}
+                <span className="relative z-10 flex items-center justify-center gap-2">
+                  {isLoggedIn ? 'VOIR LES LOTS' : 'COMMENCER'}
                   <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                   </svg>
@@ -458,61 +542,37 @@ export function LandingClient({
               </Link>
               <a
                 href="#how-it-works"
-                className="px-8 py-4 border-2 border-white/20 text-white font-bold hover:border-neon-blue/50 hover:text-neon-blue transition-all clip-angle focus:outline-none focus:ring-2 focus:ring-neon-blue/50"
+                className="px-8 py-4 border-2 border-white/20 text-white font-bold hover:border-neon-blue/50 hover:text-neon-blue transition-all text-center focus:outline-none focus:ring-2 focus:ring-neon-blue/50"
               >
                 COMMENT CA MARCHE
               </a>
             </div>
 
             {/* Stats */}
-            <div className="hero-stats flex gap-6">
-              <div
-                className="stat-box p-4 rounded-xl bg-bg-secondary/40 border border-neon-blue/20 backdrop-blur-sm"
-                style={{ boxShadow: '0 0 20px rgba(60, 203, 255, 0.1)' }}
-              >
-                <div
-                  className="text-3xl font-black text-neon-blue"
-                  style={{ textShadow: '0 0 20px rgba(60, 203, 255, 0.5)' }}
-                >
-                  {stats.totalWinningsValue.toLocaleString()}€
-                </div>
-                <div className="text-xs text-white/40 uppercase tracking-wider">De gains distribues</div>
+            <div className="hero-stats grid grid-cols-3 gap-6">
+              <div className="stat-box p-4 rounded-xl bg-bg-secondary/40 border border-neon-blue/20">
+                <div className="text-3xl font-black text-neon-blue">{stats.totalWinningsValue.toLocaleString()}€</div>
+                <div className="text-xs text-white/40 uppercase tracking-wider">Gains</div>
               </div>
-              <div
-                className="stat-box p-4 rounded-xl bg-bg-secondary/40 border border-neon-purple/20 backdrop-blur-sm"
-                style={{ boxShadow: '0 0 20px rgba(155, 92, 255, 0.1)' }}
-              >
-                <div
-                  className="text-3xl font-black text-neon-purple"
-                  style={{ textShadow: '0 0 20px rgba(155, 92, 255, 0.5)' }}
-                >
-                  {stats.totalGames}+
-                </div>
-                <div className="text-xs text-white/40 uppercase tracking-wider">Lots remportes</div>
+              <div className="stat-box p-4 rounded-xl bg-bg-secondary/40 border border-neon-purple/20">
+                <div className="text-3xl font-black text-neon-purple">{stats.totalGames}+</div>
+                <div className="text-xs text-white/40 uppercase tracking-wider">Lots</div>
               </div>
-              <div
-                className="stat-box p-4 rounded-xl bg-bg-secondary/40 border border-neon-pink/20 backdrop-blur-sm"
-                style={{ boxShadow: '0 0 20px rgba(255, 79, 216, 0.1)' }}
-              >
-                <div
-                  className="text-3xl font-black text-neon-pink"
-                  style={{ textShadow: '0 0 20px rgba(255, 79, 216, 0.5)' }}
-                >
-                  10
-                </div>
-                <div className="text-xs text-white/40 uppercase tracking-wider">Credits offerts</div>
+              <div className="stat-box p-4 rounded-xl bg-bg-secondary/40 border border-neon-pink/20">
+                <div className="text-3xl font-black text-neon-pink">10</div>
+                <div className="text-xs text-white/40 uppercase tracking-wider">Offerts</div>
               </div>
             </div>
           </div>
 
-          {/* Right - Floating prizes with 3D models */}
-          <div className="hero-prize relative">
+          {/* Right - Floating prizes */}
+          <div className="hero-prize relative hidden lg:block">
             <FloatingPrizes />
           </div>
         </div>
 
         {/* Scroll indicator */}
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2">
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 desktop-scroll-indicator">
           <ScrollIndicator targetId="how-it-works" />
         </div>
       </section>
@@ -521,141 +581,95 @@ export function LandingClient({
       <TrustBadges variant="horizontal" />
 
       {/* HOW IT WORKS */}
-      <section id="how-it-works" className="how-section relative py-20 overflow-hidden">
-        {/* Background gradient */}
+      {/* === MOBILE HOW IT WORKS === */}
+      <section id="how-it-works" className="md:hidden how-section relative py-8 px-4">
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-neon-purple/3 to-transparent" />
+
+        <div className="relative">
+          {/* Header */}
+          <div className="text-center mb-6">
+            <h2 className="text-2xl font-black">
+              COMMENT <span className="text-neon-purple">ÇA MARCHE</span>
+            </h2>
+          </div>
+
+          {/* Vertical steps */}
+          <div className="space-y-3">
+            {[
+              { num: '1', title: 'CHOISIS', desc: 'Sélectionne ton lot', Icon: TargetIcon, hex: '#9B5CFF' },
+              { num: '2', title: 'CLIQUE', desc: '1 clic = 1 crédit', Icon: CursorClickIcon, hex: '#3CCBFF' },
+              { num: '3', title: 'GAGNE', desc: 'Dernier clic = gagnant', Icon: TrophyIcon, hex: '#FF4FD8' },
+            ].map((step, i) => (
+              <div
+                key={i}
+                className="step-card flex items-center gap-4 p-4 rounded-xl bg-bg-secondary/50 border"
+                style={{ borderColor: `${step.hex}30` }}
+              >
+                {/* Number badge */}
+                <div
+                  className="w-12 h-12 rounded-xl flex items-center justify-center font-black text-lg text-white flex-shrink-0"
+                  style={{ backgroundColor: `${step.hex}20`, border: `2px solid ${step.hex}` }}
+                >
+                  {step.num}
+                </div>
+
+                {/* Content */}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-0.5">
+                    <step.Icon className="w-5 h-5" style={{ color: step.hex }} />
+                    <h3 className="font-black" style={{ color: step.hex }}>{step.title}</h3>
+                  </div>
+                  <p className="text-white/50 text-sm">{step.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* === DESKTOP HOW IT WORKS === */}
+      <section className="hidden md:block how-section relative py-20 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-neon-purple/5 to-transparent" />
 
         <div className="relative max-w-7xl mx-auto px-6">
-          {/* Section header */}
           <div className="text-center mb-20">
-            <h2 className="section-title text-4xl md:text-6xl font-black mb-4">
-              COMMENT <span className="text-neon-purple neon-text">ÇA MARCHE</span>
+            <h2 className="section-title text-6xl font-black mb-4">
+              COMMENT <span className="text-neon-purple">ÇA MARCHE</span>
             </h2>
-            <p className="text-white/70 text-lg max-w-2xl mx-auto">
-              Un système simple et transparent en 3 étapes
+            <p className="text-white/60 text-lg max-w-2xl mx-auto">
+              3 étapes simples
             </p>
           </div>
 
-          {/* Steps container with progress line */}
           <div className="relative">
-            {/* Progress line - desktop only */}
-            <div className="hidden md:block absolute top-24 left-[16.666%] right-[16.666%] h-[2px]">
+            {/* Progress line */}
+            <div className="absolute top-24 left-[16.666%] right-[16.666%] h-[2px]">
               <div className="absolute inset-0 bg-white/10" />
               <div className="absolute inset-0 bg-gradient-to-r from-neon-purple via-neon-blue to-neon-pink animate-gradient-x" />
-              {/* Animated glow on line */}
-              <div className="absolute inset-0 bg-gradient-to-r from-neon-purple via-neon-blue to-neon-pink blur-sm opacity-50" />
             </div>
 
-            {/* Steps grid */}
-            <div className="grid md:grid-cols-3 gap-8 md:gap-12">
+            <div className="grid grid-cols-3 gap-12">
               {[
-                {
-                  num: '1',
-                  title: 'CHOISIS',
-                  desc: 'Parcours les lots disponibles et sélectionne celui qui te fait envie.',
-                  Icon: TargetIcon,
-                  color: 'neon-purple',
-                  hex: '#9B5CFF',
-                  shadow: 'shadow-[0_0_30px_rgba(155,92,255,0.3)]',
-                  hoverShadow: 'group-hover:shadow-[0_0_50px_rgba(155,92,255,0.5)]',
-                },
-                {
-                  num: '2',
-                  title: 'CLIQUE',
-                  desc: 'Chaque clic coûte 1 crédit et relance le timer. Sois stratégique.',
-                  Icon: CursorClickIcon,
-                  color: 'neon-blue',
-                  hex: '#3CCBFF',
-                  shadow: 'shadow-[0_0_30px_rgba(60,203,255,0.3)]',
-                  hoverShadow: 'group-hover:shadow-[0_0_50px_rgba(60,203,255,0.5)]',
-                },
-                {
-                  num: '3',
-                  title: 'GAGNE',
-                  desc: 'Sois le dernier à cliquer quand le timer atteint zéro et remporte le lot.',
-                  Icon: TrophyIcon,
-                  color: 'neon-pink',
-                  hex: '#FF4FD8',
-                  shadow: 'shadow-[0_0_30px_rgba(255,79,216,0.3)]',
-                  hoverShadow: 'group-hover:shadow-[0_0_50px_rgba(255,79,216,0.5)]',
-                },
+                { num: '1', title: 'CHOISIS', desc: 'Parcours les lots disponibles et sélectionne celui qui te fait envie.', Icon: TargetIcon, hex: '#9B5CFF' },
+                { num: '2', title: 'CLIQUE', desc: 'Chaque clic coûte 1 crédit et relance le timer. Sois stratégique.', Icon: CursorClickIcon, hex: '#3CCBFF' },
+                { num: '3', title: 'GAGNE', desc: 'Sois le dernier à cliquer quand le timer atteint zéro et remporte le lot.', Icon: TrophyIcon, hex: '#FF4FD8' },
               ].map((step, i) => (
-                <div
-                  key={i}
-                  className="step-card group relative"
-                  style={{ animationDelay: `${i * 150}ms` }}
-                >
-                  {/* Neon badge number - positioned above card */}
+                <div key={i} className="step-card group relative">
                   <div className="relative z-10 flex justify-center mb-6">
                     <div
-                      className={`
-                        w-12 h-12 rounded-full flex items-center justify-center
-                        font-black text-xl text-white
-                        border-2 transition-all duration-300
-                        ${step.shadow} ${step.hoverShadow}
-                      `}
-                      style={{
-                        backgroundColor: `${step.hex}20`,
-                        borderColor: step.hex,
-                      }}
+                      className="w-12 h-12 rounded-full flex items-center justify-center font-black text-xl text-white border-2"
+                      style={{ backgroundColor: `${step.hex}20`, borderColor: step.hex }}
                     >
                       {step.num}
                     </div>
                   </div>
 
-                  {/* Card */}
-                  <div
-                    className={`
-                      relative p-8 rounded-lg
-                      bg-bg-secondary/50 backdrop-blur-sm
-                      border border-white/10
-                      transition-all duration-300
-                      group-hover:border-opacity-50
-                      ${step.hoverShadow}
-                    `}
-                    style={{
-                      ['--hover-border-color' as string]: step.hex,
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.borderColor = step.hex
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'
-                    }}
-                  >
-                    {/* Icon with glow */}
-                    <div className="mb-6 relative">
-                      {/* Glow behind icon */}
-                      <div
-                        className="absolute inset-0 blur-xl opacity-0 group-hover:opacity-50 transition-opacity duration-300"
-                        style={{ backgroundColor: step.hex }}
-                      />
-                      <step.Icon
-                        className="w-14 h-14 relative z-10 transition-transform duration-300 group-hover:scale-110"
-                        style={{ color: step.hex }}
-                      />
+                  <div className="relative p-8 rounded-lg bg-bg-secondary/50 border" style={{ borderColor: `${step.hex}30` }}>
+                    <div className="mb-6">
+                      <step.Icon className="w-14 h-14" style={{ color: step.hex }} />
                     </div>
-
-                    {/* Title */}
-                    <h3
-                      className="text-2xl font-black mb-3 transition-all duration-300"
-                      style={{ color: step.hex }}
-                    >
-                      {step.title}
-                    </h3>
-
-                    {/* Description */}
-                    <p className="text-white/70 leading-relaxed">
-                      {step.desc}
-                    </p>
-
-                    {/* Bottom line accent */}
-                    <div
-                      className="absolute bottom-0 left-0 right-0 h-[2px] opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                      style={{
-                        background: `linear-gradient(90deg, transparent, ${step.hex}, transparent)`,
-                      }}
-                    />
+                    <h3 className="text-2xl font-black mb-3" style={{ color: step.hex }}>{step.title}</h3>
+                    <p className="text-white/60 text-base leading-relaxed">{step.desc}</p>
                   </div>
                 </div>
               ))}
@@ -665,8 +679,40 @@ export function LandingClient({
       </section>
 
       {/* PRIZES SHOWCASE */}
-      <section id="lots" className="relative py-20 overflow-hidden">
-        {/* Background effects */}
+      {/* === MOBILE PRIZES === */}
+      <section id="lots" className="md:hidden relative py-8 px-4">
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-neon-pink/3 to-transparent" />
+
+        <div className="relative">
+          {/* Header compact */}
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <div className="inline-flex items-center gap-1.5 px-2 py-1 bg-neon-pink/10 border border-neon-pink/30 rounded-full text-neon-pink text-[10px] font-medium mb-2">
+                <GiftIcon className="w-3 h-3" />
+                Premium
+              </div>
+              <h2 className="text-xl font-black">
+                LOTS <span className="text-neon-pink">À GAGNER</span>
+              </h2>
+            </div>
+            <Link
+              href="/lobby"
+              className="text-xs text-neon-pink font-semibold flex items-center gap-1"
+            >
+              Voir tout
+              <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </Link>
+          </div>
+
+          {/* Carousel */}
+          <PrizeCarousel />
+        </div>
+      </section>
+
+      {/* === DESKTOP PRIZES === */}
+      <section className="hidden md:block relative py-20 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-neon-pink/5 to-transparent" />
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-neon-pink/10 rounded-full blur-[150px]" />
@@ -674,30 +720,21 @@ export function LandingClient({
 
         <div className="relative max-w-7xl mx-auto px-6">
           <div className="text-center mb-16">
-            <div
-              className="inline-flex items-center gap-2 px-3 py-1.5 bg-neon-pink/10 border border-neon-pink/30 rounded-full text-neon-pink text-sm font-medium mb-4"
-              style={{ boxShadow: '0 0 20px rgba(255, 79, 216, 0.2)' }}
-            >
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-neon-pink/10 border border-neon-pink/30 rounded-full text-neon-pink text-sm font-medium mb-4">
               <GiftIcon className="w-5 h-5" />
               Premium
             </div>
-            <h2 className="text-4xl md:text-5xl font-black mb-4">
-              LOTS{' '}
-              <span
-                className="text-neon-pink"
-                style={{ textShadow: '0 0 40px rgba(255, 79, 216, 0.5)' }}
-              >
-                À REMPORTER
-              </span>
+            <h2 className="text-5xl font-black mb-4">
+              LOTS <span className="text-neon-pink">À REMPORTER</span>
             </h2>
-            <p className="text-white/70 text-lg">Des produits premium à remporter quotidiennement</p>
+            <p className="text-white/60 text-lg">Produits premium quotidiens</p>
           </div>
           <PrizeCarousel />
         </div>
       </section>
 
-      {/* LEADERBOARD & TESTIMONIALS */}
-      <section className="relative py-20">
+      {/* LEADERBOARD & TESTIMONIALS - Hidden on mobile to reduce length */}
+      <section className="hidden md:block relative py-20">
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid lg:grid-cols-2 gap-8">
             <Leaderboard />
@@ -706,80 +743,108 @@ export function LandingClient({
         </div>
       </section>
 
-      {/* WINNERS SECTION - Modern Design */}
-      <section id="winners" className="winners-section relative py-20 overflow-hidden">
-        {/* Background glow */}
+      {/* WINNERS SECTION */}
+      {/* === MOBILE WINNERS === */}
+      <section id="winners" className="md:hidden winners-section relative py-8 px-4">
+        <div className="relative">
+          {/* Header compact */}
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <div className="inline-flex items-center gap-1.5 px-2 py-1 bg-success/10 border border-success/30 rounded-full text-success text-[10px] font-medium mb-2">
+                <span className="relative flex h-1.5 w-1.5">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-success opacity-75" />
+                  <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-success" />
+                </span>
+                Live
+              </div>
+              <h2 className="text-xl font-black">
+                DERNIERS <span className="text-success">GAGNANTS</span>
+              </h2>
+            </div>
+            {/* Mini stats */}
+            <div className="text-right">
+              <div className="text-lg font-black text-success">{stats.totalWinningsValue.toLocaleString()}€</div>
+              <div className="text-[9px] text-white/40 uppercase">Distribués</div>
+            </div>
+          </div>
+
+          {/* Compact winners list */}
+          <div className="space-y-2">
+            {(recentWinners.length > 0 ? recentWinners.slice(0, 4) : [
+              { id: '1', username: 'Alex42', item_name: 'iPhone 15 Pro', item_value: 1299, won_at: new Date().toISOString() },
+              { id: '2', username: 'GamerPro', item_name: 'PS5', item_value: 549, won_at: new Date().toISOString() },
+              { id: '3', username: 'LuckyOne', item_name: 'AirPods Pro', item_value: 279, won_at: new Date().toISOString() },
+              { id: '4', username: 'WinnerX', item_name: 'Nintendo Switch', item_value: 329, won_at: new Date().toISOString() },
+            ]).map((winner, i) => (
+              <div
+                key={winner.id}
+                className="winner-item flex items-center gap-3 p-3 rounded-xl bg-bg-secondary/50 border border-success/20"
+              >
+                {/* Avatar */}
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-neon-purple to-neon-pink flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+                  {winner.username.charAt(0).toUpperCase()}
+                </div>
+
+                {/* Info */}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <span className="font-bold text-white text-sm truncate">{winner.username}</span>
+                    {i === 0 && <span className="text-[10px] text-success">À l'instant</span>}
+                  </div>
+                  <div className="text-xs text-white/50 truncate">{winner.item_name}</div>
+                </div>
+
+                {/* Value */}
+                <div className="text-success font-black text-sm">{winner.item_value}€</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* === DESKTOP WINNERS === */}
+      <section className="hidden md:block winners-section relative py-20 overflow-hidden">
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-success/5 rounded-full blur-[120px]" />
         </div>
 
         <div className="relative max-w-7xl mx-auto px-6">
-          {/* Header row */}
           <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6 mb-12">
             <div>
-              <div
-                className="inline-flex items-center gap-2 px-3 py-1.5 bg-success/10 border border-success/30 rounded-full text-success text-sm font-medium mb-4"
-                style={{ boxShadow: '0 0 20px rgba(0, 255, 136, 0.2)' }}
-              >
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-success/10 border border-success/30 rounded-full text-success text-sm font-medium mb-4">
                 <span className="relative flex h-2 w-2">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-success opacity-75" />
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-success" />
                 </span>
                 Live
               </div>
-              <h2 className="text-4xl md:text-5xl lg:text-6xl font-black">
-                DERNIERS{' '}
-                <span
-                  className="text-success"
-                  style={{ textShadow: '0 0 40px rgba(0, 255, 136, 0.5)' }}
-                >
-                  GAGNANTS
-                </span>
+              <h2 className="text-6xl font-black">
+                DERNIERS <span className="text-success">GAGNANTS</span>
               </h2>
               <p className="text-white/70 mt-3 max-w-md">
-                Des gagnants remportent des objets chaque jour. Consulte les gains en temps réel.
+                Des gagnants remportent des objets chaque jour.
               </p>
             </div>
 
-            {/* Stats badges */}
             <div className="flex gap-4">
-              <div
-                className="flex flex-col items-center justify-center px-6 py-4 rounded-2xl bg-bg-secondary/60 border border-neon-purple/30 backdrop-blur-sm"
-                style={{ boxShadow: '0 0 25px rgba(155, 92, 255, 0.15)' }}
-              >
-                <span
-                  className="text-2xl md:text-3xl font-black text-neon-purple"
-                  style={{ textShadow: '0 0 20px rgba(155, 92, 255, 0.5)' }}
-                >
-                  {stats.totalWinningsValue.toLocaleString()}€
-                </span>
-                <span className="text-xs text-white/40 uppercase tracking-wider mt-1">Total distribué</span>
+              <div className="flex flex-col items-center justify-center px-6 py-4 rounded-2xl bg-bg-secondary/60 border border-neon-purple/30">
+                <span className="text-3xl font-black text-neon-purple">{stats.totalWinningsValue.toLocaleString()}€</span>
+                <span className="text-xs text-white/40 uppercase tracking-wider mt-1">Distribué</span>
               </div>
-              <div
-                className="flex flex-col items-center justify-center px-6 py-4 rounded-2xl bg-bg-secondary/60 border border-success/30 backdrop-blur-sm"
-                style={{ boxShadow: '0 0 25px rgba(0, 255, 136, 0.15)' }}
-              >
-                <span
-                  className="text-2xl md:text-3xl font-black text-success"
-                  style={{ textShadow: '0 0 20px rgba(0, 255, 136, 0.5)' }}
-                >
-                  {stats.totalGames}+
-                </span>
+              <div className="flex flex-col items-center justify-center px-6 py-4 rounded-2xl bg-bg-secondary/60 border border-success/30">
+                <span className="text-3xl font-black text-success">{stats.totalGames}+</span>
                 <span className="text-xs text-white/40 uppercase tracking-wider mt-1">Gagnants</span>
               </div>
             </div>
           </div>
 
-          {/* Winners Marquee - Infinite scrolling */}
+          {/* Winners Marquee */}
           <div className="relative">
-            {/* Gradient overlays for fade effect */}
             <div className="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-bg-primary via-bg-primary/80 to-transparent z-10 pointer-events-none" />
             <div className="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-bg-primary via-bg-primary/80 to-transparent z-10 pointer-events-none" />
 
-            {/* Scrolling container */}
             <div className="overflow-hidden">
               <div className="winners-marquee-track">
-                {/* First set */}
                 <div className="winners-marquee-content">
                   {(recentWinners.length > 0 ? recentWinners : [
                     { id: '1', username: 'Alex42', item_name: 'iPhone 15 Pro', item_value: 1299, won_at: new Date().toISOString() },
@@ -794,7 +859,6 @@ export function LandingClient({
                     <WinnerCard key={winner.id} winner={winner} />
                   ))}
                 </div>
-                {/* Duplicate set */}
                 <div className="winners-marquee-content">
                   {(recentWinners.length > 0 ? recentWinners : [
                     { id: '1', username: 'Alex42', item_name: 'iPhone 15 Pro', item_value: 1299, won_at: new Date().toISOString() },
@@ -813,7 +877,6 @@ export function LandingClient({
             </div>
           </div>
 
-          {/* CTA */}
           <div className="mt-10 text-center">
             <Link
               href="/lobby"
@@ -830,8 +893,63 @@ export function LandingClient({
       </section>
 
       {/* FINAL CTA */}
-      <section className="final-cta relative py-20 overflow-hidden">
-        {/* Background effects */}
+      {/* === MOBILE FINAL CTA === */}
+      <section className="md:hidden final-cta relative py-10 px-4 overflow-hidden">
+        {/* Background */}
+        <div className="absolute inset-0 bg-gradient-to-t from-neon-purple/15 via-transparent to-transparent" />
+
+        <div className="relative text-center final-cta-content">
+          {/* Badge */}
+          <div className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-neon-purple/20 border border-neon-purple/40 rounded-full mb-4">
+            <GiftIcon className="w-4 h-4 text-neon-pink" />
+            <span className="text-white text-xs font-bold">OFFRE DE BIENVENUE</span>
+          </div>
+
+          <h2 className="text-2xl font-black mb-3">
+            PRÊT À{' '}
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-neon-purple to-neon-pink">GAGNER</span>
+            {' '}?
+          </h2>
+
+          <p className="text-sm text-white/60 mb-5">
+            Reçois <span className="text-neon-pink font-black">10 crédits offerts</span>
+          </p>
+
+          {/* CTA Button */}
+          <Link
+            href={isLoggedIn ? '/lobby' : '/register'}
+            className="w-full py-4 bg-gradient-to-r from-neon-purple to-neon-pink text-white font-black text-base rounded-xl text-center block mb-5"
+            style={{ boxShadow: '0 0 30px rgba(155, 92, 255, 0.4)' }}
+          >
+            {isLoggedIn ? 'VOIR LES LOTS' : 'CRÉER MON COMPTE'}
+          </Link>
+
+          {/* Trust badges - Compact horizontal */}
+          <div className="flex justify-center gap-3">
+            <div className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-success/10 border border-success/20">
+              <svg className="w-4 h-4 text-success" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span className="text-success text-[10px] font-bold">0€</span>
+            </div>
+            <div className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-neon-blue/10 border border-neon-blue/20">
+              <svg className="w-4 h-4 text-neon-blue" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+              </svg>
+              <span className="text-neon-blue text-[10px] font-bold">Légal</span>
+            </div>
+            <div className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-neon-pink/10 border border-neon-pink/20">
+              <svg className="w-4 h-4 text-neon-pink" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+              </svg>
+              <span className="text-neon-pink text-[10px] font-bold">Gratuit</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* === DESKTOP FINAL CTA === */}
+      <section className="hidden md:block final-cta relative py-20 overflow-hidden">
         <div className="absolute inset-0">
           <div className="absolute inset-0 bg-gradient-to-t from-neon-purple/20 via-transparent to-transparent" />
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-neon-purple/10 rounded-full blur-[150px]" />
@@ -841,7 +959,6 @@ export function LandingClient({
         </div>
 
         <div className="relative max-w-4xl mx-auto px-6 text-center final-cta-content">
-          {/* Badge OFFRE DE BIENVENUE */}
           <div
             className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-neon-purple/20 to-neon-pink/20 border border-neon-purple/40 rounded-full mb-8 animate-pulse"
             style={{ boxShadow: '0 0 25px rgba(155, 92, 255, 0.3)' }}
@@ -850,38 +967,20 @@ export function LandingClient({
             <span className="text-white text-sm font-bold tracking-wide">OFFRE DE BIENVENUE</span>
           </div>
 
-          <h2 className="text-4xl md:text-6xl lg:text-7xl font-black mb-6">
-            PRET A{' '}
-            <span
-              className="text-transparent bg-clip-text bg-gradient-to-r from-neon-purple via-neon-pink to-neon-purple animate-gradient-x"
-              style={{
-                textShadow: '0 0 80px rgba(155, 92, 255, 0.8), 0 0 120px rgba(255, 79, 216, 0.4)',
-                filter: 'drop-shadow(0 0 30px rgba(155, 92, 255, 0.5))'
-              }}
-            >
-              GAGNER
-            </span>{' '}
-            ?
+          <h2 className="text-6xl lg:text-7xl font-black mb-6">
+            PRÊT À{' '}
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-neon-purple via-neon-pink to-neon-purple">GAGNER</span>
+            {' '}?
           </h2>
 
           <p className="text-xl text-white/70 mb-10 max-w-2xl mx-auto">
             Inscris-toi maintenant et reçois{' '}
-            <span
-              className="text-neon-pink font-black text-2xl"
-              style={{ textShadow: '0 0 20px rgba(255, 79, 216, 0.6)' }}
-            >
-              10 crédits offerts
-            </span>{' '}
+            <span className="text-neon-pink font-black text-2xl">10 crédits offerts</span>{' '}
             pour tenter ta chance.
           </p>
 
-          {/* CTA Button avec pulsation */}
           <div className="relative inline-block">
-            {/* Glow pulsant derrière le bouton */}
-            <div
-              className="absolute inset-0 bg-neon-purple rounded-full blur-xl animate-pulse opacity-60"
-              style={{ transform: 'scale(1.1)' }}
-            />
+            <div className="absolute inset-0 bg-neon-purple rounded-full blur-xl animate-pulse opacity-60" style={{ transform: 'scale(1.1)' }} />
             <Link
               href={isLoggedIn ? '/lobby' : '/register'}
               className="relative gaming-btn-large inline-flex items-center gap-3 group"
@@ -890,25 +989,14 @@ export function LandingClient({
               <span className="relative z-10 font-black tracking-wide">
                 {isLoggedIn ? 'VOIR LES LOTS' : 'CRÉER MON COMPTE'}
               </span>
-              <svg
-                className="w-5 h-5 relative z-10 transition-transform group-hover:translate-x-1"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={2.5}
-              >
+              <svg className="w-5 h-5 relative z-10 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
               </svg>
             </Link>
           </div>
 
-          {/* Badges améliorés */}
           <div className="mt-14 flex flex-wrap justify-center gap-4">
-            {/* Badge 0€ */}
-            <div
-              className="flex items-center gap-3 px-5 py-3 rounded-2xl bg-success/10 border border-success/30"
-              style={{ boxShadow: '0 0 20px rgba(0, 255, 136, 0.15)' }}
-            >
+            <div className="flex items-center gap-3 px-5 py-3 rounded-2xl bg-success/10 border border-success/30">
               <div className="w-10 h-10 rounded-xl bg-success/20 flex items-center justify-center">
                 <svg className="w-5 h-5 text-success" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -919,12 +1007,7 @@ export function LandingClient({
                 <div className="text-white/40 text-xs">100% gratuit</div>
               </div>
             </div>
-
-            {/* Badge 100% légal */}
-            <div
-              className="flex items-center gap-3 px-5 py-3 rounded-2xl bg-neon-blue/10 border border-neon-blue/30"
-              style={{ boxShadow: '0 0 20px rgba(60, 203, 255, 0.15)' }}
-            >
+            <div className="flex items-center gap-3 px-5 py-3 rounded-2xl bg-neon-blue/10 border border-neon-blue/30">
               <div className="w-10 h-10 rounded-xl bg-neon-blue/20 flex items-center justify-center">
                 <svg className="w-5 h-5 text-neon-blue" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
@@ -935,12 +1018,7 @@ export function LandingClient({
                 <div className="text-white/40 text-xs">Conforme CNIL</div>
               </div>
             </div>
-
-            {/* Badge Livraison */}
-            <div
-              className="flex items-center gap-3 px-5 py-3 rounded-2xl bg-neon-pink/10 border border-neon-pink/30"
-              style={{ boxShadow: '0 0 20px rgba(255, 79, 216, 0.15)' }}
-            >
+            <div className="flex items-center gap-3 px-5 py-3 rounded-2xl bg-neon-pink/10 border border-neon-pink/30">
               <div className="w-10 h-10 rounded-xl bg-neon-pink/20 flex items-center justify-center">
                 <svg className="w-5 h-5 text-neon-pink" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
@@ -956,62 +1034,67 @@ export function LandingClient({
       </section>
 
       {/* FOOTER */}
-      <footer className="relative border-t border-white/10">
-        {/* Subtle glow line */}
-        <div
-          className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-neon-purple/50 to-transparent"
-          style={{ boxShadow: '0 0 10px rgba(155, 92, 255, 0.3)' }}
-        />
+      {/* === MOBILE FOOTER === */}
+      <footer className="md:hidden relative border-t border-white/10 px-4 py-6">
+        {/* Logo & Social */}
+        <div className="flex items-center justify-between mb-6">
+          <div className="text-xl font-black">
+            <span className="text-neon-purple">CLIK</span>
+            <span className="text-neon-pink">ZY</span>
+          </div>
+          <nav className="flex gap-2" aria-label="Réseaux sociaux">
+            <a href="#" className="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center" aria-label="Twitter">
+              <svg className="w-4 h-4 text-white/50" fill="currentColor" viewBox="0 0 24 24"><path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"/></svg>
+            </a>
+            <a href="#" className="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center" aria-label="Instagram">
+              <svg className="w-4 h-4 text-white/50" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073z"/></svg>
+            </a>
+            <a href="#" className="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center" aria-label="TikTok">
+              <svg className="w-4 h-4 text-white/50" fill="currentColor" viewBox="0 0 24 24"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/></svg>
+            </a>
+          </nav>
+        </div>
 
-        {/* Main Footer Content */}
+        {/* Links - Horizontal compact */}
+        <div className="flex flex-wrap gap-x-4 gap-y-2 mb-4 text-xs">
+          <a href="#" className="text-white/40">CGU</a>
+          <a href="#" className="text-white/40">Confidentialité</a>
+          <a href="#" className="text-white/40">Mentions légales</a>
+          <a href="mailto:contact@clikzy.fr" className="text-white/40">Contact</a>
+        </div>
+
+        {/* Copyright */}
+        <div className="flex items-center justify-between text-[10px] text-white/30">
+          <span>© 2025 CLIKZY</span>
+          <span>🎮 Clique. Gagne. Répète.</span>
+        </div>
+      </footer>
+
+      {/* === DESKTOP FOOTER === */}
+      <footer className="hidden md:block relative border-t border-white/10">
+        <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-neon-purple/50 to-transparent" style={{ boxShadow: '0 0 10px rgba(155, 92, 255, 0.3)' }} />
+
         <div className="max-w-7xl mx-auto px-6 py-16">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
+          <div className="grid grid-cols-4 gap-12">
             {/* Logo & Description */}
-            <div className="lg:col-span-1">
+            <div>
               <div className="text-3xl font-black mb-4">
-                <span className="text-neon-purple" style={{ textShadow: '0 0 20px rgba(155, 92, 255, 0.4)' }}>CLIK</span>
-                <span className="text-neon-pink" style={{ textShadow: '0 0 20px rgba(255, 79, 216, 0.4)' }}>ZY</span>
+                <span className="text-neon-purple">CLIK</span>
+                <span className="text-neon-pink">ZY</span>
               </div>
-              <p className="text-white/70 text-sm mb-6 leading-relaxed">
-                La plateforme de jeu où le dernier clic gagne. Tente ta chance et repars avec des lots incroyables.
-              </p>
-              {/* Social Links */}
+              <p className="text-white/70 text-sm mb-6">La plateforme de jeu où le dernier clic gagne.</p>
               <nav className="flex gap-3" aria-label="Réseaux sociaux">
-                <a
-                  href="#"
-                  className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:border-neon-purple/50 hover:bg-neon-purple/10 transition-all duration-300 group focus:outline-none focus:ring-2 focus:ring-neon-purple/50"
-                  aria-label="Twitter"
-                >
-                  <svg className="w-5 h-5 text-white/60 group-hover:text-neon-purple transition-colors" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"/>
-                  </svg>
+                <a href="#" className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:border-neon-purple/50 hover:bg-neon-purple/10 transition-all group" aria-label="Twitter">
+                  <svg className="w-5 h-5 text-white/60 group-hover:text-neon-purple" fill="currentColor" viewBox="0 0 24 24"><path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"/></svg>
                 </a>
-                <a
-                  href="#"
-                  className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:border-neon-pink/50 hover:bg-neon-pink/10 transition-all duration-300 group focus:outline-none focus:ring-2 focus:ring-neon-pink/50"
-                  aria-label="Instagram"
-                >
-                  <svg className="w-5 h-5 text-white/60 group-hover:text-neon-pink transition-colors" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
-                  </svg>
+                <a href="#" className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:border-neon-pink/50 hover:bg-neon-pink/10 transition-all group" aria-label="Instagram">
+                  <svg className="w-5 h-5 text-white/60 group-hover:text-neon-pink" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069z"/></svg>
                 </a>
-                <a
-                  href="#"
-                  className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:border-neon-blue/50 hover:bg-neon-blue/10 transition-all duration-300 group focus:outline-none focus:ring-2 focus:ring-neon-blue/50"
-                  aria-label="TikTok"
-                >
-                  <svg className="w-5 h-5 text-white/60 group-hover:text-neon-blue transition-colors" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/>
-                  </svg>
+                <a href="#" className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:border-neon-blue/50 hover:bg-neon-blue/10 transition-all group" aria-label="TikTok">
+                  <svg className="w-5 h-5 text-white/60 group-hover:text-neon-blue" fill="currentColor" viewBox="0 0 24 24"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/></svg>
                 </a>
-                <a
-                  href="#"
-                  className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:border-success/50 hover:bg-success/10 transition-all duration-300 group focus:outline-none focus:ring-2 focus:ring-success/50"
-                  aria-label="Discord"
-                >
-                  <svg className="w-5 h-5 text-white/60 group-hover:text-success transition-colors" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/>
-                  </svg>
+                <a href="#" className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:border-success/50 hover:bg-success/10 transition-all group" aria-label="Discord">
+                  <svg className="w-5 h-5 text-white/60 group-hover:text-success" fill="currentColor" viewBox="0 0 24 24"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128c.12-.098.246-.198.373-.292a.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>
                 </a>
               </nav>
             </div>
@@ -1020,26 +1103,10 @@ export function LandingClient({
             <div>
               <h4 className="text-white font-bold mb-5 text-sm uppercase tracking-wider">Navigation</h4>
               <ul className="space-y-3">
-                <li>
-                  <Link href="/lobby" className="text-white/50 hover:text-neon-purple transition-colors duration-300 text-sm">
-                    Voir les lots
-                  </Link>
-                </li>
-                <li>
-                  <a href="#how-it-works" className="text-white/50 hover:text-neon-purple transition-colors duration-300 text-sm">
-                    Comment ça marche
-                  </a>
-                </li>
-                <li>
-                  <a href="#winners" className="text-white/50 hover:text-neon-purple transition-colors duration-300 text-sm">
-                    Derniers gagnants
-                  </a>
-                </li>
-                <li>
-                  <Link href="/register" className="text-white/50 hover:text-neon-purple transition-colors duration-300 text-sm">
-                    Créer un compte
-                  </Link>
-                </li>
+                <li><Link href="/lobby" className="text-white/50 hover:text-neon-purple transition-colors text-sm">Voir les lots</Link></li>
+                <li><a href="#how-it-works" className="text-white/50 hover:text-neon-purple transition-colors text-sm">Comment ça marche</a></li>
+                <li><a href="#winners" className="text-white/50 hover:text-neon-purple transition-colors text-sm">Derniers gagnants</a></li>
+                <li><Link href="/register" className="text-white/50 hover:text-neon-purple transition-colors text-sm">Créer un compte</Link></li>
               </ul>
             </div>
 
@@ -1047,55 +1114,27 @@ export function LandingClient({
             <div>
               <h4 className="text-white font-bold mb-5 text-sm uppercase tracking-wider">Légal</h4>
               <ul className="space-y-3">
-                <li>
-                  <a href="#" className="text-white/50 hover:text-neon-blue transition-colors duration-300 text-sm">
-                    Conditions générales
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="text-white/50 hover:text-neon-blue transition-colors duration-300 text-sm">
-                    Politique de confidentialité
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="text-white/50 hover:text-neon-blue transition-colors duration-300 text-sm">
-                    Mentions légales
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="text-white/50 hover:text-neon-blue transition-colors duration-300 text-sm">
-                    Règlement des jeux
-                  </a>
-                </li>
+                <li><a href="#" className="text-white/50 hover:text-neon-blue transition-colors text-sm">Conditions générales</a></li>
+                <li><a href="#" className="text-white/50 hover:text-neon-blue transition-colors text-sm">Politique de confidentialité</a></li>
+                <li><a href="#" className="text-white/50 hover:text-neon-blue transition-colors text-sm">Mentions légales</a></li>
+                <li><a href="#" className="text-white/50 hover:text-neon-blue transition-colors text-sm">Règlement des jeux</a></li>
               </ul>
             </div>
 
-            {/* Contact & Trust */}
+            {/* Contact */}
             <div>
               <h4 className="text-white font-bold mb-5 text-sm uppercase tracking-wider">Contact</h4>
               <ul className="space-y-3 mb-6">
-                <li>
-                  <a href="mailto:contact@clikzy.fr" className="text-white/50 hover:text-neon-pink transition-colors duration-300 text-sm">
-                    contact@clikzy.fr
-                  </a>
-                </li>
-                <li>
-                  <span className="text-white/50 text-sm">Support 24h/24 - 7j/7</span>
-                </li>
+                <li><a href="mailto:contact@clikzy.fr" className="text-white/50 hover:text-neon-pink transition-colors text-sm">contact@clikzy.fr</a></li>
+                <li><span className="text-white/50 text-sm">Support 24h/24 - 7j/7</span></li>
               </ul>
-
-              {/* Trust badges */}
-              <div className="flex flex-wrap gap-2">
+              <div className="flex gap-2">
                 <div className="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs text-white/40 flex items-center gap-1.5">
-                  <svg className="w-4 h-4 text-success" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                  </svg>
+                  <svg className="w-4 h-4 text-success" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
                   SSL
                 </div>
                 <div className="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs text-white/40 flex items-center gap-1.5">
-                  <svg className="w-4 h-4 text-neon-purple" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-                  </svg>
+                  <svg className="w-4 h-4 text-neon-purple" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" /></svg>
                   Stripe
                 </div>
               </div>
@@ -1103,15 +1142,10 @@ export function LandingClient({
           </div>
         </div>
 
-        {/* Bottom Bar */}
         <div className="border-t border-white/5">
-          <div className="max-w-7xl mx-auto px-6 py-6 flex flex-col md:flex-row items-center justify-between gap-4">
-            <p className="text-white/30 text-sm">
-              © 2025 CLIKZY. Tous droits réservés.
-            </p>
-            <p className="text-white/20 text-xs">
-              🎮 Clique. Gagne. Répète.
-            </p>
+          <div className="max-w-7xl mx-auto px-6 py-6 flex items-center justify-between">
+            <p className="text-white/30 text-sm">© 2025 CLIKZY. Tous droits réservés.</p>
+            <p className="text-white/20 text-xs">🎮 Clique. Gagne. Répète.</p>
           </div>
         </div>
       </footer>

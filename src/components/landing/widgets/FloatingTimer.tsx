@@ -153,137 +153,160 @@ export function FloatingTimer({
           stiffness: 400,
           damping: 25,
         }}
-        className="fixed bottom-6 right-6 z-50"
+        className="fixed bottom-3 md:bottom-6 right-2 md:right-6 z-50"
       >
-        <div
-          className={`
-            relative overflow-hidden
-            bg-bg-secondary/95 backdrop-blur-xl
-            border rounded-xl
-            p-4 min-w-[280px]
-            transition-all duration-300
-            ${isCritical
-              ? 'border-red-500/80'
-              : isUrgent
-                ? 'border-neon-pink/50'
-                : 'border-white/10'
-            }
-          `}
-          style={{
-            boxShadow: isCritical
-              ? '0 0 30px rgba(239, 68, 68, 0.5), 0 0 60px rgba(239, 68, 68, 0.3), inset 0 0 30px rgba(239, 68, 68, 0.1)'
-              : isUrgent
-                ? '0 0 20px rgba(255, 79, 216, 0.3)'
-                : 'none',
-            animation: isCritical ? 'heartbeat 0.5s ease-in-out infinite' : 'none',
-          }}
-        >
-          {/* Critical heartbeat glow overlay */}
-          {isCritical && (
-            <div
-              className="absolute inset-0 rounded-xl pointer-events-none"
-              style={{
-                background: 'radial-gradient(ellipse at center, rgba(239, 68, 68, 0.2) 0%, transparent 70%)',
-                animation: 'pulse 0.5s ease-in-out infinite',
-              }}
-            />
-          )}
-
-          {/* Urgent glow effect */}
-          {isUrgent && !isCritical && (
-            <div className="absolute inset-0 bg-gradient-to-r from-neon-pink/10 to-neon-purple/10 animate-pulse rounded-xl" />
-          )}
-
-          <div className="relative">
-            {/* Close button */}
+        {/* MOBILE VERSION - Ultra compact */}
+        <div className="md:hidden">
+          <div
+            className={`
+              relative overflow-hidden
+              bg-bg-secondary/95
+              border rounded-lg
+              p-2 min-w-[120px]
+              ${isCritical ? 'border-red-500/60' : isUrgent ? 'border-neon-pink/40' : 'border-white/10'}
+            `}
+          >
+            {/* Close button - tiny */}
             <button
               onClick={handleClose}
-              className="absolute -top-1 -right-1 w-6 h-6 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-white/60 hover:text-white transition-colors z-10"
+              className="absolute top-1 right-1 w-4 h-4 flex items-center justify-center rounded-full bg-white/10 text-white/40 z-10"
               aria-label="Fermer"
             >
-              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+              <svg className="w-2.5 h-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
 
-            {/* Header */}
-            <div className="flex items-center justify-between mb-3 pr-6">
-              <div className="flex items-center gap-2">
-                <span className="relative flex h-2 w-2">
-                  <span className={`animate-ping absolute h-full w-full rounded-full opacity-75 ${isCritical ? 'bg-red-500' : isUrgent ? 'bg-neon-pink' : 'bg-neon-purple'}`} />
-                  <span className={`relative rounded-full h-2 w-2 ${isCritical ? 'bg-red-500' : isUrgent ? 'bg-neon-pink' : 'bg-neon-purple'}`} />
+            <div className="relative pr-4">
+              {/* Live dot + Timer on same line */}
+              <div className="flex items-center gap-1.5 mb-1">
+                <span className="relative flex h-1.5 w-1.5">
+                  <span className={`animate-ping absolute h-full w-full rounded-full opacity-75 ${isCritical ? 'bg-red-500' : 'bg-neon-purple'}`} />
+                  <span className={`relative rounded-full h-1.5 w-1.5 ${isCritical ? 'bg-red-500' : 'bg-neon-purple'}`} />
                 </span>
-                <span className="text-xs font-bold uppercase tracking-wider text-white/60">
-                  En cours
-                </span>
+                <span className="text-[9px] font-bold uppercase text-white/50">Live</span>
               </div>
-              {isCritical ? (
-                <span
-                  className="px-2 py-0.5 bg-red-500/20 text-red-500 text-xs font-bold rounded"
-                  style={{ animation: 'pulse 0.5s ease-in-out infinite' }}
-                >
-                  DERNIERS INSTANTS!
-                </span>
-              ) : isUrgent && (
-                <span className="px-2 py-0.5 bg-neon-pink/20 text-neon-pink text-xs font-bold rounded">
-                  FINALE
-                </span>
-              )}
+
+              {/* Timer - compact */}
+              <div
+                className={`text-xl font-black font-mono ${isCritical ? 'text-red-500' : isUrgent ? 'text-neon-pink' : 'text-neon-blue'}`}
+              >
+                {formatTime(timeLeft)}
+              </div>
+
+              {/* Mini CTA */}
+              <Link
+                href={gameId ? `/game/${gameId}` : '/lobby'}
+                className={`
+                  block w-full text-center py-1.5 mt-1.5 font-bold text-[10px] uppercase rounded
+                  ${isCritical
+                    ? 'bg-red-500'
+                    : isUrgent
+                      ? 'bg-neon-pink'
+                      : 'bg-neon-purple'
+                  }
+                `}
+              >
+                GO
+              </Link>
             </div>
-
-            {/* Item name */}
-            <p className="text-sm text-white/80 mb-2 truncate">{currentProduct}</p>
-
-            {/* Timer */}
-            <div
-              className={`
-                text-4xl font-black font-mono tracking-wider mb-4
-                ${isCritical ? 'text-red-500' : isUrgent ? 'text-neon-pink' : 'text-neon-blue'}
-              `}
-              style={{
-                textShadow: isCritical
-                  ? '0 0 20px rgba(239, 68, 68, 0.8), 0 0 40px rgba(239, 68, 68, 0.5)'
-                  : isUrgent
-                    ? '0 0 15px rgba(255, 79, 216, 0.5)'
-                    : 'none',
-                animation: isCritical ? 'pulse 0.5s ease-in-out infinite' : 'none',
-              }}
-            >
-              {formatTime(timeLeft)}
-            </div>
-
-            {/* CTA Button */}
-            <Link
-              href={gameId ? `/game/${gameId}` : '/lobby'}
-              className={`
-                block w-full text-center py-3 font-bold text-sm uppercase tracking-wider
-                transition-all duration-300 rounded-lg
-                ${isCritical
-                  ? 'bg-gradient-to-r from-red-500 to-red-600 hover:shadow-[0_0_30px_rgba(239,68,68,0.6)]'
-                  : isUrgent
-                    ? 'bg-gradient-to-r from-neon-pink to-neon-purple hover:shadow-[0_0_30px_rgba(255,79,216,0.5)]'
-                    : 'bg-gradient-to-r from-neon-purple to-neon-blue hover:shadow-[0_0_30px_rgba(155,92,255,0.5)]'
-                }
-              `}
-              style={{
-                animation: isCritical ? 'pulse 0.5s ease-in-out infinite' : 'none',
-              }}
-            >
-              {isCritical ? 'CLIQUE MAINTENANT!' : isUrgent ? 'PARTICIPER VITE!' : 'PARTICIPER'}
-            </Link>
           </div>
+        </div>
 
-          {/* Progress bar */}
-          <div className="absolute bottom-0 left-0 right-0 h-1 bg-white/10 rounded-b-xl overflow-hidden">
-            <motion.div
-              className={`h-full ${isCritical ? 'bg-red-500' : isUrgent ? 'bg-neon-pink' : 'bg-neon-purple'}`}
-              initial={{ width: '100%' }}
-              animate={{ width: '0%' }}
-              transition={{ duration: timeLeft, ease: 'linear' }}
-              style={{
-                boxShadow: isCritical ? '0 0 10px rgba(239, 68, 68, 0.8)' : 'none',
-              }}
-            />
+        {/* DESKTOP VERSION - Full */}
+        <div className="hidden md:block">
+          <div
+            className={`
+              relative overflow-hidden
+              bg-bg-secondary/95 backdrop-blur-xl
+              border rounded-xl
+              p-4 min-w-[280px]
+              transition-all duration-300
+              ${isCritical
+                ? 'border-red-500/80'
+                : isUrgent
+                  ? 'border-neon-pink/50'
+                  : 'border-white/10'
+              }
+            `}
+            style={{
+              boxShadow: isCritical
+                ? '0 0 30px rgba(239, 68, 68, 0.5), 0 0 60px rgba(239, 68, 68, 0.3)'
+                : isUrgent
+                  ? '0 0 20px rgba(255, 79, 216, 0.3)'
+                  : 'none',
+            }}
+          >
+            {/* Urgent glow effect */}
+            {isUrgent && !isCritical && (
+              <div className="absolute inset-0 bg-gradient-to-r from-neon-pink/10 to-neon-purple/10 animate-pulse rounded-xl" />
+            )}
+
+            <div className="relative">
+              {/* Close button */}
+              <button
+                onClick={handleClose}
+                className="absolute -top-1 -right-1 w-6 h-6 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-white/60 hover:text-white transition-colors z-10"
+                aria-label="Fermer"
+              >
+                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+
+              {/* Header */}
+              <div className="flex items-center justify-between mb-3 pr-6">
+                <div className="flex items-center gap-2">
+                  <span className="relative flex h-2 w-2">
+                    <span className={`animate-ping absolute h-full w-full rounded-full opacity-75 ${isCritical ? 'bg-red-500' : isUrgent ? 'bg-neon-pink' : 'bg-neon-purple'}`} />
+                    <span className={`relative rounded-full h-2 w-2 ${isCritical ? 'bg-red-500' : isUrgent ? 'bg-neon-pink' : 'bg-neon-purple'}`} />
+                  </span>
+                  <span className="text-xs font-bold uppercase tracking-wider text-white/60">En cours</span>
+                </div>
+                {isCritical ? (
+                  <span className="px-2 py-0.5 bg-red-500/20 text-red-500 text-xs font-bold rounded">DERNIERS INSTANTS!</span>
+                ) : isUrgent && (
+                  <span className="px-2 py-0.5 bg-neon-pink/20 text-neon-pink text-xs font-bold rounded">FINALE</span>
+                )}
+              </div>
+
+              {/* Item name */}
+              <p className="text-sm text-white/80 mb-2 truncate">{currentProduct}</p>
+
+              {/* Timer */}
+              <div
+                className={`text-4xl font-black font-mono tracking-wider mb-4 ${isCritical ? 'text-red-500' : isUrgent ? 'text-neon-pink' : 'text-neon-blue'}`}
+              >
+                {formatTime(timeLeft)}
+              </div>
+
+              {/* CTA Button */}
+              <Link
+                href={gameId ? `/game/${gameId}` : '/lobby'}
+                className={`
+                  block w-full text-center py-3 font-bold text-sm uppercase tracking-wider
+                  transition-all duration-300 rounded-lg
+                  ${isCritical
+                    ? 'bg-gradient-to-r from-red-500 to-red-600'
+                    : isUrgent
+                      ? 'bg-gradient-to-r from-neon-pink to-neon-purple'
+                      : 'bg-gradient-to-r from-neon-purple to-neon-blue'
+                  }
+                `}
+              >
+                {isCritical ? 'CLIQUE MAINTENANT!' : isUrgent ? 'PARTICIPER VITE!' : 'PARTICIPER'}
+              </Link>
+            </div>
+
+            {/* Progress bar */}
+            <div className="absolute bottom-0 left-0 right-0 h-1 bg-white/10 rounded-b-xl overflow-hidden">
+              <motion.div
+                className={`h-full ${isCritical ? 'bg-red-500' : isUrgent ? 'bg-neon-pink' : 'bg-neon-purple'}`}
+                initial={{ width: '100%' }}
+                animate={{ width: '0%' }}
+                transition={{ duration: timeLeft, ease: 'linear' }}
+              />
+            </div>
           </div>
         </div>
       </motion.div>
