@@ -10,27 +10,38 @@ export type AuthResult = {
 }
 
 /**
- * Sign in with Magic Link (email)
+ * Sign in with email and password
  */
-export async function signInWithEmail(formData: FormData): Promise<AuthResult> {
+export async function signInWithPassword(formData: FormData): Promise<AuthResult> {
   const email = formData.get('email') as string
+  const password = formData.get('password') as string
 
   if (!email || !email.includes('@')) {
     return { success: false, error: 'Email invalide' }
   }
 
-  const supabase = await createClient()
-  const origin = (await headers()).get('origin') || process.env.NEXT_PUBLIC_SITE_URL
+  if (!password) {
+    return { success: false, error: 'Mot de passe requis' }
+  }
 
-  const { error } = await supabase.auth.signInWithOtp({
+  const supabase = await createClient()
+
+  const { error } = await supabase.auth.signInWithPassword({
     email,
-    options: {
-      emailRedirectTo: `${origin}/auth/callback`,
-    },
+    password,
   })
 
   if (error) {
-    console.error('Magic link error:', error.message)
+    console.error('Sign in error:', error.message)
+
+    if (error.message.includes('Invalid login credentials')) {
+      return { success: false, error: 'Email ou mot de passe incorrect' }
+    }
+
+    if (error.message.includes('Email not confirmed')) {
+      return { success: false, error: 'Vérifie ton email pour confirmer ton compte' }
+    }
+
     return { success: false, error: error.message }
   }
 

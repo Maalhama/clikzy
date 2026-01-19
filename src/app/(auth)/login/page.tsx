@@ -1,39 +1,46 @@
 'use client'
 
-import { useState, Suspense } from 'react'
+import { useState } from 'react'
 import Link from 'next/link'
-import { useSearchParams } from 'next/navigation'
-import { signInWithEmail, signInWithOAuth } from '@/actions/auth'
+import { useRouter } from 'next/navigation'
+import { signInWithPassword, signInWithOAuth } from '@/actions/auth'
 import { Button } from '@/components/ui/button'
 import { Logo } from '@/components/ui/Logo'
 
-function LoginForm() {
-  const searchParams = useSearchParams()
-  const redirect = searchParams.get('redirect') || '/lobby'
-
-  const [email, setEmail] = useState('')
+export default function LoginPage() {
+  const router = useRouter()
+  const [formData, setFormData] = useState({
+    email: '',
+    password: '',
+  })
   const [isLoading, setIsLoading] = useState(false)
   const [isOAuthLoading, setIsOAuthLoading] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
-  const [success, setSuccess] = useState(false)
 
-  async function handleMagicLink(e: React.FormEvent) {
+  function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
+    setFormData(prev => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }))
+  }
+
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setIsLoading(true)
     setError(null)
 
-    const formData = new FormData()
-    formData.append('email', email)
+    const data = new FormData()
+    data.append('email', formData.email)
+    data.append('password', formData.password)
 
-    const result = await signInWithEmail(formData)
+    const result = await signInWithPassword(data)
 
     if (result.success) {
-      setSuccess(true)
+      router.push('/lobby')
     } else {
       setError(result.error || 'Une erreur est survenue')
+      setIsLoading(false)
     }
-
-    setIsLoading(false)
   }
 
   async function handleOAuth(provider: 'google' | 'github') {
@@ -46,33 +53,6 @@ function LoginForm() {
       setError(result.error || 'Une erreur est survenue')
       setIsOAuthLoading(null)
     }
-  }
-
-  if (success) {
-    return (
-      <div className="h-full w-full flex items-center justify-center p-5">
-        <div className="text-center max-w-sm">
-          <div className="relative w-20 h-20 mx-auto mb-5">
-            <div className="absolute inset-0 rounded-full bg-gradient-to-br from-neon-purple/30 to-neon-pink/30 animate-pulse" />
-            <div className="absolute inset-2 rounded-full bg-bg-secondary flex items-center justify-center">
-              <svg className="w-8 h-8 text-neon-purple" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
-              </svg>
-            </div>
-          </div>
-          <h1 className="text-xl font-bold text-white mb-2">Vérifie ta boîte mail</h1>
-          <p className="text-text-secondary text-sm mb-5">
-            Un lien de connexion a été envoyé à <strong className="text-neon-purple">{email}</strong>
-          </p>
-          <p className="text-xs text-text-secondary/60 mb-5">
-            Le lien expire dans 1 heure
-          </p>
-          <Button variant="ghost" size="sm" onClick={() => setSuccess(false)}>
-            Utiliser une autre adresse
-          </Button>
-        </div>
-      </div>
-    )
   }
 
   return (
@@ -129,7 +109,7 @@ function LoginForm() {
           {/* Google OAuth */}
           <button
             onClick={() => handleOAuth('google')}
-            disabled={isOAuthLoading !== null}
+            disabled={isOAuthLoading !== null || isLoading}
             className="w-full flex items-center justify-center gap-3 px-5 py-3 rounded-xl bg-white/5 border border-white/10 text-white text-sm font-medium transition-all hover:bg-white/10 hover:border-white/20 disabled:opacity-50 disabled:cursor-not-allowed mb-5"
           >
             {isOAuthLoading === 'google' ? (
@@ -155,8 +135,8 @@ function LoginForm() {
             </div>
           </div>
 
-          {/* Email Form */}
-          <form onSubmit={handleMagicLink} className="space-y-3">
+          {/* Login Form */}
+          <form onSubmit={handleSubmit} className="space-y-3">
             <div>
               <label htmlFor="email" className="block text-xs font-medium text-text-secondary mb-1.5">
                 Email
@@ -164,9 +144,27 @@ function LoginForm() {
               <input
                 type="email"
                 id="email"
+                name="email"
                 placeholder="ton@email.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                value={formData.email}
+                onChange={handleChange}
+                required
+                disabled={isLoading}
+                className="w-full px-4 py-3 rounded-xl bg-bg-secondary/50 border border-white/10 text-sm text-white placeholder-text-secondary/50 transition-all focus:outline-none focus:border-neon-purple focus:ring-2 focus:ring-neon-purple/20 disabled:opacity-50"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="password" className="block text-xs font-medium text-text-secondary mb-1.5">
+                Mot de passe
+              </label>
+              <input
+                type="password"
+                id="password"
+                name="password"
+                placeholder="Ton mot de passe"
+                value={formData.password}
+                onChange={handleChange}
                 required
                 disabled={isLoading}
                 className="w-full px-4 py-3 rounded-xl bg-bg-secondary/50 border border-white/10 text-sm text-white placeholder-text-secondary/50 transition-all focus:outline-none focus:border-neon-purple focus:ring-2 focus:ring-neon-purple/20 disabled:opacity-50"
@@ -188,14 +186,9 @@ function LoginForm() {
               className="w-full py-3 text-sm"
               isLoading={isLoading}
             >
-              Recevoir un lien magique
+              Se connecter
             </Button>
           </form>
-
-          {/* Info */}
-          <p className="mt-3 text-[11px] text-text-secondary/60 text-center">
-            Un lien de connexion sera envoyé à ton adresse email
-          </p>
 
           {/* Footer */}
           <div className="mt-6 pt-5 border-t border-white/5 text-center">
@@ -219,21 +212,5 @@ function LoginForm() {
         </div>
       </div>
     </div>
-  )
-}
-
-function LoginFallback() {
-  return (
-    <div className="h-full w-full flex items-center justify-center">
-      <div className="w-6 h-6 border-2 border-neon-purple border-t-transparent rounded-full animate-spin" />
-    </div>
-  )
-}
-
-export default function LoginPage() {
-  return (
-    <Suspense fallback={<LoginFallback />}>
-      <LoginForm />
-    </Suspense>
   )
 }

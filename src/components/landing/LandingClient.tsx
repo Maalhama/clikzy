@@ -4,9 +4,11 @@ import { useRef, useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import Link from 'next/link'
 import Image from 'next/image'
+import { useRouter } from 'next/navigation'
 import { useGSAP } from '@gsap/react'
 import { gsap } from '@/lib/gsap/gsapConfig'
 import { useLandingRealtime } from '@/hooks/landing/useLandingRealtime'
+import { signOut } from '@/actions/auth'
 
 // Widgets
 import {
@@ -144,9 +146,15 @@ export function LandingClient({
   stats,
 }: LandingClientProps) {
   const mainRef = useRef<HTMLElement>(null)
+  const router = useRouter()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [menuClosing, setMenuClosing] = useState(false)
   const [isMounted, setIsMounted] = useState(false)
+
+  async function handleSignOut() {
+    await signOut()
+    router.push('/login')
+  }
 
   // Pour le portal - attendre le montage côté client
   useEffect(() => {
@@ -323,14 +331,25 @@ export function LandingClient({
             <PlayerCounter count={playerCount} label="en ligne" size="sm" />
 
             {/* Desktop buttons */}
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3">
               {isLoggedIn ? (
-                <Link
-                  href="/lobby"
-                  className="neon-btn-primary px-6 py-2.5 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-neon-purple/50"
-                >
-                  PARTICIPER
-                </Link>
+                <>
+                  <Link
+                    href="/lobby"
+                    className="neon-btn-primary px-6 py-2.5 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-neon-purple/50"
+                  >
+                    PARTICIPER
+                  </Link>
+                  <button
+                    onClick={handleSignOut}
+                    className="p-2.5 rounded-lg bg-white/5 border border-white/10 hover:border-danger/50 hover:bg-danger/10 transition-all group focus:outline-none focus:ring-2 focus:ring-danger/50"
+                    aria-label="Déconnexion"
+                  >
+                    <svg className="w-5 h-5 text-white/50 group-hover:text-danger transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                    </svg>
+                  </button>
+                </>
               ) : (
                 <>
                   <Link
@@ -1354,18 +1373,29 @@ export function LandingClient({
           <div className="px-4 pb-4">
             <div className="p-3 rounded-xl bg-gradient-to-br from-neon-purple/10 to-neon-pink/10 border border-neon-purple/20">
               {isLoggedIn ? (
-                <Link
-                  href="/lobby"
-                  onClick={closeMenu}
-                  className="flex items-center justify-center gap-2 w-full py-3 bg-gradient-to-r from-neon-purple to-neon-pink text-white font-bold text-sm rounded-lg hover:opacity-90 transition-opacity"
-                  style={{ boxShadow: '0 0 20px rgba(155, 92, 255, 0.3)' }}
-                >
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  JOUER
-                </Link>
+                <div className="space-y-2">
+                  <Link
+                    href="/lobby"
+                    onClick={closeMenu}
+                    className="flex items-center justify-center gap-2 w-full py-3 bg-gradient-to-r from-neon-purple to-neon-pink text-white font-bold text-sm rounded-lg hover:opacity-90 transition-opacity"
+                    style={{ boxShadow: '0 0 20px rgba(155, 92, 255, 0.3)' }}
+                  >
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    JOUER
+                  </Link>
+                  <button
+                    onClick={() => { closeMenu(); handleSignOut(); }}
+                    className="flex items-center justify-center gap-2 w-full py-2.5 rounded-lg bg-danger/10 border border-danger/30 text-danger hover:bg-danger/20 transition-colors text-sm font-semibold"
+                  >
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                    </svg>
+                    Déconnexion
+                  </button>
+                </div>
               ) : (
                 <div className="space-y-2">
                   <Link

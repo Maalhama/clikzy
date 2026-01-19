@@ -1,9 +1,11 @@
 'use client'
 
+import { useState } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
+import { createPortal } from 'react-dom'
 import { signOut } from '@/actions/auth'
-import { Button } from '@/components/ui/button'
+import { Logo } from '@/components/ui/Logo'
 import type { Profile } from '@/types/database'
 
 interface HeaderProps {
@@ -12,78 +14,283 @@ interface HeaderProps {
 
 export function Header({ profile }: HeaderProps) {
   const router = useRouter()
+  const pathname = usePathname()
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [menuClosing, setMenuClosing] = useState(false)
+  const [isMounted, setIsMounted] = useState(false)
+
+  // Mount check for portal
+  useState(() => {
+    setIsMounted(true)
+  })
+
+  const closeMenu = () => {
+    if (menuClosing) return
+    setMenuClosing(true)
+    setTimeout(() => {
+      setMobileMenuOpen(false)
+      setMenuClosing(false)
+    }, 300)
+  }
 
   async function handleSignOut() {
+    closeMenu()
     await signOut()
     router.push('/login')
   }
 
+  const isActive = (path: string) => pathname === path
+
   return (
-    <header className="sticky top-0 z-50 glass border-b border-bg-tertiary">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+    <>
+      <header className="fixed top-0 left-0 right-0 z-50">
+        {/* Background with glassmorphism */}
+        <div className="absolute inset-0 bg-bg-primary/80 backdrop-blur-xl" />
+
+        {/* Animated gradient border */}
+        <div className="absolute bottom-0 left-0 right-0 h-[1px] overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-neon-purple to-transparent animate-border-scan" />
+          <div className="absolute inset-0 bg-gradient-to-r from-neon-purple/20 via-neon-pink/40 to-neon-purple/20" />
+        </div>
+
+        {/* Mobile Header */}
+        <div className="md:hidden relative px-4 py-3 flex items-center justify-between">
+          {/* Menu button */}
+          <button
+            onClick={() => mobileMenuOpen ? closeMenu() : setMobileMenuOpen(true)}
+            className="p-2 rounded-lg bg-gradient-to-r from-neon-purple/15 to-neon-pink/15 border border-neon-purple/30 hover:border-neon-pink/50 transition-colors"
+            aria-label={mobileMenuOpen ? 'Fermer le menu' : 'Ouvrir le menu'}
+          >
+            <svg className="w-5 h-5 text-neon-purple" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
+
+          {/* Logo - Center */}
+          <div className="absolute left-1/2 -translate-x-1/2">
+            <Logo size="md" animated={false} href="/lobby" />
+          </div>
+
+          {/* Credits badge - Right */}
+          {profile && (
+            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-neon-purple/10 border border-neon-purple/30">
+              <svg className="w-4 h-4 text-neon-purple" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span className="text-sm font-bold text-neon-purple">{profile.credits}</span>
+            </div>
+          )}
+        </div>
+
+        {/* Desktop Header */}
+        <div className="hidden md:flex relative max-w-7xl mx-auto px-6 py-4 items-center justify-between">
           {/* Logo */}
-          <Link href="/lobby" className="flex items-center gap-2">
-            <span className="text-2xl font-bold">
-              <span className="text-neon-purple">CLIK</span>
-              <span className="text-neon-pink">ZY</span>
-            </span>
-          </Link>
+          <Logo size="md" animated={false} href="/lobby" />
 
           {/* Navigation */}
-          <nav className="hidden md:flex items-center gap-6">
+          <nav className="flex items-center gap-8">
             <Link
               href="/lobby"
-              className="text-text-secondary hover:text-text-primary transition-colors"
+              className={`nav-link-neon text-sm font-medium transition-all duration-300 ${
+                isActive('/lobby')
+                  ? 'text-neon-purple'
+                  : 'text-white/70 hover:text-white'
+              }`}
             >
               Lobby
             </Link>
             <Link
               href="/profile"
-              className="text-text-secondary hover:text-text-primary transition-colors"
+              className={`nav-link-neon text-sm font-medium transition-all duration-300 ${
+                isActive('/profile')
+                  ? 'text-neon-purple'
+                  : 'text-white/70 hover:text-white'
+              }`}
             >
               Profil
             </Link>
           </nav>
 
-          {/* User section */}
+          {/* Right section */}
           <div className="flex items-center gap-4">
             {profile && (
               <>
-                {/* Credits */}
-                <div className="flex items-center gap-2 px-3 py-1.5 bg-bg-tertiary rounded-lg">
-                  <span className="text-neon-blue font-mono font-bold">
-                    {profile.credits}
-                  </span>
-                  <span className="text-text-secondary text-sm">crédits</span>
+                {/* Credits with glow */}
+                <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-neon-purple/10 border border-neon-purple/30 hover:border-neon-purple/50 transition-colors group">
+                  <svg className="w-5 h-5 text-neon-purple group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <span className="font-bold text-neon-purple">{profile.credits}</span>
+                  <span className="text-white/50 text-sm">crédits</span>
                 </div>
 
-                {/* Username */}
+                {/* User avatar + name */}
                 <Link
                   href="/profile"
-                  className="hidden sm:flex items-center gap-2 text-text-primary hover:text-neon-purple transition-colors"
+                  className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-white/5 transition-colors group"
                 >
-                  <div className="w-8 h-8 rounded-full bg-neon-purple/20 flex items-center justify-center">
-                    <span className="text-neon-purple font-bold text-sm">
-                      {profile.username.charAt(0).toUpperCase()}
-                    </span>
+                  <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-neon-purple to-neon-pink flex items-center justify-center font-bold text-white group-hover:scale-105 transition-transform">
+                    {profile.username.charAt(0).toUpperCase()}
                   </div>
-                  <span className="font-medium">{profile.username}</span>
+                  <span className="font-medium text-white/80 group-hover:text-white transition-colors">
+                    {profile.username}
+                  </span>
                 </Link>
+
+                {/* Sign out */}
+                <button
+                  onClick={handleSignOut}
+                  className="p-2.5 rounded-lg bg-white/5 border border-white/10 hover:border-danger/50 hover:bg-danger/10 transition-all group"
+                  aria-label="Déconnexion"
+                >
+                  <svg className="w-5 h-5 text-white/50 group-hover:text-danger transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                  </svg>
+                </button>
               </>
             )}
-
-            {/* Sign out */}
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleSignOut}
-            >
-              Déconnexion
-            </Button>
           </div>
         </div>
-      </div>
-    </header>
+      </header>
+
+      {/* Spacer for fixed header */}
+      <div className="h-14 md:h-[72px]" />
+
+      {/* Mobile Menu Portal */}
+      {typeof window !== 'undefined' && mobileMenuOpen && createPortal(
+        <div className="md:hidden" style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 999999 }}>
+          {/* Backdrop */}
+          <div
+            onClick={closeMenu}
+            className={menuClosing ? 'animate-fade-out' : 'animate-fade-in'}
+            style={{
+              position: 'fixed',
+              top: '3.5rem',
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: 'rgba(0, 0, 0, 0.6)',
+              backdropFilter: 'blur(4px)'
+            }}
+          />
+
+          {/* Menu Panel */}
+          <div
+            className={menuClosing ? 'animate-slide-out-left' : 'animate-slide-in-left'}
+            style={{
+              position: 'fixed',
+              top: '3.5rem',
+              left: 0,
+              width: '17rem',
+              backgroundColor: '#0a0a0f',
+              border: '2px solid rgba(155, 92, 255, 0.5)',
+              borderLeft: 'none',
+              borderRadius: '0 1rem 1rem 0',
+              boxShadow: '0 0 60px rgba(155, 92, 255, 0.4), 10px 10px 40px rgba(0, 0, 0, 0.8)'
+            }}
+          >
+            {/* Menu Header */}
+            <div className="flex items-center justify-between px-4 py-3 border-b border-white/10">
+              <span className="text-xs font-bold text-white/40 uppercase tracking-wider">Menu</span>
+              <button
+                onClick={closeMenu}
+                className="flex items-center justify-center w-8 h-8 rounded-lg bg-neon-purple/10 hover:bg-neon-purple/20 border border-neon-purple/30 transition-all"
+                aria-label="Fermer le menu"
+              >
+                <svg className="w-4 h-4 text-neon-pink" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            {/* User info */}
+            {profile && (
+              <div className="px-4 py-4 border-b border-white/10">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-neon-purple to-neon-pink flex items-center justify-center font-bold text-white text-lg">
+                    {profile.username.charAt(0).toUpperCase()}
+                  </div>
+                  <div>
+                    <div className="font-bold text-white">{profile.username}</div>
+                    <div className="flex items-center gap-1 text-neon-purple text-sm">
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      <span className="font-bold">{profile.credits} crédits</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Navigation */}
+            <nav className="px-3 py-3">
+              <Link
+                href="/lobby"
+                onClick={closeMenu}
+                className={`flex items-center gap-3 px-3 py-3 rounded-xl transition-all ${
+                  isActive('/lobby')
+                    ? 'bg-neon-purple/20 text-white'
+                    : 'text-white/80 hover:bg-neon-purple/10'
+                }`}
+              >
+                <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${
+                  isActive('/lobby')
+                    ? 'bg-neon-purple/30 border-neon-purple/50'
+                    : 'bg-neon-purple/10 border-neon-purple/30'
+                } border transition-colors`}>
+                  <svg className="w-5 h-5 text-neon-purple" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <div>
+                  <span className="block text-sm font-semibold">Lobby</span>
+                  <span className="block text-[10px] text-white/40">Voir les parties</span>
+                </div>
+              </Link>
+
+              <Link
+                href="/profile"
+                onClick={closeMenu}
+                className={`flex items-center gap-3 px-3 py-3 rounded-xl transition-all ${
+                  isActive('/profile')
+                    ? 'bg-neon-pink/20 text-white'
+                    : 'text-white/80 hover:bg-neon-pink/10'
+                }`}
+              >
+                <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${
+                  isActive('/profile')
+                    ? 'bg-neon-pink/30 border-neon-pink/50'
+                    : 'bg-neon-pink/10 border-neon-pink/30'
+                } border transition-colors`}>
+                  <svg className="w-5 h-5 text-neon-pink" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  </svg>
+                </div>
+                <div>
+                  <span className="block text-sm font-semibold">Profil</span>
+                  <span className="block text-[10px] text-white/40">Mon compte</span>
+                </div>
+              </Link>
+            </nav>
+
+            {/* Sign out */}
+            <div className="px-4 pb-4">
+              <button
+                onClick={handleSignOut}
+                className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-danger/10 border border-danger/30 text-danger hover:bg-danger/20 transition-colors"
+              >
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                </svg>
+                <span className="font-semibold">Déconnexion</span>
+              </button>
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
+    </>
   )
 }

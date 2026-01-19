@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { Header } from '@/components/layout/Header'
+import { BackgroundEffects } from '@/components/ui/BackgroundEffects'
 import type { Profile } from '@/types/database'
 
 export default async function MainLayout({
@@ -25,15 +26,24 @@ export default async function MainLayout({
     .single()
 
   return (
-    <div className="min-h-screen flex flex-col">
-      {/* Background */}
-      <div className="fixed inset-0 bg-gradient-to-br from-bg-primary via-bg-secondary to-bg-primary -z-10" />
+    <div className="min-h-screen flex flex-col bg-bg-primary">
+      {/* Mobile lightweight background */}
+      <div className="md:hidden fixed inset-0 -z-10">
+        <div className="mobile-grid-bg" />
+        <div className="mobile-glow-spot mobile-glow-spot-1" />
+        <div className="mobile-glow-spot mobile-glow-spot-2" />
+      </div>
+
+      {/* Desktop animated background */}
+      <div className="hidden md:block fixed inset-0 -z-10">
+        <BackgroundEffects simplified />
+      </div>
 
       {/* Header */}
       <Header profile={profile as Profile | null} />
 
       {/* Main content */}
-      <main className="flex-1">
+      <main className="flex-1 relative z-10">
         {children}
       </main>
     </div>
