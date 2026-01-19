@@ -1,6 +1,7 @@
 'use client'
 
-import { useRef, useState } from 'react'
+import { useRef, useState, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useGSAP } from '@gsap/react'
@@ -145,6 +146,12 @@ export function LandingClient({
   const mainRef = useRef<HTMLElement>(null)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [menuClosing, setMenuClosing] = useState(false)
+  const [isMounted, setIsMounted] = useState(false)
+
+  // Pour le portal - attendre le montage côté client
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
 
   const closeMenu = () => {
     if (menuClosing) return
@@ -268,19 +275,19 @@ export function LandingClient({
           {/* Mobile menu button - Left */}
           <button
             onClick={() => mobileMenuOpen ? closeMenu() : setMobileMenuOpen(true)}
-            className="p-2 rounded-lg bg-white/5 border border-white/10 hover:border-neon-purple/50 transition-colors focus:outline-none focus:ring-2 focus:ring-neon-purple/50"
+            className="p-2 rounded-lg bg-gradient-to-r from-neon-purple/15 to-neon-pink/15 border border-neon-purple/30 hover:border-neon-pink/50 transition-colors focus:outline-none focus:ring-2 focus:ring-neon-purple/50"
             aria-label={mobileMenuOpen ? 'Fermer le menu' : 'Ouvrir le menu'}
             aria-expanded={mobileMenuOpen}
           >
-            {mobileMenuOpen ? (
-              <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            ) : (
-              <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
-            )}
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="url(#menuGradient)" strokeWidth={2}>
+              <defs>
+                <linearGradient id="menuGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#9B5CFF" />
+                  <stop offset="100%" stopColor="#FF4FD8" />
+                </linearGradient>
+              </defs>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
           </button>
 
           {/* Logo - Center */}
@@ -1230,77 +1237,165 @@ export function LandingClient({
       </footer>
     </main>
 
-    {/* Mobile Slide Menu */}
-    {mobileMenuOpen && (
-      <>
+    {/* Mobile Menu Portal - rendu directement dans document.body via createPortal */}
+    {isMounted && mobileMenuOpen && createPortal(
+      <div
+        className="md:hidden"
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          zIndex: 999999,
+          pointerEvents: 'auto'
+        }}
+      >
+        {/* Backdrop */}
         <div
-          className={`fixed inset-0 bg-black/50 z-[9998] md:hidden ${menuClosing ? 'animate-fade-out' : 'animate-fade-in'}`}
           onClick={closeMenu}
-        />
-        <div
-          className={`fixed top-0 left-0 w-64 z-[9999] md:hidden rounded-br-2xl ${menuClosing ? 'animate-slide-out-left' : 'animate-slide-in-left'}`}
+          className={menuClosing ? 'animate-fade-out' : 'animate-fade-in'}
           style={{
+            position: 'fixed',
+            top: '3.5rem',
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.6)',
+            backdropFilter: 'blur(4px)'
+          }}
+        />
+        {/* Menu Panel */}
+        <div
+          className={menuClosing ? 'animate-slide-out-left' : 'animate-slide-in-left'}
+          style={{
+            position: 'fixed',
+            top: '3.5rem',
+            left: 0,
+            width: '17rem',
             backgroundColor: '#0a0a0f',
-            border: '1px solid rgba(155, 92, 255, 0.5)',
+            border: '2px solid rgba(155, 92, 255, 0.5)',
             borderLeft: 'none',
-            borderTop: 'none',
-            boxShadow: '0 0 20px rgba(155, 92, 255, 0.3), inset 0 0 30px rgba(155, 92, 255, 0.05)'
+            borderRadius: '0 1rem 1rem 0',
+            boxShadow: menuClosing ? 'none' : '0 0 60px rgba(155, 92, 255, 0.4), 0 0 100px rgba(255, 79, 216, 0.2), 10px 10px 40px rgba(0, 0, 0, 0.8)'
           }}
         >
+          {/* Menu Header */}
+          <div className="flex items-center justify-between px-4 py-3 border-b border-white/10">
+            <span className="text-xs font-bold text-white/40 uppercase tracking-wider">Menu</span>
+            <button
+              onClick={closeMenu}
+              className="flex items-center justify-center w-8 h-8 rounded-lg bg-neon-purple/10 hover:bg-neon-purple/20 border border-neon-purple/30 hover:border-neon-pink/50 transition-all"
+              aria-label="Fermer le menu"
+              style={{ boxShadow: '0 0 10px rgba(155, 92, 255, 0.2)' }}
+            >
+              <svg className="w-4 h-4 text-neon-pink" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
 
-          <div className="p-4 pt-16 pb-6">
-            <a href="#lots" onClick={closeMenu} className="flex items-center gap-2.5 py-2.5 text-sm text-white/80 hover:text-neon-purple transition-colors">
-              <svg className="w-4 h-4 text-neon-pink" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
-              </svg>
-              <span>Lots</span>
-            </a>
-            <a href="#how-it-works" onClick={closeMenu} className="flex items-center gap-2.5 py-2.5 text-sm text-white/80 hover:text-neon-blue transition-colors">
-              <svg className="w-4 h-4 text-neon-blue" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
-              </svg>
-              <span>Comment ça marche</span>
-            </a>
-            <a href="#winners" onClick={closeMenu} className="flex items-center gap-2.5 py-2.5 text-sm text-white/80 hover:text-success transition-colors">
-              <svg className="w-4 h-4 text-success" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
-              </svg>
-              <span>Gagnants</span>
+          {/* Navigation Links */}
+          <nav className="px-3 py-3">
+            <a
+              href="#lots"
+              onClick={closeMenu}
+              className="flex items-center gap-3 px-3 py-3 rounded-xl text-white/80 hover:text-white hover:bg-neon-pink/10 transition-all group"
+            >
+              <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-neon-pink/10 border border-neon-pink/30 group-hover:border-neon-pink/50 transition-colors">
+                <svg className="w-4 h-4 text-neon-pink" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
+                </svg>
+              </div>
+              <div>
+                <span className="block text-sm font-semibold">Lots</span>
+                <span className="block text-[10px] text-white/40">Voir les lots disponibles</span>
+              </div>
             </a>
 
-            <div className="mt-5 pt-5 border-t border-white/10 space-y-2">
+            <a
+              href="#how-it-works"
+              onClick={closeMenu}
+              className="flex items-center gap-3 px-3 py-3 rounded-xl text-white/80 hover:text-white hover:bg-neon-blue/10 transition-all group"
+            >
+              <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-neon-blue/10 border border-neon-blue/30 group-hover:border-neon-blue/50 transition-colors">
+                <svg className="w-4 h-4 text-neon-blue" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+              </div>
+              <div>
+                <span className="block text-sm font-semibold">Comment jouer</span>
+                <span className="block text-[10px] text-white/40">Les règles du jeu</span>
+              </div>
+            </a>
+
+            <a
+              href="#winners"
+              onClick={closeMenu}
+              className="flex items-center gap-3 px-3 py-3 rounded-xl text-white/80 hover:text-white hover:bg-success/10 transition-all group"
+            >
+              <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-success/10 border border-success/30 group-hover:border-success/50 transition-colors">
+                <svg className="w-4 h-4 text-success" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                </svg>
+              </div>
+              <div className="flex-1">
+                <span className="block text-sm font-semibold">Gagnants</span>
+                <span className="block text-[10px] text-white/40">Derniers lots remportés</span>
+              </div>
+              <span className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-success/20 text-success text-[9px] font-bold">
+                <span className="w-1.5 h-1.5 rounded-full bg-success animate-pulse" />
+                Live
+              </span>
+            </a>
+          </nav>
+
+          {/* CTA Section */}
+          <div className="px-4 pb-4">
+            <div className="p-3 rounded-xl bg-gradient-to-br from-neon-purple/10 to-neon-pink/10 border border-neon-purple/20">
               {isLoggedIn ? (
                 <Link
                   href="/lobby"
                   onClick={closeMenu}
-                  className="block w-full py-2.5 text-center text-sm bg-gradient-to-r from-neon-purple to-neon-pink text-white font-bold rounded-lg"
-                  style={{ boxShadow: '0 0 15px rgba(155, 92, 255, 0.3)' }}
+                  className="flex items-center justify-center gap-2 w-full py-3 bg-gradient-to-r from-neon-purple to-neon-pink text-white font-bold text-sm rounded-lg hover:opacity-90 transition-opacity"
+                  style={{ boxShadow: '0 0 20px rgba(155, 92, 255, 0.3)' }}
                 >
-                  PARTICIPER
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  JOUER
                 </Link>
               ) : (
-                <>
+                <div className="space-y-2">
                   <Link
                     href="/register"
                     onClick={closeMenu}
-                    className="block w-full py-2.5 text-center text-sm bg-gradient-to-r from-neon-purple to-neon-pink text-white font-bold rounded-lg"
-                    style={{ boxShadow: '0 0 15px rgba(155, 92, 255, 0.3)' }}
+                    className="flex items-center justify-center gap-2 w-full py-3 bg-gradient-to-r from-neon-purple to-neon-pink text-white font-bold text-sm rounded-lg hover:opacity-90 transition-opacity"
+                    style={{ boxShadow: '0 0 20px rgba(155, 92, 255, 0.3)' }}
                   >
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+                    </svg>
                     S'INSCRIRE
                   </Link>
                   <Link
                     href="/login"
                     onClick={closeMenu}
-                    className="block w-full py-2 text-center text-xs text-white/60 hover:text-white transition-colors"
+                    className="flex items-center justify-center gap-1.5 w-full py-2 text-xs text-white/50 hover:text-white transition-colors"
                   >
-                    Connexion
+                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+                    </svg>
+                    Déjà inscrit ? Connexion
                   </Link>
-                </>
+                </div>
               )}
             </div>
           </div>
         </div>
-      </>
+      </div>,
+      document.body
     )}
     </>
   )
