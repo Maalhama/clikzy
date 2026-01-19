@@ -1,14 +1,15 @@
 'use client'
 
 import { useRef, useState, useEffect } from 'react'
-import { GiftIcon, TrophyIcon, CursorClickIcon } from '@/components/ui/GamingIcons'
+import Image from 'next/image'
+import { GiftIcon } from '@/components/ui/GamingIcons'
 
 interface Prize {
   id: string
   name: string
   value: number
   color: 'purple' | 'blue' | 'pink'
-  Icon: React.ComponentType<{ className?: string }>
+  image: string
 }
 
 const PRIZES: Prize[] = [
@@ -17,42 +18,42 @@ const PRIZES: Prize[] = [
     name: 'iPhone 15 Pro',
     value: 1479,
     color: 'purple',
-    Icon: GiftIcon,
+    image: '/products/iphone-15-pro.svg',
   },
   {
     id: '2',
     name: 'PlayStation 5',
     value: 549,
     color: 'blue',
-    Icon: TrophyIcon,
+    image: '/products/ps5.svg',
   },
   {
     id: '3',
     name: 'MacBook Pro',
     value: 2499,
     color: 'pink',
-    Icon: GiftIcon,
+    image: '/products/macbook-pro.svg',
   },
   {
     id: '4',
     name: 'AirPods Pro',
     value: 279,
     color: 'purple',
-    Icon: CursorClickIcon,
+    image: '/products/airpods-pro.svg',
   },
   {
     id: '5',
     name: 'Apple Watch',
     value: 449,
     color: 'blue',
-    Icon: GiftIcon,
+    image: '/products/apple-watch.svg',
   },
   {
     id: '6',
     name: 'iPad Pro',
     value: 1099,
     color: 'pink',
-    Icon: TrophyIcon,
+    image: '/products/ipad-pro.svg',
   },
 ]
 
@@ -88,6 +89,7 @@ const getColorStyles = (color: Prize['color']) => {
 export function FloatingPrizes() {
   const containerRef = useRef<HTMLDivElement>(null)
   const [isVisible, setIsVisible] = useState(false)
+  const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({})
 
   useEffect(() => {
     if (!containerRef.current) return
@@ -108,6 +110,10 @@ export function FloatingPrizes() {
 
     return () => observer.disconnect()
   }, [isVisible])
+
+  const handleImageError = (prizeId: string) => {
+    setImageErrors((prev) => ({ ...prev, [prizeId]: true }))
+  }
 
   return (
     <div ref={containerRef} className="relative w-full h-full min-h-[500px]">
@@ -157,23 +163,39 @@ export function FloatingPrizes() {
                   }}
                 />
 
-                {/* Icon container */}
+                {/* Image container */}
                 <div className={`
                   relative rounded-xl overflow-hidden mb-3 group/image
                   ${isMain ? 'h-40' : 'h-20'}
                 `}>
-                  {/* Icon glow */}
+                  {/* Image glow */}
                   <div className={`absolute inset-0 ${colors.glow} blur-2xl opacity-0 group-hover:opacity-50 transition-opacity duration-500`} />
 
-                  <div
-                    className="w-full h-full flex items-center justify-center"
-                    style={{ background: `linear-gradient(135deg, ${colors.hex}15, ${colors.hex}05)` }}
-                  >
-                    <prize.Icon
-                      className={`${isMain ? 'w-20 h-20' : 'w-10 h-10'} transition-transform duration-300 group-hover:scale-110`}
-                      style={{ color: colors.hex }}
-                    />
-                  </div>
+                  {imageErrors[prize.id] ? (
+                    <div
+                      className="w-full h-full flex items-center justify-center"
+                      style={{ background: `linear-gradient(135deg, ${colors.hex}15, ${colors.hex}05)` }}
+                    >
+                      <GiftIcon
+                        className={`${isMain ? 'w-20 h-20' : 'w-10 h-10'} transition-transform duration-300 group-hover:scale-110`}
+                        style={{ color: colors.hex }}
+                      />
+                    </div>
+                  ) : (
+                    <div
+                      className="relative w-full h-full"
+                      style={{ background: `linear-gradient(135deg, ${colors.hex}10, transparent)` }}
+                    >
+                      <Image
+                        src={prize.image}
+                        alt={prize.name}
+                        fill
+                        className="object-contain p-2 transition-transform duration-300 group-hover:scale-110"
+                        onError={() => handleImageError(prize.id)}
+                        sizes={isMain ? '(max-width: 768px) 200px, 300px' : '(max-width: 768px) 100px, 150px'}
+                      />
+                    </div>
+                  )}
 
                   {/* Shine effect */}
                   <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out" />

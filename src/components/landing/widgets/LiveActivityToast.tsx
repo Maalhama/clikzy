@@ -2,11 +2,13 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
+import Image from 'next/image'
 
 interface WinNotification {
   id: string
   username: string
   item: string
+  itemImage: string
   value: number
   timestamp: number
 }
@@ -50,18 +52,12 @@ function generateFrenchUsername(): string {
 }
 
 const MOCK_ITEMS = [
-  { name: 'iPhone 15 Pro', value: 1299 },
-  { name: 'PS5', value: 549 },
-  { name: 'AirPods Pro', value: 279 },
-  { name: 'Nintendo Switch', value: 329 },
-  { name: 'MacBook Air', value: 1199 },
-  { name: 'iPad Pro', value: 1099 },
-  { name: 'Apple Watch', value: 449 },
-  { name: 'Samsung S24', value: 899 },
-  { name: 'Xbox Series X', value: 499 },
-  { name: 'Meta Quest 3', value: 549 },
-  { name: 'Sony WH-1000XM5', value: 379 },
-  { name: 'DJI Mini 4', value: 799 },
+  { name: 'iPhone 15 Pro', value: 1299, image: '/products/iphone-15-pro.svg' },
+  { name: 'PS5', value: 549, image: '/products/ps5.svg' },
+  { name: 'AirPods Pro', value: 279, image: '/products/airpods-pro.svg' },
+  { name: 'MacBook Pro', value: 2499, image: '/products/macbook-pro.svg' },
+  { name: 'iPad Pro', value: 1099, image: '/products/ipad-pro.svg' },
+  { name: 'Apple Watch', value: 449, image: '/products/apple-watch.svg' },
 ]
 
 const TOAST_DURATION = 6000 // 6 seconds
@@ -97,6 +93,7 @@ export function LiveActivityToast({ enabled = true, maxVisible = 3 }: LiveActivi
       id,
       username,
       item: item.name,
+      itemImage: item.image,
       value: item.value,
       timestamp: Date.now(),
     }
@@ -143,18 +140,22 @@ export function LiveActivityToast({ enabled = true, maxVisible = 3 }: LiveActivi
           >
             {/* MOBILE VERSION - Ultra compact */}
             <div className="md:hidden relative overflow-hidden rounded-lg">
-              <div className="relative flex items-center gap-2 px-2 py-1.5 bg-bg-secondary/95 border border-success/30 rounded-lg max-w-[180px]">
-                {/* Tiny avatar */}
-                <div className="relative flex-shrink-0">
-                  <div className="w-6 h-6 rounded-full bg-gradient-to-br from-neon-purple to-neon-pink flex items-center justify-center font-bold text-[10px]">
-                    {notification.username.charAt(0).toUpperCase()}
-                  </div>
+              <div className="relative flex items-center gap-2 px-2 py-1.5 bg-bg-secondary/95 border border-success/30 rounded-lg max-w-[200px]">
+                {/* Product image */}
+                <div className="relative flex-shrink-0 w-8 h-8 rounded-lg overflow-hidden bg-neon-purple/10">
+                  <Image
+                    src={notification.itemImage}
+                    alt={notification.item}
+                    fill
+                    className="object-contain p-0.5"
+                    sizes="32px"
+                  />
                 </div>
                 {/* Content - minimal */}
                 <div className="flex-1 min-w-0">
                   <p className="text-[10px] truncate">
                     <span className="font-bold text-white">{notification.username.slice(0, 8)}</span>
-                    <span className="text-success"> 🎉</span>
+                    <span className="text-success"> a gagné</span>
                   </p>
                   <p className="text-[10px] font-bold text-success">{notification.value}€</p>
                 </div>
@@ -164,11 +165,17 @@ export function LiveActivityToast({ enabled = true, maxVisible = 3 }: LiveActivi
             {/* DESKTOP VERSION - Full */}
             <div className="hidden md:block relative overflow-hidden rounded-xl">
               <div className="relative flex items-center gap-3 px-4 py-3 bg-bg-secondary/95 backdrop-blur-xl border border-success/40 rounded-xl">
-                {/* Avatar with glow */}
+                {/* Product image with glow */}
                 <div className="relative flex-shrink-0">
-                  <div className="absolute inset-0 bg-gradient-to-br from-neon-purple/50 to-neon-pink/50 rounded-full blur-md" />
-                  <div className="relative w-10 h-10 rounded-full bg-gradient-to-br from-neon-purple to-neon-pink flex items-center justify-center font-bold text-sm border-2 border-white/20">
-                    {notification.username.charAt(0).toUpperCase()}
+                  <div className="absolute inset-0 bg-gradient-to-br from-neon-purple/30 to-neon-pink/30 rounded-xl blur-md" />
+                  <div className="relative w-12 h-12 rounded-xl overflow-hidden bg-neon-purple/10 border border-white/10">
+                    <Image
+                      src={notification.itemImage}
+                      alt={notification.item}
+                      fill
+                      className="object-contain p-1"
+                      sizes="48px"
+                    />
                   </div>
                   <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-success rounded-full flex items-center justify-center border-2 border-bg-secondary">
                     <TrophyIcon className="w-3 h-3 text-bg-primary" />

@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none">
+  <defs>
+    <linearGradient id="macGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF4FD8" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#FF4FD8" stop-opacity="0.1"/>
+    </linearGradient>
+  </defs>
+  <!-- Screen -->
+  <rect x="30" y="35" width="140" height="90" rx="6" fill="url(#macGrad)" stroke="#FF4FD8" stroke-width="2"/>
+  <!-- Screen inner -->
+  <rect x="36" y="41" width="128" height="78" rx="3" fill="#0B0F1A" stroke="#FF4FD8" stroke-opacity="0.3"/>
+  <!-- Camera -->
+  <circle cx="100" cy="47" r="2" fill="#141B2D" stroke="#FF4FD8" stroke-opacity="0.5"/>
+  <!-- Apple logo on screen -->
+  <ellipse cx="100" cy="80" rx="12" ry="14" fill="#FF4FD8" fill-opacity="0.2"/>
+  <!-- Base/Keyboard -->
+  <path d="M25 130 L30 125 L170 125 L175 130 L175 145 Q175 150 170 150 L30 150 Q25 150 25 145 Z" fill="url(#macGrad)" stroke="#FF4FD8" stroke-width="2"/>
+  <!-- Trackpad -->
+  <rect x="75" y="133" width="50" height="12" rx="2" fill="#0B0F1A" stroke="#FF4FD8" stroke-opacity="0.3"/>
+  <!-- Hinge -->
+  <rect x="35" y="123" width="130" height="4" rx="1" fill="#141B2D"/>
+  <!-- Glow effect -->
+  <ellipse cx="100" cy="100" rx="80" ry="60" fill="#FF4FD8" fill-opacity="0.05"/>
+</svg>

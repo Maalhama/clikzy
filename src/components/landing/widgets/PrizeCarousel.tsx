@@ -24,42 +24,42 @@ const MOCK_PRIZES: Prize[] = [
   {
     id: '1',
     name: 'iPhone 15 Pro',
-    image_url: 'https://images.unsplash.com/photo-1695048133142-1a20484d2569?w=1200&q=95&fit=crop',
+    image_url: '/products/iphone-15-pro.svg',
     value: 1479,
     status: 'ending_soon'
   },
   {
     id: '2',
     name: 'PlayStation 5',
-    image_url: 'https://images.unsplash.com/photo-1606813907291-d86efa9b94db?w=1200&q=95&fit=crop',
+    image_url: '/products/ps5.svg',
     value: 549,
     status: 'available'
   },
   {
     id: '3',
     name: 'MacBook Pro',
-    image_url: 'https://images.unsplash.com/photo-1611186871348-b1ce696e52c9?w=1200&q=95&fit=crop',
+    image_url: '/products/macbook-pro.svg',
     value: 2499,
     status: 'available'
   },
   {
     id: '4',
     name: 'AirPods Pro',
-    image_url: 'https://images.unsplash.com/photo-1600294037681-c80b4cb5b434?w=1200&q=95&fit=crop',
+    image_url: '/products/airpods-pro.svg',
     value: 279,
     status: 'available'
   },
   {
     id: '5',
     name: 'Apple Watch',
-    image_url: 'https://images.unsplash.com/photo-1434493789847-2f02dc6ca35d?w=1200&q=95&fit=crop',
+    image_url: '/products/apple-watch.svg',
     value: 449,
     status: 'ending_soon'
   },
   {
     id: '6',
     name: 'iPad Pro',
-    image_url: 'https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=1200&q=95&fit=crop',
+    image_url: '/products/ipad-pro.svg',
     value: 1099,
     status: 'available'
   },

@@ -2,6 +2,7 @@
 
 import { useRef, useState } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { useGSAP } from '@gsap/react'
 import { gsap } from '@/lib/gsap/gsapConfig'
 import { useLandingRealtime } from '@/hooks/landing/useLandingRealtime'
@@ -453,18 +454,29 @@ export function LandingClient({
           </p>
 
           {/* Mini Prize Showcase - Mobile */}
-          <div className="hero-prize mb-6 flex gap-2 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">
+          <div className="hero-prize mb-6 flex gap-3 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">
             {[
-              { name: 'iPhone 15 Pro', value: 1479, color: '#9B5CFF' },
-              { name: 'PlayStation 5', value: 549, color: '#3CCBFF' },
-              { name: 'MacBook Pro', value: 2499, color: '#FF4FD8' },
+              { name: 'iPhone 15 Pro', value: 1479, color: '#9B5CFF', image: '/products/iphone-15-pro.svg' },
+              { name: 'PlayStation 5', value: 549, color: '#3CCBFF', image: '/products/ps5.svg' },
+              { name: 'MacBook Pro', value: 2499, color: '#FF4FD8', image: '/products/macbook-pro.svg' },
             ].map((prize, i) => (
               <div
                 key={i}
-                className="flex-shrink-0 w-[100px] p-3 rounded-xl bg-bg-secondary/60 border text-center"
-                style={{ borderColor: `${prize.color}30` }}
+                className="flex-shrink-0 w-[110px] p-3 rounded-xl bg-bg-secondary/70 border text-center"
+                style={{ borderColor: `${prize.color}40` }}
               >
-                <GiftIcon className="w-8 h-8 mx-auto mb-1" style={{ color: prize.color }} />
+                <div
+                  className="relative w-16 h-16 mx-auto mb-2 rounded-lg overflow-hidden"
+                  style={{ background: `linear-gradient(135deg, ${prize.color}20, transparent)` }}
+                >
+                  <Image
+                    src={prize.image}
+                    alt={prize.name}
+                    fill
+                    className="object-contain p-1"
+                    sizes="64px"
+                  />
+                </div>
                 <div className="text-[10px] text-white/70 truncate">{prize.name}</div>
                 <div className="text-sm font-black" style={{ color: prize.color }}>{prize.value}€</div>
               </div>

@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none">
+  <defs>
+    <linearGradient id="watchGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3CCBFF" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#3CCBFF" stop-opacity="0.1"/>
+    </linearGradient>
+  </defs>
+  <!-- Top band -->
+  <rect x="75" y="25" width="50" height="35" rx="8" fill="#141B2D" stroke="#3CCBFF" stroke-opacity="0.3"/>
+  <!-- Bottom band -->
+  <rect x="75" y="140" width="50" height="35" rx="8" fill="#141B2D" stroke="#3CCBFF" stroke-opacity="0.3"/>
+  <!-- Watch body -->
+  <rect x="60" y="55" width="80" height="90" rx="18" fill="url(#watchGrad)" stroke="#3CCBFF" stroke-width="2"/>
+  <!-- Screen -->
+  <rect x="68" y="63" width="64" height="74" rx="12" fill="#0B0F1A" stroke="#3CCBFF" stroke-opacity="0.5"/>
+  <!-- Crown -->
+  <rect x="140" y="82" width="8" height="16" rx="3" fill="#141B2D" stroke="#3CCBFF" stroke-opacity="0.5"/>
+  <!-- Side button -->
+  <rect x="140" y="105" width="6" height="10" rx="2" fill="#141B2D"/>
+  <!-- Time display -->
+  <text x="100" y="105" font-family="monospace" font-size="16" font-weight="bold" fill="#3CCBFF" text-anchor="middle">10:09</text>
+  <!-- Glow effect -->
+  <ellipse cx="100" cy="100" rx="50" ry="60" fill="#3CCBFF" fill-opacity="0.05"/>
+</svg>
