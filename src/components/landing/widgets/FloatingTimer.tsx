@@ -178,14 +178,17 @@ export function FloatingTimer({
             </button>
 
             <div className="relative pr-4">
-              {/* Live dot + Timer on same line */}
-              <div className="flex items-center gap-1.5 mb-1">
+              {/* Live dot */}
+              <div className="flex items-center gap-1.5 mb-0.5">
                 <span className="relative flex h-1.5 w-1.5">
                   <span className={`animate-ping absolute h-full w-full rounded-full opacity-75 ${isCritical ? 'bg-red-500' : 'bg-neon-purple'}`} />
                   <span className={`relative rounded-full h-1.5 w-1.5 ${isCritical ? 'bg-red-500' : 'bg-neon-purple'}`} />
                 </span>
                 <span className="text-[9px] font-bold uppercase text-white/50">Live</span>
               </div>
+
+              {/* Product name - small */}
+              <p className="text-[10px] text-white/60 truncate max-w-[100px] mb-1">{currentProduct}</p>
 
               {/* Timer - compact */}
               <div
