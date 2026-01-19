@@ -437,20 +437,22 @@ export function LandingClient({
           {/* Title - Big & Bold */}
           <h1 className="hero-title text-[2.75rem] leading-[0.9] font-black mb-4">
             <span className="block">
-              <span className="text-white">TU </span>
-              <span className="text-neon-purple neon-text">CLIQUES</span>
+              <span className="text-neon-purple neon-text">CLIQUE</span>
               <span className="text-white">.</span>
             </span>
             <span className="block">
-              <span className="text-white">TU </span>
-              <span className="text-neon-pink neon-text-pink">GAGNES</span>
+              <span className="text-neon-blue neon-text">JOUE</span>
+              <span className="text-white">.</span>
+            </span>
+            <span className="block">
+              <span className="text-neon-pink neon-text-pink">GAGNE</span>
               <span className="text-white">.</span>
             </span>
           </h1>
 
           {/* Subtitle - Short */}
-          <p className="hero-subtitle text-sm text-white/60 mb-4 max-w-[280px]">
-            Le dernier clic gagne le lot.
+          <p className="hero-subtitle text-sm text-white/60 mb-4 max-w-[300px]">
+            Le dernier clic remporte le lot. <span className="text-neon-blue font-semibold">10 clics gratuits chaque jour.</span>
           </p>
 
           {/* Mini Prize Showcase - Mobile */}
@@ -486,17 +488,22 @@ export function LandingClient({
           {/* Single CTA - Full width */}
           <Link
             href={isLoggedIn ? '/lobby' : '/register'}
-            className="hero-cta w-full py-4 bg-gradient-to-r from-neon-purple to-neon-pink text-white font-black text-base rounded-xl text-center mb-6"
+            className="hero-cta w-full py-4 bg-gradient-to-r from-neon-purple to-neon-pink text-white font-black text-base rounded-xl text-center mb-3"
             style={{ boxShadow: '0 0 30px rgba(155, 92, 255, 0.4)' }}
           >
-            {isLoggedIn ? 'VOIR LES LOTS' : 'COMMENCER MAINTENANT'}
+            {isLoggedIn ? 'VOIR LES LOTS' : 'JOUER GRATUITEMENT'}
           </Link>
+
+          {/* Reassurance message */}
+          <p className="text-[10px] text-white/40 text-center mb-6">
+            Jeu 100% gratuit • Aucun paiement requis • Lots réels
+          </p>
 
           {/* Stats - Horizontal compact */}
           <div className="hero-stats flex justify-between gap-2">
             <div className="flex-1 py-3 px-2 rounded-lg bg-bg-secondary/60 border border-neon-blue/20 text-center">
               <div className="text-lg font-black text-neon-blue">{stats.totalWinningsValue.toLocaleString()}€</div>
-              <div className="text-[9px] text-white/40 uppercase">Gains</div>
+              <div className="text-[9px] text-white/40 uppercase">Récompenses</div>
             </div>
             <div className="flex-1 py-3 px-2 rounded-lg bg-bg-secondary/60 border border-neon-purple/20 text-center">
               <div className="text-lg font-black text-neon-purple">{stats.totalGames}+</div>
@@ -504,7 +511,7 @@ export function LandingClient({
             </div>
             <div className="flex-1 py-3 px-2 rounded-lg bg-bg-secondary/60 border border-neon-pink/20 text-center">
               <div className="text-lg font-black text-neon-pink">10</div>
-              <div className="text-[9px] text-white/40 uppercase">Offerts</div>
+              <div className="text-[9px] text-white/40 uppercase">Gratuits/jour</div>
             </div>
           </div>
         </div>
@@ -540,57 +547,65 @@ export function LandingClient({
             {/* Title */}
             <h1 className="hero-title text-5xl lg:text-6xl font-black leading-[0.9] mb-6" style={{ perspective: '1000px' }}>
               <span className="block">
-                <span className="text-white">TU </span>
-                <span className="text-neon-purple neon-text">CLIQUES</span>
+                <span className="text-neon-purple neon-text">CLIQUE</span>
                 <span className="text-white">.</span>
               </span>
-              <span className="block glitch-text" data-text="TU GAGNES.">
-                <span className="text-white">TU </span>
-                <span className="text-neon-pink neon-text-pink">GAGNES</span>
+              <span className="block">
+                <span className="text-neon-blue neon-text">JOUE</span>
+                <span className="text-white">.</span>
+              </span>
+              <span className="block glitch-text" data-text="GAGNE.">
+                <span className="text-neon-pink neon-text-pink">GAGNE</span>
                 <span className="text-white">.</span>
               </span>
             </h1>
 
             {/* Subtitle */}
-            <p className="hero-subtitle text-base text-white/70 max-w-lg mb-8">
-              Sois le dernier a cliquer avant la fin du timer et remporte le lot.
-              <span className="block text-neon-blue font-semibold mt-1">iPhone, PS5, MacBook... a toi de cliquer.</span>
+            <p className="hero-subtitle text-lg text-white/70 max-w-lg mb-8">
+              Le dernier clic remporte le lot. Rejoins des milliers de joueurs et tente ta récompense.
+              <span className="block text-neon-blue font-semibold mt-2">10 clics gratuits chaque jour.</span>
             </p>
 
             {/* CTA */}
-            <div className="hero-cta flex gap-4 mb-12">
-              <Link
-                href={isLoggedIn ? '/lobby' : '/register'}
-                className="gaming-btn-large group text-center"
-              >
-                <span className="relative z-10 flex items-center justify-center gap-2">
-                  {isLoggedIn ? 'VOIR LES LOTS' : 'COMMENCER'}
-                  <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                  </svg>
-                </span>
-              </Link>
-              <a
-                href="#how-it-works"
-                className="px-8 py-4 border-2 border-white/20 text-white font-bold hover:border-neon-blue/50 hover:text-neon-blue transition-all text-center focus:outline-none focus:ring-2 focus:ring-neon-blue/50"
-              >
-                COMMENT CA MARCHE
-              </a>
+            <div className="hero-cta flex flex-col gap-3 mb-12">
+              <div className="flex gap-4">
+                <Link
+                  href={isLoggedIn ? '/lobby' : '/register'}
+                  className="gaming-btn-large group text-center"
+                >
+                  <span className="relative z-10 flex items-center justify-center gap-2">
+                    {isLoggedIn ? 'VOIR LES LOTS' : 'JOUER GRATUITEMENT'}
+                    <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                    </svg>
+                  </span>
+                </Link>
+                <a
+                  href="#how-it-works"
+                  className="px-8 py-4 border-2 border-white/20 text-white font-bold hover:border-neon-blue/50 hover:text-neon-blue transition-all text-center focus:outline-none focus:ring-2 focus:ring-neon-blue/50"
+                >
+                  COMMENT ÇA MARCHE
+                </a>
+              </div>
+              {/* Reassurance message */}
+              <p className="text-sm text-white/50">
+                Jeu 100% gratuit • Aucun paiement requis • Lots réels livrés chez toi
+              </p>
             </div>
 
             {/* Stats */}
             <div className="hero-stats grid grid-cols-3 gap-6">
               <div className="stat-box p-4 rounded-xl bg-bg-secondary/40 border border-neon-blue/20">
                 <div className="text-3xl font-black text-neon-blue">{stats.totalWinningsValue.toLocaleString()}€</div>
-                <div className="text-xs text-white/40 uppercase tracking-wider">Gains</div>
+                <div className="text-xs text-white/40 uppercase tracking-wider">Récompenses</div>
               </div>
               <div className="stat-box p-4 rounded-xl bg-bg-secondary/40 border border-neon-purple/20">
                 <div className="text-3xl font-black text-neon-purple">{stats.totalGames}+</div>
-                <div className="text-xs text-white/40 uppercase tracking-wider">Lots</div>
+                <div className="text-xs text-white/40 uppercase tracking-wider">Lots distribués</div>
               </div>
               <div className="stat-box p-4 rounded-xl bg-bg-secondary/40 border border-neon-pink/20">
                 <div className="text-3xl font-black text-neon-pink">10</div>
-                <div className="text-xs text-white/40 uppercase tracking-wider">Offerts</div>
+                <div className="text-xs text-white/40 uppercase tracking-wider">Clics gratuits/jour</div>
               </div>
             </div>
           </div>
@@ -617,18 +632,20 @@ export function LandingClient({
 
         <div className="relative">
           {/* Header */}
-          <div className="text-center mb-6">
+          <div className="text-center mb-4">
             <h2 className="text-2xl font-black">
               COMMENT <span className="text-neon-purple">ÇA MARCHE</span>
             </h2>
+            <p className="text-white/50 text-sm mt-1">Un jeu simple, transparent, ouvert à tous</p>
           </div>
 
           {/* Vertical steps */}
           <div className="space-y-3">
             {[
-              { num: '1', title: 'CHOISIS', desc: 'Sélectionne ton lot', Icon: TargetIcon, hex: '#9B5CFF' },
-              { num: '2', title: 'CLIQUE', desc: '1 clic = 1 crédit', Icon: CursorClickIcon, hex: '#3CCBFF' },
-              { num: '3', title: 'GAGNE', desc: 'Dernier clic = gagnant', Icon: TrophyIcon, hex: '#FF4FD8' },
+              { num: '1', title: 'CHOISIS', desc: 'Parcours les lots et choisis celui qui te fait envie', Icon: TargetIcon, hex: '#9B5CFF' },
+              { num: '2', title: 'CLIQUE', desc: '1 clic = 1 crédit (10 gratuits chaque jour)', Icon: CursorClickIcon, hex: '#3CCBFF' },
+              { num: '3', title: 'ATTENDS', desc: 'Sous 1 min, chaque clic relance le timer à 1 min', Icon: TrophyIcon, hex: '#00FF88' },
+              { num: '4', title: 'GAGNE', desc: 'Timer à zéro ? Le dernier clic remporte le lot !', Icon: GiftIcon, hex: '#FF4FD8' },
             ].map((step, i) => (
               <div
                 key={i}
@@ -654,6 +671,13 @@ export function LandingClient({
               </div>
             ))}
           </div>
+
+          {/* Transparency note */}
+          <div className="mt-4 p-3 rounded-lg bg-neon-blue/10 border border-neon-blue/20">
+            <p className="text-[11px] text-white/60 text-center">
+              Les crédits supplémentaires permettent de jouer plus longtemps, mais n'augmentent pas tes chances de remporter le lot.
+            </p>
+          </div>
         </div>
       </section>
 
@@ -662,27 +686,28 @@ export function LandingClient({
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-neon-purple/5 to-transparent" />
 
         <div className="relative max-w-7xl mx-auto px-6">
-          <div className="text-center mb-20">
+          <div className="text-center mb-16">
             <h2 className="section-title text-6xl font-black mb-4">
               COMMENT <span className="text-neon-purple">ÇA MARCHE</span>
             </h2>
             <p className="text-white/60 text-lg max-w-2xl mx-auto">
-              3 étapes simples
+              Un jeu simple, transparent, et ouvert à tous
             </p>
           </div>
 
           <div className="relative">
             {/* Progress line */}
-            <div className="absolute top-24 left-[16.666%] right-[16.666%] h-[2px]">
+            <div className="absolute top-24 left-[12.5%] right-[12.5%] h-[2px]">
               <div className="absolute inset-0 bg-white/10" />
-              <div className="absolute inset-0 bg-gradient-to-r from-neon-purple via-neon-blue to-neon-pink animate-gradient-x" />
+              <div className="absolute inset-0 bg-gradient-to-r from-neon-purple via-neon-blue via-success to-neon-pink animate-gradient-x" />
             </div>
 
-            <div className="grid grid-cols-3 gap-12">
+            <div className="grid grid-cols-4 gap-8">
               {[
-                { num: '1', title: 'CHOISIS', desc: 'Parcours les lots disponibles et sélectionne celui qui te fait envie.', Icon: TargetIcon, hex: '#9B5CFF' },
-                { num: '2', title: 'CLIQUE', desc: 'Chaque clic coûte 1 crédit et relance le timer. Sois stratégique.', Icon: CursorClickIcon, hex: '#3CCBFF' },
-                { num: '3', title: 'GAGNE', desc: 'Sois le dernier à cliquer quand le timer atteint zéro et remporte le lot.', Icon: TrophyIcon, hex: '#FF4FD8' },
+                { num: '1', title: 'CHOISIS', desc: 'Parcours les lots disponibles : smartphones, consoles, accessoires... Choisis celui qui te fait envie.', Icon: TargetIcon, hex: '#9B5CFF' },
+                { num: '2', title: 'CLIQUE', desc: 'Chaque clic utilise 1 crédit. Tu reçois 10 crédits gratuits chaque jour, sans aucun paiement.', Icon: CursorClickIcon, hex: '#3CCBFF' },
+                { num: '3', title: 'LE TIMER', desc: 'Quand le timer passe sous 1 minute, chaque clic le relance à 1 minute. Le jeu continue tant que la communauté joue.', Icon: TrophyIcon, hex: '#00FF88' },
+                { num: '4', title: 'GAGNE', desc: 'Quand le timer atteint zéro, le dernier joueur à avoir cliqué remporte le lot. Simple.', Icon: GiftIcon, hex: '#FF4FD8' },
               ].map((step, i) => (
                 <div key={i} className="step-card group relative">
                   <div className="relative z-10 flex justify-center mb-6">
@@ -694,16 +719,23 @@ export function LandingClient({
                     </div>
                   </div>
 
-                  <div className="relative p-8 rounded-lg bg-bg-secondary/50 border" style={{ borderColor: `${step.hex}30` }}>
-                    <div className="mb-6">
-                      <step.Icon className="w-14 h-14" style={{ color: step.hex }} />
+                  <div className="relative p-6 rounded-lg bg-bg-secondary/50 border h-full" style={{ borderColor: `${step.hex}30` }}>
+                    <div className="mb-4">
+                      <step.Icon className="w-12 h-12" style={{ color: step.hex }} />
                     </div>
-                    <h3 className="text-2xl font-black mb-3" style={{ color: step.hex }}>{step.title}</h3>
-                    <p className="text-white/60 text-base leading-relaxed">{step.desc}</p>
+                    <h3 className="text-xl font-black mb-2" style={{ color: step.hex }}>{step.title}</h3>
+                    <p className="text-white/60 text-sm leading-relaxed">{step.desc}</p>
                   </div>
                 </div>
               ))}
             </div>
+          </div>
+
+          {/* Transparency note */}
+          <div className="mt-12 max-w-2xl mx-auto p-4 rounded-xl bg-neon-blue/10 border border-neon-blue/20 text-center">
+            <p className="text-white/70 text-sm">
+              Les crédits supplémentaires permettent de jouer plus longtemps, mais n'augmentent pas tes chances de remporter le lot. Seul le timing compte.
+            </p>
           </div>
         </div>
       </section>
@@ -932,27 +964,30 @@ export function LandingClient({
           {/* Badge */}
           <div className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-neon-purple/20 border border-neon-purple/40 rounded-full mb-4">
             <GiftIcon className="w-4 h-4 text-neon-pink" />
-            <span className="text-white text-xs font-bold">OFFRE DE BIENVENUE</span>
+            <span className="text-white text-xs font-bold">REJOINS LA PARTIE</span>
           </div>
 
           <h2 className="text-2xl font-black mb-3">
             PRÊT À{' '}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-neon-purple to-neon-pink">GAGNER</span>
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-neon-purple to-neon-pink">JOUER</span>
             {' '}?
           </h2>
 
           <p className="text-sm text-white/60 mb-5">
-            Reçois <span className="text-neon-pink font-black">10 crédits offerts</span>
+            Reçois <span className="text-neon-pink font-black">10 clics gratuits</span> chaque jour
           </p>
 
           {/* CTA Button */}
           <Link
             href={isLoggedIn ? '/lobby' : '/register'}
-            className="w-full py-4 bg-gradient-to-r from-neon-purple to-neon-pink text-white font-black text-base rounded-xl text-center block mb-5"
+            className="w-full py-4 bg-gradient-to-r from-neon-purple to-neon-pink text-white font-black text-base rounded-xl text-center block mb-3"
             style={{ boxShadow: '0 0 30px rgba(155, 92, 255, 0.4)' }}
           >
-            {isLoggedIn ? 'VOIR LES LOTS' : 'CRÉER MON COMPTE'}
+            {isLoggedIn ? 'VOIR LES LOTS' : 'JOUER GRATUITEMENT'}
           </Link>
+
+          {/* Reassurance */}
+          <p className="text-[10px] text-white/40 mb-5">Aucun paiement requis • Lots réels livrés</p>
 
           {/* Trust badges - Compact horizontal */}
           <div className="flex justify-center gap-3">
@@ -966,13 +1001,13 @@ export function LandingClient({
               <svg className="w-4 h-4 text-neon-blue" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
               </svg>
-              <span className="text-neon-blue text-[10px] font-bold">Légal</span>
+              <span className="text-neon-blue text-[10px] font-bold">+18 ans</span>
             </div>
             <div className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-neon-pink/10 border border-neon-pink/20">
               <svg className="w-4 h-4 text-neon-pink" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
               </svg>
-              <span className="text-neon-pink text-[10px] font-bold">Gratuit</span>
+              <span className="text-neon-pink text-[10px] font-bold">Lots réels</span>
             </div>
           </div>
         </div>
@@ -994,19 +1029,23 @@ export function LandingClient({
             style={{ boxShadow: '0 0 25px rgba(155, 92, 255, 0.3)' }}
           >
             <GiftIcon className="w-5 h-5 text-neon-pink" />
-            <span className="text-white text-sm font-bold tracking-wide">OFFRE DE BIENVENUE</span>
+            <span className="text-white text-sm font-bold tracking-wide">REJOINS LA PARTIE</span>
           </div>
 
           <h2 className="text-6xl lg:text-7xl font-black mb-6">
             PRÊT À{' '}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-neon-purple via-neon-pink to-neon-purple">GAGNER</span>
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-neon-purple via-neon-pink to-neon-purple">JOUER</span>
             {' '}?
           </h2>
 
-          <p className="text-xl text-white/70 mb-10 max-w-2xl mx-auto">
-            Inscris-toi maintenant et reçois{' '}
-            <span className="text-neon-pink font-black text-2xl">10 crédits offerts</span>{' '}
-            pour tenter ta chance.
+          <p className="text-xl text-white/70 mb-6 max-w-2xl mx-auto">
+            Inscris-toi et reçois{' '}
+            <span className="text-neon-pink font-black text-2xl">10 clics gratuits</span>{' '}
+            chaque jour pour participer.
+          </p>
+
+          <p className="text-sm text-white/50 mb-10">
+            Jeu 100% gratuit • Aucun paiement requis • Lots réels livrés chez toi
           </p>
 
           <div className="relative inline-block">
@@ -1017,7 +1056,7 @@ export function LandingClient({
               style={{ boxShadow: '0 0 40px rgba(155, 92, 255, 0.5), inset 0 0 20px rgba(255, 255, 255, 0.1)' }}
             >
               <span className="relative z-10 font-black tracking-wide">
-                {isLoggedIn ? 'VOIR LES LOTS' : 'CRÉER MON COMPTE'}
+                {isLoggedIn ? 'VOIR LES LOTS' : 'JOUER GRATUITEMENT'}
               </span>
               <svg className="w-5 h-5 relative z-10 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />

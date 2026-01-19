@@ -17,27 +17,27 @@ interface TrustBadgesProps {
 
 const BADGES: Badge[] = [
   {
-    Icon: ShieldIcon,
-    title: 'Zero arnaque',
-    description: 'Paiement Stripe securise',
+    Icon: GiftIcon,
+    title: '10 clics gratuits',
+    description: 'Chaque jour, sans payer',
     color: 'purple',
   },
   {
-    Icon: GiftIcon,
-    title: 'Livraison offerte',
-    description: 'Neuf. Emballe. Chez toi.',
+    Icon: ShieldIcon,
+    title: 'Lots réels',
+    description: 'Livrés gratuitement',
     color: 'blue',
   },
   {
     Icon: LightningIcon,
-    title: '100% live',
-    description: 'Pas de triche possible',
+    title: 'Jeu transparent',
+    description: 'Dernier clic = gagnant',
     color: 'pink',
   },
   {
     Icon: UsersIcon,
-    title: 'On repond',
-    description: '24h/24 - 7j/7',
+    title: 'Communauté',
+    description: 'Support 24h/24',
     color: 'green',
   },
 ]
