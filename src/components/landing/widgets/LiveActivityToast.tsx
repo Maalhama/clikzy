@@ -106,7 +106,7 @@ export function LiveActivityToast({ enabled = true, maxVisible = 3 }: LiveActivi
     }, TOAST_DURATION)
   }, [maxVisible])
 
-  // Show winners every 1 minute to not be aggressive
+  // Show winners every 1 minute
   useEffect(() => {
     if (!enabled) return
 

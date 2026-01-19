@@ -29,7 +29,7 @@ import { BackgroundEffects } from './components/BackgroundEffects'
 
 // Components
 import { PlayerCounter } from './components/PlayerCounter'
-import { ScrollProgressBar, ScrollIndicator } from './components/ScrollProgressBar'
+import { ScrollProgressBar } from './components/ScrollProgressBar'
 
 // Logo
 import { Logo } from '@/components/ui/Logo'
@@ -153,47 +153,7 @@ export function LandingClient({
       if (!mainRef.current) return
 
       const ctx = gsap.context(() => {
-        // Hero animations
-        const heroTl = gsap.timeline()
-
-        heroTl
-          .from('.hero-badge', {
-            y: -50,
-            opacity: 0,
-            duration: 0.6,
-            ease: 'power3.out',
-          })
-          .from('.hero-title span', {
-            y: 100,
-            opacity: 0,
-            rotationX: -90,
-            stagger: 0.1,
-            duration: 0.8,
-            ease: 'back.out(1.7)',
-          }, '-=0.3')
-          .from('.hero-subtitle', {
-            y: 30,
-            opacity: 0,
-            duration: 0.6,
-          }, '-=0.4')
-          .from('.hero-cta', {
-            scale: 0.8,
-            opacity: 0,
-            duration: 0.5,
-            ease: 'back.out(2)',
-          }, '-=0.2')
-          .from('.hero-stats > div', {
-            y: 40,
-            opacity: 0,
-            stagger: 0.15,
-            duration: 0.5,
-          }, '-=0.3')
-          .from('.hero-prize', {
-            x: 100,
-            opacity: 0,
-            duration: 0.8,
-            ease: 'power3.out',
-          }, '-=0.6')
+        // Hero animations removed - instant display
 
         // How it works - stagger from sides
         gsap.from('.step-card:nth-child(odd)', {
@@ -434,17 +394,17 @@ export function LandingClient({
             </span>
           </div>
 
-          {/* Title - Big & Bold */}
-          <h1 className="hero-title text-[2.75rem] leading-[0.9] font-black mb-4">
-            <span className="block">
+          {/* Title - Escalating sizes effect */}
+          <h1 className="hero-title leading-[0.9] font-black mb-4">
+            <span className="block text-xl">
               <span className="text-neon-purple neon-text">CLIQUE</span>
               <span className="text-white">.</span>
             </span>
-            <span className="block">
+            <span className="block text-4xl">
               <span className="text-neon-blue neon-text">JOUE</span>
               <span className="text-white">.</span>
             </span>
-            <span className="block">
+            <span className="block text-[2.75rem]">
               <span className="text-neon-pink neon-text-pink">GAGNE</span>
               <span className="text-white">.</span>
             </span>
@@ -452,37 +412,80 @@ export function LandingClient({
 
           {/* Subtitle - Short */}
           <p className="hero-subtitle text-sm text-white/60 mb-4 max-w-[300px]">
-            Le dernier clic remporte le lot. <span className="text-neon-blue font-semibold">10 clics gratuits chaque jour.</span>
+            Le dernier clic remporte le lot. Rejoins des milliers de joueurs et tente de remporter ta récompense.
+            <span className="block text-neon-blue font-semibold mt-1">10 clics gratuits chaque jour.</span>
           </p>
 
-          {/* Mini Prize Showcase - Mobile */}
-          <div className="hero-prize mb-6 flex gap-3 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">
-            {[
-              { name: 'iPhone 15 Pro', value: 1479, color: '#9B5CFF', image: '/products/iphone-15-pro.svg' },
-              { name: 'PlayStation 5', value: 549, color: '#3CCBFF', image: '/products/ps5.svg' },
-              { name: 'MacBook Pro', value: 2499, color: '#FF4FD8', image: '/products/macbook-pro.svg' },
-            ].map((prize, i) => (
-              <div
-                key={i}
-                className="flex-shrink-0 w-[110px] p-3 rounded-xl bg-bg-secondary/70 border text-center"
-                style={{ borderColor: `${prize.color}40` }}
-              >
+          {/* Mini Prize Showcase - Mobile - Infinite Marquee */}
+          <div className="hero-prize mb-6 -mx-4 overflow-hidden">
+            <div
+              className="flex gap-3"
+              style={{
+                width: 'max-content',
+                animation: 'marquee 20s linear infinite',
+              }}
+            >
+              {/* First set */}
+              {[
+                { name: 'iPhone 15 Pro', value: 1479, color: '#9B5CFF', image: '/products/iphone-15-pro.svg' },
+                { name: 'PlayStation 5', value: 549, color: '#3CCBFF', image: '/products/ps5.svg' },
+                { name: 'MacBook Pro', value: 2499, color: '#FF4FD8', image: '/products/macbook-pro.svg' },
+                { name: 'AirPods Pro', value: 279, color: '#00FF88', image: '/products/airpods-pro.svg' },
+                { name: 'Apple Watch', value: 449, color: '#9B5CFF', image: '/products/apple-watch.svg' },
+                { name: 'iPad Pro', value: 1099, color: '#3CCBFF', image: '/products/ipad-pro.svg' },
+              ].map((prize, i) => (
                 <div
-                  className="relative w-16 h-16 mx-auto mb-2 rounded-lg overflow-hidden"
-                  style={{ background: `linear-gradient(135deg, ${prize.color}20, transparent)` }}
+                  key={`a-${i}`}
+                  className="flex-shrink-0 w-[100px] p-2.5 rounded-xl bg-bg-secondary/70 border text-center"
+                  style={{ borderColor: `${prize.color}40` }}
                 >
-                  <Image
-                    src={prize.image}
-                    alt={prize.name}
-                    fill
-                    className="object-contain p-1"
-                    sizes="64px"
-                  />
+                  <div
+                    className="relative w-14 h-14 mx-auto mb-1.5 rounded-lg overflow-hidden"
+                    style={{ background: `linear-gradient(135deg, ${prize.color}20, transparent)` }}
+                  >
+                    <Image
+                      src={prize.image}
+                      alt={prize.name}
+                      fill
+                      className="object-contain p-1"
+                      sizes="56px"
+                    />
+                  </div>
+                  <div className="text-[9px] text-white/70 truncate">{prize.name}</div>
+                  <div className="text-xs font-black" style={{ color: prize.color }}>{prize.value}€</div>
                 </div>
-                <div className="text-[10px] text-white/70 truncate">{prize.name}</div>
-                <div className="text-sm font-black" style={{ color: prize.color }}>{prize.value}€</div>
-              </div>
-            ))}
+              ))}
+              {/* Duplicate set for seamless loop */}
+              {[
+                { name: 'iPhone 15 Pro', value: 1479, color: '#9B5CFF', image: '/products/iphone-15-pro.svg' },
+                { name: 'PlayStation 5', value: 549, color: '#3CCBFF', image: '/products/ps5.svg' },
+                { name: 'MacBook Pro', value: 2499, color: '#FF4FD8', image: '/products/macbook-pro.svg' },
+                { name: 'AirPods Pro', value: 279, color: '#00FF88', image: '/products/airpods-pro.svg' },
+                { name: 'Apple Watch', value: 449, color: '#9B5CFF', image: '/products/apple-watch.svg' },
+                { name: 'iPad Pro', value: 1099, color: '#3CCBFF', image: '/products/ipad-pro.svg' },
+              ].map((prize, i) => (
+                <div
+                  key={`b-${i}`}
+                  className="flex-shrink-0 w-[100px] p-2.5 rounded-xl bg-bg-secondary/70 border text-center"
+                  style={{ borderColor: `${prize.color}40` }}
+                >
+                  <div
+                    className="relative w-14 h-14 mx-auto mb-1.5 rounded-lg overflow-hidden"
+                    style={{ background: `linear-gradient(135deg, ${prize.color}20, transparent)` }}
+                  >
+                    <Image
+                      src={prize.image}
+                      alt={prize.name}
+                      fill
+                      className="object-contain p-1"
+                      sizes="56px"
+                    />
+                  </div>
+                  <div className="text-[9px] text-white/70 truncate">{prize.name}</div>
+                  <div className="text-xs font-black" style={{ color: prize.color }}>{prize.value}€</div>
+                </div>
+              ))}
+            </div>
           </div>
 
           {/* Single CTA - Full width */}
@@ -510,19 +513,12 @@ export function LandingClient({
               <div className="text-[9px] text-white/40 uppercase">Lots</div>
             </div>
             <div className="flex-1 py-3 px-2 rounded-lg bg-bg-secondary/60 border border-neon-pink/20 text-center">
-              <div className="text-lg font-black text-neon-pink">10</div>
+              <div className="text-lg font-black text-neon-pink">10c</div>
               <div className="text-[9px] text-white/40 uppercase">Gratuits/jour</div>
             </div>
           </div>
         </div>
 
-        {/* Scroll hint */}
-        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 opacity-50">
-          <span className="text-[10px] text-white/40 uppercase tracking-wider">Scroll</span>
-          <svg className="w-4 h-4 text-white/40 animate-bounce" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-          </svg>
-        </div>
       </section>
 
       {/* === DESKTOP HERO === */}
@@ -544,17 +540,17 @@ export function LandingClient({
               </span>
             </div>
 
-            {/* Title */}
-            <h1 className="hero-title text-5xl lg:text-6xl font-black leading-[0.9] mb-6" style={{ perspective: '1000px' }}>
-              <span className="block">
+            {/* Title - Escalating sizes effect */}
+            <h1 className="hero-title font-black leading-[0.9] mb-6" style={{ perspective: '1000px' }}>
+              <span className="block text-3xl lg:text-4xl">
                 <span className="text-neon-purple neon-text">CLIQUE</span>
                 <span className="text-white">.</span>
               </span>
-              <span className="block">
+              <span className="block text-5xl lg:text-6xl">
                 <span className="text-neon-blue neon-text">JOUE</span>
                 <span className="text-white">.</span>
               </span>
-              <span className="block glitch-text" data-text="GAGNE.">
+              <span className="block text-6xl lg:text-7xl glitch-text" data-text="GAGNE.">
                 <span className="text-neon-pink neon-text-pink">GAGNE</span>
                 <span className="text-white">.</span>
               </span>
@@ -562,7 +558,7 @@ export function LandingClient({
 
             {/* Subtitle */}
             <p className="hero-subtitle text-lg text-white/70 max-w-lg mb-8">
-              Le dernier clic remporte le lot. Rejoins des milliers de joueurs et tente ta récompense.
+              Le dernier clic remporte le lot. Rejoins des milliers de joueurs et tente de remporter ta récompense.
               <span className="block text-neon-blue font-semibold mt-2">10 clics gratuits chaque jour.</span>
             </p>
 
@@ -616,10 +612,6 @@ export function LandingClient({
           </div>
         </div>
 
-        {/* Scroll indicator */}
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 desktop-scroll-indicator">
-          <ScrollIndicator targetId="how-it-works" />
-        </div>
       </section>
 
       {/* TRUST BADGES */}
@@ -673,10 +665,17 @@ export function LandingClient({
           </div>
 
           {/* Transparency note */}
-          <div className="mt-4 p-3 rounded-lg bg-neon-blue/10 border border-neon-blue/20">
-            <p className="text-[11px] text-white/60 text-center">
-              Les crédits supplémentaires permettent de jouer plus longtemps, mais n'augmentent pas tes chances de remporter le lot.
-            </p>
+          <div className="mt-8 p-3 rounded-lg bg-neon-blue/10 border border-neon-blue/20">
+            <div className="flex items-start gap-2 justify-center">
+              <svg className="w-4 h-4 text-neon-blue flex-shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <circle cx="12" cy="12" r="10" />
+                <line x1="12" y1="8" x2="12" y2="12" />
+                <line x1="12" y1="16" x2="12.01" y2="16" />
+              </svg>
+              <p className="text-[11px] text-white/60 text-left">
+                Les crédits supplémentaires permettent de jouer plus longtemps, mais n'augmentent pas tes chances de remporter le lot.
+              </p>
+            </div>
           </div>
         </div>
       </section>
@@ -732,10 +731,17 @@ export function LandingClient({
           </div>
 
           {/* Transparency note */}
-          <div className="mt-12 max-w-2xl mx-auto p-4 rounded-xl bg-neon-blue/10 border border-neon-blue/20 text-center">
-            <p className="text-white/70 text-sm">
-              Les crédits supplémentaires permettent de jouer plus longtemps, mais n'augmentent pas tes chances de remporter le lot. Seul le timing compte.
-            </p>
+          <div className="mt-16 max-w-2xl mx-auto p-4 rounded-xl bg-neon-blue/10 border border-neon-blue/20">
+            <div className="flex items-center gap-3 justify-center">
+              <svg className="w-5 h-5 text-neon-blue flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <circle cx="12" cy="12" r="10" />
+                <line x1="12" y1="8" x2="12" y2="12" />
+                <line x1="12" y1="16" x2="12.01" y2="16" />
+              </svg>
+              <p className="text-white/70 text-sm text-left">
+                Les crédits supplémentaires permettent de jouer plus longtemps, mais n'augmentent pas tes chances de remporter le lot. Seul le timing compte.
+              </p>
+            </div>
           </div>
         </div>
       </section>

@@ -51,6 +51,7 @@ const config: Config = {
         'spin-slow': 'spin 20s linear infinite',
         'bounce-subtle': 'bounce-subtle 2s ease-in-out infinite',
         'border-scan': 'border-scan 3s linear infinite',
+        'scroll-loop': 'scroll-loop 20s linear infinite',
       },
       keyframes: {
         glow: {
@@ -72,6 +73,10 @@ const config: Config = {
         'border-scan': {
           '0%': { transform: 'translateX(-100%)' },
           '100%': { transform: 'translateX(100%)' },
+        },
+        'scroll-loop': {
+          '0%': { transform: 'translateX(0)' },
+          '100%': { transform: 'translateX(-50%)' },
         },
       },
     },

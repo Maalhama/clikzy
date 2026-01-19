@@ -37,34 +37,17 @@ export function FloatingTimer({
   const [isVisible, setIsVisible] = useState(false)
   const [isClosed, setIsClosed] = useState(false)
   const [isUrgent, setIsUrgent] = useState(false)
-  const [isCritical, setIsCritical] = useState(false) // For heartbeat at <= 3s
-  const [isEnding, setIsEnding] = useState(false) // For exit animation
+  const [isCritical, setIsCritical] = useState(false)
+  const [isEnding, setIsEnding] = useState(false)
   const [endTime, setEndTime] = useState<number | null>(null)
   const [currentProduct, setCurrentProduct] = useState(itemName || PRODUCT_NAMES[0])
   const productIndexRef = useRef(0)
+  const isWaitingRef = useRef(false) // Track if we're waiting for 2 min cooldown
 
   // Close handler
   const handleClose = useCallback(() => {
     setIsClosed(true)
   }, [])
-
-  // Initialize and update timer
-  useEffect(() => {
-    if (!enabled || isClosed) return
-
-    // Show after 2 seconds
-    const showTimeout = setTimeout(() => {
-      setIsVisible(true)
-    }, 2000)
-
-    // Use real endTime or simulate one close to 0 for urgency (15-45 seconds)
-    const targetEndTime = initialEndTime || Date.now() + (15 + Math.random() * 30) * 1000
-    setEndTime(targetEndTime)
-
-    return () => {
-      clearTimeout(showTimeout)
-    }
-  }, [enabled, initialEndTime, isClosed])
 
   // Track if we're using simulated time
   const isSimulated = !initialEndTime
@@ -79,9 +62,26 @@ export function FloatingTimer({
     return PRODUCT_NAMES[newIndex]
   }, [])
 
+  // Initialize timer on mount
+  useEffect(() => {
+    if (!enabled || isClosed) return
+
+    // Show after 2 seconds
+    const showTimeout = setTimeout(() => {
+      setIsVisible(true)
+      // Set initial end time
+      const targetEndTime = initialEndTime || Date.now() + (15 + Math.random() * 30) * 1000
+      setEndTime(targetEndTime)
+    }, 2000)
+
+    return () => {
+      clearTimeout(showTimeout)
+    }
+  }, [enabled, initialEndTime, isClosed])
+
   // Real-time countdown
   useEffect(() => {
-    if (!endTime || isClosed) return
+    if (!endTime || isClosed || !isVisible || isWaitingRef.current) return
 
     const updateTimer = () => {
       const now = Date.now()
@@ -91,15 +91,23 @@ export function FloatingTimer({
       setIsCritical(remaining <= 3 && remaining > 0)
 
       // Handle timer reaching 0
-      if (remaining === 0 && isSimulated && !isEnding) {
+      if (remaining === 0 && isSimulated && !isEnding && !isWaitingRef.current) {
         setIsEnding(true)
+        isWaitingRef.current = true
 
-        // After exit animation, reset with new product
+        // After exit animation, hide for 2 minutes then reset with new product
         setTimeout(() => {
           setIsEnding(false)
           setIsCritical(false)
-          setCurrentProduct(getNextProduct())
-          setEndTime(Date.now() + (15 + Math.random() * 30) * 1000)
+          setIsVisible(false)
+
+          // Show again after 2 minutes with new product
+          setTimeout(() => {
+            isWaitingRef.current = false
+            setCurrentProduct(getNextProduct())
+            setEndTime(Date.now() + (15 + Math.random() * 30) * 1000)
+            setIsVisible(true)
+          }, 120000) // 2 minutes
         }, 1500)
       }
     }
@@ -111,7 +119,7 @@ export function FloatingTimer({
     const interval = setInterval(updateTimer, 1000)
 
     return () => clearInterval(interval)
-  }, [endTime, isClosed, isSimulated, isEnding, getNextProduct])
+  }, [endTime, isClosed, isSimulated, isEnding, isVisible, getNextProduct])
 
   const formatTime = (seconds: number) => {
     const hours = Math.floor(seconds / 3600)
