@@ -16,6 +16,7 @@ import {
   TrustBadges,
   Testimonials,
   FloatingPrizes,
+  FAQ,
 } from './widgets'
 
 // Gaming Icons
@@ -964,6 +965,19 @@ export function LandingClient({
               </svg>
             </Link>
           </div>
+        </div>
+      </section>
+
+      {/* FAQ SECTION */}
+      {/* === MOBILE FAQ === */}
+      <section className="md:hidden relative py-8 px-4">
+        <FAQ />
+      </section>
+
+      {/* === DESKTOP FAQ === */}
+      <section className="hidden md:block relative py-20">
+        <div className="max-w-7xl mx-auto px-6">
+          <FAQ />
         </div>
       </section>
 
