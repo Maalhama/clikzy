@@ -143,13 +143,13 @@ export function BackgroundEffects({ simplified = false }: BackgroundEffectsProps
   // No particles on mobile, fewer if simplified
   const particleCount = isMobile ? 0 : (simplified ? 15 : 25)
 
-  // Mobile: render minimal static background
+  // Mobile: render minimal static background with reduced blur
   if (isMobile) {
     return (
       <div ref={containerRef} className="fixed inset-0 pointer-events-none overflow-hidden z-0">
-        {/* Simple gradient background for mobile - no blur, no animations */}
-        <div className="absolute top-[10%] left-[10%] w-[200px] h-[200px] bg-neon-purple/10 rounded-full blur-[60px]" />
-        <div className="absolute bottom-[20%] right-[10%] w-[150px] h-[150px] bg-neon-blue/10 rounded-full blur-[50px]" />
+        {/* Simple gradient background for mobile - minimal blur for performance */}
+        <div className="absolute top-[10%] left-[10%] w-32 h-32 bg-neon-purple/8 rounded-full blur-2xl" />
+        <div className="absolute bottom-[20%] right-[10%] w-40 h-40 bg-neon-blue/8 rounded-full blur-2xl" />
       </div>
     )
   }

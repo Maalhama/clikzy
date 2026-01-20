@@ -72,64 +72,42 @@ function getEndedGamesStartTime(): number {
 async function getLobbyData() {
   const supabase = await createClient()
 
-  // Check and reset daily credits if needed
-  const creditsResult = await checkAndResetDailyCredits()
-  const credits = creditsResult.success ? (creditsResult.data?.credits ?? 0) : 0
-  const wasReset = creditsResult.success
-    ? (creditsResult.data?.wasReset ?? false)
-    : false
-
   // Get the time from which to show ended games (since current rotation)
-  // Games expire 1 minute before next rotation
   const endedGamesStartTime = getEndedGamesStartTime()
-
-  // Get active games with their items
-  const { data: activeGames } = await supabase
-    .from('games')
-    .select(
-      `
-      *,
-      item:items(*)
-    `
-    )
-    .in('status', ['active', 'final_phase'])
-    .order('created_at', { ascending: false })
-    .limit(100)
-
-  // Get waiting games that are within the "soon" window (15 min before start_time)
   const soonThreshold = new Date(Date.now() + SOON_THRESHOLD).toISOString()
-  const { data: soonGames } = await supabase
-    .from('games')
-    .select(
-      `
-      *,
-      item:items(*)
-    `
-    )
-    .eq('status', 'waiting')
-    .lte('start_time', soonThreshold)
-    .order('start_time', { ascending: true })
-    .limit(20)
 
-  // Get recently ended games (ended after current rotation started)
-  // Expires 1 minute before next rotation
-  const { data: endedGames } = await supabase
-    .from('games')
-    .select(
-      `
-      *,
-      item:items(*)
-    `
-    )
-    .eq('status', 'ended')
-    .gte('end_time', endedGamesStartTime)
-    .order('end_time', { ascending: false })
-    .limit(100)
+  // Run all queries in parallel for faster loading
+  const [creditsResult, activeGamesResult, soonGamesResult, endedGamesResult] = await Promise.all([
+    checkAndResetDailyCredits(),
+    supabase
+      .from('games')
+      .select('*, item:items(*)')
+      .in('status', ['active', 'final_phase'])
+      .order('created_at', { ascending: false })
+      .limit(100),
+    supabase
+      .from('games')
+      .select('*, item:items(*)')
+      .eq('status', 'waiting')
+      .lte('start_time', soonThreshold)
+      .order('start_time', { ascending: true })
+      .limit(20),
+    supabase
+      .from('games')
+      .select('*, item:items(*)')
+      .eq('status', 'ended')
+      .gte('end_time', endedGamesStartTime)
+      .order('end_time', { ascending: false })
+      .limit(100)
+  ])
+
+  const credits = creditsResult.success ? (creditsResult.data?.credits ?? 0) : 0
+  const wasReset = creditsResult.success ? (creditsResult.data?.wasReset ?? false) : false
 
   // Combine all games
-  const allActiveGames = (activeGames as GameWithItem[] | null) ?? []
-  const allSoonGames = (soonGames as GameWithItem[] | null) ?? []
-  const recentlyEndedGames = (endedGames as GameWithItem[] | null) ?? []
+  const allActiveGames = (activeGamesResult.data as GameWithItem[] | null) ?? []
+  const allSoonGames = (soonGamesResult.data as GameWithItem[] | null) ?? []
+  const recentlyEndedGames = (endedGamesResult.data as GameWithItem[] | null) ?? []
 
   // Merge: soon first, then active, then ended
   const games = [

@@ -154,11 +154,15 @@ export function ProfileClient({ profile, wins, gamesPlayed, totalValueWon }: Pro
 
   return (
     <div className="min-h-screen pb-20">
-      {/* Background effects */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute top-[5%] left-[10%] w-96 h-96 bg-neon-purple/15 rounded-full blur-[150px] animate-pulse" />
+      {/* Background effects - reduced on mobile for performance */}
+      <div className="hidden lg:block fixed inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute top-[5%] left-[10%] w-96 h-96 bg-neon-purple/15 rounded-full blur-[150px]" />
         <div className="absolute bottom-[10%] right-[5%] w-[500px] h-[500px] bg-neon-pink/10 rounded-full blur-[180px]" />
         <div className="absolute top-[40%] right-[30%] w-64 h-64 bg-neon-blue/10 rounded-full blur-[100px]" />
+      </div>
+      <div className="lg:hidden fixed inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute top-[10%] left-[5%] w-40 h-40 bg-neon-purple/10 rounded-full blur-3xl" />
+        <div className="absolute bottom-[20%] right-[5%] w-48 h-48 bg-neon-pink/8 rounded-full blur-3xl" />
       </div>
 
       {/* Success toast */}

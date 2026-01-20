@@ -1,10 +1,14 @@
 export default function ProfileLoading() {
   return (
     <div className="min-h-screen pb-20">
-      {/* Background effects */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden">
+      {/* Background effects - reduced on mobile */}
+      <div className="hidden lg:block fixed inset-0 pointer-events-none overflow-hidden">
         <div className="absolute top-[5%] left-[10%] w-96 h-96 bg-neon-purple/10 rounded-full blur-[100px]" />
         <div className="absolute bottom-[10%] right-[5%] w-[400px] h-[400px] bg-neon-pink/5 rounded-full blur-[120px]" />
+      </div>
+      <div className="lg:hidden fixed inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute top-[10%] left-[5%] w-32 h-32 bg-neon-purple/10 rounded-full blur-2xl" />
+        <div className="absolute bottom-[20%] right-[5%] w-40 h-40 bg-neon-pink/5 rounded-full blur-2xl" />
       </div>
 
       <div className="relative z-10 max-w-5xl mx-auto px-4 md:px-6 py-6 md:py-8">
