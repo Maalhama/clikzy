@@ -151,11 +151,15 @@ function shouldBotClick(
   timeLeftMs: number,
   isResponseToRealPlayer: boolean,
   battleStartTime: Date | null,
-  battleDuration: number
+  battleDuration: number,
+  gameStatus: string // 'active' | 'final_phase'
 ): { shouldClick: boolean; reason: string } {
 
   // CHECK BATTLE STATE FIRST (durée de bataille)
-  if (battleStartTime && timeLeftMs <= FINAL_PHASE_THRESHOLD) {
+  // Use game status instead of timer to handle 65s buffer correctly
+  const isInFinalPhase = gameStatus === 'final_phase' || timeLeftMs <= FINAL_PHASE_THRESHOLD
+
+  if (battleStartTime && isInFinalPhase) {
     const battleElapsed = Date.now() - battleStartTime.getTime()
     const timeUntilBattleEnd = battleDuration - battleElapsed
 
@@ -203,7 +207,7 @@ function shouldBotClick(
   }
 
   // FINAL PHASE but no battle started yet - start the battle!
-  if (timeLeftMs <= FINAL_PHASE_THRESHOLD) {
+  if (isInFinalPhase) {
     // Always click to start/maintain final phase
     if (Math.random() < FINAL_PHASE_CLICK_CHANCE) {
       return { shouldClick: true, reason: 'final_phase_start' }
@@ -379,7 +383,8 @@ export async function GET(request: NextRequest) {
         timeLeft,
         isRecentRealPlayer,
         battleStartTime,
-        battleDuration
+        battleDuration,
+        game.status as string
       )
 
       if (!decision.shouldClick) {
