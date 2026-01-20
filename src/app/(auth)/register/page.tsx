@@ -168,7 +168,7 @@ export default function RegisterPage() {
       </div>
 
       {/* Right Panel - Form */}
-      <div className="flex-1 flex items-start lg:items-center justify-center px-6 pt-6 pb-40 lg:p-10 relative z-10">
+      <div className="flex-1 flex items-start lg:items-center justify-center px-6 pt-6 pb-52 lg:p-10 relative z-10">
         <div className="w-full max-w-sm">
           {/* Mobile Logo */}
           <div className="lg:hidden flex justify-center mb-6">
