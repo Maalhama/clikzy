@@ -2,6 +2,7 @@
 
 import { useRef, useState, useEffect, ComponentType } from 'react'
 import { ShieldIcon, GiftIcon, LightningIcon, UsersIcon } from '@/components/ui/GamingIcons'
+import { useIsMobile } from '@/hooks/useIsMobile'
 
 interface Badge {
   Icon: ComponentType<{ className?: string }>
@@ -82,6 +83,7 @@ const getColorStyles = (color: Badge['color']) => {
 export function TrustBadges({ className = '', variant = 'horizontal' }: TrustBadgesProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const [isVisible, setIsVisible] = useState(false)
+  const isMobile = useIsMobile()
 
   useEffect(() => {
     if (!containerRef.current) return
@@ -115,12 +117,12 @@ export function TrustBadges({ className = '', variant = 'horizontal' }: TrustBad
                 trust-badge relative p-6 bg-bg-secondary/50 backdrop-blur-sm
                 border border-white/10 ${colors.border}
                 rounded-xl text-center
-                transition-all duration-500 group
+                ${isMobile ? '' : 'transition-all duration-500'} group
                 hover:bg-bg-secondary/70
-                ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}
+                ${isMobile ? 'opacity-100' : (isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4')}
               `}
               style={{
-                transitionDelay: isVisible ? `${index * 100}ms` : '0ms',
+                transitionDelay: isMobile ? '0ms' : (isVisible ? `${index * 100}ms` : '0ms'),
               }}
             >
               {/* Glow effect on hover */}
@@ -173,11 +175,11 @@ export function TrustBadges({ className = '', variant = 'horizontal' }: TrustBad
                 key={index}
                 className={`
                   trust-badge flex flex-col items-center text-center flex-1
-                  transition-all duration-500
-                  ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}
+                  ${isMobile ? '' : 'transition-all duration-500'}
+                  ${isMobile ? 'opacity-100' : (isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4')}
                 `}
                 style={{
-                  transitionDelay: isVisible ? `${index * 50}ms` : '0ms',
+                  transitionDelay: isMobile ? '0ms' : (isVisible ? `${index * 50}ms` : '0ms'),
                 }}
               >
                 <badge.Icon className={`w-5 h-5 ${colors.text} mb-1`} />

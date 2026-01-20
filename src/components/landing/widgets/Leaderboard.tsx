@@ -2,6 +2,7 @@
 
 import { useRef, useState, useEffect, useMemo } from 'react'
 import { CrownIcon } from '@/components/ui/GamingIcons'
+import { useIsMobile } from '@/hooks/useIsMobile'
 
 interface LeaderboardEntry {
   rank: number
@@ -105,6 +106,7 @@ export function Leaderboard({
   const containerRef = useRef<HTMLDivElement>(null)
   const [isVisible, setIsVisible] = useState(false)
   const [selectedPeriod, setSelectedPeriod] = useState<'today' | 'week' | 'month' | 'all'>(initialPeriod)
+  const isMobile = useIsMobile()
 
   // Convert real winners to leaderboard format if available
   const realLeaderboard = useMemo(() => {
@@ -263,12 +265,12 @@ export function Leaderboard({
                 ${style.bg} border ${style.border} ${style.hoverBorder}
                 rounded-lg
                 ${style.glow}
-                transition-all duration-300
+                ${isMobile ? '' : 'transition-all duration-300'}
                 group/row
-                ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-8'}
+                ${isMobile ? 'opacity-100' : (isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-8')}
               `}
               style={{
-                transitionDelay: isVisible ? `${index * 100}ms` : '0ms',
+                transitionDelay: isMobile ? '0ms' : (isVisible ? `${index * 100}ms` : '0ms'),
               }}
             >
               {/* Rank badge with glow */}

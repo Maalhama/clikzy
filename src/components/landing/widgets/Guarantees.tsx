@@ -2,6 +2,7 @@
 
 import { useRef, useState, useEffect } from 'react'
 import Image from 'next/image'
+import { useIsMobile } from '@/hooks/useIsMobile'
 
 interface GuaranteesProps {
   className?: string
@@ -64,6 +65,7 @@ export function Guarantees({ className = '' }: GuaranteesProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const [isVisible, setIsVisible] = useState(false)
   const [imageErrors, setImageErrors] = useState<Record<number, boolean>>({})
+  const isMobile = useIsMobile()
 
   useEffect(() => {
     if (!containerRef.current) return
@@ -101,10 +103,10 @@ export function Guarantees({ className = '' }: GuaranteesProps) {
                 key={index}
                 className={`
                   p-3 rounded-xl bg-bg-secondary/50 border border-white/10
-                  transition-all duration-500
-                  ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}
+                  ${isMobile ? '' : 'transition-all duration-500'}
+                  ${isMobile ? 'opacity-100' : (isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4')}
                 `}
-                style={{ transitionDelay: `${index * 100}ms` }}
+                style={{ transitionDelay: isMobile ? '0ms' : `${index * 100}ms` }}
               >
                 <div className="mb-2" style={{ color: item.color }}>
                   {item.icon}
@@ -127,10 +129,10 @@ export function Guarantees({ className = '' }: GuaranteesProps) {
                 key={proof.id}
                 className={`
                   relative rounded-xl overflow-hidden bg-bg-secondary/50 border border-white/10
-                  transition-all duration-500
-                  ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}
+                  ${isMobile ? '' : 'transition-all duration-500'}
+                  ${isMobile ? 'opacity-100' : (isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4')}
                 `}
-                style={{ transitionDelay: `${(index + 4) * 100}ms` }}
+                style={{ transitionDelay: isMobile ? '0ms' : `${(index + 4) * 100}ms` }}
               >
                 <div className="aspect-square relative">
                   {imageErrors[proof.id] ? (
@@ -164,10 +166,10 @@ export function Guarantees({ className = '' }: GuaranteesProps) {
         <div
           className={`
             p-4 rounded-xl bg-bg-secondary/50 border border-white/10 text-center
-            transition-all duration-500
-            ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}
+            ${isMobile ? '' : 'transition-all duration-500'}
+            ${isMobile ? 'opacity-100' : (isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4')}
           `}
-          style={{ transitionDelay: '800ms' }}
+          style={{ transitionDelay: isMobile ? '0ms' : '800ms' }}
         >
           <div className="flex items-center justify-center gap-1.5 mb-2">
             {/* Trustpilot Star Icon */}

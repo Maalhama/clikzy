@@ -2,6 +2,7 @@
 
 import { useRef, useState, useEffect, ComponentType } from 'react'
 import { CoinsIcon, GamepadIcon, UsersIcon } from '@/components/ui/GamingIcons'
+import { useIsMobile } from '@/hooks/useIsMobile'
 
 interface StatItem {
   value: number
@@ -33,6 +34,7 @@ export function AnimatedStats({
     games: 0,
     players: 0,
   })
+  const isMobile = useIsMobile()
 
   const stats: StatItem[] = [
     {
@@ -182,10 +184,10 @@ export function AnimatedStats({
               ${colors.glow}
               transition-all duration-500
               group
-              ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}
+              ${isMobile ? 'opacity-100' : (isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8')}
             `}
             style={{
-              transitionDelay: isVisible ? `${index * 150}ms` : '0ms',
+              transitionDelay: isMobile ? '0ms' : (isVisible ? `${index * 150}ms` : '0ms'),
             }}
           >
             {/* Gradient border glow on hover */}
