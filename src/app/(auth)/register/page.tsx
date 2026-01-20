@@ -1,47 +1,54 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import { signUp, signInWithOAuth } from '@/actions/auth'
 import { Button } from '@/components/ui/button'
 import { Logo } from '@/components/ui/Logo'
+import { checkIsMobile } from '@/hooks/useIsMobile'
 
-// Animation variants
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.06,
-      delayChildren: 0.1,
+// Check if mobile for disabling animations
+const getAnimationVariants = (isMobile: boolean) => {
+  if (isMobile) {
+    return {
+      container: { hidden: { opacity: 1 }, visible: { opacity: 1 } },
+      item: { hidden: { opacity: 1, y: 0 }, visible: { opacity: 1, y: 0 } },
+      float: { animate: {} },
+      success: { hidden: { opacity: 1, scale: 1 }, visible: { opacity: 1, scale: 1 } },
+    }
+  }
+  return {
+    container: {
+      hidden: { opacity: 0 },
+      visible: {
+        opacity: 1,
+        transition: { staggerChildren: 0.06, delayChildren: 0.1 },
+      },
     },
-  },
-}
-
-const itemVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] as const },
-  },
-}
-
-const floatVariants = {
-  animate: {
-    y: [-5, 5, -5],
-    transition: { duration: 4, repeat: Infinity, ease: 'easeInOut' as const },
-  },
-}
-
-const successVariants = {
-  hidden: { opacity: 0, scale: 0.8 },
-  visible: {
-    opacity: 1,
-    scale: 1,
-    transition: { duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] as const },
-  },
+    item: {
+      hidden: { opacity: 0, y: 20 },
+      visible: {
+        opacity: 1,
+        y: 0,
+        transition: { duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] as const },
+      },
+    },
+    float: {
+      animate: {
+        y: [-5, 5, -5],
+        transition: { duration: 4, repeat: Infinity, ease: 'easeInOut' as const },
+      },
+    },
+    success: {
+      hidden: { opacity: 0, scale: 0.8 },
+      visible: {
+        opacity: 1,
+        scale: 1,
+        transition: { duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] as const },
+      },
+    },
+  }
 }
 
 function getPasswordStrength(password: string): { score: number; label: string; color: string } {
@@ -70,6 +77,14 @@ export default function RegisterPage() {
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
   const [focusedField, setFocusedField] = useState<string | null>(null)
+  const [isMobile, setIsMobile] = useState(false)
+
+  // Check mobile on mount
+  useEffect(() => {
+    setIsMobile(checkIsMobile())
+  }, [])
+
+  const variants = getAnimationVariants(isMobile)
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     setFormData(prev => ({
@@ -117,7 +132,7 @@ export default function RegisterPage() {
   // Success state with animation
   if (success) {
     return (
-      <div className="min-h-screen w-full flex items-center justify-center p-6 relative overflow-hidden">
+      <div className="min-h-dvh w-full flex items-center justify-center p-6 relative overflow-hidden">
         {/* Background effects */}
         <div className="absolute inset-0 pointer-events-none">
           <motion.div
@@ -134,7 +149,7 @@ export default function RegisterPage() {
         </div>
 
         <motion.div
-          variants={successVariants}
+          variants={variants.success}
           initial="hidden"
           animate="visible"
           className="text-center max-w-sm relative z-10"
@@ -202,22 +217,22 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen w-full flex flex-col lg:flex-row relative overflow-hidden">
+    <div className="min-h-dvh w-full flex flex-col lg:flex-row relative overflow-hidden pb-20 lg:pb-0">
       {/* Mobile Background Effects */}
       <div className="lg:hidden absolute inset-0 pointer-events-none">
         <motion.div
-          variants={floatVariants}
+          variants={variants.float}
           animate="animate"
           className="absolute top-[5%] right-[10%] w-32 h-32 bg-neon-purple/15 rounded-full blur-[60px]"
         />
         <motion.div
-          variants={floatVariants}
+          variants={variants.float}
           animate="animate"
           style={{ animationDelay: '1s' }}
           className="absolute bottom-[15%] left-[5%] w-40 h-40 bg-neon-pink/15 rounded-full blur-[70px]"
         />
         <motion.div
-          variants={floatVariants}
+          variants={variants.float}
           animate="animate"
           style={{ animationDelay: '2s' }}
           className="absolute top-[40%] left-[20%] w-24 h-24 bg-success/10 rounded-full blur-[50px]"
@@ -300,18 +315,18 @@ export default function RegisterPage() {
       {/* Right Panel - Form */}
       <div className="flex-1 flex items-center justify-center px-6 py-8 lg:p-10 relative z-10">
         <motion.div
-          variants={containerVariants}
+          variants={variants.container}
           initial="hidden"
           animate="visible"
           className="w-full max-w-sm"
         >
           {/* Mobile Logo */}
-          <motion.div variants={itemVariants} className="lg:hidden flex justify-center mb-6">
+          <motion.div variants={variants.item} className="lg:hidden flex justify-center mb-6">
             <Logo size="lg" animated={true} href="/" />
           </motion.div>
 
           {/* Header - Mobile optimized */}
-          <motion.div variants={itemVariants} className="text-center lg:text-left mb-6">
+          <motion.div variants={variants.item} className="text-center lg:text-left mb-6">
             <h2 className="text-2xl font-bold text-white mb-2">Créer un compte</h2>
             <p className="text-sm text-text-secondary">
               Inscris-toi et reçois{' '}
@@ -326,7 +341,7 @@ export default function RegisterPage() {
 
           {/* Google OAuth - Larger touch target on mobile */}
           <motion.button
-            variants={itemVariants}
+            variants={variants.item}
             whileTap={{ scale: 0.98 }}
             onClick={() => handleOAuth('google')}
             disabled={isOAuthLoading !== null || isLoading}
@@ -350,7 +365,7 @@ export default function RegisterPage() {
           </motion.button>
 
           {/* Divider */}
-          <motion.div variants={itemVariants} className="relative mb-5">
+          <motion.div variants={variants.item} className="relative mb-5">
             <div className="absolute inset-0 flex items-center">
               <div className="w-full border-t border-white/10" />
             </div>
@@ -361,7 +376,7 @@ export default function RegisterPage() {
 
           {/* Register Form */}
           <form onSubmit={handleSubmit} className="space-y-3">
-            <motion.div variants={itemVariants}>
+            <motion.div variants={variants.item}>
               <label htmlFor="username" className="block text-xs font-medium text-text-secondary mb-2">
                 Pseudo
               </label>
@@ -393,7 +408,7 @@ export default function RegisterPage() {
               </motion.div>
             </motion.div>
 
-            <motion.div variants={itemVariants}>
+            <motion.div variants={variants.item}>
               <label htmlFor="email" className="block text-xs font-medium text-text-secondary mb-2">
                 Email
               </label>
@@ -422,7 +437,7 @@ export default function RegisterPage() {
               </motion.div>
             </motion.div>
 
-            <motion.div variants={itemVariants}>
+            <motion.div variants={variants.item}>
               <label htmlFor="password" className="block text-xs font-medium text-text-secondary mb-2">
                 Mot de passe
               </label>
@@ -496,7 +511,7 @@ export default function RegisterPage() {
               )}
             </AnimatePresence>
 
-            <motion.div variants={itemVariants} className="pt-1">
+            <motion.div variants={variants.item} className="pt-1">
               <Button
                 type="submit"
                 variant="neon-pink"
@@ -509,7 +524,7 @@ export default function RegisterPage() {
           </form>
 
           {/* Terms */}
-          <motion.p variants={itemVariants} className="mt-4 text-xs text-text-secondary/60 text-center">
+          <motion.p variants={variants.item} className="mt-4 text-xs text-text-secondary/60 text-center">
             En créant un compte, tu acceptes nos{' '}
             <Link href="/terms" className="text-neon-purple/80 hover:underline">
               conditions d&apos;utilisation
@@ -517,7 +532,7 @@ export default function RegisterPage() {
           </motion.p>
 
           {/* Footer */}
-          <motion.div variants={itemVariants} className="mt-6 pt-5 border-t border-white/5 text-center">
+          <motion.div variants={variants.item} className="mt-6 pt-5 border-t border-white/5 text-center">
             <p className="text-[15px] text-text-secondary">
               Déjà un compte ?{' '}
               <Link
@@ -530,7 +545,7 @@ export default function RegisterPage() {
           </motion.div>
 
           {/* Security badge */}
-          <motion.div variants={itemVariants} className="mt-5 flex justify-center">
+          <motion.div variants={variants.item} className="mt-5 flex justify-center">
             <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-xs text-text-secondary/60">
               <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />

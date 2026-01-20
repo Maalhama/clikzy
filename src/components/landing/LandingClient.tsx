@@ -491,7 +491,7 @@ export function LandingClient({
           {/* Single CTA - Full width */}
           <Link
             href={isLoggedIn ? '/lobby' : '/register'}
-            className="hero-cta w-full py-4 bg-gradient-to-r from-neon-purple to-neon-pink text-white font-black text-base rounded-xl text-center mb-3"
+            className="hero-cta w-full py-4 bg-gradient-to-r from-neon-purple to-neon-pink text-white font-black text-base rounded-xl text-center mb-3 block active:scale-95 active:opacity-90 transition-transform"
             style={{ boxShadow: '0 0 30px rgba(155, 92, 255, 0.4)' }}
           >
             {isLoggedIn ? 'VOIR LES LOTS' : 'JOUER GRATUITEMENT'}
@@ -1013,7 +1013,7 @@ export function LandingClient({
           {/* CTA Button */}
           <Link
             href={isLoggedIn ? '/lobby' : '/register'}
-            className="w-full py-4 bg-gradient-to-r from-neon-purple to-neon-pink text-white font-black text-base rounded-xl text-center block mb-3"
+            className="w-full py-4 bg-gradient-to-r from-neon-purple to-neon-pink text-white font-black text-base rounded-xl text-center block mb-3 active:scale-95 active:opacity-90 transition-transform"
             style={{ boxShadow: '0 0 30px rgba(155, 92, 255, 0.4)' }}
           >
             {isLoggedIn ? 'VOIR LES LOTS' : 'JOUER GRATUITEMENT'}

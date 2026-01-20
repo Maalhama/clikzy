@@ -593,6 +593,11 @@ body {
   box-shadow: 0 10px 40px -10px rgba(155, 92, 255, 0.5);
 }
 
+.gaming-btn:active {
+  transform: scale(0.95);
+  opacity: 0.9;
+}
+
 .gaming-btn-large {
   position: relative;
   display: inline-flex;
@@ -628,6 +633,11 @@ body {
 
 .gaming-btn-large:hover::before {
   opacity: 1;
+}
+
+.gaming-btn-large:active {
+  transform: scale(0.95);
+  opacity: 0.9;
 }
 
 /* Glitch text effect */

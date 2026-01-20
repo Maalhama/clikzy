@@ -1,39 +1,46 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { signInWithPassword, signInWithOAuth } from '@/actions/auth'
 import { Button } from '@/components/ui/button'
 import { Logo } from '@/components/ui/Logo'
+import { checkIsMobile } from '@/hooks/useIsMobile'
 
-// Animation variants
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.08,
-      delayChildren: 0.1,
+// Get animation variants based on mobile status
+const getAnimationVariants = (isMobile: boolean) => {
+  if (isMobile) {
+    return {
+      container: { hidden: { opacity: 1 }, visible: { opacity: 1 } },
+      item: { hidden: { opacity: 1, y: 0 }, visible: { opacity: 1, y: 0 } },
+      float: { animate: {} },
+    }
+  }
+  return {
+    container: {
+      hidden: { opacity: 0 },
+      visible: {
+        opacity: 1,
+        transition: { staggerChildren: 0.08, delayChildren: 0.1 },
+      },
     },
-  },
-}
-
-const itemVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] as const },
-  },
-}
-
-const floatVariants = {
-  animate: {
-    y: [-5, 5, -5],
-    transition: { duration: 4, repeat: Infinity, ease: 'easeInOut' as const },
-  },
+    item: {
+      hidden: { opacity: 0, y: 20 },
+      visible: {
+        opacity: 1,
+        y: 0,
+        transition: { duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] as const },
+      },
+    },
+    float: {
+      animate: {
+        y: [-5, 5, -5],
+        transition: { duration: 4, repeat: Infinity, ease: 'easeInOut' as const },
+      },
+    },
+  }
 }
 
 export default function LoginPage() {
@@ -46,6 +53,14 @@ export default function LoginPage() {
   const [isOAuthLoading, setIsOAuthLoading] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [focusedField, setFocusedField] = useState<string | null>(null)
+  const [isMobile, setIsMobile] = useState(false)
+
+  // Check mobile on mount
+  useEffect(() => {
+    setIsMobile(checkIsMobile())
+  }, [])
+
+  const variants = getAnimationVariants(isMobile)
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     setFormData(prev => ({
@@ -89,22 +104,22 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen w-full flex flex-col lg:flex-row relative overflow-hidden">
+    <div className="min-h-dvh w-full flex flex-col lg:flex-row relative overflow-hidden pb-20 lg:pb-0">
       {/* Mobile Background Effects */}
       <div className="lg:hidden absolute inset-0 pointer-events-none">
         <motion.div
-          variants={floatVariants}
+          variants={variants.float}
           animate="animate"
           className="absolute top-[10%] left-[5%] w-32 h-32 bg-neon-purple/15 rounded-full blur-[60px]"
         />
         <motion.div
-          variants={floatVariants}
+          variants={variants.float}
           animate="animate"
           style={{ animationDelay: '1s' }}
           className="absolute bottom-[20%] right-[5%] w-40 h-40 bg-neon-pink/15 rounded-full blur-[70px]"
         />
         <motion.div
-          variants={floatVariants}
+          variants={variants.float}
           animate="animate"
           style={{ animationDelay: '2s' }}
           className="absolute top-[50%] right-[20%] w-24 h-24 bg-neon-blue/10 rounded-full blur-[50px]"
@@ -154,18 +169,18 @@ export default function LoginPage() {
       {/* Right Panel - Form */}
       <div className="flex-1 flex items-center justify-center px-6 py-10 lg:p-10 relative z-10">
         <motion.div
-          variants={containerVariants}
+          variants={variants.container}
           initial="hidden"
           animate="visible"
           className="w-full max-w-sm"
         >
           {/* Mobile Logo */}
-          <motion.div variants={itemVariants} className="lg:hidden flex justify-center mb-8">
+          <motion.div variants={variants.item} className="lg:hidden flex justify-center mb-8">
             <Logo size="lg" animated={true} href="/" />
           </motion.div>
 
           {/* Header - Mobile optimized */}
-          <motion.div variants={itemVariants} className="text-center lg:text-left mb-8">
+          <motion.div variants={variants.item} className="text-center lg:text-left mb-8">
             <h2 className="text-2xl lg:text-2xl font-bold text-white mb-2">Connexion</h2>
             <p className="text-sm text-text-secondary">
               Connecte-toi pour rejoindre une partie
@@ -174,7 +189,7 @@ export default function LoginPage() {
 
           {/* Google OAuth - Larger touch target on mobile */}
           <motion.button
-            variants={itemVariants}
+            variants={variants.item}
             whileTap={{ scale: 0.98 }}
             onClick={() => handleOAuth('google')}
             disabled={isOAuthLoading !== null || isLoading}
@@ -198,7 +213,7 @@ export default function LoginPage() {
           </motion.button>
 
           {/* Divider */}
-          <motion.div variants={itemVariants} className="relative mb-6">
+          <motion.div variants={variants.item} className="relative mb-6">
             <div className="absolute inset-0 flex items-center">
               <div className="w-full border-t border-white/10" />
             </div>
@@ -209,7 +224,7 @@ export default function LoginPage() {
 
           {/* Login Form */}
           <form onSubmit={handleSubmit} className="space-y-4">
-            <motion.div variants={itemVariants}>
+            <motion.div variants={variants.item}>
               <label htmlFor="email" className="block text-xs font-medium text-text-secondary mb-2">
                 Email
               </label>
@@ -238,7 +253,7 @@ export default function LoginPage() {
               </motion.div>
             </motion.div>
 
-            <motion.div variants={itemVariants}>
+            <motion.div variants={variants.item}>
               <div className="flex items-center justify-between mb-2">
                 <label htmlFor="password" className="block text-xs font-medium text-text-secondary">
                   Mot de passe
@@ -288,7 +303,7 @@ export default function LoginPage() {
               </motion.div>
             )}
 
-            <motion.div variants={itemVariants} className="pt-2">
+            <motion.div variants={variants.item} className="pt-2">
               <Button
                 type="submit"
                 variant="neon-pink"
@@ -301,7 +316,7 @@ export default function LoginPage() {
           </form>
 
           {/* Footer */}
-          <motion.div variants={itemVariants} className="mt-8 pt-6 border-t border-white/5 text-center">
+          <motion.div variants={variants.item} className="mt-8 pt-6 border-t border-white/5 text-center">
             <p className="text-[15px] text-text-secondary">
               Pas encore de compte ?{' '}
               <Link
@@ -314,7 +329,7 @@ export default function LoginPage() {
           </motion.div>
 
           {/* Security badge */}
-          <motion.div variants={itemVariants} className="mt-6 flex justify-center">
+          <motion.div variants={variants.item} className="mt-6 flex justify-center">
             <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-xs text-text-secondary/60">
               <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
