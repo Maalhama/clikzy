@@ -26,6 +26,30 @@ export async function GET(request: NextRequest) {
   try {
     const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
+    // 1. Supprimer tous les jeux terminés (nettoyage avant nouvelle rotation)
+    const { data: deletedEnded } = await supabase
+      .from('games')
+      .delete()
+      .eq('status', 'ended')
+      .select('id')
+
+    const endedCount = deletedEnded?.length || 0
+    if (endedCount > 0) {
+      console.log(`Cleaned up ${endedCount} ended games`)
+    }
+
+    // 2. Supprimer les anciens jeux en attente (garder la place pour la nouvelle rotation)
+    const { data: deletedWaiting } = await supabase
+      .from('games')
+      .delete()
+      .eq('status', 'waiting')
+      .select('id')
+
+    const waitingCount = deletedWaiting?.length || 0
+    if (waitingCount > 0) {
+      console.log(`Cleaned up ${waitingCount} old waiting games`)
+    }
+
     // Obtenir la prochaine rotation (utilise la fonction utilitaire)
     const utcStartTime = getNextRotationTime()
 
@@ -107,6 +131,10 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       message: `Created ${createdGames?.length || 0} games for rotation`,
       created: createdGames?.length || 0,
+      cleaned: {
+        ended: endedCount,
+        waiting: waitingCount,
+      },
       games: createdGames?.map(g => ({
         id: g.id,
         name: getItemName(g.item),
