@@ -42,7 +42,7 @@ export const SORT_OPTIONS: SortOption[] = [
   { value: 'highest_value', label: 'Valeur max' },
 ]
 
-const HIGH_VALUE_THRESHOLD = 500 // €
+const HIGH_VALUE_THRESHOLD = 1000 // €
 const ITEMS_PER_PAGE = 9
 
 export function useLobbyFilters(games: GameWithFinalPhaseTracking[], options: UseLobbyFiltersOptions = {}) {
