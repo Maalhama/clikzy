@@ -13,7 +13,7 @@ import {
 import { FloatingTimer } from '@/components/landing/widgets/FloatingTimer'
 import { useLobbyFilters } from '@/hooks/lobby/useLobbyFilters'
 import { useLobbyRealtime } from '@/hooks/lobby/useLobbyRealtime'
-// NOTE: useLobbyBots removed - bots are now generated server-side via cron
+// import { useLobbyBots } from '@/hooks/lobby/useLobbyBots' // Disabled - using server bots
 import { useFavorites } from '@/hooks/useFavorites'
 import { usePullToRefresh } from '@/hooks/usePullToRefresh'
 import type { GameWithItem } from '@/types/database'
@@ -51,9 +51,12 @@ export function LobbyClient({
     onRefresh: handleRefresh,
   })
 
-  // Real-time updates from database (bots + real players)
-  // NOTE: Bots are generated server-side via cron, no client-side bot generation
+  // Real-time updates - reads from shared cache
   const { games, recentClicks, isConnected } = useLobbyRealtime(initialGames)
+
+  // Client-side bots DISABLED - using server-side bots via cron instead
+  // This ensures all devices (Mac, mobile, etc.) see the same bot activity
+  // useLobbyBots(games, true)
 
   // Filters, sorting and pagination
   const {

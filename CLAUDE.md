@@ -190,21 +190,6 @@ Les crons sont configurés sur **cron-job.org** (pas GitHub Actions) :
 
 Header requis : `Authorization: Bearer [CRON_SECRET]`
 
-## Sélection de modèle
-
-**IMPORTANT** : Utiliser **UNIQUEMENT Sonnet 4.5** jusqu'à nouvel ordre.
-
-La limite d'Opus 4.5 est atteinte (99%). Ne pas utiliser Opus tant que la limite n'est pas réinitialisée.
-
-- ✅ Sonnet 4.5 par défaut
-- ❌ Opus 4.5 - limite atteinte
-
-## Environnement de test
-
-**IMPORTANT** : Tester et déboguer **UNIQUEMENT sur production Vercel** (clikzy.vercel.app).
-
-Ne pas utiliser localhost pour les tests. Toutes les vérifications doivent se faire sur l'environnement de production.
-
 ## Notes
 
 ### Notifications audio

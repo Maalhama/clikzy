@@ -44,7 +44,7 @@ const RARE_CLICK_CHANCE = 0.05               // 5% quand beaucoup de temps
 const SUSPENSE_THRESHOLD = 10 * 1000         // Attendre que le timer soit < 10s
 const SUSPENSE_CHANCE = 0.7                  // 70% du temps, attendre le suspense
 const PLAYER_RESPONSE_CHANCE = 0.98          // 98% de chance de répondre à un vrai joueur
-const REAL_PLAYER_WINDOW = 90 * 1000         // Considérer un clic comme "récent" si < 90s (accounts for cron interval)
+const REAL_PLAYER_WINDOW = 30 * 1000         // Considérer un clic comme "récent" si < 30s
 
 // Configuration du cron (toutes les 5 minutes)
 const CRON_INTERVAL = 5 * 60 * 1000          // 5 minutes entre chaque exécution
