@@ -49,14 +49,14 @@ export async function clickGame(gameId: string): Promise<ActionResult<{ newEndTi
     return { success: false, error: 'Crédits insuffisants' }
   }
 
-  // Get game to validate status
+  // Get game to validate status (with item for the feed)
   const { data: gameData } = await supabase
     .from('games')
-    .select('*')
+    .select('*, item:items(name)')
     .eq('id', gameId)
     .single()
 
-  const game = gameData as Game | null
+  const game = gameData as (Game & { item: { name: string } | null }) | null
 
   if (!game) {
     return { success: false, error: 'Partie non trouvée' }
@@ -91,13 +91,16 @@ export async function clickGame(gameId: string): Promise<ActionResult<{ newEndTi
     return { success: false, error: 'Erreur lors de la déduction des crédits' }
   }
 
-  // 2. Record click
+  // 2. Record click (with username and item_name for the live feed)
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { error: clickError } = await (supabase as any)
     .from('clicks')
     .insert({
       game_id: gameId,
       user_id: user.id,
+      username: profile.username,
+      item_name: game.item?.name || 'Produit',
+      is_bot: false,
       sequence_number: sequence,
       credits_spent: GAME_CONSTANTS.CREDIT_COST_PER_CLICK,
     })

@@ -132,7 +132,10 @@ export interface Database {
         Row: {
           id: string
           game_id: string
-          user_id: string
+          user_id: string | null
+          username: string | null
+          item_name: string | null
+          is_bot: boolean
           clicked_at: string
           credits_spent: number
           sequence_number: number
@@ -140,7 +143,10 @@ export interface Database {
         Insert: {
           id?: string
           game_id: string
-          user_id: string
+          user_id?: string | null
+          username?: string | null
+          item_name?: string | null
+          is_bot?: boolean
           clicked_at?: string
           credits_spent?: number
           sequence_number: number
@@ -148,7 +154,10 @@ export interface Database {
         Update: {
           id?: string
           game_id?: string
-          user_id?: string
+          user_id?: string | null
+          username?: string | null
+          item_name?: string | null
+          is_bot?: boolean
           clicked_at?: string
           credits_spent?: number
           sequence_number?: number

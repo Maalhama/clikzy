@@ -5,6 +5,11 @@ import { generateUsername } from '@/lib/bots/usernameGenerator'
 /**
  * Server-side bot system with FULL INTELLIGENCE
  * Replicates the client-side bot behavior but persists to database
+ *
+ * RÉALISME:
+ * - Chaque clic vient d'un bot DIFFÉRENT du précédent
+ * - Timestamps variés et réalistes entre les clics
+ * - Patterns de clics qui simulent de vrais utilisateurs
  */
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
@@ -79,6 +84,61 @@ function getBattleDuration(gameId: string): number {
  */
 function isRealPlayerClick(lastClickUserId: string | null): boolean {
   return lastClickUserId !== null && lastClickUserId !== ''
+}
+
+/**
+ * Generate a unique bot username different from the excluded one
+ * Tries up to 10 times to get a different username
+ */
+function generateUniqueUsername(excludeUsername: string | null): string {
+  let attempts = 0
+  let username = generateUsername()
+
+  while (username === excludeUsername && attempts < 10) {
+    username = generateUsername()
+    attempts++
+  }
+
+  return username
+}
+
+/**
+ * Generate realistic timestamps for bot clicks
+ * Simulates human-like delays between clicks during a battle
+ *
+ * @param baseTime - Starting timestamp
+ * @param clickIndex - Index of the click (0, 1, 2...)
+ * @param timeLeftMs - Time left in the game
+ * @returns Realistic timestamp for this click
+ */
+function generateRealisticTimestamp(baseTime: number, clickIndex: number, timeLeftMs: number): number {
+  if (clickIndex === 0) return baseTime
+
+  // Base delay depends on how urgent the game is
+  let minDelay: number
+  let maxDelay: number
+
+  if (timeLeftMs <= 10000) {
+    // Critical phase (< 10s): very fast reactions
+    minDelay = 200
+    maxDelay = 1500
+  } else if (timeLeftMs <= 30000) {
+    // Urgent (< 30s): fast reactions
+    minDelay = 500
+    maxDelay = 3000
+  } else if (timeLeftMs <= 60000) {
+    // Final phase (< 1min): quick but not instant
+    minDelay = 1000
+    maxDelay = 8000
+  } else {
+    // Normal: more relaxed timing
+    minDelay = 5000
+    maxDelay = 30000
+  }
+
+  // Add cumulative delay for each subsequent click
+  const delay = minDelay + Math.random() * (maxDelay - minDelay)
+  return baseTime + (clickIndex * delay)
 }
 
 /**
@@ -267,14 +327,47 @@ export async function GET(request: NextRequest) {
         clickCount = 1 + Math.floor(Math.random() * 2)
       }
 
-      // Generate bot clicks
+      // Generate bot clicks with REALISTIC behavior
+      // Each click comes from a DIFFERENT bot than the previous one
       let lastUsername = game.last_click_username
       let newEndTime = endTime
       let newStatus = game.status
       let shouldSetBattleStart = false
+      const botClicks: Array<{
+        username: string
+        item_name: string
+        clicked_at: string
+      }> = []
+
+      // Track usernames used in this batch to avoid duplicates
+      const usedUsernames = new Set<string>()
+      if (lastUsername) {
+        usedUsernames.add(lastUsername)
+      }
 
       for (let i = 0; i < clickCount; i++) {
-        lastUsername = generateUsername()
+        // Generate unique username different from previous clicks
+        let newUsername = generateUniqueUsername(lastUsername)
+
+        // Also ensure we don't repeat within this batch
+        let batchAttempts = 0
+        while (usedUsernames.has(newUsername) && batchAttempts < 10) {
+          newUsername = generateUsername()
+          batchAttempts++
+        }
+
+        usedUsernames.add(newUsername)
+        lastUsername = newUsername
+
+        // Generate realistic timestamp with human-like delays
+        const clickTimestamp = generateRealisticTimestamp(now, i, timeLeft)
+
+        // Store click for insertion
+        botClicks.push({
+          username: newUsername,
+          item_name: getItemName(game.item),
+          clicked_at: new Date(clickTimestamp).toISOString(),
+        })
 
         // Trigger final phase if time < 1 minute
         if (game.status === 'active' && timeLeft <= FINAL_PHASE_THRESHOLD) {
@@ -310,6 +403,29 @@ export async function GET(request: NextRequest) {
       if (updateError) {
         console.error(`Error updating game ${game.id}:`, updateError)
         continue
+      }
+
+      // Insert bot clicks into clicks table for the live feed
+      if (botClicks.length > 0) {
+        const currentTotal = (game.total_clicks || 0)
+        const clicksToInsert = botClicks.map((click, index) => ({
+          game_id: game.id,
+          user_id: null as string | null,
+          username: click.username,
+          item_name: click.item_name,
+          is_bot: true,
+          clicked_at: click.clicked_at,
+          credits_spent: 0,
+          sequence_number: currentTotal + index + 1,
+        }))
+
+        const { error: clicksError } = await supabase
+          .from('clicks')
+          .insert(clicksToInsert)
+
+        if (clicksError) {
+          console.error(`Error inserting clicks for game ${game.id}:`, clicksError)
+        }
       }
 
       results.push({

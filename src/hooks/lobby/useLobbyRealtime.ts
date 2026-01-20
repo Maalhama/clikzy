@@ -400,12 +400,67 @@ export function useLobbyRealtime(
     []
   )
 
+  // Fetch initial clicks from database
+  useEffect(() => {
+    const fetchInitialClicks = async () => {
+      try {
+        const response = await fetch('/api/clicks/recent?limit=5')
+        if (response.ok) {
+          const data = await response.json()
+          if (data.clicks && data.clicks.length > 0) {
+            setRecentClicks(data.clicks.map((click: { id: string; username: string; game_id: string; item_name: string; timestamp: number }) => ({
+              id: click.id,
+              username: click.username,
+              game_id: click.game_id,
+              item_name: click.item_name,
+              timestamp: click.timestamp,
+            })))
+          }
+        }
+      } catch (error) {
+        console.error('Failed to fetch initial clicks:', error)
+      }
+    }
+
+    fetchInitialClicks()
+  }, [])
+
   useEffect(() => {
     const supabase = createClient()
 
-    // Subscribe to game updates
+    // Subscribe to game updates AND clicks
     const channel = supabase
       .channel('lobby-games-realtime')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'clicks',
+        },
+        (payload) => {
+          // New click from database (bot or real player)
+          const click = payload.new as {
+            id: string
+            game_id: string
+            username: string | null
+            item_name: string | null
+            clicked_at: string
+          }
+
+          if (click.username) {
+            const notification: ClickNotification = {
+              id: click.id,
+              username: click.username,
+              game_id: click.game_id,
+              item_name: click.item_name || 'Produit',
+              timestamp: new Date(click.clicked_at).getTime(),
+            }
+
+            setRecentClicks((prev) => [notification, ...prev].slice(0, 5))
+          }
+        }
+      )
       .on(
         'postgres_changes',
         {
