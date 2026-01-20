@@ -504,7 +504,7 @@ export function LandingClient({
 
           {/* Single CTA - Full width */}
           <button
-            onClick={(e) => handleCtaClick(e, isLoggedIn ? '/lobby' : '/register')}
+            onClick={(e) => handleCtaClick(e, isLoggedIn ? '/lobby' : '/login')}
             disabled={isNavigating}
             className="hero-cta w-full py-4 bg-gradient-to-r from-neon-purple to-neon-pink text-white font-black text-base rounded-xl text-center mb-3 block active:scale-95 active:opacity-90 transition-all disabled:opacity-80"
             style={{ boxShadow: '0 0 30px rgba(155, 92, 255, 0.4)' }}
@@ -592,7 +592,7 @@ export function LandingClient({
             <div className="hero-cta flex flex-col gap-3 mb-12">
               <div className="flex gap-4">
                 <button
-                  onClick={(e) => handleCtaClick(e, isLoggedIn ? '/lobby' : '/register')}
+                  onClick={(e) => handleCtaClick(e, isLoggedIn ? '/lobby' : '/login')}
                   disabled={isNavigating}
                   className="gaming-btn-large group text-center disabled:opacity-80"
                 >
@@ -1050,7 +1050,7 @@ export function LandingClient({
 
           {/* CTA Button */}
           <button
-            onClick={(e) => handleCtaClick(e, isLoggedIn ? '/lobby' : '/register')}
+            onClick={(e) => handleCtaClick(e, isLoggedIn ? '/lobby' : '/login')}
             disabled={isNavigating}
             className="w-full py-4 bg-gradient-to-r from-neon-purple to-neon-pink text-white font-black text-base rounded-xl text-center block mb-3 active:scale-95 active:opacity-90 transition-all disabled:opacity-80"
             style={{ boxShadow: '0 0 30px rgba(155, 92, 255, 0.4)' }}
@@ -1133,7 +1133,7 @@ export function LandingClient({
           <div className="relative inline-block">
             <div className="absolute inset-0 bg-neon-purple rounded-full blur-xl animate-pulse opacity-60" style={{ transform: 'scale(1.1)' }} />
             <button
-              onClick={(e) => handleCtaClick(e, isLoggedIn ? '/lobby' : '/register')}
+              onClick={(e) => handleCtaClick(e, isLoggedIn ? '/lobby' : '/login')}
               disabled={isNavigating}
               className="relative gaming-btn-large inline-flex items-center gap-3 group disabled:opacity-80"
               style={{ boxShadow: '0 0 40px rgba(155, 92, 255, 0.5), inset 0 0 20px rgba(255, 255, 255, 0.1)' }}
