@@ -150,15 +150,17 @@ export function LandingClient({
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [menuClosing, setMenuClosing] = useState(false)
   const [isMounted, setIsMounted] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
 
   async function handleSignOut() {
     await signOut()
     router.push('/login')
   }
 
-  // Pour le portal - attendre le montage côté client
+  // Pour le portal - attendre le montage côté client + detect mobile
   useEffect(() => {
     setIsMounted(true)
+    setIsMobile(window.innerWidth < 768)
   }, [])
 
   const closeMenu = () => {
@@ -175,14 +177,13 @@ export function LandingClient({
     initialFeaturedGame
   )
 
-  // GSAP Animations
+  // GSAP Animations - Skip on mobile for performance
   useGSAP(
     () => {
-      if (!mainRef.current) return
+      // Skip all GSAP animations on mobile for better performance
+      if (!mainRef.current || isMobile) return
 
       const ctx = gsap.context(() => {
-        // Hero animations removed - instant display
-
         // How it works - stagger from sides
         gsap.from('.step-card:nth-child(odd)', {
           scrollTrigger: {
@@ -233,7 +234,7 @@ export function LandingClient({
 
       return () => ctx.revert()
     },
-    { scope: mainRef }
+    { scope: mainRef, dependencies: [isMobile] }
   )
 
   return (
@@ -412,23 +413,24 @@ export function LandingClient({
             <span className="block text-neon-purple text-xs mt-1">Nouveaux produits toutes les 3 heures</span>
           </p>
 
-          {/* Mini Prize Showcase - Mobile - Infinite Marquee */}
+          {/* Mini Prize Showcase - Mobile - Infinite Marquee (reduced for performance) */}
           <div className="hero-prize mb-6 -mx-4 overflow-hidden">
             <div
               className="flex gap-3"
               style={{
                 width: 'max-content',
-                animation: 'marquee 20s linear infinite',
+                animation: 'marquee 25s linear infinite',
+                willChange: 'transform',
+                backfaceVisibility: 'hidden',
+                transform: 'translate3d(0, 0, 0)',
               }}
             >
-              {/* First set */}
+              {/* First set - reduced to 4 items for mobile performance */}
               {[
                 { name: 'iPhone 15 Pro', value: 1479, color: '#9B5CFF', image: '/products/iphone-15-pro.svg' },
                 { name: 'PlayStation 5', value: 549, color: '#3CCBFF', image: '/products/ps5.svg' },
                 { name: 'MacBook Pro', value: 2499, color: '#FF4FD8', image: '/products/macbook-pro.svg' },
                 { name: 'AirPods Pro', value: 279, color: '#00FF88', image: '/products/airpods-pro.svg' },
-                { name: 'Apple Watch', value: 449, color: '#9B5CFF', image: '/products/apple-watch.svg' },
-                { name: 'iPad Pro', value: 1099, color: '#3CCBFF', image: '/products/ipad-pro.svg' },
               ].map((prize, i) => (
                 <div
                   key={`a-${i}`}
@@ -445,7 +447,7 @@ export function LandingClient({
                       fill
                       className="object-contain p-1"
                       sizes="56px"
-                      priority={i < 3} // Prioritize first 3 for LCP on mobile
+                      priority={i < 2}
                     />
                   </div>
                   <div className="text-[9px] text-white/70 truncate">{prize.name}</div>
@@ -458,8 +460,6 @@ export function LandingClient({
                 { name: 'PlayStation 5', value: 549, color: '#3CCBFF', image: '/products/ps5.svg' },
                 { name: 'MacBook Pro', value: 2499, color: '#FF4FD8', image: '/products/macbook-pro.svg' },
                 { name: 'AirPods Pro', value: 279, color: '#00FF88', image: '/products/airpods-pro.svg' },
-                { name: 'Apple Watch', value: 449, color: '#9B5CFF', image: '/products/apple-watch.svg' },
-                { name: 'iPad Pro', value: 1099, color: '#3CCBFF', image: '/products/ipad-pro.svg' },
               ].map((prize, i) => (
                 <div
                   key={`b-${i}`}

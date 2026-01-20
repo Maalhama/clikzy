@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { FireIcon } from '@/components/ui/GamingIcons'
+import { useIsMobile } from '@/hooks/useIsMobile'
 
 interface Testimonial {
   id: string
@@ -80,6 +81,7 @@ export function Testimonials({
   const [currentIndex, setCurrentIndex] = useState(0)
   const [isHovered, setIsHovered] = useState(false)
   const [progress, setProgress] = useState(0)
+  const isMobile = useIsMobile()
 
   // Use external testimonials or bot testimonials
   const testimonials = externalTestimonials || BOT_TESTIMONIALS
@@ -141,10 +143,10 @@ export function Testimonials({
         <AnimatePresence mode="wait">
           <motion.div
             key={currentIndex}
-            initial={{ opacity: 0, y: 20 }}
+            initial={isMobile ? false : { opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.3 }}
+            exit={isMobile ? { opacity: 0 } : { opacity: 0, y: -20 }}
+            transition={{ duration: isMobile ? 0.1 : 0.3 }}
           >
             {/* Stars with glow */}
             <div className="flex gap-1 mb-4">

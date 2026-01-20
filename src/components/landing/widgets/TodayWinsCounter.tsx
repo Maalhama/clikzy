@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
+import { useIsMobile } from '@/hooks/useIsMobile'
 
 interface TodayWinsCounterProps {
   className?: string
@@ -14,6 +15,7 @@ export function TodayWinsCounter({ className = '', initialCount = 12 }: TodayWin
   const [isAnimating, setIsAnimating] = useState(false)
   const hasAnimated = useRef(false)
   const containerRef = useRef<HTMLDivElement>(null)
+  const isMobile = useIsMobile()
 
   // Animate count on first view
   useEffect(() => {
@@ -77,8 +79,8 @@ export function TodayWinsCounter({ className = '', initialCount = 12 }: TodayWin
       {/* Mobile version */}
       <div className="md:hidden">
         <motion.div
-          animate={isAnimating ? { scale: [1, 1.05, 1] } : {}}
-          transition={{ duration: 0.5 }}
+          animate={isAnimating && !isMobile ? { scale: [1, 1.05, 1] } : {}}
+          transition={{ duration: isMobile ? 0.1 : 0.5 }}
           className="flex items-center justify-center gap-2 py-3 px-4 bg-gradient-to-r from-success/10 via-success/5 to-success/10 border-y border-success/20"
         >
           <span className="relative flex h-2 w-2">
@@ -88,8 +90,9 @@ export function TodayWinsCounter({ className = '', initialCount = 12 }: TodayWin
           <span className="text-sm">
             <motion.span
               key={displayCount}
-              initial={{ opacity: 0, y: -10 }}
+              initial={isMobile ? false : { opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: isMobile ? 0 : 0.3 }}
               className="font-black text-success"
             >
               {displayCount}

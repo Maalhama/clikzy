@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useSounds } from '@/hooks/useSounds'
+import { useIsMobile } from '@/hooks/useIsMobile'
 
 // Fake products for non-logged-in users (urgency marketing)
 const FAKE_PRODUCTS = [
@@ -50,6 +51,7 @@ export function FloatingTimer({
   const [currentGameId, setCurrentGameId] = useState<string | undefined>(gameId)
   const productIndexRef = useRef(0)
   const isWaitingRef = useRef(false)
+  const isMobile = useIsMobile()
 
   // Sounds
   const { playHeartbeat, stopAll: stopSounds } = useSounds(enabled && isVisible)
@@ -209,17 +211,17 @@ export function FloatingTimer({
     <AnimatePresence mode="wait">
       <motion.div
         key={currentProduct}
-        initial={{ opacity: 0, x: 300 }}
+        initial={isMobile ? false : { opacity: 0, x: 300 }}
         animate={isEnding ? {
           opacity: 0,
-          x: 300,
+          x: isMobile ? 0 : 300,
         } : {
           opacity: 1,
           x: 0,
-          scale: isCritical ? [1, 1.02, 1] : 1,
+          scale: isCritical && !isMobile ? [1, 1.02, 1] : 1,
         }}
-        exit={{ opacity: 0, x: 300 }}
-        transition={isEnding ? {
+        exit={isMobile ? { opacity: 0 } : { opacity: 0, x: 300 }}
+        transition={isMobile ? { duration: 0.15 } : isEnding ? {
           duration: 0.4,
           ease: 'easeIn',
         } : isCritical ? {

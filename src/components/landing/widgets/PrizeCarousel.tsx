@@ -5,6 +5,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import { GiftIcon } from '@/components/ui/GamingIcons'
+import { useIsMobile } from '@/hooks/useIsMobile'
 
 interface Prize {
   id: string
@@ -74,6 +75,7 @@ export function PrizeCarousel({
   const [isHovered, setIsHovered] = useState(false)
   const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({})
   const intervalRef = useRef<NodeJS.Timeout | null>(null)
+  const isMobile = useIsMobile()
 
   const handleImageError = useCallback((prizeId: string) => {
     setImageErrors(prev => ({ ...prev, [prizeId]: true }))
@@ -147,10 +149,10 @@ export function PrizeCarousel({
         <AnimatePresence mode="wait">
           <motion.div
             key={currentIndex}
-            initial={{ opacity: 0, x: 50 }}
+            initial={isMobile ? false : { opacity: 0, x: 50 }}
             animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -50 }}
-            transition={{ duration: 0.3 }}
+            exit={isMobile ? { opacity: 0 } : { opacity: 0, x: -50 }}
+            transition={{ duration: isMobile ? 0.1 : 0.3 }}
             className="flex flex-col md:flex-row gap-6 items-center"
           >
             {/* Image */}

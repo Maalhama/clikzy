@@ -1377,10 +1377,10 @@ body {
 
 @keyframes marquee {
   from {
-    transform: translateX(0%);
+    transform: translate3d(0, 0, 0);
   }
   to {
-    transform: translateX(-50%);
+    transform: translate3d(-50%, 0, 0);
   }
 }
 
@@ -1396,6 +1396,8 @@ body {
   gap: 0.75rem;
   width: max-content;
   animation: marquee 20s linear infinite;
+  will-change: transform;
+  backface-visibility: hidden;
 }
 
 .marquee-content:hover {
@@ -1438,9 +1440,24 @@ body {
     animation: none !important;
   }
 
-  /* Simplify marquee on mobile */
+  /* Simplify and slow marquee on mobile for performance */
   .marquee-content {
-    animation-duration: 30s;
+    animation-duration: 40s;
+  }
+
+  /* Disable neon text shadows on mobile */
+  .neon-text,
+  .neon-text-blue,
+  .neon-text-pink {
+    text-shadow: none !important;
+  }
+
+  /* Disable box shadows on mobile for performance */
+  .neon-glow,
+  .neon-glow-blue,
+  .neon-glow-pink,
+  .neon-glow-success {
+    box-shadow: none !important;
   }
 
   /* Disable hover transforms on mobile (no hover anyway) */
@@ -1448,6 +1465,12 @@ body {
   .hover\:scale-105:hover,
   .hover\:scale-110:hover {
     transform: none !important;
+  }
+
+  /* GPU acceleration for transforms */
+  .hero-prize > div {
+    transform: translate3d(0, 0, 0);
+    will-change: transform;
   }
 }
 

@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useIsMobile } from '@/hooks/useIsMobile'
 
 interface FAQItem {
   question: string
@@ -53,11 +54,12 @@ function ChevronIcon({ isOpen }: { isOpen: boolean }) {
   )
 }
 
-function FAQItemComponent({ item, isOpen, onToggle, index }: {
+function FAQItemComponent({ item, isOpen, onToggle, index, isMobile }: {
   item: FAQItem
   isOpen: boolean
   onToggle: () => void
   index: number
+  isMobile: boolean
 }) {
   const colors = ['#9B5CFF', '#3CCBFF', '#FF4FD8', '#00FF88']
   const color = colors[index % colors.length]
@@ -83,10 +85,10 @@ function FAQItemComponent({ item, isOpen, onToggle, index }: {
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.3, ease: 'easeInOut' }}
+            initial={isMobile ? { opacity: 0 } : { height: 0, opacity: 0 }}
+            animate={isMobile ? { opacity: 1 } : { height: 'auto', opacity: 1 }}
+            exit={isMobile ? { opacity: 0 } : { height: 0, opacity: 0 }}
+            transition={{ duration: isMobile ? 0.1 : 0.3, ease: 'easeInOut' }}
           >
             <div className="px-4 md:px-5 pb-4 md:pb-5">
               <p className="text-white/70 text-sm md:text-base leading-relaxed">
@@ -102,6 +104,7 @@ function FAQItemComponent({ item, isOpen, onToggle, index }: {
 
 export function FAQ({ className = '' }: FAQProps) {
   const [openIndex, setOpenIndex] = useState<number | null>(0)
+  const isMobile = useIsMobile()
 
   const toggleItem = (index: number) => {
     setOpenIndex(openIndex === index ? null : index)
@@ -134,6 +137,7 @@ export function FAQ({ className = '' }: FAQProps) {
             index={index}
             isOpen={openIndex === index}
             onToggle={() => toggleItem(index)}
+            isMobile={isMobile}
           />
         ))}
       </div>

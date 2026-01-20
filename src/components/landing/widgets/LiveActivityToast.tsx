@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import Image from 'next/image'
+import { useIsMobile } from '@/hooks/useIsMobile'
 
 interface WinNotification {
   id: string
@@ -87,6 +88,7 @@ function TrophyIcon({ className }: { className?: string }) {
 
 export function LiveActivityToast({ enabled = true, maxVisible = 3, realWinners = [] }: LiveActivityToastProps) {
   const [notifications, setNotifications] = useState<WinNotification[]>([])
+  const isMobile = useIsMobile()
 
   // Use refs to avoid useEffect re-running
   const winnerIndexRef = useRef(0)
@@ -225,10 +227,10 @@ export function LiveActivityToast({ enabled = true, maxVisible = 3, realWinners 
         {notifications.map((notification) => (
           <motion.div
             key={notification.id}
-            initial={{ opacity: 0, x: -50 }}
+            initial={isMobile ? { opacity: 0 } : { opacity: 0, x: -50 }}
             animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -200 }}
-            transition={{ duration: 0.3, ease: 'easeInOut' }}
+            exit={isMobile ? { opacity: 0 } : { opacity: 0, x: -200 }}
+            transition={{ duration: isMobile ? 0.15 : 0.3, ease: 'easeInOut' }}
             className="pointer-events-auto group"
           >
             {/* MOBILE VERSION - Ultra compact */}
