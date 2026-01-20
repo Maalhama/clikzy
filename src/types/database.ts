@@ -20,6 +20,7 @@ export interface Database {
           total_wins: number
           total_clicks: number
           last_credits_reset: string
+          has_purchased_credits: boolean
           created_at: string
           updated_at: string
         }
@@ -31,6 +32,7 @@ export interface Database {
           total_wins?: number
           total_clicks?: number
           last_credits_reset?: string
+          has_purchased_credits?: boolean
           created_at?: string
           updated_at?: string
         }
@@ -42,6 +44,7 @@ export interface Database {
           total_wins?: number
           total_clicks?: number
           last_credits_reset?: string
+          has_purchased_credits?: boolean
           created_at?: string
           updated_at?: string
         }

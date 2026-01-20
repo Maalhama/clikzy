@@ -12,6 +12,7 @@ type ActionResult<T = void> = {
 /**
  * Check and reset daily credits if needed
  * Credits reset to 10 every day at midnight (00:00)
+ * ONLY for users who haven't purchased credits
  */
 export async function checkAndResetDailyCredits(): Promise<ActionResult<{ credits: number; wasReset: boolean }>> {
   const supabase = await createClient()
@@ -21,18 +22,33 @@ export async function checkAndResetDailyCredits(): Promise<ActionResult<{ credit
     return { success: false, error: 'Non authentifié' }
   }
 
-  // Get user's profile with last reset time
+  // Get user's profile with last reset time and purchase status
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { data: profileData } = await (supabase as any)
     .from('profiles')
-    .select('credits, last_credits_reset')
+    .select('credits, last_credits_reset, has_purchased_credits')
     .eq('id', user.id)
     .single()
 
-  const profile = profileData as { credits: number; last_credits_reset: string } | null
+  const profile = profileData as {
+    credits: number
+    last_credits_reset: string
+    has_purchased_credits: boolean
+  } | null
 
   if (!profile) {
     return { success: false, error: 'Profil non trouvé' }
+  }
+
+  // Skip reset for users who have purchased credits
+  if (profile.has_purchased_credits) {
+    return {
+      success: true,
+      data: {
+        credits: profile.credits,
+        wasReset: false
+      }
+    }
   }
 
   // Check if reset is needed
