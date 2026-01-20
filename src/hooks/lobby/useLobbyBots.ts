@@ -207,10 +207,13 @@ export function useLobbyBots(
   // Get or initialize timing for a game
   const getGameTiming = useCallback((gameId: string, timeLeftMs: number): GameTiming => {
     if (!gameTimingsRef.current[gameId]) {
-      // Initialize with random delay so games don't all start at same time
+      // Initialize avec lastClickAt = now pour éviter que tous les jeux cliquent en même temps
+      // Chaque jeu attend son propre délai aléatoire avant le premier clic
+      const baseDelay = getRandomDelay(timeLeftMs)
+      const randomOffset = Math.random() * baseDelay // Décalage aléatoire entre 0 et baseDelay
       gameTimingsRef.current[gameId] = {
-        lastClickAt: 0,
-        nextClickDelay: Math.random() * getRandomDelay(timeLeftMs),
+        lastClickAt: Date.now(), // Commence maintenant, pas à 0
+        nextClickDelay: randomOffset, // Délai initial aléatoire différent pour chaque jeu
       }
     }
     return gameTimingsRef.current[gameId]
