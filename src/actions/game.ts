@@ -123,6 +123,11 @@ export async function clickGame(gameId: string): Promise<ActionResult<{ newEndTi
   if (newEndTime) {
     updateData.end_time = newEndTime
     updateData.status = 'final_phase'
+    // Set battle_start_time if entering final phase for the first time
+    // This is critical for bots to maintain the battle for 30-119 minutes
+    if (game.status === 'active') {
+      updateData.battle_start_time = new Date(now).toISOString()
+    }
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

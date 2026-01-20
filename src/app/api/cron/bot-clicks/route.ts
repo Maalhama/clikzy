@@ -143,6 +143,9 @@ function generateRealisticTimestamp(baseTime: number, clickIndex: number, timeLe
 
 /**
  * Decide if bot should click based on time left and context
+ *
+ * CRITICAL: Bots MUST maintain the battle for the full duration (30-119 min)
+ * even when no real players are present. This ensures realistic game activity.
  */
 function shouldBotClick(
   timeLeftMs: number,
@@ -151,46 +154,68 @@ function shouldBotClick(
   battleDuration: number
 ): { shouldClick: boolean; reason: string } {
 
-  // RÉPONSE AUX VRAIS JOUEURS (DOPAMINE!)
-  if (isResponseToRealPlayer && timeLeftMs <= FINAL_PHASE_THRESHOLD) {
-    // 70% du temps, attendre que timer < 10 secondes (suspense!)
-    if (timeLeftMs > SUSPENSE_THRESHOLD && Math.random() < SUSPENSE_CHANCE) {
-      return { shouldClick: false, reason: 'suspense_wait' }
-    }
-    // Répondre avec haute probabilité
-    if (Math.random() < PLAYER_RESPONSE_CHANCE) {
-      return { shouldClick: true, reason: 'response_to_player' }
-    }
-    return { shouldClick: false, reason: 'response_skip' }
-  }
-
-  // CHECK BATTLE STATE (durée de bataille)
+  // CHECK BATTLE STATE FIRST (durée de bataille)
   if (battleStartTime && timeLeftMs <= FINAL_PHASE_THRESHOLD) {
     const battleElapsed = Date.now() - battleStartTime.getTime()
     const timeUntilBattleEnd = battleDuration - battleElapsed
-
-    // Phase de ralentissement (5 dernières minutes de bataille)
-    if (timeUntilBattleEnd <= WIND_DOWN_DURATION && timeUntilBattleEnd > 0) {
-      if (Math.random() > WIND_DOWN_CLICK_CHANCE) {
-        return { shouldClick: false, reason: 'wind_down' }
-      }
-    }
 
     // Bataille terminée - laisser quelqu'un gagner
     if (battleElapsed >= battleDuration) {
       return { shouldClick: false, reason: 'battle_ended' }
     }
+
+    // CRITICAL: Battle is still ongoing - bot MUST click to keep game alive
+    // This ensures the battle lasts the full 30-119 minutes
+
+    // Phase de ralentissement (5 dernières minutes de bataille)
+    if (timeUntilBattleEnd <= WIND_DOWN_DURATION) {
+      // During wind-down, reduce click rate but STILL click sometimes
+      if (Math.random() < WIND_DOWN_CLICK_CHANCE) {
+        return { shouldClick: true, reason: 'wind_down_click' }
+      }
+      return { shouldClick: false, reason: 'wind_down_skip' }
+    }
+
+    // RÉPONSE AUX VRAIS JOUEURS (DOPAMINE!) - only during active battle
+    if (isResponseToRealPlayer) {
+      // 70% du temps, attendre que timer < 10 secondes (suspense!)
+      if (timeLeftMs > SUSPENSE_THRESHOLD && Math.random() < SUSPENSE_CHANCE) {
+        // But if timer is very low, MUST click to keep game alive
+        if (timeLeftMs <= 15000) {
+          return { shouldClick: true, reason: 'keep_alive_suspense' }
+        }
+        return { shouldClick: false, reason: 'suspense_wait' }
+      }
+      return { shouldClick: true, reason: 'response_to_player' }
+    }
+
+    // Normal battle: ALWAYS click to maintain the game
+    // Add small variation for realism (98% click rate during battle)
+    if (Math.random() < 0.98) {
+      return { shouldClick: true, reason: 'battle_maintain' }
+    }
+    // 2% chance to skip, but only if timer has enough buffer
+    if (timeLeftMs > 30000) {
+      return { shouldClick: false, reason: 'battle_variance' }
+    }
+    // Timer too low, must click
+    return { shouldClick: true, reason: 'battle_keep_alive' }
   }
 
-  // PROBABILITÉS SELON LE TEMPS RESTANT
+  // FINAL PHASE but no battle started yet - start the battle!
   if (timeLeftMs <= FINAL_PHASE_THRESHOLD) {
-    // Phase finale (< 1 minute): très actif
+    // Always click to start/maintain final phase
     if (Math.random() < FINAL_PHASE_CLICK_CHANCE) {
-      return { shouldClick: true, reason: 'final_phase' }
+      return { shouldClick: true, reason: 'final_phase_start' }
+    }
+    // Even if we "skip", if timer is very low, must click
+    if (timeLeftMs <= 20000) {
+      return { shouldClick: true, reason: 'final_phase_keep_alive' }
     }
     return { shouldClick: false, reason: 'final_phase_skip' }
   }
 
+  // PROBABILITÉS SELON LE TEMPS RESTANT (hors phase finale)
   if (timeLeftMs <= INTERESTED_THRESHOLD) {
     // Intéressé (< 5 minutes): actif
     if (Math.random() < INTERESTED_CLICK_CHANCE) {
@@ -418,13 +443,14 @@ export async function GET(request: NextRequest) {
         })
 
         // Trigger final phase if time < 1 minute
+        // Use 65 seconds buffer to prevent race condition with 1-minute cron interval
         if (game.status === 'active' && timeLeft <= FINAL_PHASE_THRESHOLD) {
-          newEndTime = now + 60000 // Reset to 1 minute
+          newEndTime = now + 65000 // Reset to 1:05 (buffer for cron timing)
           newStatus = 'final_phase'
           shouldSetBattleStart = true
         } else if (game.status === 'final_phase') {
-          // In final phase, reset to 1 minute
-          newEndTime = now + 60000
+          // In final phase, reset to 1:05 (buffer for cron timing)
+          newEndTime = now + 65000
         }
       }
 
