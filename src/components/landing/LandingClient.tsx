@@ -151,10 +151,18 @@ export function LandingClient({
   const [menuClosing, setMenuClosing] = useState(false)
   const [isMounted, setIsMounted] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
+  const [isNavigating, setIsNavigating] = useState(false)
 
   async function handleSignOut() {
     await signOut()
     router.push('/login')
+  }
+
+  // Navigation with loading state for better UX
+  function handleCtaClick(e: React.MouseEvent, href: string) {
+    e.preventDefault()
+    setIsNavigating(true)
+    router.push(href)
   }
 
   // Pour le portal - attendre le montage côté client + detect mobile + prefetch auth pages
@@ -495,13 +503,24 @@ export function LandingClient({
           </div>
 
           {/* Single CTA - Full width */}
-          <Link
-            href={isLoggedIn ? '/lobby' : '/register'}
-            className="hero-cta w-full py-4 bg-gradient-to-r from-neon-purple to-neon-pink text-white font-black text-base rounded-xl text-center mb-3 block active:scale-95 active:opacity-90 transition-transform"
+          <button
+            onClick={(e) => handleCtaClick(e, isLoggedIn ? '/lobby' : '/register')}
+            disabled={isNavigating}
+            className="hero-cta w-full py-4 bg-gradient-to-r from-neon-purple to-neon-pink text-white font-black text-base rounded-xl text-center mb-3 block active:scale-95 active:opacity-90 transition-all disabled:opacity-80"
             style={{ boxShadow: '0 0 30px rgba(155, 92, 255, 0.4)' }}
           >
-            {isLoggedIn ? 'VOIR LES LOTS' : 'JOUER GRATUITEMENT'}
-          </Link>
+            {isNavigating ? (
+              <span className="inline-flex items-center gap-2">
+                <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                </svg>
+                Chargement...
+              </span>
+            ) : (
+              isLoggedIn ? 'VOIR LES LOTS' : 'JOUER GRATUITEMENT'
+            )}
+          </button>
 
           {/* Reassurance message */}
           <p className="text-[10px] text-white/40 text-center mb-6">
@@ -572,17 +591,30 @@ export function LandingClient({
             {/* CTA */}
             <div className="hero-cta flex flex-col gap-3 mb-12">
               <div className="flex gap-4">
-                <Link
-                  href={isLoggedIn ? '/lobby' : '/register'}
-                  className="gaming-btn-large group text-center"
+                <button
+                  onClick={(e) => handleCtaClick(e, isLoggedIn ? '/lobby' : '/register')}
+                  disabled={isNavigating}
+                  className="gaming-btn-large group text-center disabled:opacity-80"
                 >
                   <span className="relative z-10 flex items-center justify-center gap-2">
-                    {isLoggedIn ? 'VOIR LES LOTS' : 'JOUER GRATUITEMENT'}
-                    <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                    </svg>
+                    {isNavigating ? (
+                      <>
+                        <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                        </svg>
+                        Chargement...
+                      </>
+                    ) : (
+                      <>
+                        {isLoggedIn ? 'VOIR LES LOTS' : 'JOUER GRATUITEMENT'}
+                        <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                        </svg>
+                      </>
+                    )}
                   </span>
-                </Link>
+                </button>
                 <a
                   href="#how-it-works"
                   className="px-8 py-4 border-2 border-white/20 text-white font-bold hover:border-neon-blue/50 hover:text-neon-blue transition-all text-center focus:outline-none focus:ring-2 focus:ring-neon-blue/50"
@@ -1017,13 +1049,24 @@ export function LandingClient({
           </p>
 
           {/* CTA Button */}
-          <Link
-            href={isLoggedIn ? '/lobby' : '/register'}
-            className="w-full py-4 bg-gradient-to-r from-neon-purple to-neon-pink text-white font-black text-base rounded-xl text-center block mb-3 active:scale-95 active:opacity-90 transition-transform"
+          <button
+            onClick={(e) => handleCtaClick(e, isLoggedIn ? '/lobby' : '/register')}
+            disabled={isNavigating}
+            className="w-full py-4 bg-gradient-to-r from-neon-purple to-neon-pink text-white font-black text-base rounded-xl text-center block mb-3 active:scale-95 active:opacity-90 transition-all disabled:opacity-80"
             style={{ boxShadow: '0 0 30px rgba(155, 92, 255, 0.4)' }}
           >
-            {isLoggedIn ? 'VOIR LES LOTS' : 'JOUER GRATUITEMENT'}
-          </Link>
+            {isNavigating ? (
+              <span className="inline-flex items-center justify-center gap-2">
+                <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                </svg>
+                Chargement...
+              </span>
+            ) : (
+              isLoggedIn ? 'VOIR LES LOTS' : 'JOUER GRATUITEMENT'
+            )}
+          </button>
 
           {/* Reassurance */}
           <p className="text-[10px] text-white/40 mb-5">Aucun paiement requis • Lots réels livrés</p>
@@ -1089,18 +1132,31 @@ export function LandingClient({
 
           <div className="relative inline-block">
             <div className="absolute inset-0 bg-neon-purple rounded-full blur-xl animate-pulse opacity-60" style={{ transform: 'scale(1.1)' }} />
-            <Link
-              href={isLoggedIn ? '/lobby' : '/register'}
-              className="relative gaming-btn-large inline-flex items-center gap-3 group"
+            <button
+              onClick={(e) => handleCtaClick(e, isLoggedIn ? '/lobby' : '/register')}
+              disabled={isNavigating}
+              className="relative gaming-btn-large inline-flex items-center gap-3 group disabled:opacity-80"
               style={{ boxShadow: '0 0 40px rgba(155, 92, 255, 0.5), inset 0 0 20px rgba(255, 255, 255, 0.1)' }}
             >
               <span className="relative z-10 font-black tracking-wide">
-                {isLoggedIn ? 'VOIR LES LOTS' : 'JOUER GRATUITEMENT'}
+                {isNavigating ? (
+                  <span className="inline-flex items-center gap-2">
+                    <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                    </svg>
+                    Chargement...
+                  </span>
+                ) : (
+                  isLoggedIn ? 'VOIR LES LOTS' : 'JOUER GRATUITEMENT'
+                )}
               </span>
-              <svg className="w-5 h-5 relative z-10 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-              </svg>
-            </Link>
+              {!isNavigating && (
+                <svg className="w-5 h-5 relative z-10 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                </svg>
+              )}
+            </button>
           </div>
 
           <div className="mt-14 flex flex-wrap justify-center gap-4">
