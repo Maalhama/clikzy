@@ -1,0 +1,20 @@
+name: Create Rotation
+
+on:
+  schedule:
+    # Toutes les 3 heures (heures Paris: 0, 3, 6, 9, 12, 15, 18, 21)
+    # En UTC: 23, 2, 5, 8, 11, 14, 17, 20 (hiver) ou 22, 1, 4, 7, 10, 13, 16, 19 (été)
+    # On utilise les heures UTC qui couvrent les deux cas
+    - cron: '0 */3 * * *'
+  workflow_dispatch:
+
+jobs:
+  create-rotation:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create new rotation games
+        run: |
+          response=$(curl -sf -X POST "${{ secrets.SITE_URL }}/api/cron/create-rotation" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            -H "Content-Type: application/json")
+          echo "$response"
