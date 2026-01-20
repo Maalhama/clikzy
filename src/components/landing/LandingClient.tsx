@@ -157,11 +157,17 @@ export function LandingClient({
     router.push('/login')
   }
 
-  // Pour le portal - attendre le montage côté client + detect mobile
+  // Pour le portal - attendre le montage côté client + detect mobile + prefetch auth pages
   useEffect(() => {
     setIsMounted(true)
     setIsMobile(window.innerWidth < 768)
-  }, [])
+
+    // Prefetch auth pages for faster navigation
+    if (!isLoggedIn) {
+      router.prefetch('/register')
+      router.prefetch('/login')
+    }
+  }, [isLoggedIn, router])
 
   const closeMenu = () => {
     if (menuClosing) return
