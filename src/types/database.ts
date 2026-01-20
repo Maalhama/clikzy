@@ -91,6 +91,7 @@ export interface Database {
           total_clicks: number
           created_at: string
           ended_at: string | null
+          battle_start_time: string | null
         }
         Insert: {
           id?: string
@@ -107,6 +108,7 @@ export interface Database {
           total_clicks?: number
           created_at?: string
           ended_at?: string | null
+          battle_start_time?: string | null
         }
         Update: {
           id?: string
@@ -123,6 +125,7 @@ export interface Database {
           total_clicks?: number
           created_at?: string
           ended_at?: string | null
+          battle_start_time?: string | null
         }
       }
       clicks: {

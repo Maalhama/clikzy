@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { getNextRotationTime, DEFAULT_GAME_DURATION } from '@/lib/constants/rotation'
 
-// Cette route est appelée par Vercel Cron toutes les 3 heures
-// pour créer les jeux de la nouvelle rotation
+// Cette route crée les jeux pour la PROCHAINE rotation
+// Les jeux sont créés en 'waiting' et apparaissent dans "Bientôt" 15min avant
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
@@ -11,8 +12,6 @@ const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
 const CRON_SECRET = process.env.CRON_SECRET
 
 // Configuration
-const TIMEZONE = 'Europe/Paris'
-const DEFAULT_GAME_DURATION = 1 * 60 * 60 * 1000 // 1 heure
 const GAMES_PER_ROTATION = 18
 
 export async function GET(request: NextRequest) {
@@ -26,16 +25,9 @@ export async function GET(request: NextRequest) {
 
   try {
     const supabase = createClient(supabaseUrl, supabaseServiceKey)
-    const now = new Date()
 
-    // Calculer le start_time (maintenant, arrondi à l'heure)
-    const parisTime = new Date(now.toLocaleString('en-US', { timeZone: TIMEZONE }))
-    const startTime = new Date(parisTime)
-    startTime.setMinutes(0, 0, 0)
-
-    // Convertir en UTC pour stockage
-    const parisOffset = getParisOffset(startTime)
-    const utcStartTime = new Date(startTime.getTime() - parisOffset)
+    // Obtenir la prochaine rotation (utilise la fonction utilitaire)
+    const utcStartTime = getNextRotationTime()
 
     // Calculer end_time (1h après start_time)
     const endTime = utcStartTime.getTime() + DEFAULT_GAME_DURATION
@@ -75,10 +67,10 @@ export async function GET(request: NextRequest) {
     const shuffled = freeItems.sort(() => Math.random() - 0.5)
     const selectedItems = shuffled.slice(0, Math.min(GAMES_PER_ROTATION, shuffled.length))
 
-    // Créer les jeux
+    // Créer les jeux en status 'waiting' (seront activés par activate-games)
     const games = selectedItems.map(item => ({
       item_id: item.id,
-      status: 'active' as const,
+      status: 'waiting' as const,
       start_time: utcStartTime.toISOString(),
       end_time: endTime,
       initial_duration: DEFAULT_GAME_DURATION,
@@ -105,6 +97,13 @@ export async function GET(request: NextRequest) {
     const createdNames = createdGames?.map(g => getItemName(g.item)).join(', ') || ''
     console.log(`Created ${createdGames?.length || 0} games: ${createdNames}`)
 
+    // Calculer l'heure Paris pour le log
+    const parisFormatter = new Intl.DateTimeFormat('fr-FR', {
+      timeZone: 'Europe/Paris',
+      hour: '2-digit',
+      minute: '2-digit',
+    })
+
     return NextResponse.json({
       message: `Created ${createdGames?.length || 0} games for rotation`,
       created: createdGames?.length || 0,
@@ -115,7 +114,7 @@ export async function GET(request: NextRequest) {
       rotation: {
         startTime: utcStartTime.toISOString(),
         endTime: new Date(endTime).toISOString(),
-        parisHour: parisTime.getHours(),
+        parisTime: parisFormatter.format(utcStartTime),
       }
     })
   } catch (error) {
@@ -127,13 +126,4 @@ export async function GET(request: NextRequest) {
 // Support POST aussi
 export async function POST(request: NextRequest) {
   return GET(request)
-}
-
-/**
- * Obtient le décalage horaire de Paris (en ms)
- */
-function getParisOffset(date: Date): number {
-  const utcDate = new Date(date.toLocaleString('en-US', { timeZone: 'UTC' }))
-  const parisDate = new Date(date.toLocaleString('en-US', { timeZone: TIMEZONE }))
-  return parisDate.getTime() - utcDate.getTime()
 }

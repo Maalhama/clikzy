@@ -17,45 +17,82 @@ export const TIMEZONE = 'Europe/Paris'
 
 /**
  * Calcule la prochaine heure de rotation
- * @returns Date de la prochaine rotation
+ * @returns Date de la prochaine rotation (en UTC)
  */
 export function getNextRotationTime(): Date {
   const now = new Date()
 
-  // Obtenir l'heure actuelle à Paris
-  const parisTime = new Date(now.toLocaleString('en-US', { timeZone: TIMEZONE }))
-  const currentHour = parisTime.getHours()
-  const currentMinutes = parisTime.getMinutes()
+  // Obtenir l'heure actuelle à Paris via Intl
+  const parisFormatter = new Intl.DateTimeFormat('en-US', {
+    timeZone: TIMEZONE,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  })
 
-  // Trouver la prochaine heure de rotation
+  const parts = parisFormatter.formatToParts(now)
+  const getPart = (type: string) => parts.find(p => p.type === type)?.value || '0'
+
+  const currentHour = parseInt(getPart('hour'), 10)
+  const currentMinutes = parseInt(getPart('minute'), 10)
+  const currentDay = parseInt(getPart('day'), 10)
+  const currentMonth = parseInt(getPart('month'), 10) - 1 // JS months are 0-indexed
+  const currentYear = parseInt(getPart('year'), 10)
+
+  // Trouver la prochaine heure de rotation (strictement supérieure)
   let nextRotationHour = ROTATION_HOURS.find(h => h > currentHour)
 
-  // Si on est dans l'heure de rotation mais pas encore passé, vérifier les minutes
-  const currentRotationHour = ROTATION_HOURS.find(h => h === currentHour)
-  if (currentRotationHour !== undefined && currentMinutes < 1) {
-    // On est dans la minute de la rotation, c'est maintenant
-    nextRotationHour = currentRotationHour
+  // Si on est EXACTEMENT sur une heure de rotation et dans la première minute
+  const isExactlyOnRotation = ROTATION_HOURS.includes(currentHour as typeof ROTATION_HOURS[number]) && currentMinutes < 1
+  if (isExactlyOnRotation) {
+    nextRotationHour = currentHour as typeof ROTATION_HOURS[number]
   }
 
-  // Si pas de rotation aujourd'hui, prendre la première de demain
-  const isNextDay = nextRotationHour === undefined
+  // Si pas de rotation plus tard aujourd'hui, prendre la première de demain
+  let isNextDay = nextRotationHour === undefined
   if (isNextDay) {
     nextRotationHour = ROTATION_HOURS[0]
   }
 
-  // Construire la date de la prochaine rotation
-  const nextRotation = new Date(parisTime)
-  nextRotation.setHours(nextRotationHour!, 0, 0, 0)
+  // Construire la date en heure Paris
+  // On crée d'abord la date en UTC puis on ajuste pour Paris
+  const targetDate = new Date(Date.UTC(currentYear, currentMonth, currentDay, nextRotationHour!, 0, 0, 0))
 
   if (isNextDay) {
-    nextRotation.setDate(nextRotation.getDate() + 1)
+    targetDate.setUTCDate(targetDate.getUTCDate() + 1)
   }
 
-  // Convertir de Paris vers UTC
-  const parisOffset = getParisOffset(nextRotation)
-  const utcRotation = new Date(nextRotation.getTime() - parisOffset)
+  // Calculer l'offset Paris (en heures) pour cette date
+  // Paris est UTC+1 en hiver, UTC+2 en été
+  const parisOffset = getParisOffsetHours(targetDate)
 
-  return utcRotation
+  // Soustraire l'offset pour obtenir l'heure UTC
+  // Ex: 15h Paris = 15h - 1h = 14h UTC (en hiver)
+  targetDate.setUTCHours(targetDate.getUTCHours() - parisOffset)
+
+  return targetDate
+}
+
+/**
+ * Obtient l'offset Paris en heures (1 en hiver, 2 en été)
+ */
+function getParisOffsetHours(date: Date): number {
+  // Créer deux strings formatées pour comparer
+  const utcString = date.toLocaleString('en-US', { timeZone: 'UTC', hour: '2-digit', hour12: false })
+  const parisString = date.toLocaleString('en-US', { timeZone: TIMEZONE, hour: '2-digit', hour12: false })
+
+  const utcHour = parseInt(utcString, 10)
+  const parisHour = parseInt(parisString, 10)
+
+  // Gérer le cas où on traverse minuit
+  let diff = parisHour - utcHour
+  if (diff < -12) diff += 24
+  if (diff > 12) diff -= 24
+
+  return diff
 }
 
 /**

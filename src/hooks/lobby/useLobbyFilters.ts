@@ -107,11 +107,18 @@ export function useLobbyFilters(games: GameWithFinalPhaseTracking[], options: Us
 
     // Apply filter
     switch (currentFilter) {
+      case 'all':
+        // "Toutes" = only active games (NOT waiting, NOT ended)
+        filtered = filtered.filter((game) => {
+          return game.status !== 'waiting' && game.status !== 'ended' && game.end_time > sortTime
+        })
+        break
       case 'favorites':
-        filtered = filtered.filter((game) => favorites.includes(game.id))
+        filtered = filtered.filter((game) => favorites.includes(game.id) && game.status !== 'waiting')
         break
       case 'urgent':
         filtered = filtered.filter((game) => {
+          if (game.status === 'waiting') return false
           const timeLeft = game.end_time ? game.end_time - sortTime : 0
           return timeLeft > 0 && timeLeft <= FINAL_PHASE_THRESHOLD
         })
@@ -130,7 +137,7 @@ export function useLobbyFilters(games: GameWithFinalPhaseTracking[], options: Us
         break
       case 'high_value':
         filtered = filtered.filter(
-          (game) => (game.item?.retail_value ?? 0) >= HIGH_VALUE_THRESHOLD
+          (game) => game.status !== 'waiting' && (game.item?.retail_value ?? 0) >= HIGH_VALUE_THRESHOLD
         )
         break
       case 'ended':

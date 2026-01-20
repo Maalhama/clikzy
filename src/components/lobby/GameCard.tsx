@@ -305,6 +305,28 @@ export const GameCard = memo(function GameCard({ game, index = 0, isFavorite = f
   }, [game.id, game.last_click_username, game.total_clicks])
   const isWaiting = game.status === 'waiting'
 
+  // Timer countdown for waiting games (time until start_time)
+  const [timeUntilStart, setTimeUntilStart] = useState<number>(() => {
+    if (!isWaiting || !('start_time' in game) || !game.start_time) return 0
+    const startTime = new Date(game.start_time).getTime()
+    return Math.max(0, startTime - Date.now())
+  })
+
+  // Update countdown for waiting games
+  useEffect(() => {
+    if (!isWaiting || !('start_time' in game) || !game.start_time) return
+
+    const startTime = new Date(game.start_time).getTime()
+
+    const updateCountdown = () => {
+      setTimeUntilStart(Math.max(0, startTime - Date.now()))
+    }
+
+    updateCountdown()
+    const interval = setInterval(updateCountdown, 1000)
+    return () => clearInterval(interval)
+  }, [isWaiting, game])
+
   // Stagger animation delay
   const animationDelay = `${index * 50}ms`
 
@@ -343,6 +365,13 @@ export const GameCard = memo(function GameCard({ game, index = 0, isFavorite = f
         border: '1.5px solid transparent',
       }
     }
+    if (isWaiting) {
+      // Purple gradient for waiting (Bientôt)
+      return {
+        background: `linear-gradient(${cardBg}, ${cardBg}) padding-box, linear-gradient(135deg, #9B5CFF, #7C3AED, #9B5CFF) border-box`,
+        border: '1.5px solid transparent',
+      }
+    }
     if (isCritical || isUrgent) {
       // Red gradient for urgent
       return {
@@ -355,15 +384,15 @@ export const GameCard = memo(function GameCard({ game, index = 0, isFavorite = f
       background: `linear-gradient(${cardBg}, ${cardBg}) padding-box, linear-gradient(135deg, #FF4FD8, #9B5CFF, #3CCBFF) border-box`,
       border: '1.5px solid transparent',
     }
-  }, [isEnded, isCritical, isUrgent])
+  }, [isEnded, isWaiting, isCritical, isUrgent])
 
   return (
     <Link
       ref={cardRef}
-      href={isEnded ? '#' : `/game/${game.id}`}
+      href={(isEnded || isWaiting) ? '#' : `/game/${game.id}`}
       className={cardClasses}
       style={{ animationDelay, ...borderStyle }}
-      onClick={isEnded ? (e) => e.preventDefault() : undefined}
+      onClick={(isEnded || isWaiting) ? (e) => e.preventDefault() : undefined}
     >
       {/* Favorite button */}
       {onToggleFavorite && (
@@ -433,8 +462,20 @@ export const GameCard = memo(function GameCard({ game, index = 0, isFavorite = f
         </div>
       )}
 
+      {/* Waiting badge (Bientôt) */}
+      {isWaiting && (
+        <div className="absolute top-3 right-3 z-20">
+          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-white text-xs font-bold bg-neon-purple/90">
+            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            BIENTÔT
+          </div>
+        </div>
+      )}
+
       {/* Urgent badge */}
-      {isUrgent && !isEnded && (
+      {isUrgent && !isEnded && !isWaiting && (
         <div className="absolute top-3 right-3 z-20 flex items-center gap-1.5">
           {/* Duration badge */}
           {finalPhaseDuration > 0 && !isCritical && (
@@ -588,14 +629,16 @@ export const GameCard = memo(function GameCard({ game, index = 0, isFavorite = f
           >
             <div className="flex items-center justify-between">
               <span className="text-xs text-white/50 uppercase tracking-wider">
-                {isWaiting ? 'Bientot' : isUrgent ? 'Fonce !' : 'Temps restant'}
+                {isWaiting ? 'Disponible dans' : isUrgent ? 'Fonce !' : 'Temps restant'}
               </span>
               <span
                 suppressHydrationWarning
                 className={`
                   font-mono font-bold text-2xl tracking-tight
                   ${
-                    isCritical
+                    isWaiting
+                      ? 'text-neon-purple'
+                      : isCritical
                       ? 'text-danger animate-pulse'
                       : isUrgent
                       ? 'text-danger'
@@ -603,7 +646,7 @@ export const GameCard = memo(function GameCard({ game, index = 0, isFavorite = f
                   }
                 `}
               >
-                {isWaiting ? '--:--' : formatTime(timeLeft)}
+                {isWaiting ? formatTime(timeUntilStart) : formatTime(timeLeft)}
               </span>
             </div>
 
@@ -676,6 +719,13 @@ export const GameCard = memo(function GameCard({ game, index = 0, isFavorite = f
               <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
             <span className="text-success/80 font-medium">Partie terminée</span>
+          </div>
+        ) : isWaiting ? (
+          <div className="py-3 rounded-xl text-center font-bold text-sm bg-neon-purple/20 text-neon-purple border border-neon-purple/30 flex items-center justify-center gap-2">
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            BIENTÔT DISPONIBLE
           </div>
         ) : (
           <div
