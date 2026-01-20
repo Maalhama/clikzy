@@ -70,7 +70,7 @@ export const LobbyHeader = memo(function LobbyHeader({
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
               <span className="text-xs text-neon-purple font-medium">
-                Nouveaux produits tous les jours a 19h00
+                Nouveaux produits toutes les 3 heures
               </span>
             </div>
           </div>

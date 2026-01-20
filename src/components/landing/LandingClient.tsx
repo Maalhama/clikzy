@@ -409,7 +409,7 @@ export function LandingClient({
           <p className="hero-subtitle text-sm text-white/60 mb-4 max-w-[300px]">
             Le dernier clic remporte le lot. Rejoins des milliers de joueurs et tente de remporter ta récompense.
             <span className="block text-neon-blue font-semibold mt-1">10 clics gratuits chaque jour.</span>
-            <span className="block text-neon-purple text-xs mt-1">Nouveaux produits tous les jours a 19h00</span>
+            <span className="block text-neon-purple text-xs mt-1">Nouveaux produits toutes les 3 heures</span>
           </p>
 
           {/* Mini Prize Showcase - Mobile - Infinite Marquee */}
@@ -556,7 +556,7 @@ export function LandingClient({
             <p className="hero-subtitle text-lg text-white/70 max-w-lg mb-8">
               Le dernier clic remporte le lot. Rejoins des milliers de joueurs et tente de remporter ta récompense.
               <span className="block text-neon-blue font-semibold mt-2">10 clics gratuits chaque jour.</span>
-              <span className="block text-neon-purple text-sm mt-1">Nouveaux produits tous les jours a 19h00</span>
+              <span className="block text-neon-purple text-sm mt-1">Nouveaux produits toutes les 3 heures</span>
             </p>
 
             {/* CTA */}
