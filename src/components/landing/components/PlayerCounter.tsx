@@ -3,6 +3,7 @@
 import { useRef, useEffect, useState } from 'react'
 import { useGSAP } from '@gsap/react'
 import { gsap } from '@/lib/gsap/gsapConfig'
+import { useIsMobile } from '@/hooks/useIsMobile'
 
 interface PlayerCounterProps {
   count: number
@@ -29,6 +30,7 @@ export function PlayerCounter({
   const dotRef = useRef<HTMLSpanElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const [displayCount, setDisplayCount] = useState(count)
+  const isMobile = useIsMobile()
 
   // Animate count changes
   useEffect(() => {
@@ -45,10 +47,10 @@ export function PlayerCounter({
     })
   }, [count, displayCount])
 
-  // Pulsing dot animation with glow
+  // Pulsing dot animation with glow - disabled on mobile
   useGSAP(
     () => {
-      if (!dotRef.current) return
+      if (!dotRef.current || isMobile) return
 
       gsap.to(dotRef.current, {
         scale: 1.8,
@@ -59,13 +61,13 @@ export function PlayerCounter({
         yoyo: true,
       })
     },
-    { scope: dotRef }
+    { scope: dotRef, dependencies: [isMobile] }
   )
 
-  // Subtle container glow pulse
+  // Subtle container glow pulse - disabled on mobile
   useGSAP(
     () => {
-      if (!containerRef.current) return
+      if (!containerRef.current || isMobile) return
 
       gsap.to(containerRef.current, {
         boxShadow: '0 0 20px rgba(0, 255, 136, 0.3), inset 0 0 15px rgba(0, 255, 136, 0.05)',
@@ -75,7 +77,7 @@ export function PlayerCounter({
         yoyo: true,
       })
     },
-    { scope: containerRef }
+    { scope: containerRef, dependencies: [isMobile] }
   )
 
   return (
@@ -126,10 +128,18 @@ interface ClickNotificationProps {
 
 export function ClickNotification({ username, onComplete }: ClickNotificationProps) {
   const notifRef = useRef<HTMLDivElement>(null)
+  const isMobile = useIsMobile()
 
   useGSAP(
     () => {
       if (!notifRef.current) return
+
+      // Simplified animation on mobile
+      if (isMobile) {
+        gsap.set(notifRef.current, { opacity: 1 })
+        gsap.to(notifRef.current, { opacity: 0, duration: 0.2, delay: 3, onComplete })
+        return
+      }
 
       const tl = gsap.timeline({
         onComplete,
@@ -145,7 +155,7 @@ export function ClickNotification({ username, onComplete }: ClickNotificationPro
         '+=2'
       )
     },
-    { scope: notifRef }
+    { scope: notifRef, dependencies: [isMobile] }
   )
 
   return (
@@ -217,12 +227,22 @@ export function StatsCounter({
   const valueRef = useRef<HTMLSpanElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const [hasAnimated, setHasAnimated] = useState(false)
+  const isMobile = useIsMobile()
 
   const colors = colorStyles[color]
 
   useGSAP(
     () => {
       if (!valueRef.current || !containerRef.current || hasAnimated) return
+
+      // On mobile, show value instantly without animation
+      if (isMobile) {
+        if (valueRef.current) {
+          valueRef.current.textContent = `${prefix}${Math.round(value).toLocaleString()}${suffix}`
+        }
+        setHasAnimated(true)
+        return
+      }
 
       const observer = new IntersectionObserver(
         (entries) => {
@@ -251,7 +271,7 @@ export function StatsCounter({
 
       return () => observer.disconnect()
     },
-    { scope: containerRef, dependencies: [value, hasAnimated] }
+    { scope: containerRef, dependencies: [value, hasAnimated, isMobile] }
   )
 
   return (
