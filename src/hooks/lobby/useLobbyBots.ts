@@ -12,7 +12,15 @@ const BOT_COUNT = 200
 
 // Durée de bataille (avant de laisser quelqu'un gagner)
 const MIN_BATTLE_DURATION = 30 * 60 * 1000   // 30 minutes minimum
-const MAX_BATTLE_DURATION = 5 * 60 * 60 * 1000 // 5 heures maximum
+const MAX_BATTLE_DURATION = 119 * 60 * 1000  // 1h59 maximum
+
+// Phase de ralentissement progressif avant fin de bataille
+const WIND_DOWN_DURATION = 5 * 60 * 1000     // 5 minutes de ralentissement
+const WIND_DOWN_CLICK_CHANCE = 0.3           // 30% de chance pendant le ralentissement
+
+// Réponse intelligente aux vrais joueurs (dopamine)
+const SUSPENSE_THRESHOLD = 10 * 1000         // Attendre que le timer soit < 10s
+const SUSPENSE_CHANCE = 0.7                  // 70% du temps, attendre le suspense
 
 // Seuils de temps pour le comportement des bots
 const FINAL_PHASE_THRESHOLD = 60 * 1000      // < 1 minute = phase finale (bataille intense)
@@ -76,6 +84,7 @@ interface BattleState {
   startTime: number
   duration: number  // Random duration between MIN and MAX
   ended: boolean
+  windingDown: boolean  // Phase de ralentissement progressif
 }
 
 // Timing individuel par jeu
@@ -185,6 +194,7 @@ export function useLobbyBots(
         startTime: 0,
         duration: MIN_BATTLE_DURATION + Math.random() * (MAX_BATTLE_DURATION - MIN_BATTLE_DURATION),
         ended: false,
+        windingDown: false,
       }
     }
     return battleStatesRef.current[gameId]
@@ -219,13 +229,26 @@ export function useLobbyBots(
     return gameTimingsRef.current[gameId]
   }, [getRandomDelay])
 
-  // Check if battle should end (let someone win)
+  // Check if battle should end (let someone win) - avec ralentissement progressif
   const shouldEndBattle = useCallback((gameId: string): boolean => {
     const battle = getBattleState(gameId)
     if (battle.ended) return true
     if (battle.startTime === 0) return false // Battle hasn't started yet
 
     const battleDuration = Date.now() - battle.startTime
+    const timeUntilEnd = battle.duration - battleDuration
+
+    // Phase de ralentissement progressif (5 dernières minutes)
+    if (timeUntilEnd <= WIND_DOWN_DURATION && timeUntilEnd > 0) {
+      battle.windingDown = true
+      // Pendant le ralentissement, 70% de chance de ne PAS cliquer
+      if (Math.random() > WIND_DOWN_CLICK_CHANCE) {
+        return true // Skip ce clic (mais bataille pas encore finie)
+      }
+      return false // Peut encore cliquer
+    }
+
+    // Bataille complètement terminée
     if (battleDuration >= battle.duration) {
       battle.ended = true
       return true
@@ -235,8 +258,15 @@ export function useLobbyBots(
 
   // Decide if bot should click based on time left (INTELLIGENCE)
   const shouldBotClick = useCallback((timeLeftMs: number, isResponseToPlayer: boolean): boolean => {
-    // ALWAYS respond to real players in final phase (never let them win easily)
+    // RÉPONSE INTELLIGENTE aux vrais joueurs (dopamine!)
+    // 70% du temps, attendre que le timer soit < 10 secondes
     if (isResponseToPlayer && timeLeftMs <= FINAL_PHASE_THRESHOLD) {
+      // Si timer > 10 secondes ET on veut créer du suspense (70% du temps)
+      if (timeLeftMs > SUSPENSE_THRESHOLD && Math.random() < SUSPENSE_CHANCE) {
+        return false // Attendre encore, laisser le joueur stresser
+      }
+      // Timer < 10 secondes OU on a décidé de ne pas attendre (30%)
+      // Répondre avec haute probabilité
       return Math.random() < PLAYER_RESPONSE_CHANCE
     }
 
