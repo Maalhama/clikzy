@@ -3,7 +3,7 @@
 import { useRef, useEffect, useState } from 'react'
 import { useGSAP } from '@gsap/react'
 import { gsap } from '@/lib/gsap/gsapConfig'
-import { useIsMobile } from '@/hooks/useIsMobile'
+import { checkIsMobile } from '@/hooks/useIsMobile'
 
 interface PlayerCounterProps {
   count: number
@@ -30,7 +30,6 @@ export function PlayerCounter({
   const dotRef = useRef<HTMLSpanElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const [displayCount, setDisplayCount] = useState(count)
-  const isMobile = useIsMobile()
 
   // Animate count changes
   useEffect(() => {
@@ -50,7 +49,7 @@ export function PlayerCounter({
   // Pulsing dot animation with glow - disabled on mobile
   useGSAP(
     () => {
-      if (!dotRef.current || isMobile) return
+      if (!dotRef.current || checkIsMobile()) return
 
       gsap.to(dotRef.current, {
         scale: 1.8,
@@ -61,13 +60,13 @@ export function PlayerCounter({
         yoyo: true,
       })
     },
-    { scope: dotRef, dependencies: [isMobile] }
+    { scope: dotRef }
   )
 
   // Subtle container glow pulse - disabled on mobile
   useGSAP(
     () => {
-      if (!containerRef.current || isMobile) return
+      if (!containerRef.current || checkIsMobile()) return
 
       gsap.to(containerRef.current, {
         boxShadow: '0 0 20px rgba(0, 255, 136, 0.3), inset 0 0 15px rgba(0, 255, 136, 0.05)',
@@ -77,7 +76,7 @@ export function PlayerCounter({
         yoyo: true,
       })
     },
-    { scope: containerRef, dependencies: [isMobile] }
+    { scope: containerRef }
   )
 
   return (
@@ -128,14 +127,13 @@ interface ClickNotificationProps {
 
 export function ClickNotification({ username, onComplete }: ClickNotificationProps) {
   const notifRef = useRef<HTMLDivElement>(null)
-  const isMobile = useIsMobile()
 
   useGSAP(
     () => {
       if (!notifRef.current) return
 
       // Simplified animation on mobile
-      if (isMobile) {
+      if (checkIsMobile()) {
         gsap.set(notifRef.current, { opacity: 1 })
         gsap.to(notifRef.current, { opacity: 0, duration: 0.2, delay: 3, onComplete })
         return
@@ -155,7 +153,7 @@ export function ClickNotification({ username, onComplete }: ClickNotificationPro
         '+=2'
       )
     },
-    { scope: notifRef, dependencies: [isMobile] }
+    { scope: notifRef }
   )
 
   return (
@@ -227,7 +225,6 @@ export function StatsCounter({
   const valueRef = useRef<HTMLSpanElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const [hasAnimated, setHasAnimated] = useState(false)
-  const isMobile = useIsMobile()
 
   const colors = colorStyles[color]
 
@@ -236,7 +233,7 @@ export function StatsCounter({
       if (!valueRef.current || !containerRef.current || hasAnimated) return
 
       // On mobile, show value instantly without animation
-      if (isMobile) {
+      if (checkIsMobile()) {
         if (valueRef.current) {
           valueRef.current.textContent = `${prefix}${Math.round(value).toLocaleString()}${suffix}`
         }
@@ -271,7 +268,7 @@ export function StatsCounter({
 
       return () => observer.disconnect()
     },
-    { scope: containerRef, dependencies: [value, hasAnimated, isMobile] }
+    { scope: containerRef, dependencies: [value, hasAnimated] }
   )
 
   return (
