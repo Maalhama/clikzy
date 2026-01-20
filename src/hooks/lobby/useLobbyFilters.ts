@@ -109,10 +109,8 @@ export function useLobbyFilters(games: GameWithFinalPhaseTracking[], options: Us
     switch (currentFilter) {
       case 'all':
         // "Toutes" = only active games (NOT waiting, NOT ended)
-        // NOTE: Don't filter by end_time because bots reset it server-side every 60s
-        // The game status is the source of truth, not the client-side timer
         filtered = filtered.filter((game) => {
-          return game.status !== 'waiting' && game.status !== 'ended'
+          return game.status !== 'waiting' && game.status !== 'ended' && game.end_time > sortTime
         })
         break
       case 'favorites':
@@ -143,17 +141,18 @@ export function useLobbyFilters(games: GameWithFinalPhaseTracking[], options: Us
         )
         break
       case 'ended':
-        // Only use status, not end_time (bots reset end_time server-side)
         filtered = filtered.filter((game) => {
-          return game.status === 'ended'
+          return game.status === 'ended' || game.end_time <= sortTime
         })
         break
     }
 
     // Helper: check if game is ended for SORTING purposes
-    // NOTE: Only use DB status, not end_time (bots reset end_time server-side)
+    // Uses captured sortTime for stability - a game is "ended" if:
+    // 1. DB status is 'ended', OR
+    // 2. Timer has expired (end_time <= sortTime)
     const isGameEndedForSort = (game: GameWithFinalPhaseTracking) => {
-      return game.status === 'ended'
+      return game.status === 'ended' || game.end_time <= sortTime
     }
 
     // Helper: check if game is in final phase (< 60s remaining)
@@ -302,9 +301,10 @@ export function useLobbyFilters(games: GameWithFinalPhaseTracking[], options: Us
       (g) => (g.item?.retail_value ?? 0) >= HIGH_VALUE_THRESHOLD
     ).length
 
-    // Ended = DB status only (bots reset timer server-side)
+    // Ended = timer expired OR status is ended
     const endedCount = games.filter((g) => {
-      return g.status === 'ended'
+      const timeLeft = g.end_time ? g.end_time - now : 0
+      return g.status === 'ended' || timeLeft <= 0
     }).length
 
     // Favorites count
