@@ -138,9 +138,22 @@ export function GameClient({
   userId,
   recentClicks: initialClicks,
 }: GameClientProps) {
-  const { game, isConnected, optimisticUpdate } = useGame(initialGame)
+  // useGame now provides recentClicks from DB (synced with lobby)
+  const { game, recentClicks: dbClicks, isConnected, optimisticUpdate, addClick, removeClick } = useGame(initialGame)
   const { credits, decrementCredits } = useCredits()
-  const [recentClicks, setRecentClicks] = useState(initialClicks)
+
+  // Merge initial clicks with DB clicks, prioritizing DB
+  const recentClicks = useMemo(() => {
+    const dbIds = new Set(dbClicks.map(c => c.id))
+    const uniqueInitial = initialClicks.filter(c => !dbIds.has(c.id))
+    // Convert dbClicks to the expected format
+    const formattedDbClicks = dbClicks.map(c => ({
+      id: c.id,
+      username: c.username,
+      clickedAt: c.clickedAt,
+    }))
+    return [...formattedDbClicks, ...uniqueInitial].slice(0, 10)
+  }, [dbClicks, initialClicks])
   const [isPending, startTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
   const [showWinnerModal, setShowWinnerModal] = useState(false)
@@ -198,32 +211,18 @@ export function GameClient({
     initialLastUser: game.last_click_username,
   })
 
-  // Apply cached bot data from lobby (synced via localStorage)
+  // Apply cached game state from lobby (for fast sync between DB updates)
+  // Note: Click feed is now from DB via useGame, not localStorage
   useEffect(() => {
     if (!cachedData) return
 
-    // Check if cache has newer data than current game state
+    // Check if cache has newer game state
     const hasNewerClicks = cachedData.totalClicks > game.total_clicks
     const hasNewerLeader = cachedData.lastUser && cachedData.lastUser !== game.last_click_username
     const hasNewerEndTime = cachedData.endTime && cachedData.endTime > game.end_time
 
     if (hasNewerClicks || hasNewerLeader || hasNewerEndTime) {
-      // Add bot clicks to recent clicks feed
-      if (cachedData.recentClicks.length > 0) {
-        const newBotClicks = cachedData.recentClicks.map(click => ({
-          id: click.id,
-          username: click.username,
-          clickedAt: new Date(click.timestamp).toISOString(),
-        }))
-        setRecentClicks(prev => {
-          // Merge and dedupe by id
-          const existingIds = new Set(prev.map(c => c.id))
-          const uniqueNew = newBotClicks.filter(c => !existingIds.has(c.id))
-          return [...uniqueNew, ...prev].slice(0, 10)
-        })
-      }
-
-      // Update game state with cached data
+      // Update game state with cached data (fast sync)
       optimisticUpdate({
         last_click_username: cachedData.lastUser || game.last_click_username,
         total_clicks: Math.max(cachedData.totalClicks, game.total_clicks),
@@ -253,8 +252,8 @@ export function GameClient({
     const now = new Date().toISOString()
     decrementCredits(GAME_CONSTANTS.CREDIT_COST_PER_CLICK)
 
-    const newClick = { id: generateId(), username, clickedAt: now }
-    setRecentClicks(prev => [newClick, ...prev.slice(0, 9)])
+    const newClick = { id: generateId(), username, clickedAt: now, isBot: false }
+    addClick(newClick)
 
     const currentTimeLeft = game.end_time - Date.now()
     let newEndTime = game.end_time
@@ -286,11 +285,11 @@ export function GameClient({
       if (!result.success) {
         // Refund credit by decrementing a negative amount
         decrementCredits(-GAME_CONSTANTS.CREDIT_COST_PER_CLICK)
-        setRecentClicks(prev => prev.filter(c => c.id !== newClick.id))
+        removeClick(newClick.id)
         setError(result.error || 'Une erreur est survenue')
       }
     })
-  }, [isPending, hasCredits, canClick, playClick, triggerHaptic, username, game, optimisticUpdate, decrementCredits])
+  }, [isPending, hasCredits, canClick, playClick, triggerHaptic, username, game, optimisticUpdate, decrementCredits, addClick, removeClick])
 
   // Border gradient style (same as lobby cards)
   const borderStyle = useMemo(() => {
