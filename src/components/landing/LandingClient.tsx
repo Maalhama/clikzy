@@ -445,6 +445,7 @@ export function LandingClient({
                       fill
                       className="object-contain p-1"
                       sizes="56px"
+                      priority={i < 3} // Prioritize first 3 for LCP on mobile
                     />
                   </div>
                   <div className="text-[9px] text-white/70 truncate">{prize.name}</div>

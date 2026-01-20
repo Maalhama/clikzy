@@ -200,6 +200,7 @@ export function FloatingPrizes() {
                         className="object-contain p-2 transition-transform duration-300 group-hover:scale-110"
                         onError={() => handleImageError(prize.id)}
                         sizes={isMain ? '(max-width: 768px) 200px, 300px' : '(max-width: 768px) 100px, 150px'}
+                        priority={index < 2} // Prioritize first 2 images for LCP
                       />
                     </div>
                   )}

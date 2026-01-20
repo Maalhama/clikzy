@@ -31,17 +31,56 @@ interface FeaturedItem {
 
 async function getLandingData() {
   const supabase = await createClient()
+  const now = Date.now()
 
-  // Fetch recent winners
-  const { data: winnersData } = await supabase
-    .from('winners')
-    .select('id, item_name, item_value, won_at, user_id')
-    .order('won_at', { ascending: false })
-    .limit(10)
+  // Run all independent queries in parallel for faster data fetching
+  const [
+    winnersResult,
+    gameResult,
+    statsResult,
+    winningsResult,
+    fallbackItemResult,
+  ] = await Promise.all([
+    // Fetch recent winners
+    supabase
+      .from('winners')
+      .select('id, item_name, item_value, won_at, user_id')
+      .order('won_at', { ascending: false })
+      .limit(10),
 
-  const typedWinners = winnersData as Pick<DbWinner, 'id' | 'item_name' | 'item_value' | 'won_at' | 'user_id'>[] | null
+    // Fetch featured game
+    supabase
+      .from('games')
+      .select('id, end_time, total_clicks, last_click_username, status, item_id')
+      .in('status', ['active', 'final_phase'])
+      .gt('end_time', now)
+      .order('end_time', { ascending: true })
+      .limit(1)
+      .single(),
 
-  // Fetch profiles for winners
+    // Fetch total games count
+    supabase
+      .from('games')
+      .select('*', { count: 'exact', head: true })
+      .eq('status', 'ended'),
+
+    // Fetch total winnings
+    supabase
+      .from('winners')
+      .select('item_value'),
+
+    // Fetch fallback item (in case no active game)
+    supabase
+      .from('items')
+      .select('name, image_url, retail_value, description')
+      .order('retail_value', { ascending: false })
+      .limit(1)
+      .single(),
+  ])
+
+  const typedWinners = winnersResult.data as Pick<DbWinner, 'id' | 'item_name' | 'item_value' | 'won_at' | 'user_id'>[] | null
+
+  // Fetch profiles for winners (depends on winners result)
   const userIds = typedWinners ? typedWinners.map((w) => w.user_id).filter(Boolean) : []
   const { data: profilesData } = userIds.length > 0
     ? await supabase
@@ -67,24 +106,13 @@ async function getLandingData() {
     }
   })
 
-  // Fetch featured game - the one ending soonest (for urgent timer)
-  const now = Date.now()
-  const { data: gameData } = await supabase
-    .from('games')
-    .select('id, end_time, total_clicks, last_click_username, status, item_id')
-    .in('status', ['active', 'final_phase'])
-    .gt('end_time', now) // Only games that haven't ended
-    .order('end_time', { ascending: true }) // Get the one ending soonest
-    .limit(1)
-    .single()
-
-  const typedGame = gameData as Pick<Game, 'id' | 'end_time' | 'total_clicks' | 'last_click_username' | 'status' | 'item_id'> | null
+  const typedGame = gameResult.data as Pick<Game, 'id' | 'end_time' | 'total_clicks' | 'last_click_username' | 'status' | 'item_id'> | null
 
   let featuredGame: FeaturedGame | null = null
   let featuredItem: FeaturedItem | null = null
 
   if (typedGame && typedGame.item_id) {
-    // Fetch the item separately
+    // Fetch the item for the featured game
     const { data: itemData } = await supabase
       .from('items')
       .select('name, image_url, retail_value')
@@ -112,16 +140,9 @@ async function getLandingData() {
     }
   }
 
-  // If no active game, try to get any item for showcase
+  // Use fallback item if no active game
   if (!featuredItem) {
-    const { data: itemData } = await supabase
-      .from('items')
-      .select('name, image_url, retail_value, description')
-      .order('retail_value', { ascending: false })
-      .limit(1)
-      .single()
-
-    const typedFallbackItem = itemData as Pick<Item, 'name' | 'image_url' | 'retail_value' | 'description'> | null
+    const typedFallbackItem = fallbackItemResult.data as Pick<Item, 'name' | 'image_url' | 'retail_value' | 'description'> | null
 
     if (typedFallbackItem) {
       featuredItem = {
@@ -133,17 +154,8 @@ async function getLandingData() {
     }
   }
 
-  // Fetch stats
-  const { count: totalGames } = await supabase
-    .from('games')
-    .select('*', { count: 'exact', head: true })
-    .eq('status', 'ended')
-
-  const { data: totalWinningsData } = await supabase
-    .from('winners')
-    .select('item_value')
-
-  const typedWinningsData = totalWinningsData as Pick<DbWinner, 'item_value'>[] | null
+  // Process stats
+  const typedWinningsData = winningsResult.data as Pick<DbWinner, 'item_value'>[] | null
   const totalWinningsValue = (typedWinningsData || []).reduce(
     (sum, w) => sum + (w.item_value || 0),
     0
@@ -154,8 +166,8 @@ async function getLandingData() {
     featuredGame,
     featuredItem,
     stats: {
-      totalWinningsValue: totalWinningsValue || 15000, // Fallback demo value
-      totalGames: totalGames || 50, // Fallback demo value
+      totalWinningsValue: totalWinningsValue || 15000,
+      totalGames: statsResult.count || 50,
     },
   }
 }
