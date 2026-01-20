@@ -273,14 +273,17 @@ export function useLobbyFilters(games: GameWithFinalPhaseTracking[], options: Us
   const stats = useMemo(() => {
     const now = Date.now()
 
-    // Active = timer not expired
+    // Active = timer > 1 minute (NOT in final phase, NOT ended, NOT waiting)
     const activeCount = games.filter((g) => {
+      if (g.status === 'ended' || g.status === 'waiting') return false
       const timeLeft = g.end_time ? g.end_time - now : 0
-      return timeLeft > 0 && g.status !== 'ended'
+      // Only count if timer > 1 minute (60000ms)
+      return timeLeft > FINAL_PHASE_THRESHOLD
     }).length
 
-    // Urgent = in final phase (< 60s remaining)
+    // Urgent = in final phase (< 60s remaining, but still active)
     const urgentCount = games.filter((g) => {
+      if (g.status === 'ended' || g.status === 'waiting') return false
       const timeLeft = g.end_time ? calculateTimeLeft(g.end_time) : 0
       return timeLeft > 0 && timeLeft <= FINAL_PHASE_THRESHOLD
     }).length
