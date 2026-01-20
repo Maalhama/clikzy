@@ -2,10 +2,8 @@ name: Create Rotation
 
 on:
   schedule:
-    # Toutes les 3 heures (heures Paris: 0, 3, 6, 9, 12, 15, 18, 21)
-    # En UTC: 23, 2, 5, 8, 11, 14, 17, 20 (hiver) ou 22, 1, 4, 7, 10, 13, 16, 19 (été)
-    # On utilise les heures UTC qui couvrent les deux cas
-    - cron: '0 */3 * * *'
+    # À :45 chaque heure pour créer les jeux 15min avant chaque rotation
+    - cron: '45 * * * *'
   workflow_dispatch:
 
 jobs:
