@@ -180,8 +180,11 @@ export function LandingClient({
   // GSAP Animations - Skip on mobile for performance
   useGSAP(
     () => {
+      // Check window width directly to avoid state timing issues
+      const isMobileDevice = typeof window !== 'undefined' && window.innerWidth < 768
+
       // Skip all GSAP animations on mobile for better performance
-      if (!mainRef.current || isMobile) return
+      if (!mainRef.current || isMobileDevice) return
 
       const ctx = gsap.context(() => {
         // How it works - stagger from sides
@@ -234,7 +237,7 @@ export function LandingClient({
 
       return () => ctx.revert()
     },
-    { scope: mainRef, dependencies: [isMobile] }
+    { scope: mainRef }
   )
 
   return (
