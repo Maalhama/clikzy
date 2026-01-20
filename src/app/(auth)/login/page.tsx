@@ -74,7 +74,7 @@ export default function LoginPage() {
           <Logo size="lg" animated={false} href="/" />
           <h1 className="text-3xl font-bold text-white mt-6 mb-3">Content de te revoir !</h1>
           <p className="text-text-secondary text-lg mb-10">
-            Connecte-toi pour acceder a tes parties et tes recompenses.
+            Connecte-toi pour accéder à tes parties et tes récompenses.
           </p>
 
           <div className="space-y-4">
@@ -85,8 +85,8 @@ export default function LoginPage() {
                 </svg>
               </div>
               <div>
-                <div className="font-medium text-white text-sm">Tes credits t&apos;attendent</div>
-                <div className="text-xs text-text-secondary">Reprends la ou tu t&apos;es arrete</div>
+                <div className="font-medium text-white text-sm">Tes crédits t&apos;attendent</div>
+                <div className="text-xs text-text-secondary">Reprends là où tu t&apos;es arrêté</div>
               </div>
             </div>
             <div className="flex items-center gap-3">
@@ -116,7 +116,7 @@ export default function LoginPage() {
           <div className="text-center lg:text-left mb-6">
             <h2 className="text-2xl font-bold text-white mb-2">Se connecter</h2>
             <p className="text-sm text-text-secondary">
-              Accede a ton compte pour jouer
+              Accède à ton compte pour jouer
             </p>
           </div>
 
@@ -174,7 +174,7 @@ export default function LoginPage() {
                   Mot de passe
                 </label>
                 <Link href="/forgot-password" className="text-xs text-neon-purple hover:text-neon-pink transition-colors">
-                  Oublie ?
+                  Oublié ?
                 </Link>
               </div>
               <input
@@ -227,7 +227,7 @@ export default function LoginPage() {
               <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
               </svg>
-              Connexion securisee
+              Connexion sécurisée
             </div>
           </div>
         </div>

@@ -93,9 +93,9 @@ export default function RegisterPage() {
             </div>
           </div>
 
-          <h1 className="text-2xl font-bold text-white mb-3">Compte cree !</h1>
+          <h1 className="text-2xl font-bold text-white mb-3">Compte créé !</h1>
           <p className="text-text-secondary mb-6">
-            Un email de confirmation a ete envoye a{' '}
+            Un email de confirmation a été envoyé à{' '}
             <strong className="text-neon-purple block mt-1">{formData.email}</strong>
           </p>
 
@@ -126,7 +126,7 @@ export default function RegisterPage() {
           <Logo size="lg" animated={false} href="/" />
           <h1 className="text-3xl font-bold text-white mt-6 mb-3">Rejoins l&apos;aventure</h1>
           <p className="text-text-secondary text-lg mb-10">
-            Cree ton compte et recois 10 credits gratuits pour commencer a jouer.
+            Crée ton compte et reçois 10 crédits gratuits pour commencer à jouer.
           </p>
 
           <div className="space-y-4">
@@ -137,8 +137,8 @@ export default function RegisterPage() {
                 </svg>
               </div>
               <div>
-                <div className="font-medium text-white text-sm">10 credits offerts</div>
-                <div className="text-xs text-text-secondary">A l&apos;inscription, sans engagement</div>
+                <div className="font-medium text-white text-sm">10 crédits offerts</div>
+                <div className="text-xs text-text-secondary">À l&apos;inscription, sans engagement</div>
               </div>
             </div>
             <div className="flex items-center gap-3">
@@ -148,7 +148,7 @@ export default function RegisterPage() {
                 </svg>
               </div>
               <div>
-                <div className="font-medium text-white text-sm">Parties en temps reel</div>
+                <div className="font-medium text-white text-sm">Parties en temps réel</div>
                 <div className="text-xs text-text-secondary">Affronte des joueurs du monde entier</div>
               </div>
             </div>
@@ -160,7 +160,7 @@ export default function RegisterPage() {
               </div>
               <div>
                 <div className="font-medium text-white text-sm">100% authentique</div>
-                <div className="text-xs text-text-secondary">Tous les objets sont verifies</div>
+                <div className="text-xs text-text-secondary">Tous les objets sont vérifiés</div>
               </div>
             </div>
           </div>
@@ -177,14 +177,14 @@ export default function RegisterPage() {
 
           {/* Header */}
           <div className="text-center lg:text-left mb-6">
-            <h2 className="text-2xl font-bold text-white mb-2">Creer un compte</h2>
+            <h2 className="text-2xl font-bold text-white mb-2">Créer un compte</h2>
             <p className="text-sm text-text-secondary">
-              Inscris-toi et recois{' '}
+              Inscris-toi et reçois{' '}
               <span className="inline-flex items-center gap-1 text-success font-semibold">
                 <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clipRule="evenodd" />
                 </svg>
-                10 credits gratuits
+                10 crédits gratuits
               </span>
             </p>
           </div>
@@ -265,7 +265,7 @@ export default function RegisterPage() {
                 type="password"
                 id="password"
                 name="password"
-                placeholder="Minimum 6 caracteres"
+                placeholder="Minimum 6 caractères"
                 value={formData.password}
                 onChange={handleChange}
                 required
@@ -315,14 +315,14 @@ export default function RegisterPage() {
                 className="w-full py-4 text-[15px] font-semibold rounded-2xl"
                 isLoading={isLoading}
               >
-                Creer mon compte
+                Créer mon compte
               </Button>
             </div>
           </form>
 
           {/* Terms */}
           <p className="mt-4 text-xs text-text-secondary/60 text-center">
-            En creant un compte, tu acceptes nos{' '}
+            En créant un compte, tu acceptes nos{' '}
             <Link href="/terms" className="text-neon-purple/80 hover:underline">
               conditions d&apos;utilisation
             </Link>
@@ -331,7 +331,7 @@ export default function RegisterPage() {
           {/* Footer */}
           <div className="mt-6 pt-5 border-t border-white/5 text-center">
             <p className="text-[15px] text-text-secondary">
-              Deja un compte ?{' '}
+              Déjà un compte ?{' '}
               <Link href="/login" className="text-neon-purple hover:text-neon-pink transition-colors font-semibold">
                 Se connecter
               </Link>
@@ -344,7 +344,7 @@ export default function RegisterPage() {
               <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
               </svg>
-              Donnees protegees
+              Données protégées
             </div>
           </div>
         </div>
