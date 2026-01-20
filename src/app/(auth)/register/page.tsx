@@ -1,12 +1,11 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import { signUp, signInWithOAuth } from '@/actions/auth'
 import { Button } from '@/components/ui/button'
 import { Logo } from '@/components/ui/Logo'
-import { checkIsMobile } from '@/hooks/useIsMobile'
 
 // Check if mobile for disabling animations
 const getAnimationVariants = (isMobile: boolean) => {
@@ -77,13 +76,9 @@ export default function RegisterPage() {
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
   const [focusedField, setFocusedField] = useState<string | null>(null)
-  const [isMobile, setIsMobile] = useState(false)
 
-  // Check mobile on mount
-  useEffect(() => {
-    setIsMobile(checkIsMobile())
-  }, [])
-
+  // Always disable animations on mobile for instant display
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768
   const variants = getAnimationVariants(isMobile)
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -217,7 +212,7 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-dvh w-full flex flex-col lg:flex-row relative overflow-hidden pb-20 lg:pb-0">
+    <div className="min-h-dvh w-full flex flex-col lg:flex-row relative overflow-y-auto" style={{ paddingBottom: 'max(5rem, env(safe-area-inset-bottom))' }}>
       {/* Mobile Background Effects */}
       <div className="lg:hidden absolute inset-0 pointer-events-none">
         <motion.div
