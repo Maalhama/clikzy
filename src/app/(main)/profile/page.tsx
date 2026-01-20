@@ -16,35 +16,32 @@ export default async function ProfilePage() {
     redirect('/login')
   }
 
-  // Get profile
-  const { data: profileData } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('id', user.id)
-    .single()
+  // Run all queries in parallel for faster loading
+  const [profileResult, winsResult, gamesPlayedResult] = await Promise.all([
+    supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', user.id)
+      .single(),
+    supabase
+      .from('winners')
+      .select('*, item:items(*)')
+      .eq('user_id', user.id)
+      .order('won_at', { ascending: false }),
+    supabase
+      .from('clicks')
+      .select('game_id', { count: 'exact', head: true })
+      .eq('user_id', user.id)
+  ])
 
-  const profile = profileData as Profile | null
+  const profile = profileResult.data as Profile | null
 
   if (!profile) {
     redirect('/login')
   }
 
-  // Get user's wins with items
-  const { data: winsData } = await supabase
-    .from('winners')
-    .select('*, item:items(*)')
-    .eq('user_id', user.id)
-    .order('won_at', { ascending: false })
-
-  const wins = (winsData as WinnerWithItem[] | null) || []
-
-  // Get total games played (unique games where user clicked)
-  const { count: gamesPlayedCount } = await supabase
-    .from('clicks')
-    .select('game_id', { count: 'exact', head: true })
-    .eq('user_id', user.id)
-
-  const gamesPlayed = gamesPlayedCount || 0
+  const wins = (winsResult.data as WinnerWithItem[] | null) || []
+  const gamesPlayed = gamesPlayedResult.count || 0
 
   // Calculate total value won
   const totalValueWon = wins.reduce((acc, win) => {
