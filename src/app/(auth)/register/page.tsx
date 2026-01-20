@@ -79,8 +79,8 @@ export default function RegisterPage() {
     return (
       <div className="min-h-dvh w-full flex items-center justify-center p-6 relative overflow-hidden">
         <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-[20%] left-[10%] w-40 h-40 bg-success/20 rounded-full blur-[80px]" />
-          <div className="absolute bottom-[30%] right-[10%] w-32 h-32 bg-neon-blue/15 rounded-full blur-[60px]" />
+          <div className="absolute top-[20%] left-[10%] w-40 h-40 bg-success/15 rounded-full blur-2xl lg:blur-[80px]" />
+          <div className="absolute bottom-[30%] right-[10%] w-32 h-32 bg-neon-blue/10 rounded-full blur-2xl lg:blur-[60px]" />
         </div>
 
         <div className="text-center max-w-sm relative z-10">
@@ -111,10 +111,10 @@ export default function RegisterPage() {
 
   return (
     <div className="min-h-dvh w-full flex flex-col lg:flex-row relative overflow-y-auto" style={{ paddingBottom: 'max(5rem, env(safe-area-inset-bottom))' }}>
-      {/* Mobile Background Effects - CSS only */}
+      {/* Mobile Background Effects - Reduced blur for performance */}
       <div className="lg:hidden absolute inset-0 pointer-events-none">
-        <div className="absolute top-[5%] right-[10%] w-32 h-32 bg-neon-purple/15 rounded-full blur-[60px]" />
-        <div className="absolute bottom-[15%] left-[5%] w-40 h-40 bg-neon-pink/15 rounded-full blur-[70px]" />
+        <div className="absolute top-[5%] right-[10%] w-32 h-32 bg-neon-purple/10 rounded-full blur-2xl" />
+        <div className="absolute bottom-[15%] left-[5%] w-40 h-40 bg-neon-pink/10 rounded-full blur-2xl" />
       </div>
 
       {/* Left Panel - Branding (Desktop only) */}

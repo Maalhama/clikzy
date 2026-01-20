@@ -59,10 +59,10 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-dvh w-full flex flex-col lg:flex-row relative overflow-y-auto" style={{ paddingBottom: 'max(5rem, env(safe-area-inset-bottom))' }}>
-      {/* Mobile Background Effects - CSS only */}
+      {/* Mobile Background Effects - Reduced blur for performance */}
       <div className="lg:hidden absolute inset-0 pointer-events-none">
-        <div className="absolute top-[10%] left-[5%] w-32 h-32 bg-neon-purple/15 rounded-full blur-[60px]" />
-        <div className="absolute bottom-[20%] right-[10%] w-40 h-40 bg-neon-pink/15 rounded-full blur-[70px]" />
+        <div className="absolute top-[10%] left-[5%] w-32 h-32 bg-neon-purple/10 rounded-full blur-2xl" />
+        <div className="absolute bottom-[20%] right-[10%] w-40 h-40 bg-neon-pink/10 rounded-full blur-2xl" />
       </div>
 
       {/* Left Panel - Branding (Desktop only) */}
