@@ -448,14 +448,15 @@ export async function GET(request: NextRequest) {
         })
 
         // Trigger final phase if time < 1 minute
-        // Use 65 seconds buffer to prevent race condition with 1-minute cron interval
+        // Use 70 seconds buffer to prevent race condition with 1-minute cron interval
+        // This gives 10s safety margin for cron delays/network latency
         if (game.status === 'active' && timeLeft <= FINAL_PHASE_THRESHOLD) {
-          newEndTime = now + 65000 // Reset to 1:05 (buffer for cron timing)
+          newEndTime = now + 70000 // Reset to 1:10 (buffer for cron timing)
           newStatus = 'final_phase'
           shouldSetBattleStart = true
         } else if (game.status === 'final_phase') {
-          // In final phase, reset to 1:05 (buffer for cron timing)
-          newEndTime = now + 65000
+          // In final phase, reset to 1:10 (buffer for cron timing)
+          newEndTime = now + 70000
         }
       }
 
