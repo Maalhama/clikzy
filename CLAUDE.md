@@ -161,6 +161,35 @@ Quand l'utilisateur dit "verifie la prod" ou "check production", lancer :
 npm audit && npm run lint && npm run test:run && npm run build
 ```
 
+## Système de crédits
+
+### Reset quotidien
+- **Utilisateurs gratuits** : Reset à 10 crédits chaque minuit
+- **Utilisateurs payants** : Pas de reset (gardent leurs crédits)
+
+### Intégration paiement (Stripe ou autre)
+Quand un utilisateur achète des crédits, exécuter :
+
+```sql
+UPDATE profiles
+SET has_purchased_credits = true, credits = credits + [NB_CREDITS_ACHETÉS]
+WHERE id = '[USER_ID]';
+```
+
+Le flag `has_purchased_credits = true` désactive le reset quotidien pour cet utilisateur.
+
+## Système de crons (cron-job.org)
+
+Les crons sont configurés sur **cron-job.org** (pas GitHub Actions) :
+
+| Cron | Fréquence | URL |
+|------|-----------|-----|
+| Bot Clicks | 1 min | `/api/cron/bot-clicks` |
+| Activate Games | 1 min | `/api/cron/activate-games` |
+| Create Rotation | :45 aux heures 23,2,5,8,11,14,17,20 | `/api/cron/create-rotation` |
+
+Header requis : `Authorization: Bearer [CRON_SECRET]`
+
 ## Notes
 
 ### Notifications audio
