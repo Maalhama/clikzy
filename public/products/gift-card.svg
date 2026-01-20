@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none">
+  <defs>
+    <linearGradient id="giftGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#9B5CFF" stop-opacity="0.4"/>
+      <stop offset="50%" stop-color="#FF5CB8" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#3CCBFF" stop-opacity="0.2"/>
+    </linearGradient>
+  </defs>
+  <!-- Card body -->
+  <rect x="30" y="55" width="140" height="90" rx="10" fill="url(#giftGrad)" stroke="#9B5CFF" stroke-width="2"/>
+  <!-- Inner border -->
+  <rect x="40" y="65" width="120" height="70" rx="6" fill="#0B0F1A" stroke="#FF5CB8" stroke-opacity="0.5"/>
+  <!-- Gift bow -->
+  <ellipse cx="100" cy="85" rx="25" ry="12" fill="none" stroke="#FFD700" stroke-width="3"/>
+  <ellipse cx="85" cy="80" rx="10" ry="8" fill="#FFD700" fill-opacity="0.3" stroke="#FFD700" stroke-width="2"/>
+  <ellipse cx="115" cy="80" rx="10" ry="8" fill="#FFD700" fill-opacity="0.3" stroke="#FFD700" stroke-width="2"/>
+  <circle cx="100" cy="85" r="5" fill="#FFD700"/>
+  <!-- Ribbon trails -->
+  <path d="M95 90 Q90 100 85 120" fill="none" stroke="#FFD700" stroke-width="2"/>
+  <path d="M105 90 Q110 100 115 120" fill="none" stroke="#FFD700" stroke-width="2"/>
+  <!-- Value amount -->
+  <text x="100" y="115" text-anchor="middle" font-family="Arial" font-weight="bold" font-size="18" fill="#FFFFFF">500€</text>
+  <!-- Card chip hint -->
+  <rect x="45" y="100" width="20" height="15" rx="3" fill="#FFD700" fill-opacity="0.5" stroke="#FFD700" stroke-opacity="0.5"/>
+  <!-- Sparkles -->
+  <circle cx="55" cy="75" r="2" fill="#FFFFFF" fill-opacity="0.8"/>
+  <circle cx="145" cy="70" r="2" fill="#FFFFFF" fill-opacity="0.8"/>
+  <circle cx="140" cy="125" r="2" fill="#FFFFFF" fill-opacity="0.6"/>
+  <circle cx="50" cy="120" r="1.5" fill="#FFFFFF" fill-opacity="0.6"/>
+  <!-- Glow effect -->
+  <ellipse cx="100" cy="100" rx="75" ry="55" fill="#9B5CFF" fill-opacity="0.05"/>
+</svg>

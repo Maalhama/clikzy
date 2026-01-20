@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none">
+  <defs>
+    <linearGradient id="kbGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#9B5CFF" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#3CCBFF" stop-opacity="0.2"/>
+    </linearGradient>
+  </defs>
+  <!-- Keyboard body -->
+  <rect x="20" y="70" width="160" height="60" rx="8" fill="url(#kbGrad)" stroke="#9B5CFF" stroke-width="2"/>
+  <!-- Key rows -->
+  <!-- Row 1 -->
+  <rect x="28" y="78" width="8" height="8" rx="2" fill="#FF5C5C"/>
+  <rect x="40" y="78" width="8" height="8" rx="2" fill="#FF9F5C"/>
+  <rect x="52" y="78" width="8" height="8" rx="2" fill="#FFEB5C"/>
+  <rect x="64" y="78" width="8" height="8" rx="2" fill="#5CFF5C"/>
+  <rect x="76" y="78" width="8" height="8" rx="2" fill="#5CFFEB"/>
+  <rect x="88" y="78" width="8" height="8" rx="2" fill="#5CB8FF"/>
+  <rect x="100" y="78" width="8" height="8" rx="2" fill="#9B5CFF"/>
+  <rect x="112" y="78" width="8" height="8" rx="2" fill="#FF5CB8"/>
+  <rect x="124" y="78" width="8" height="8" rx="2" fill="#FF5C5C"/>
+  <rect x="136" y="78" width="8" height="8" rx="2" fill="#9B5CFF"/>
+  <rect x="148" y="78" width="8" height="8" rx="2" fill="#3CCBFF"/>
+  <rect x="160" y="78" width="16" height="8" rx="2" fill="#141B2D" stroke="#9B5CFF" stroke-opacity="0.5"/>
+  <!-- Row 2 -->
+  <rect x="28" y="90" width="12" height="8" rx="2" fill="#141B2D" stroke="#9B5CFF" stroke-opacity="0.5"/>
+  <rect x="44" y="90" width="8" height="8" rx="2" fill="#9B5CFF" fill-opacity="0.5"/>
+  <rect x="56" y="90" width="8" height="8" rx="2" fill="#3CCBFF" fill-opacity="0.5"/>
+  <rect x="68" y="90" width="8" height="8" rx="2" fill="#FF5CB8" fill-opacity="0.5"/>
+  <rect x="80" y="90" width="8" height="8" rx="2" fill="#9B5CFF" fill-opacity="0.5"/>
+  <rect x="92" y="90" width="8" height="8" rx="2" fill="#3CCBFF" fill-opacity="0.5"/>
+  <rect x="104" y="90" width="8" height="8" rx="2" fill="#FF5CB8" fill-opacity="0.5"/>
+  <rect x="116" y="90" width="8" height="8" rx="2" fill="#9B5CFF" fill-opacity="0.5"/>
+  <rect x="128" y="90" width="8" height="8" rx="2" fill="#3CCBFF" fill-opacity="0.5"/>
+  <rect x="140" y="90" width="8" height="8" rx="2" fill="#FF5CB8" fill-opacity="0.5"/>
+  <rect x="152" y="90" width="24" height="8" rx="2" fill="#141B2D" stroke="#9B5CFF" stroke-opacity="0.5"/>
+  <!-- Row 3 - WASD highlight -->
+  <rect x="28" y="102" width="14" height="8" rx="2" fill="#141B2D" stroke="#9B5CFF" stroke-opacity="0.5"/>
+  <rect x="46" y="102" width="8" height="8" rx="2" fill="#141B2D" stroke="#FF5C5C"/>
+  <rect x="58" y="102" width="8" height="8" rx="2" fill="#FF5C5C"/>
+  <rect x="70" y="102" width="8" height="8" rx="2" fill="#141B2D" stroke="#FF5C5C"/>
+  <rect x="82" y="102" width="8" height="8" rx="2" fill="#141B2D" stroke="#FF5C5C"/>
+  <rect x="94" y="102" width="8" height="8" rx="2" fill="#141B2D" stroke="#9B5CFF" stroke-opacity="0.3"/>
+  <rect x="106" y="102" width="8" height="8" rx="2" fill="#141B2D" stroke="#9B5CFF" stroke-opacity="0.3"/>
+  <rect x="118" y="102" width="8" height="8" rx="2" fill="#141B2D" stroke="#9B5CFF" stroke-opacity="0.3"/>
+  <rect x="130" y="102" width="8" height="8" rx="2" fill="#141B2D" stroke="#9B5CFF" stroke-opacity="0.3"/>
+  <rect x="142" y="102" width="34" height="8" rx="2" fill="#141B2D" stroke="#9B5CFF" stroke-opacity="0.5"/>
+  <!-- Row 4 - Space bar -->
+  <rect x="28" y="114" width="20" height="8" rx="2" fill="#141B2D" stroke="#9B5CFF" stroke-opacity="0.5"/>
+  <rect x="52" y="114" width="8" height="8" rx="2" fill="#141B2D" stroke="#9B5CFF" stroke-opacity="0.3"/>
+  <rect x="64" y="114" width="8" height="8" rx="2" fill="#141B2D" stroke="#9B5CFF" stroke-opacity="0.3"/>
+  <rect x="76" y="114" width="48" height="8" rx="2" fill="#9B5CFF" fill-opacity="0.3" stroke="#9B5CFF"/>
+  <rect x="128" y="114" width="8" height="8" rx="2" fill="#141B2D" stroke="#9B5CFF" stroke-opacity="0.3"/>
+  <rect x="140" y="114" width="8" height="8" rx="2" fill="#141B2D" stroke="#9B5CFF" stroke-opacity="0.3"/>
+  <rect x="152" y="114" width="24" height="8" rx="2" fill="#141B2D" stroke="#9B5CFF" stroke-opacity="0.5"/>
+  <!-- Glow effect -->
+  <ellipse cx="100" cy="100" rx="85" ry="40" fill="#9B5CFF" fill-opacity="0.05"/>
+</svg>

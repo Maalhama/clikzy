@@ -33,6 +33,18 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: 'images.pexels.com',
       },
+      {
+        protocol: 'https',
+        hostname: '*.secretlab.co',
+      },
+      {
+        protocol: 'https',
+        hostname: 'secretlab.co',
+      },
+      {
+        protocol: 'https',
+        hostname: '*.secretlab.eu',
+      },
     ],
   },
 }

@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none">
+  <defs>
+    <linearGradient id="questGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#9B5CFF" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#3CCBFF" stop-opacity="0.2"/>
+    </linearGradient>
+  </defs>
+  <!-- Headset body -->
+  <rect x="35" y="70" width="130" height="70" rx="20" fill="url(#questGrad)" stroke="#9B5CFF" stroke-width="2"/>
+  <!-- Visor -->
+  <rect x="45" y="80" width="110" height="50" rx="15" fill="#0B0F1A" stroke="#9B5CFF" stroke-opacity="0.5"/>
+  <!-- Lenses -->
+  <circle cx="70" cy="105" r="18" fill="#141B2D" stroke="#3CCBFF" stroke-opacity="0.5"/>
+  <circle cx="70" cy="105" r="10" fill="#0B0F1A"/>
+  <circle cx="130" cy="105" r="18" fill="#141B2D" stroke="#3CCBFF" stroke-opacity="0.5"/>
+  <circle cx="130" cy="105" r="10" fill="#0B0F1A"/>
+  <!-- Strap connectors -->
+  <rect x="25" y="95" width="15" height="20" rx="5" fill="url(#questGrad)" stroke="#9B5CFF" stroke-width="1.5"/>
+  <rect x="160" y="95" width="15" height="20" rx="5" fill="url(#questGrad)" stroke="#9B5CFF" stroke-width="1.5"/>
+  <!-- Strap (curved) -->
+  <path d="M30 105 Q30 50 100 45 Q170 50 170 105" fill="none" stroke="#9B5CFF" stroke-width="4" stroke-linecap="round"/>
+  <!-- LED indicator -->
+  <circle cx="100" cy="82" r="3" fill="#3CCBFF"/>
+  <!-- Glow effect -->
+  <ellipse cx="100" cy="100" rx="75" ry="50" fill="#9B5CFF" fill-opacity="0.05"/>
+</svg>

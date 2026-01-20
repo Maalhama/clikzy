@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
+  <defs>
+    <linearGradient id="pixelGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#4285F4"/>
+      <stop offset="100%" style="stop-color:#34A853"/>
+    </linearGradient>
+  </defs>
+  <!-- Phone body -->
+  <rect x="25" y="8" width="50" height="84" rx="8" fill="#1a1a2e" stroke="url(#pixelGrad)" stroke-width="2"/>
+  <!-- Screen -->
+  <rect x="29" y="16" width="42" height="68" rx="4" fill="#0a0a15"/>
+  <!-- Camera bar -->
+  <rect x="25" y="8" width="50" height="18" rx="8" fill="#2d2d44"/>
+  <rect x="25" y="18" width="50" height="8" fill="#2d2d44"/>
+  <!-- Camera lenses -->
+  <circle cx="38" cy="17" r="5" fill="#1a1a2e" stroke="#4285F4" stroke-width="1"/>
+  <circle cx="38" cy="17" r="2" fill="#4285F4"/>
+  <circle cx="52" cy="17" r="5" fill="#1a1a2e" stroke="#34A853" stroke-width="1"/>
+  <circle cx="52" cy="17" r="2" fill="#34A853"/>
+  <circle cx="66" cy="17" r="3" fill="#1a1a2e" stroke="#EA4335" stroke-width="1"/>
+  <!-- G logo on screen -->
+  <text x="50" y="55" text-anchor="middle" fill="#4285F4" font-size="16" font-weight="bold">G</text>
+</svg>

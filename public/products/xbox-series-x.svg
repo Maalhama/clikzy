@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none">
+  <defs>
+    <linearGradient id="xboxGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#107C10" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#107C10" stop-opacity="0.1"/>
+    </linearGradient>
+  </defs>
+  <!-- Xbox body -->
+  <rect x="60" y="25" width="80" height="150" rx="8" fill="url(#xboxGrad)" stroke="#107C10" stroke-width="2"/>
+  <!-- Top vent pattern -->
+  <circle cx="100" cy="50" r="20" fill="#0B0F1A" stroke="#107C10" stroke-opacity="0.5"/>
+  <circle cx="100" cy="50" r="12" fill="none" stroke="#107C10" stroke-opacity="0.3"/>
+  <circle cx="100" cy="50" r="5" fill="#107C10"/>
+  <!-- Front panel -->
+  <rect x="70" y="90" width="60" height="70" rx="3" fill="#0B0F1A" stroke="#107C10" stroke-opacity="0.3"/>
+  <!-- Disc slot -->
+  <rect x="75" y="100" width="50" height="4" rx="2" fill="#141B2D" stroke="#107C10" stroke-opacity="0.5"/>
+  <!-- USB port -->
+  <rect x="95" y="140" width="10" height="5" rx="1" fill="#141B2D"/>
+  <!-- Power button -->
+  <circle cx="100" cy="120" r="6" fill="#141B2D" stroke="#107C10" stroke-opacity="0.5"/>
+  <!-- Glow effect -->
+  <ellipse cx="100" cy="100" rx="50" ry="80" fill="#107C10" fill-opacity="0.05"/>
+</svg>

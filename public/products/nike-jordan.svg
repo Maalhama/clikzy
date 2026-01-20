@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none">
+  <defs>
+    <linearGradient id="jordanGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF5C5C" stop-opacity="0.4"/>
+      <stop offset="100%" stop-color="#FF5C5C" stop-opacity="0.2"/>
+    </linearGradient>
+  </defs>
+  <!-- Sole -->
+  <path d="M30 145 Q25 150 30 155 L160 155 Q175 155 175 145 L170 140 Q165 138 30 140 Z" fill="#0B0F1A" stroke="#FF5C5C" stroke-opacity="0.5"/>
+  <!-- Midsole -->
+  <path d="M35 140 L165 140 Q170 135 165 130 L40 130 Q30 135 35 140 Z" fill="#FFFFFF" fill-opacity="0.9" stroke="#FF5C5C" stroke-opacity="0.3"/>
+  <!-- Shoe body -->
+  <path d="M40 130 L160 130 L155 80 Q150 55 120 50 L70 50 Q45 55 40 80 Z" fill="url(#jordanGrad)" stroke="#FF5C5C" stroke-width="2"/>
+  <!-- Upper panels -->
+  <path d="M50 120 L65 70 Q70 60 85 58 L75 120 Z" fill="#0B0F1A" fill-opacity="0.3" stroke="#FF5C5C" stroke-opacity="0.3"/>
+  <path d="M80 120 L90 65 Q95 55 115 55 L105 120 Z" fill="#FFFFFF" fill-opacity="0.2" stroke="#FF5C5C" stroke-opacity="0.3"/>
+  <!-- Toe box -->
+  <path d="M40 100 Q35 115 40 130 L75 130 L80 100 Z" fill="#0B0F1A" fill-opacity="0.2" stroke="#FF5C5C" stroke-opacity="0.3"/>
+  <!-- Swoosh -->
+  <path d="M45 110 Q80 95 130 85 Q150 82 155 90 Q140 88 100 100 Q60 112 45 110 Z" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="1"/>
+  <!-- Ankle collar -->
+  <ellipse cx="135" cy="65" rx="25" ry="15" fill="url(#jordanGrad)" stroke="#FF5C5C" stroke-width="2"/>
+  <ellipse cx="135" cy="65" rx="15" ry="10" fill="#0B0F1A"/>
+  <!-- Laces -->
+  <line x1="85" y1="70" x2="105" y2="68" stroke="#FFFFFF" stroke-width="2"/>
+  <line x1="85" y1="80" x2="110" y2="78" stroke="#FFFFFF" stroke-width="2"/>
+  <line x1="85" y1="90" x2="115" y2="88" stroke="#FFFFFF" stroke-width="2"/>
+  <!-- Air Jordan logo area -->
+  <circle cx="145" cy="100" r="10" fill="#0B0F1A" fill-opacity="0.5" stroke="#FF5C5C" stroke-opacity="0.5"/>
+  <!-- Glow effect -->
+  <ellipse cx="100" cy="105" rx="80" ry="50" fill="#FF5C5C" fill-opacity="0.05"/>
+</svg>

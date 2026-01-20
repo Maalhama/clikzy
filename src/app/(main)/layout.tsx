@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { Header } from '@/components/layout/Header'
 import { BackgroundEffects } from '@/components/ui/BackgroundEffects'
+import { ClientProviders } from '@/components/providers/ClientProviders'
 import type { Profile } from '@/types/database'
 
 export default async function MainLayout({
@@ -19,33 +20,40 @@ export default async function MainLayout({
   }
 
   // Get user profile
-  const { data: profile } = await supabase
+  const { data: profileData } = await supabase
     .from('profiles')
     .select('*')
     .eq('id', user.id)
     .single()
 
+  const profile = profileData as Profile | null
+
   return (
-    <div className="min-h-screen flex flex-col bg-bg-primary">
-      {/* Mobile lightweight background */}
-      <div className="md:hidden fixed inset-0 -z-10">
-        <div className="mobile-grid-bg" />
-        <div className="mobile-glow-spot mobile-glow-spot-1" />
-        <div className="mobile-glow-spot mobile-glow-spot-2" />
+    <ClientProviders
+      initialCredits={profile?.credits ?? 0}
+      userId={user.id}
+    >
+      <div className="min-h-screen flex flex-col bg-bg-primary">
+        {/* Mobile lightweight background */}
+        <div className="md:hidden fixed inset-0 -z-10">
+          <div className="mobile-grid-bg" />
+          <div className="mobile-glow-spot mobile-glow-spot-1" />
+          <div className="mobile-glow-spot mobile-glow-spot-2" />
+        </div>
+
+        {/* Desktop animated background */}
+        <div className="hidden md:block fixed inset-0 -z-10">
+          <BackgroundEffects simplified />
+        </div>
+
+        {/* Header */}
+        <Header profile={profile} />
+
+        {/* Main content */}
+        <main className="flex-1 relative z-10">
+          {children}
+        </main>
       </div>
-
-      {/* Desktop animated background */}
-      <div className="hidden md:block fixed inset-0 -z-10">
-        <BackgroundEffects simplified />
-      </div>
-
-      {/* Header */}
-      <Header profile={profile as Profile | null} />
-
-      {/* Main content */}
-      <main className="flex-1 relative z-10">
-        {children}
-      </main>
-    </div>
+    </ClientProviders>
   )
 }

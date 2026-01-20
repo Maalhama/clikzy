@@ -4,6 +4,34 @@ import { useEffect, useState, useCallback, useRef } from 'react'
 import { createClient } from '@/lib/supabase/browser'
 import type { RealtimeChannel } from '@supabase/supabase-js'
 
+// Shared localStorage key with useLobbyBots and useGameBots for synchronization
+const STORAGE_KEY = 'clikzy_bot_cache'
+
+interface BotCache {
+  games: Record<string, { totalClicks: number; lastUser: string; endTime: number; updatedAt: number }>
+  expiry: number
+}
+
+// Load cached data for a specific game (leader + clicks + endTime)
+function loadCachedGameData(gameId: string): { leader: string; clicks: number; endTime: number | null } | null {
+  if (typeof window === 'undefined') return null
+  try {
+    const cached = localStorage.getItem(STORAGE_KEY)
+    if (!cached) return null
+    const data: BotCache = JSON.parse(cached)
+    if (Date.now() > data.expiry) return null
+    const gameData = data.games[gameId]
+    if (!gameData?.lastUser) return null
+    return {
+      leader: gameData.lastUser,
+      clicks: gameData.totalClicks || 0,
+      endTime: gameData.endTime || null,
+    }
+  } catch {
+    return null
+  }
+}
+
 interface Winner {
   id: string
   username: string
@@ -61,6 +89,46 @@ export function useLandingRealtime(
     setPlayerCount(Math.floor(MIN_PARTICIPANTS + Math.random() * (MAX_PARTICIPANTS - MIN_PARTICIPANTS)))
     trendRef.current = Math.random() > 0.5 ? 1 : -1
   }, [])
+
+  // Sync bot data (leader + clicks) from shared cache (localStorage)
+  const lastCachedLeaderRef = useRef<string | null>(null)
+  const baseClicksRef = useRef<number>(initialGame?.total_clicks || 0)
+  useEffect(() => {
+    if (!isMounted || !initialGame?.id) return
+
+    // Store initial DB clicks as base
+    baseClicksRef.current = initialGame?.total_clicks || 0
+
+    // Check for cached data updates periodically
+    const checkCachedData = () => {
+      const cachedData = loadCachedGameData(initialGame.id)
+      if (cachedData) {
+        const leaderChanged = cachedData.leader !== lastCachedLeaderRef.current
+
+        if (leaderChanged) {
+          lastCachedLeaderRef.current = cachedData.leader
+        }
+
+        // Update with: base DB clicks + bot clicks from cache + endTime
+        setFeaturedGame((prev) =>
+          prev ? {
+            ...prev,
+            last_click_username: cachedData.leader,
+            total_clicks: baseClicksRef.current + cachedData.clicks,
+            // Apply cached endTime if it's newer (bot reset the timer)
+            end_time: cachedData.endTime && cachedData.endTime > prev.end_time ? cachedData.endTime : prev.end_time,
+          } : null
+        )
+      }
+    }
+
+    // Check immediately
+    checkCachedData()
+
+    // Then poll every 500ms for updates
+    const interval = setInterval(checkCachedData, 500)
+    return () => clearInterval(interval)
+  }, [isMounted, initialGame?.id, initialGame?.total_clicks])
 
   // Realistic participant counter that fluctuates (only after mount)
   useEffect(() => {

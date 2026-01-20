@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useState, useEffect } from 'react'
+import { useRef, useState, useEffect, useMemo } from 'react'
 import { CrownIcon } from '@/components/ui/GamingIcons'
 
 interface LeaderboardEntry {
@@ -11,46 +11,93 @@ interface LeaderboardEntry {
   avatar?: string
 }
 
+interface RealWinner {
+  id: string
+  username: string
+  item_name: string
+  item_value: number
+  won_at: string
+}
+
 interface LeaderboardProps {
   entries?: LeaderboardEntry[]
+  realWinners?: RealWinner[]
   title?: string
   period?: 'today' | 'week' | 'month' | 'all'
   className?: string
 }
 
-const MOCK_LEADERBOARD_TODAY: LeaderboardEntry[] = [
-  { rank: 1, username: 'LuckyChamp', wins: 2, totalValue: 1200 },
-  { rank: 2, username: 'NeonKing', wins: 1, totalValue: 549 },
-  { rank: 3, username: 'ClickMaster', wins: 1, totalValue: 279 },
-  { rank: 4, username: 'FastFinger', wins: 1, totalValue: 199 },
-  { rank: 5, username: 'QuickWin', wins: 1, totalValue: 149 },
-]
+// Bot winners data - realistic winners with diverse usernames
+// Different players for each period to show variety
+const BOT_WINNERS_DATA = {
+  today: [
+    { rank: 1, username: 'Djibril_sn', wins: 2, totalValue: 2499, items: ['MacBook Pro 14"'] },
+    { rank: 2, username: 'ClaraMusic', wins: 1, totalValue: 1229, items: ['iPhone 15 Pro'] },
+    { rank: 3, username: 'Rayan_mtl', wins: 1, totalValue: 549, items: ['PlayStation 5'] },
+    { rank: 4, username: 'MelinaParis', wins: 1, totalValue: 379, items: ['Sony WH-1000XM5'] },
+    { rank: 5, username: 'Abdou_221', wins: 1, totalValue: 279, items: ['AirPods Pro 2'] },
+  ],
+  week: [
+    { rank: 1, username: 'Yasmine_dz', wins: 5, totalValue: 4507, items: ['MacBook Pro', 'iPhone 15 Pro', 'AirPods Pro'] },
+    { rank: 2, username: 'TomGamer78', wins: 4, totalValue: 3728, items: ['MacBook Pro', 'iPhone 15 Pro'] },
+    { rank: 3, username: 'Fatou_ndiaye', wins: 3, totalValue: 1377, items: ['PlayStation 5', 'Steam Deck', 'AirPods Pro'] },
+    { rank: 4, username: 'Alex_Lyon', wins: 2, totalValue: 1608, items: ['iPhone 15 Pro', 'Sony WH-1000XM5'] },
+    { rank: 5, username: 'Ines_bzh', wins: 2, totalValue: 1048, items: ['Xbox Series X', 'Meta Quest 3'] },
+  ],
+  month: [
+    { rank: 1, username: 'Moussa_pro', wins: 12, totalValue: 8686, items: ['MacBook Pro x2', 'iPhone 15 Pro x3'] },
+    { rank: 2, username: 'JulieStyle', wins: 8, totalValue: 5957, items: ['MacBook Pro', 'Samsung Galaxy S24 x2'] },
+    { rank: 3, username: 'Karim_tunis', wins: 6, totalValue: 3327, items: ['PlayStation 5 x2', 'iPhone 15 Pro'] },
+    { rank: 4, username: 'LenaGaming', wins: 5, totalValue: 2987, items: ['iPhone 15 Pro', 'Sony WH-1000XM5 x2'] },
+    { rank: 5, username: 'Omar_casa', wins: 4, totalValue: 1656, items: ['Nintendo Switch', 'AirPods Max x2'] },
+  ],
+}
 
-const MOCK_LEADERBOARD_WEEK: LeaderboardEntry[] = [
-  { rank: 1, username: 'ProGamer99', wins: 5, totalValue: 3200 },
-  { rank: 2, username: 'LuckyChamp', wins: 4, totalValue: 2800 },
-  { rank: 3, username: 'ClickMaster', wins: 3, totalValue: 1950 },
-  { rank: 4, username: 'VictoryK', wins: 2, totalValue: 1100 },
-  { rank: 5, username: 'NeonKing', wins: 2, totalValue: 850 },
-]
+// Get bot winners for leaderboard (no generation needed, direct data)
+function getBotWinnersLeaderboard(period: string): LeaderboardEntry[] {
+  const data = BOT_WINNERS_DATA[period as keyof typeof BOT_WINNERS_DATA] || BOT_WINNERS_DATA.month
+  return data.map(({ rank, username, wins, totalValue }) => ({
+    rank,
+    username,
+    wins,
+    totalValue,
+  }))
+}
 
-const MOCK_LEADERBOARD_MONTH: LeaderboardEntry[] = [
-  { rank: 1, username: 'ProGamer99', wins: 12, totalValue: 8500 },
-  { rank: 2, username: 'LuckyChamp', wins: 8, totalValue: 5200 },
-  { rank: 3, username: 'ClickMaster', wins: 6, totalValue: 3800 },
-  { rank: 4, username: 'VictoryK', wins: 5, totalValue: 2900 },
-  { rank: 5, username: 'NeonKing', wins: 4, totalValue: 2100 },
-]
+// Convert real winners to leaderboard format (for when real DB data exists)
+function convertRealWinnersToLeaderboard(winners: RealWinner[]): LeaderboardEntry[] {
+  // Agreger par utilisateur
+  const userStats = new Map<string, { username: string; wins: number; totalValue: number }>()
 
-const MOCK_LEADERBOARD_BY_PERIOD = {
-  today: MOCK_LEADERBOARD_TODAY,
-  week: MOCK_LEADERBOARD_WEEK,
-  month: MOCK_LEADERBOARD_MONTH,
-  all: MOCK_LEADERBOARD_MONTH,
+  for (const winner of winners) {
+    const existing = userStats.get(winner.username)
+    if (existing) {
+      existing.wins += 1
+      existing.totalValue += winner.item_value
+    } else {
+      userStats.set(winner.username, {
+        username: winner.username,
+        wins: 1,
+        totalValue: winner.item_value,
+      })
+    }
+  }
+
+  // Trier par totalValue et retourner le top 5
+  return Array.from(userStats.values())
+    .sort((a, b) => b.totalValue - a.totalValue)
+    .slice(0, 5)
+    .map((stats, index) => ({
+      rank: index + 1,
+      username: stats.username,
+      wins: stats.wins,
+      totalValue: stats.totalValue,
+    }))
 }
 
 export function Leaderboard({
   entries,
+  realWinners,
   title = 'LES PLUS CHANCEUX',
   period: initialPeriod = 'week',
   className = '',
@@ -59,8 +106,19 @@ export function Leaderboard({
   const [isVisible, setIsVisible] = useState(false)
   const [selectedPeriod, setSelectedPeriod] = useState<'today' | 'week' | 'month' | 'all'>(initialPeriod)
 
-  // Use provided entries or mock data based on selected period
-  const displayedEntries = entries || MOCK_LEADERBOARD_BY_PERIOD[selectedPeriod]
+  // Convert real winners to leaderboard format if available
+  const realLeaderboard = useMemo(() => {
+    if (realWinners && realWinners.length > 0) {
+      return convertRealWinnersToLeaderboard(realWinners)
+    }
+    return null
+  }, [realWinners])
+
+  // Get bot winners data for the selected period
+  const botWinnersData = useMemo(() => getBotWinnersLeaderboard(selectedPeriod), [selectedPeriod])
+
+  // Use: provided entries > real winners from DB > bot winners data
+  const displayedEntries = entries || realLeaderboard || botWinnersData
 
   useEffect(() => {
     if (!containerRef.current) return

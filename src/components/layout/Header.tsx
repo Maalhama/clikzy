@@ -6,6 +6,7 @@ import { usePathname, useRouter } from 'next/navigation'
 import { createPortal } from 'react-dom'
 import { signOut } from '@/actions/auth'
 import { Logo } from '@/components/ui/Logo'
+import { useCredits } from '@/contexts/CreditsContext'
 import type { Profile } from '@/types/database'
 
 interface HeaderProps {
@@ -18,6 +19,7 @@ export function Header({ profile }: HeaderProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [menuClosing, setMenuClosing] = useState(false)
   const [isMounted, setIsMounted] = useState(false)
+  const { credits } = useCredits()
 
   // Mount check for portal
   useState(() => {
@@ -77,7 +79,7 @@ export function Header({ profile }: HeaderProps) {
               <svg className="w-4 h-4 text-neon-purple" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
-              <span className="text-sm font-bold text-neon-purple">{profile.credits}</span>
+              <span className="text-sm font-bold text-neon-purple">{credits}</span>
             </div>
           )}
         </div>
@@ -120,7 +122,7 @@ export function Header({ profile }: HeaderProps) {
                   <svg className="w-5 h-5 text-neon-purple group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
-                  <span className="font-bold text-neon-purple">{profile.credits}</span>
+                  <span className="font-bold text-neon-purple">{credits}</span>
                   <span className="text-white/50 text-sm">crédits</span>
                 </div>
 
@@ -216,7 +218,7 @@ export function Header({ profile }: HeaderProps) {
                       <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
-                      <span className="font-bold">{profile.credits} crédits</span>
+                      <span className="font-bold">{credits} crédits</span>
                     </div>
                   </div>
                 </div>

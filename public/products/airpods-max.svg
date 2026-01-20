@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
+  <defs>
+    <linearGradient id="maxGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#9b5cff"/>
+      <stop offset="100%" style="stop-color:#ff5cb8"/>
+    </linearGradient>
+  </defs>
+  <!-- Headband -->
+  <path d="M20 45 Q20 15 50 15 Q80 15 80 45" fill="none" stroke="#e8e8ed" stroke-width="8" stroke-linecap="round"/>
+  <!-- Headband mesh -->
+  <path d="M25 42 Q25 20 50 20 Q75 20 75 42" fill="none" stroke="#c0c0c5" stroke-width="4"/>
+  <!-- Left ear cup -->
+  <ellipse cx="22" cy="55" rx="14" ry="18" fill="#e8e8ed" stroke="url(#maxGrad)" stroke-width="2"/>
+  <ellipse cx="22" cy="55" rx="10" ry="14" fill="#d0d0d5"/>
+  <!-- Left ear cushion -->
+  <ellipse cx="22" cy="55" rx="8" ry="12" fill="#f5f5f7"/>
+  <!-- Right ear cup -->
+  <ellipse cx="78" cy="55" rx="14" ry="18" fill="#e8e8ed" stroke="url(#maxGrad)" stroke-width="2"/>
+  <ellipse cx="78" cy="55" rx="10" ry="14" fill="#d0d0d5"/>
+  <!-- Right ear cushion -->
+  <ellipse cx="78" cy="55" rx="8" ry="12" fill="#f5f5f7"/>
+  <!-- Digital Crown -->
+  <circle cx="10" cy="50" r="4" fill="#2d2d44" stroke="url(#maxGrad)" stroke-width="1"/>
+</svg>

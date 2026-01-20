@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import { useGSAP } from '@gsap/react'
 import { gsap } from '@/lib/gsap/gsapConfig'
 
@@ -18,9 +18,19 @@ interface BackgroundEffectsProps {
 
 export function BackgroundEffects({ simplified = false }: BackgroundEffectsProps) {
   const containerRef = useRef<HTMLDivElement>(null)
+  const [isMobile, setIsMobile] = useState(false)
+
+  // Detect mobile on mount
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768)
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
 
   useGSAP(() => {
-    if (!containerRef.current) return
+    // Skip all animations on mobile for performance
+    if (!containerRef.current || isMobile) return
 
     const ctx = gsap.context(() => {
       // Animate geometric shapes with rotation and glow pulse
@@ -128,9 +138,21 @@ export function BackgroundEffects({ simplified = false }: BackgroundEffectsProps
     }, containerRef)
 
     return () => ctx.revert()
-  }, { scope: containerRef })
+  }, { scope: containerRef, dependencies: [isMobile] })
 
-  const particleCount = simplified ? 15 : 25
+  // No particles on mobile, fewer if simplified
+  const particleCount = isMobile ? 0 : (simplified ? 15 : 25)
+
+  // Mobile: render minimal static background
+  if (isMobile) {
+    return (
+      <div ref={containerRef} className="fixed inset-0 pointer-events-none overflow-hidden z-0">
+        {/* Simple gradient background for mobile - no blur, no animations */}
+        <div className="absolute top-[10%] left-[10%] w-[200px] h-[200px] bg-neon-purple/10 rounded-full blur-[60px]" />
+        <div className="absolute bottom-[20%] right-[10%] w-[150px] h-[150px] bg-neon-blue/10 rounded-full blur-[50px]" />
+      </div>
+    )
+  }
 
   return (
     <div ref={containerRef} className="fixed inset-0 pointer-events-none overflow-hidden z-0">
@@ -147,8 +169,8 @@ export function BackgroundEffects({ simplified = false }: BackgroundEffectsProps
       />
 
       {/* Glow orbs */}
-      <div className="bg-glow-orb absolute top-[15%] left-[20%] w-[300px] h-[300px] md:w-[500px] md:h-[500px] bg-neon-purple/8 rounded-full blur-[100px] md:blur-[150px]" />
-      <div className="bg-glow-orb absolute bottom-[25%] right-[15%] w-[250px] h-[250px] md:w-[400px] md:h-[400px] bg-neon-blue/8 rounded-full blur-[80px] md:blur-[120px]" />
+      <div className="bg-glow-orb absolute top-[15%] left-[20%] w-[500px] h-[500px] bg-neon-purple/8 rounded-full blur-[150px]" />
+      <div className="bg-glow-orb absolute bottom-[25%] right-[15%] w-[400px] h-[400px] bg-neon-blue/8 rounded-full blur-[120px]" />
 
       {/* Geometric shapes - hidden on mobile for performance */}
       <div className="hidden md:block">

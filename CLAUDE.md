@@ -110,6 +110,14 @@ Types → API/Services → Hooks → Composants → Pages
 - Client components uniquement pour l'interactivité
 - Internationalisation pour tous les textes visibles
 
+### Copywriting / Textes UI
+- **TOUJOURS** utiliser les accents français corrects (é, è, ê, à, ù, ç, etc.)
+- Exemples :
+  - ✅ "Terminé", "Temps écoulé", "Gagné", "Remporté"
+  - ❌ "Termine", "Temps ecoule", "Gagne", "Remporte"
+- Vérifier la grammaire et l'orthographe française
+- Les textes UI doivent être naturels et professionnels en français
+
 ## Checklist Production (5 etapes)
 
 **IMPORTANT** : Quand l'utilisateur dit "prepare pour la prod", "rends ca production-ready", ou "on met en ligne", executer ces 5 etapes dans l'ordre.

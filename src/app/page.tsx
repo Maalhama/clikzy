@@ -67,12 +67,14 @@ async function getLandingData() {
     }
   })
 
-  // Fetch featured game (active or final_phase)
+  // Fetch featured game - the one ending soonest (for urgent timer)
+  const now = Date.now()
   const { data: gameData } = await supabase
     .from('games')
     .select('id, end_time, total_clicks, last_click_username, status, item_id')
     .in('status', ['active', 'final_phase'])
-    .order('created_at', { ascending: false })
+    .gt('end_time', now) // Only games that haven't ended
+    .order('end_time', { ascending: true }) // Get the one ending soonest
     .limit(1)
     .single()
 

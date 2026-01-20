@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none">
+  <defs>
+    <linearGradient id="monitorGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#9B5CFF" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#3CCBFF" stop-opacity="0.2"/>
+    </linearGradient>
+  </defs>
+  <!-- Monitor frame -->
+  <rect x="20" y="30" width="160" height="100" rx="5" fill="url(#monitorGrad)" stroke="#9B5CFF" stroke-width="2"/>
+  <!-- Screen bezel -->
+  <rect x="25" y="35" width="150" height="90" rx="3" fill="#0B0F1A" stroke="#9B5CFF" stroke-opacity="0.5"/>
+  <!-- Screen -->
+  <rect x="28" y="38" width="144" height="84" rx="2" fill="#141B2D"/>
+  <!-- Screen content -->
+  <rect x="35" y="45" width="60" height="35" rx="2" fill="#9B5CFF" fill-opacity="0.1"/>
+  <rect x="100" y="45" width="65" height="70" rx="2" fill="#3CCBFF" fill-opacity="0.1"/>
+  <rect x="35" y="85" width="60" height="30" rx="2" fill="#FF5CB8" fill-opacity="0.1"/>
+  <!-- RGB strip bottom -->
+  <rect x="28" y="118" width="144" height="4" rx="2" fill="#FF5C5C"/>
+  <rect x="28" y="118" width="48" height="4" rx="2" fill="#FF9F5C"/>
+  <rect x="76" y="118" width="48" height="4" rx="2" fill="#FFEB5C"/>
+  <rect x="124" y="118" width="48" height="4" rx="2" fill="#5CFF5C"/>
+  <!-- Stand neck -->
+  <rect x="90" y="130" width="20" height="25" rx="3" fill="url(#monitorGrad)" stroke="#9B5CFF" stroke-width="1.5"/>
+  <!-- Stand base -->
+  <ellipse cx="100" cy="165" rx="45" ry="12" fill="url(#monitorGrad)" stroke="#9B5CFF" stroke-width="2"/>
+  <ellipse cx="100" cy="162" rx="35" ry="8" fill="#0B0F1A" stroke="#9B5CFF" stroke-opacity="0.5"/>
+  <!-- RGB ring on stand -->
+  <ellipse cx="100" cy="165" rx="40" ry="10" fill="none" stroke="#9B5CFF" stroke-width="2" stroke-dasharray="5 3"/>
+  <!-- Brand logo area -->
+  <rect x="85" y="125" width="30" height="4" rx="2" fill="#9B5CFF" fill-opacity="0.5"/>
+  <!-- Glow effect -->
+  <ellipse cx="100" cy="95" rx="85" ry="60" fill="#9B5CFF" fill-opacity="0.05"/>
+</svg>

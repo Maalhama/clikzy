@@ -20,18 +20,19 @@ interface TestimonialsProps {
   className?: string
 }
 
-const MOCK_TESTIMONIALS: Testimonial[] = [
+// Bot testimonials - diverse usernames for social proof
+const BOT_TESTIMONIALS: Testimonial[] = [
   {
     id: '1',
-    username: 'Alex42',
-    text: "Le concept est simple mais vraiment addictif. J'ai gagné mon iPhone après 2 semaines. Livraison rapide, tout était conforme.",
-    itemWon: 'iPhone 15 Pro',
+    username: 'Nathan_bdx',
+    text: "Le concept est simple mais vraiment addictif. J'ai gagné mon MacBook après 2 semaines. Livraison rapide, tout était conforme.",
+    itemWon: 'MacBook Pro 14"',
     rating: 5,
     date: 'Il y a 2 jours',
   },
   {
     id: '2',
-    username: 'MaxClick',
+    username: 'Aissatou_dk',
     text: "J'étais sceptique au début mais le système est transparent. On voit les clics en temps réel. Ma PS5 est arrivée en 4 jours.",
     itemWon: 'PlayStation 5',
     rating: 5,
@@ -39,46 +40,49 @@ const MOCK_TESTIMONIALS: Testimonial[] = [
   },
   {
     id: '3',
-    username: 'LuckyOne',
+    username: 'MaximeRun',
     text: "Le support répond vite et les paiements sont sécurisés. Bonne expérience globale, je recommande.",
-    itemWon: 'AirPods Pro',
+    itemWon: 'AirPods Pro 2',
     rating: 5,
     date: 'Il y a 3 jours',
   },
   {
     id: '4',
-    username: 'WinnerX',
-    text: "Interface claire et lots réguliers. J'ai gagné ma Switch après plusieurs essais, le système est équilibré.",
-    itemWon: 'Nintendo Switch',
+    username: 'Salma_mtp',
+    text: "Interface claire et lots réguliers. J'ai gagné mon iPhone après plusieurs essais, le système est équilibré.",
+    itemWon: 'iPhone 15 Pro',
     rating: 5,
     date: 'Il y a 5 jours',
   },
   {
     id: '5',
-    username: 'Clara_75',
+    username: 'Hugo_nantes',
     text: "Mes 10 clics gratuits quotidiens m'ont suffi pour gagner ! Le timer qui reset ajoute vraiment du suspense. Super concept.",
-    itemWon: 'MacBook Air',
+    itemWon: 'Steam Deck OLED',
     rating: 5,
     date: 'Il y a 4 jours',
   },
   {
     id: '6',
-    username: 'ThomasGamer',
-    text: "Enfin un jeu honnête où tout le monde a sa chance. J'ai reçu mon Apple Watch en parfait état. Je rejoue tous les jours !",
-    itemWon: 'Apple Watch',
+    username: 'CamilleB_',
+    text: "Enfin un jeu honnête où tout le monde a sa chance. J'ai reçu mon casque en parfait état. Je rejoue tous les jours !",
+    itemWon: 'Sony WH-1000XM5',
     rating: 5,
     date: 'Il y a 6 jours',
   },
 ]
 
 export function Testimonials({
-  testimonials = MOCK_TESTIMONIALS,
+  testimonials: externalTestimonials,
   autoPlayInterval = 4000,
   className = '',
 }: TestimonialsProps) {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [isHovered, setIsHovered] = useState(false)
   const [progress, setProgress] = useState(0)
+
+  // Use external testimonials or bot testimonials
+  const testimonials = externalTestimonials || BOT_TESTIMONIALS
 
   // Auto-scroll with progress bar
   useEffect(() => {

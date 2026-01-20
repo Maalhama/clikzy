@@ -1,0 +1,13 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "crons": [
+    {
+      "path": "/api/cron/activate-games",
+      "schedule": "* * * * *"
+    },
+    {
+      "path": "/api/cron/create-rotation",
+      "schedule": "0 0,3,6,9,12,15,18,21 * * *"
+    }
+  ]
+}

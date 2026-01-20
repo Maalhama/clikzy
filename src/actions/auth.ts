@@ -1,8 +1,8 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
-import { redirect } from 'next/navigation'
 import { headers } from 'next/headers'
+import { redirect } from 'next/navigation'
 
 export type AuthResult = {
   success: boolean
@@ -50,28 +50,43 @@ export async function signInWithPassword(formData: FormData): Promise<AuthResult
 
 /**
  * Sign in with OAuth provider (Google, GitHub)
+ * Returns the OAuth URL for client-side redirect
  */
-export async function signInWithOAuth(provider: 'google' | 'github') {
-  const supabase = await createClient()
-  const origin = (await headers()).get('origin') || process.env.NEXT_PUBLIC_SITE_URL
+export async function signInWithOAuth(provider: 'google' | 'github'): Promise<{ success: boolean; error?: string; url?: string }> {
+  try {
+    console.log('[OAuth] Starting OAuth flow for provider:', provider)
 
-  const { data, error } = await supabase.auth.signInWithOAuth({
-    provider,
-    options: {
-      redirectTo: `${origin}/auth/callback`,
-    },
-  })
+    const headersList = await headers()
+    const origin = headersList.get('origin') || process.env.NEXT_PUBLIC_SITE_URL
+    console.log('[OAuth] Origin:', origin)
 
-  if (error) {
-    console.error('OAuth error:', error.message)
-    return { success: false, error: error.message }
+    const supabase = await createClient()
+    console.log('[OAuth] Supabase client created')
+
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider,
+      options: {
+        redirectTo: `${origin}/auth/callback`,
+      },
+    })
+
+    console.log('[OAuth] Supabase response:', { data, error })
+
+    if (error) {
+      console.error('[OAuth] Error:', error.message)
+      return { success: false, error: error.message }
+    }
+
+    if (data.url) {
+      console.log('[OAuth] Success, redirect URL:', data.url)
+      return { success: true, url: data.url }
+    }
+
+    return { success: false, error: 'URL de redirection manquante' }
+  } catch (err) {
+    console.error('[OAuth] Unexpected error:', err)
+    return { success: false, error: 'Erreur inattendue lors de la connexion' }
   }
-
-  if (data.url) {
-    redirect(data.url)
-  }
-
-  return { success: false, error: 'URL de redirection manquante' }
 }
 
 /**
@@ -160,4 +175,49 @@ export async function getUserWithProfile() {
     .single()
 
   return { user, profile }
+}
+
+/**
+ * Send password reset email
+ */
+export async function resetPassword(email: string): Promise<AuthResult> {
+  if (!email || !email.includes('@')) {
+    return { success: false, error: 'Email invalide' }
+  }
+
+  const supabase = await createClient()
+  const origin = (await headers()).get('origin') || process.env.NEXT_PUBLIC_SITE_URL
+
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: `${origin}/reset-password`,
+  })
+
+  if (error) {
+    console.error('Reset password error:', error.message)
+    return { success: false, error: error.message }
+  }
+
+  return { success: true }
+}
+
+/**
+ * Update password (after reset)
+ */
+export async function updatePassword(newPassword: string): Promise<AuthResult> {
+  if (!newPassword || newPassword.length < 6) {
+    return { success: false, error: 'Le mot de passe doit contenir au moins 6 caractères' }
+  }
+
+  const supabase = await createClient()
+
+  const { error } = await supabase.auth.updateUser({
+    password: newPassword,
+  })
+
+  if (error) {
+    console.error('Update password error:', error.message)
+    return { success: false, error: error.message }
+  }
+
+  return { success: true }
 }

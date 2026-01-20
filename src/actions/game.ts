@@ -78,14 +78,14 @@ export async function clickGame(gameId: string): Promise<ActionResult<{ newEndTi
 
   // Get next sequence number for this game
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data: seqData } = await (supabase.rpc as any)('get_next_sequence', { game_id_param: gameId })
+  const { data: seqData } = await (supabase.rpc as any)('get_next_sequence', { p_game_id: gameId })
 
   const sequence = (seqData as number) ?? 1
 
   // Start transaction-like operations
   // 1. Deduct credit
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { error: creditError } = await (supabase.rpc as any)('decrement_credits', { user_id_param: user.id, amount: GAME_CONSTANTS.CREDIT_COST_PER_CLICK })
+  const { error: creditError } = await (supabase.rpc as any)('decrement_credits', { p_user_id: user.id, p_amount: GAME_CONSTANTS.CREDIT_COST_PER_CLICK })
 
   if (creditError) {
     return { success: false, error: 'Erreur lors de la déduction des crédits' }
@@ -105,7 +105,7 @@ export async function clickGame(gameId: string): Promise<ActionResult<{ newEndTi
   if (clickError) {
     // Try to refund credit on failure
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await (supabase.rpc as any)('decrement_credits', { user_id_param: user.id, amount: -GAME_CONSTANTS.CREDIT_COST_PER_CLICK })
+    await (supabase.rpc as any)('decrement_credits', { p_user_id: user.id, p_amount: -GAME_CONSTANTS.CREDIT_COST_PER_CLICK })
     return { success: false, error: 'Erreur lors de l\'enregistrement du clic' }
   }
 
