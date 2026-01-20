@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import Image from 'next/image'
 
@@ -87,10 +87,14 @@ function TrophyIcon({ className }: { className?: string }) {
 
 export function LiveActivityToast({ enabled = true, maxVisible = 3, realWinners = [] }: LiveActivityToastProps) {
   const [notifications, setNotifications] = useState<WinNotification[]>([])
-  const [winnerIndex, setWinnerIndex] = useState(0)
+
+  // Use refs to avoid useEffect re-running
+  const winnerIndexRef = useRef(0)
+  const realWinnersRef = useRef(realWinners)
+  realWinnersRef.current = realWinners
 
   // Map item names to local SVG images
-  const getItemImage = useCallback((itemName: string): string => {
+  const getItemImage = (itemName: string): string => {
     const name = itemName.toLowerCase()
     // Smartphones
     if (name.includes('iphone')) return '/products/iphone-15-pro.svg'
@@ -144,74 +148,74 @@ export function LiveActivityToast({ enabled = true, maxVisible = 3, realWinners 
     if (name.includes('jordan') || name.includes('nike')) return '/products/nike-jordan.svg'
     // Fallback
     return '/products/gift-card.svg'
-  }, [])
+  }
 
-  const addWinNotification = useCallback(() => {
-    const id = Math.random().toString(36).substring(7)
-
-    let username: string
-    let itemName: string
-    let itemImage: string
-    let value: number
-    let wonAt: string | undefined
-
-    // Use real winners if available, cycling through them
-    if (realWinners.length > 0) {
-      const winner = realWinners[winnerIndex % realWinners.length]
-      username = winner.username
-      itemName = winner.item_name
-      itemImage = getItemImage(winner.item_name)
-      value = winner.item_value
-      wonAt = winner.won_at
-      setWinnerIndex(prev => prev + 1)
-    } else {
-      // Fallback to bot winners with realistic usernames and fake recent time
-      const botWinner = BOT_WINNERS[winnerIndex % BOT_WINNERS.length]
-      username = botWinner.username
-      itemName = botWinner.item
-      itemImage = botWinner.image
-      value = botWinner.value
-      // Generate fake recent time (between 5 minutes and 3 hours ago)
-      const fakeMinutesAgo = Math.floor(Math.random() * 175) + 5
-      wonAt = new Date(Date.now() - fakeMinutesAgo * 60 * 1000).toISOString()
-      setWinnerIndex(prev => prev + 1)
-    }
-
-    const newNotification: WinNotification = {
-      id,
-      username,
-      item: itemName,
-      itemImage,
-      value,
-      timestamp: Date.now(),
-      wonAt,
-    }
-
-    setNotifications(prev => [newNotification, ...prev].slice(0, maxVisible))
-
-    // Auto-remove after duration
-    setTimeout(() => {
-      setNotifications(prev => prev.filter(n => n.id !== id))
-    }, TOAST_DURATION)
-  }, [maxVisible, realWinners, winnerIndex, getItemImage])
-
-  // Show winners every 60 seconds
+  // Show winners every 60 seconds - stable useEffect with no changing dependencies
   useEffect(() => {
     if (!enabled) return
+
+    const addWinNotification = () => {
+      const id = Math.random().toString(36).substring(7)
+      const currentIndex = winnerIndexRef.current
+      const winners = realWinnersRef.current
+
+      let username: string
+      let itemName: string
+      let itemImage: string
+      let value: number
+      let wonAt: string | undefined
+
+      // Use real winners if available, cycling through them
+      if (winners.length > 0) {
+        const winner = winners[currentIndex % winners.length]
+        username = winner.username
+        itemName = winner.item_name
+        itemImage = getItemImage(winner.item_name)
+        value = winner.item_value
+        wonAt = winner.won_at
+      } else {
+        // Fallback to bot winners with realistic usernames and fake recent time
+        const botWinner = BOT_WINNERS[currentIndex % BOT_WINNERS.length]
+        username = botWinner.username
+        itemName = botWinner.item
+        itemImage = botWinner.image
+        value = botWinner.value
+        // Generate fake recent time (between 5 minutes and 3 hours ago)
+        const fakeMinutesAgo = Math.floor(Math.random() * 175) + 5
+        wonAt = new Date(Date.now() - fakeMinutesAgo * 60 * 1000).toISOString()
+      }
+
+      winnerIndexRef.current = currentIndex + 1
+
+      const newNotification: WinNotification = {
+        id,
+        username,
+        item: itemName,
+        itemImage,
+        value,
+        timestamp: Date.now(),
+        wonAt,
+      }
+
+      setNotifications(prev => [newNotification, ...prev].slice(0, maxVisible))
+
+      // Auto-remove after duration
+      setTimeout(() => {
+        setNotifications(prev => prev.filter(n => n.id !== id))
+      }, TOAST_DURATION)
+    }
 
     // Initial notification after 10 seconds
     const initialTimeout = setTimeout(addWinNotification, 10000)
 
     // Then every 60 seconds (1 minute)
-    const interval = setInterval(() => {
-      addWinNotification()
-    }, 60000)
+    const interval = setInterval(addWinNotification, 60000)
 
     return () => {
       clearTimeout(initialTimeout)
       clearInterval(interval)
     }
-  }, [enabled, addWinNotification])
+  }, [enabled, maxVisible])
 
   if (!enabled) return null
 
