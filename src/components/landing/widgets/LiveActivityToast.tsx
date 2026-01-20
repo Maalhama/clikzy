@@ -195,17 +195,17 @@ export function LiveActivityToast({ enabled = true, maxVisible = 3, realWinners 
     }, TOAST_DURATION)
   }, [maxVisible, realWinners, winnerIndex, getItemImage])
 
-  // Show winners every 15 seconds
+  // Show winners every 60 seconds
   useEffect(() => {
     if (!enabled) return
 
-    // Initial notification after 5 seconds
-    const initialTimeout = setTimeout(addWinNotification, 5000)
+    // Initial notification after 10 seconds
+    const initialTimeout = setTimeout(addWinNotification, 10000)
 
-    // Then every 15 seconds
+    // Then every 60 seconds (1 minute)
     const interval = setInterval(() => {
       addWinNotification()
-    }, 15000)
+    }, 60000)
 
     return () => {
       clearTimeout(initialTimeout)
