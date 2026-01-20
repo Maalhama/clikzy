@@ -1402,3 +1402,78 @@ body {
   animation-play-state: paused;
 }
 
+/* ===========================================
+   MOBILE PERFORMANCE OPTIMIZATIONS
+   =========================================== */
+
+/* Reduce animations on mobile for better performance */
+@media (max-width: 768px) {
+  /* Disable expensive blur effects on mobile */
+  .blur-\[150px\],
+  .blur-\[120px\],
+  .blur-\[100px\],
+  .blur-\[80px\] {
+    filter: blur(40px) !important;
+    opacity: 0.5;
+  }
+
+  /* Reduce backdrop blur intensity on mobile */
+  .backdrop-blur-xl {
+    backdrop-filter: blur(8px) !important;
+    -webkit-backdrop-filter: blur(8px) !important;
+  }
+
+  .backdrop-blur-lg {
+    backdrop-filter: blur(6px) !important;
+    -webkit-backdrop-filter: blur(6px) !important;
+  }
+
+  /* Stop infinite ping/pulse animations on mobile */
+  .animate-ping {
+    animation: none !important;
+    opacity: 0.75;
+  }
+
+  .animate-pulse {
+    animation: none !important;
+  }
+
+  /* Simplify marquee on mobile */
+  .marquee-content {
+    animation-duration: 30s;
+  }
+
+  /* Disable hover transforms on mobile (no hover anyway) */
+  .group:hover .group-hover\:scale-110,
+  .hover\:scale-105:hover,
+  .hover\:scale-110:hover {
+    transform: none !important;
+  }
+}
+
+/* ===========================================
+   REDUCED MOTION ACCESSIBILITY
+   =========================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .animate-ping,
+  .animate-pulse,
+  .animate-bounce,
+  .animate-spin {
+    animation: none !important;
+  }
+
+  .marquee-content {
+    animation: none !important;
+  }
+}
+

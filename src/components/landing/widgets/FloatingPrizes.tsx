@@ -90,6 +90,12 @@ export function FloatingPrizes() {
   const containerRef = useRef<HTMLDivElement>(null)
   const [isVisible, setIsVisible] = useState(false)
   const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({})
+  const [isMobile, setIsMobile] = useState(false)
+
+  // Detect mobile on mount
+  useEffect(() => {
+    setIsMobile(window.innerWidth < 768)
+  }, [])
 
   useEffect(() => {
     if (!containerRef.current) return
@@ -127,7 +133,8 @@ export function FloatingPrizes() {
               key={prize.id}
               className={`prize-float-card relative group ${isMain ? 'col-span-2 row-span-2' : ''}`}
               style={{
-                animation: isVisible ? `float-slow ${3 + (index % 3)}s ease-in-out ${index * 0.2}s infinite` : 'none',
+                // Disable float animation on mobile for performance
+                animation: isVisible && !isMobile ? `float-slow ${3 + (index % 3)}s ease-in-out ${index * 0.2}s infinite` : 'none',
                 opacity: isVisible ? 1 : 0,
                 transform: isVisible ? 'translateY(0)' : 'translateY(20px)',
                 transition: `opacity 0.5s ease ${index * 0.1}s, transform 0.5s ease ${index * 0.1}s`,

@@ -22,6 +22,12 @@ export function ClickPulse({
   className = '',
 }: ClickPulseProps) {
   const [pulses, setPulses] = useState<PulsePoint[]>([])
+  const [isMobile, setIsMobile] = useState(false)
+
+  // Detect mobile on mount
+  useEffect(() => {
+    setIsMobile(window.innerWidth < 768)
+  }, [])
 
   const getIntervalRange = () => {
     switch (intensity) {
@@ -52,7 +58,8 @@ export function ClickPulse({
   }, [])
 
   useEffect(() => {
-    if (!enabled) return
+    // Disable on mobile for performance
+    if (!enabled || isMobile) return
 
     const { min, max } = getIntervalRange()
 
@@ -64,15 +71,13 @@ export function ClickPulse({
       }, delay)
     }
 
-    // Initial pulses
-    for (let i = 0; i < 3; i++) {
-      setTimeout(addPulse, i * 500)
-    }
+    // Initial pulses (reduced from 3 to 1)
+    setTimeout(addPulse, 500)
 
     const timeout = scheduleNext()
 
     return () => clearTimeout(timeout)
-  }, [enabled, intensity, addPulse])
+  }, [enabled, intensity, addPulse, isMobile])
 
   const getColorStyles = (color: PulsePoint['color']) => {
     switch (color) {
@@ -85,7 +90,8 @@ export function ClickPulse({
     }
   }
 
-  if (!enabled) return null
+  // Don't render on mobile for performance
+  if (!enabled || isMobile) return null
 
   return (
     <div className={`absolute inset-0 overflow-hidden pointer-events-none ${className}`}>
