@@ -278,25 +278,56 @@ export async function GET(request: NextRequest) {
       const isRecentRealPlayer = isRealPlayerClick(game.last_click_user_id) &&
         (now - lastClickAt) < REAL_PLAYER_WINDOW
 
-      // If game has ended, mark it
+      // If game has ended, mark it and record winner
       if (timeLeft <= 0) {
-        const winnerUsername = game.last_click_username || 'Champion'
+        const winnerUsername = game.last_click_username || null
+        const winnerId = game.last_click_user_id || null
+        const itemName = getItemName(game.item)
 
+        // Update game with winner info
         await supabase
           .from('games')
           .update({
             status: 'ended',
             ended_at: new Date().toISOString(),
+            winner_id: winnerId,
           })
           .eq('id', game.id)
 
+        // Create winner record only if there was a real player winner
+        if (winnerId) {
+          await supabase
+            .from('winners')
+            .insert({
+              game_id: game.id,
+              user_id: winnerId,
+              item_id: game.item_id,
+              item_name: itemName,
+              total_clicks_in_game: game.total_clicks || 0,
+            })
+
+          // Update winner's profile stats
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('total_wins')
+            .eq('id', winnerId)
+            .single()
+
+          if (profile) {
+            await supabase
+              .from('profiles')
+              .update({ total_wins: (profile.total_wins ?? 0) + 1 })
+              .eq('id', winnerId)
+          }
+        }
+
         results.push({
           gameId: game.id,
-          itemName: getItemName(game.item),
+          itemName,
           clicks: 0,
           reason: 'game_ended',
           newStatus: 'ended',
-          winner: winnerUsername,
+          winner: winnerUsername || (game.total_clicks > 0 ? 'Bot' : 'Aucun'),
         })
         continue
       }
