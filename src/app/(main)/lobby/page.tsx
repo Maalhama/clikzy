@@ -3,40 +3,70 @@ import { createClient } from '@/lib/supabase/server'
 import { checkAndResetDailyCredits } from '@/actions/credits'
 import { LobbyClient } from './LobbyClient'
 import { GameCardSkeleton } from '@/components/lobby'
-import { SOON_THRESHOLD } from '@/lib/constants/rotation'
+import { SOON_THRESHOLD, ROTATION_HOURS } from '@/lib/constants/rotation'
 import type { GameWithItem } from '@/types/database'
 
 export const dynamic = 'force-dynamic'
 
 /**
- * Get the last 19h reset time in Paris timezone
- * Games won before this time should not be shown (they were "reset")
+ * Get the time when ended games should start being shown
+ * (since the last rotation started)
+ * Games expire 1 minute before the next rotation
  */
-function getLastResetTime(): Date {
+function getEndedGamesStartTime(): number {
   const now = new Date()
 
-  // Get current time in Paris (UTC+1 in winter, UTC+2 in summer)
+  // Get current time in Paris
   const parisFormatter = new Intl.DateTimeFormat('en-US', {
     timeZone: 'Europe/Paris',
     hour: 'numeric',
+    minute: 'numeric',
     hour12: false,
   })
-  const parisHour = parseInt(parisFormatter.format(now), 10)
+  const parisTimeStr = parisFormatter.format(now)
+  const [parisHourStr, parisMinuteStr] = parisTimeStr.split(':')
+  const parisHour = parseInt(parisHourStr, 10)
+  const parisMinute = parseInt(parisMinuteStr, 10)
 
-  // Calculate last 19h reset
-  const resetTime = new Date(now)
-
-  // Set to Paris 19:00
-  if (parisHour >= 19) {
-    // Today at 19h Paris
-    resetTime.setHours(now.getHours() - parisHour + 19, 0, 0, 0)
-  } else {
-    // Yesterday at 19h Paris
-    resetTime.setDate(resetTime.getDate() - 1)
-    resetTime.setHours(now.getHours() - parisHour + 19, 0, 0, 0)
+  // Find the current rotation hour (the most recent rotation that started)
+  let currentRotationHour: number = ROTATION_HOURS[0]
+  for (const hour of ROTATION_HOURS) {
+    if (parisHour >= hour) {
+      currentRotationHour = hour
+    }
   }
 
-  return resetTime
+  // Check if we're in the last minute before next rotation (expiry window)
+  const rotationHoursArray = [...ROTATION_HOURS] as number[]
+  const nextRotationIndex = rotationHoursArray.indexOf(currentRotationHour) + 1
+  const nextRotationHour = nextRotationIndex < rotationHoursArray.length
+    ? rotationHoursArray[nextRotationIndex]
+    : rotationHoursArray[0] // Wrap to midnight
+
+  // If we're 1 minute before the next rotation, don't show any ended games
+  const minutesUntilNextRotation = ((nextRotationHour - parisHour + 24) % 24) * 60 - parisMinute
+  if (minutesUntilNextRotation <= 1 && minutesUntilNextRotation >= 0) {
+    // Return a future timestamp so no ended games are shown
+    return Date.now() + 1000 * 60 * 60 * 24 // 24h in the future
+  }
+
+  // Calculate the start time of the current rotation in UTC
+  const rotationStart = new Date(now)
+
+  // Get Paris offset
+  const utcDate = new Date(now.toLocaleString('en-US', { timeZone: 'UTC' }))
+  const parisDate = new Date(now.toLocaleString('en-US', { timeZone: 'Europe/Paris' }))
+  const parisOffset = parisDate.getTime() - utcDate.getTime()
+
+  // Set to current rotation hour in Paris, then convert to UTC
+  rotationStart.setHours(now.getHours() - parisHour + currentRotationHour, 0, 0, 0)
+
+  // If the current rotation hour is greater than current Paris hour, it was yesterday
+  if (currentRotationHour > parisHour) {
+    rotationStart.setDate(rotationStart.getDate() - 1)
+  }
+
+  return rotationStart.getTime()
 }
 
 async function getLobbyData() {
@@ -49,8 +79,9 @@ async function getLobbyData() {
     ? (creditsResult.data?.wasReset ?? false)
     : false
 
-  // Get the last reset time (19h Paris)
-  const lastResetTime = getLastResetTime()
+  // Get the time from which to show ended games (since current rotation)
+  // Games expire 1 minute before next rotation
+  const endedGamesStartTime = getEndedGamesStartTime()
 
   // Get active games with their items
   const { data: activeGames } = await supabase
@@ -80,7 +111,8 @@ async function getLobbyData() {
     .order('start_time', { ascending: true })
     .limit(20)
 
-  // Get recently ended games (ended after last 19h reset, based on end_time)
+  // Get recently ended games (ended after current rotation started)
+  // Expires 1 minute before next rotation
   const { data: endedGames } = await supabase
     .from('games')
     .select(
@@ -90,9 +122,9 @@ async function getLobbyData() {
     `
     )
     .eq('status', 'ended')
-    .gte('end_time', lastResetTime.getTime())
+    .gte('end_time', endedGamesStartTime)
     .order('end_time', { ascending: false })
-    .limit(20)
+    .limit(100)
 
   // Combine all games
   const allActiveGames = (activeGames as GameWithItem[] | null) ?? []
