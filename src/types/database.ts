@@ -170,31 +170,37 @@ export interface Database {
         Row: {
           id: string
           game_id: string
-          user_id: string
+          user_id: string | null
+          username: string | null
           item_id: string
           item_name: string
           item_value: number | null
           total_clicks_in_game: number | null
+          is_bot: boolean
           won_at: string
         }
         Insert: {
           id?: string
           game_id: string
-          user_id: string
+          user_id?: string | null
+          username?: string | null
           item_id: string
           item_name: string
           item_value?: number | null
           total_clicks_in_game?: number | null
+          is_bot?: boolean
           won_at?: string
         }
         Update: {
           id?: string
           game_id?: string
-          user_id?: string
+          user_id?: string | null
+          username?: string | null
           item_id?: string
           item_name?: string
           item_value?: number | null
           total_clicks_in_game?: number | null
+          is_bot?: boolean
           won_at?: string
         }
       }

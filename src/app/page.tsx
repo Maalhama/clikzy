@@ -41,10 +41,10 @@ async function getLandingData() {
     winningsResult,
     fallbackItemResult,
   ] = await Promise.all([
-    // Fetch recent winners
+    // Fetch recent winners (including bots)
     supabase
       .from('winners')
-      .select('id, item_name, item_value, won_at, user_id')
+      .select('id, item_name, item_value, won_at, user_id, username, is_bot')
       .order('won_at', { ascending: false })
       .limit(10),
 
@@ -78,15 +78,17 @@ async function getLandingData() {
       .single(),
   ])
 
-  const typedWinners = winnersResult.data as Pick<DbWinner, 'id' | 'item_name' | 'item_value' | 'won_at' | 'user_id'>[] | null
+  const typedWinners = winnersResult.data as Pick<DbWinner, 'id' | 'item_name' | 'item_value' | 'won_at' | 'user_id' | 'username' | 'is_bot'>[] | null
 
-  // Fetch profiles for winners (depends on winners result)
-  const userIds = typedWinners ? typedWinners.map((w) => w.user_id).filter(Boolean) : []
-  const { data: profilesData } = userIds.length > 0
+  // Fetch profiles for real winners only (not bots) to get avatar
+  const realUserIds = typedWinners
+    ? typedWinners.filter(w => w.user_id && !w.is_bot).map(w => w.user_id).filter(Boolean) as string[]
+    : []
+  const { data: profilesData } = realUserIds.length > 0
     ? await supabase
         .from('profiles')
         .select('id, username, avatar_url')
-        .in('id', userIds)
+        .in('id', realUserIds)
     : { data: [] }
 
   const typedProfiles = profilesData as Pick<Profile, 'id' | 'username' | 'avatar_url'>[] | null
@@ -95,10 +97,11 @@ async function getLandingData() {
   )
 
   const winners: Winner[] = (typedWinners || []).map((w) => {
-    const profile = profilesMap.get(w.user_id)
+    const profile = w.user_id ? profilesMap.get(w.user_id) : null
     return {
       id: w.id,
-      username: profile?.username || 'Anonyme',
+      // Use username from winners table first (works for bots), fallback to profile
+      username: w.username || profile?.username || 'Anonyme',
       item_name: w.item_name,
       item_value: w.item_value || 0,
       won_at: w.won_at,

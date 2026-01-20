@@ -294,30 +294,47 @@ export async function GET(request: NextRequest) {
           })
           .eq('id', game.id)
 
-        // Create winner record only if there was a real player winner
-        if (winnerId) {
+        // Create winner record for both real players and bots
+        if (winnerUsername || game.total_clicks > 0) {
+          const isBot = !winnerId
+
+          // Get username for real players from profile
+          let username = winnerUsername
+          if (winnerId && !username) {
+            const { data: winnerProfile } = await supabase
+              .from('profiles')
+              .select('username')
+              .eq('id', winnerId)
+              .single()
+            username = winnerProfile?.username || 'Joueur'
+          }
+
           await supabase
             .from('winners')
             .insert({
               game_id: game.id,
-              user_id: winnerId,
+              user_id: winnerId || null,
+              username: username || 'Bot',
               item_id: game.item_id,
               item_name: itemName,
               total_clicks_in_game: game.total_clicks || 0,
+              is_bot: isBot,
             })
 
-          // Update winner's profile stats
-          const { data: profile } = await supabase
-            .from('profiles')
-            .select('total_wins')
-            .eq('id', winnerId)
-            .single()
-
-          if (profile) {
-            await supabase
+          // Update real player's profile stats (not bots)
+          if (winnerId) {
+            const { data: profile } = await supabase
               .from('profiles')
-              .update({ total_wins: (profile.total_wins ?? 0) + 1 })
+              .select('total_wins')
               .eq('id', winnerId)
+              .single()
+
+            if (profile) {
+              await supabase
+                .from('profiles')
+                .update({ total_wins: (profile.total_wins ?? 0) + 1 })
+                .eq('id', winnerId)
+            }
           }
         }
 

@@ -57,13 +57,16 @@ export default async function GamePage({ params }: PageProps) {
   type ClickWithProfile = {
     id: string
     clicked_at: string
+    username: string | null
+    is_bot: boolean
     profile: { username: string } | null
   }
 
   const recentClicks = (clicksResult.data as ClickWithProfile[] | null)?.map(click => ({
     id: click.id,
-    username: click.profile?.username || 'Anonyme',
+    username: click.username || click.profile?.username || 'Anonyme',
     clickedAt: click.clicked_at,
+    isBot: click.is_bot,
   })) ?? []
 
   return (

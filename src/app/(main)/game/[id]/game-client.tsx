@@ -121,6 +121,7 @@ type RecentClick = {
   id: string
   username: string
   clickedAt: string
+  isBot?: boolean
 }
 
 type GameClientProps = {
