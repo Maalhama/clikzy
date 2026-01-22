@@ -92,11 +92,17 @@ function getBattleProgress(gameId: string, battleStartTime: string | null): numb
   return Math.min(1.5, elapsed / totalDuration) // Cap à 150% pour éviter des valeurs infinies
 }
 
-function shouldBotClickInBattle(gameId: string, battleProgress: number): boolean {
-  if (battleProgress >= 1) return false
+function shouldBotClickInBattle(gameId: string, battleProgress: number, hasRealPlayer: boolean): boolean {
+  // Si un joueur réel est encore actif, continuer la bataille même après la durée max
+  if (battleProgress >= 1) {
+    // Bataille "terminée" mais joueur réel présent = continuer à se battre
+    return hasRealPlayer
+  }
   if (battleProgress < 0.9) return true
 
-  // 90-100%: probabilité linéaire décroissante
+  // 90-100%: probabilité linéaire décroissante (sauf si joueur réel)
+  if (hasRealPlayer) return true // Toujours cliquer si joueur réel présent
+
   const remainingProgress = (1 - battleProgress) / 0.1
   const seed = getDeterministicSeed(gameId, Math.floor(Date.now() / 5000))
   const random = (seed % 100) / 100
@@ -159,10 +165,11 @@ export function useBotSimulation({
       const hasRealPlayer = !!lastClickUserIdRef.current
 
       // Vérifier si la bataille est terminée (phase finale seulement)
+      // Si un joueur réel est présent, les bots continuent même après la durée max
       let battleEnded = false
       if (isInFinalPhase && battleStartTimeRef.current) {
         const battleProgress = getBattleProgress(gameId, battleStartTimeRef.current)
-        battleEnded = !shouldBotClickInBattle(gameId, battleProgress)
+        battleEnded = !shouldBotClickInBattle(gameId, battleProgress, hasRealPlayer)
       }
 
       // SNIPE LOGIC: Si joueur réel est leader et timer < 15s, on snipe immédiatement

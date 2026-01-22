@@ -116,15 +116,20 @@ function getBattleProgress(gameId: string, battleStartTime: string | null): numb
   return Math.min(1, elapsed / totalDuration)
 }
 
-function shouldBotClick(gameId: string, battleProgress: number): boolean {
+function shouldBotClick(gameId: string, battleProgress: number, hasRealPlayer: boolean): boolean {
   // 0-90%: clics normaux (100% chance)
   // 90-100%: probabilité décroissante
-  // >100%: plus de clics
+  // >100%: plus de clics SAUF si joueur réel présent
 
-  if (battleProgress >= 1) return false
+  if (battleProgress >= 1) {
+    // Bataille "terminée" mais joueur réel présent = continuer à se battre
+    return hasRealPlayer
+  }
   if (battleProgress < 0.9) return true
 
-  // 90-100%: probabilité linéaire décroissante de 100% à 0%
+  // 90-100%: probabilité linéaire décroissante (sauf si joueur réel)
+  if (hasRealPlayer) return true // Toujours cliquer si joueur réel présent
+
   const remainingProgress = (1 - battleProgress) / 0.1 // 1.0 à 0.0
   const seed = hashString(`${gameId}-${Math.floor(Date.now() / 60000)}`)
   const random = (seed % 100) / 100
@@ -231,9 +236,10 @@ export async function GET(request: NextRequest) {
 
         if (isInFinalPhase) {
           // Phase finale - vérifier si les bots doivent encore cliquer
-          if (shouldBotClick(game.id, battleProgress)) {
+          // shouldBotClick retourne true si joueur réel présent (même après durée max)
+          if (shouldBotClick(game.id, battleProgress, hasRealPlayer)) {
             // SNIPE: Si un joueur réel est leader et timer < 15s, le bot reprend
-            // Sinon, le bot clique normalement (ou laisse le joueur croire qu'il va gagner)
+            // Sinon, le bot clique normalement
             const shouldSnipe = hasRealPlayer && timeLeft <= 15000
             const shouldNormalClick = !hasRealPlayer
 
@@ -252,15 +258,8 @@ export async function GET(request: NextRequest) {
               action = `real_player_leading (${game.last_click_username}) - ${Math.floor(timeLeft/1000)}s left, waiting to snipe...`
             }
           } else {
-            // Bataille terminée - mais sniper quand même si joueur réel est leader
-            if (hasRealPlayer && timeLeft <= 10000) {
-              updates.last_click_username = botUsername
-              updates.last_click_user_id = null
-              updates.end_time = now + 60000
-              action = `bot_snipe_endgame! (${botUsername}) - battle ended but can't let player win`
-            } else {
-              action = `battle_ending (${Math.round(battleProgress * 100)}%) - letting timer run down`
-            }
+            // Bataille terminée ET pas de joueur réel - laisser timer descendre
+            action = `battle_ended (${Math.round(battleProgress * 100)}%) - no real player, letting timer run down`
           }
         } else {
           // Phase normale - les bots cliquent comme des vrais joueurs
