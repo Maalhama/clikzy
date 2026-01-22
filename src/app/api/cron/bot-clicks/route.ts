@@ -457,24 +457,21 @@ export async function GET(request: NextRequest) {
         })
       }
 
-      // Get the timestamp of the LAST click to calculate newEndTime correctly
-      // This fixes the 68s bug: newEndTime should be 60s from the last click, not from gameNow
-      const lastClickTimestamp = botClicks.length > 0
-        ? new Date(botClicks[botClicks.length - 1].clicked_at).getTime()
-        : gameNow
-
       // Trigger final phase if time < 1 minute
-      // Use 58-62 seconds reset from the LAST click timestamp (cron runs every 1 minute)
+      // Reset to EXACTLY 60 seconds from gameNow (not last click) to ensure timer shows exactly 01:00
       if (game.status === 'active' && timeLeft <= FINAL_PHASE_THRESHOLD) {
-        const resetTime = 58000 + Math.floor(Math.random() * 4000) // 58-62s
-        newEndTime = lastClickTimestamp + resetTime
+        newEndTime = gameNow + 60000 // EXACTLY 60 seconds
         newStatus = 'final_phase'
         shouldSetBattleStart = true
       } else if (game.status === 'final_phase') {
-        // In final phase, reset to 58-62s from last click
-        const resetTime = 58000 + Math.floor(Math.random() * 4000) // 58-62s
-        newEndTime = lastClickTimestamp + resetTime
+        // In final phase, reset to EXACTLY 60 seconds
+        newEndTime = gameNow + 60000
       }
+
+      // Get the timestamp of the LAST click for last_click_at field (feed live variety)
+      const lastClickTimestamp = botClicks.length > 0
+        ? new Date(botClicks[botClicks.length - 1].clicked_at).getTime()
+        : gameNow
 
       // Build update data
       const updateData: Record<string, unknown> = {
