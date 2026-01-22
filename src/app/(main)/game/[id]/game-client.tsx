@@ -144,6 +144,7 @@ export function GameClient({
   const { credits, decrementCredits } = useCredits()
 
   // Merge initial clicks with DB clicks, prioritizing DB
+  // If no clicks exist, generate fake initial history for visual feedback
   const recentClicks = useMemo(() => {
     const dbIds = new Set(dbClicks.map(c => c.id))
     const uniqueInitial = initialClicks.filter(c => !dbIds.has(c.id))
@@ -153,8 +154,24 @@ export function GameClient({
       username: c.username,
       clickedAt: c.clickedAt,
     }))
-    return [...formattedDbClicks, ...uniqueInitial].slice(0, 10)
-  }, [dbClicks, initialClicks])
+    const mergedClicks = [...formattedDbClicks, ...uniqueInitial]
+
+    // If no clicks yet, generate 3 fake initial clicks for visual history
+    if (mergedClicks.length === 0) {
+      const now = Date.now()
+      return [0, 1, 2].map((i) => {
+        const seed = `${initialGame.id}-initial-${i}`
+        const clickTime = now - (i * 30000 + Math.floor(Math.random() * 10000)) // 30s apart
+        return {
+          id: `initial-${seed}`,
+          username: generateDeterministicUsername(seed),
+          clickedAt: new Date(clickTime).toISOString(),
+        }
+      })
+    }
+
+    return mergedClicks.slice(0, 10)
+  }, [dbClicks, initialClicks, initialGame.id])
   const [isPending, startTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
   const [showWinnerModal, setShowWinnerModal] = useState(false)
