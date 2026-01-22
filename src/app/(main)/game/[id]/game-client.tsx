@@ -164,7 +164,9 @@ export function GameClient({
   const { timeLeft, isUrgent, isEnded } = useTimer({ endTime: game.end_time })
 
   // Cap display at 60s in final phase (cron uses 75s for safety buffer)
-  const displayTimeLeft = isUrgent ? Math.min(timeLeft, 60000) : timeLeft
+  // Apply cap when timeLeft <= 75s (cron reset zone)
+  const isInCronResetZone = timeLeft <= 75000 && timeLeft > 0
+  const displayTimeLeft = isInCronResetZone ? Math.min(timeLeft, 60000) : timeLeft
   const { playClick, playWin, playHeartbeat, stopAll: stopSounds } = useSounds(true)
 
   // Simulation pour expérience visuelle fluide
