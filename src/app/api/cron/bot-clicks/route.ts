@@ -482,14 +482,14 @@ export async function GET(request: NextRequest) {
       }
 
       // Trigger final phase if time < 1 minute
-      // Reset to EXACTLY 60 seconds from gameNow (not last click) to ensure timer shows exactly 01:00
+      // Reset to EXACTLY 60 seconds from NOW (not gameNow with delay) to ensure timer shows exactly 01:00
       if (game.status === 'active' && timeLeft <= FINAL_PHASE_THRESHOLD) {
-        newEndTime = gameNow + 60000 // EXACTLY 60 seconds
+        newEndTime = now + 60000 // EXACTLY 60 seconds from real now
         newStatus = 'final_phase'
         shouldSetBattleStart = true
       } else if (game.status === 'final_phase') {
-        // In final phase, ALWAYS reset to EXACTLY 60 seconds (even if timer is negative)
-        newEndTime = gameNow + 60000
+        // In final phase, ALWAYS reset to EXACTLY 60 seconds from real now
+        newEndTime = now + 60000
       }
 
       // Get the timestamp of the LAST click for last_click_at field (feed live variety)
