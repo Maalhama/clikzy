@@ -164,18 +164,17 @@ export function GameClient({
   const { timeLeft, isUrgent, isEnded } = useTimer({ endTime: game.end_time })
   const { playClick, playWin, playHeartbeat, stopAll: stopSounds } = useSounds(true)
 
-  // Simulation désactivée - les clics bots sont gérés par le cron backend
-  // Cela garantit que les clics persistent en DB et sont visibles après refresh
-  // useBotSimulation({
-  //   gameId: game.id,
-  //   endTime: game.end_time,
-  //   status: game.status,
-  //   battleStartTime: game.battle_start_time,
-  //   lastClickUsername: game.last_click_username,
-  //   addClick,
-  //   optimisticUpdate,
-  //   enabled: game.status === 'active' || game.status === 'final_phase',
-  // })
+  // Simulation pour expérience visuelle fluide
+  useBotSimulation({
+    gameId: game.id,
+    endTime: game.end_time,
+    status: game.status,
+    battleStartTime: game.battle_start_time,
+    lastClickUsername: game.last_click_username,
+    addClick,
+    optimisticUpdate,
+    enabled: game.status === 'active' || game.status === 'final_phase',
+  })
 
   const isCritical = timeLeft <= 10000 && timeLeft > 0
   const isWinner = game.status === 'ended' && game.winner_id === userId
@@ -468,8 +467,33 @@ export function GameClient({
                   </div>
                 </div>
                 <div className="text-right">
-                  <div className="text-white/40 text-xs uppercase">Clics</div>
-                  <div className="font-bold text-neon-purple text-xl">{game.total_clicks}</div>
+                  <div className="text-white/40 text-xs uppercase">Activité</div>
+                  <div className="flex items-center gap-1.5 justify-end">
+                    {game.status === 'ended' ? (
+                      <span className="text-white/50 font-medium">Terminé</span>
+                    ) : isUrgent ? (
+                      <>
+                        <svg className="w-5 h-5 text-danger animate-pulse" viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M12 23c-1.5 0-2.8-.5-3.9-1.4-1.1-1-1.8-2.2-2-3.6-.2-1.4.1-2.7.8-4 .4-.7.9-1.4 1.4-2l.7 1c-.4.5-.7 1-1 1.5-.5 1-.7 2-.5 3 .2 1 .6 1.9 1.4 2.6.8.7 1.8 1.1 2.9 1.1s2.1-.4 2.9-1.1c.8-.7 1.3-1.6 1.4-2.6.2-1 0-2-.5-3-.5-1-1.3-1.9-2.2-2.6-.9-.8-2-1.4-3.1-1.8-1.2-.4-2.4-.6-3.6-.5.4-1.2 1-2.3 1.8-3.2 1-1 2.2-1.8 3.5-2.3 1.4-.5 2.8-.7 4.2-.6.7.1 1.3.2 2 .4l-.5 1.4c-.5-.2-1-.3-1.5-.3-1.1-.1-2.3.1-3.4.5s-2 1-2.8 1.8c-.6.6-1 1.3-1.4 2 1 0 2 .2 3 .5 1.2.4 2.4 1.1 3.4 2 1 .9 1.9 1.9 2.5 3.1.6 1.2.9 2.5.8 3.8-.2 1.5-.8 2.7-2 3.7-1.1.9-2.4 1.4-3.9 1.4z"/>
+                        </svg>
+                        <span className="text-danger font-bold">Intense</span>
+                      </>
+                    ) : timeLeft <= 5 * 60 * 1000 ? (
+                      <>
+                        <svg className="w-5 h-5 text-neon-pink" viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M12 23c-1.5 0-2.8-.5-3.9-1.4-1.1-1-1.8-2.2-2-3.6-.2-1.4.1-2.7.8-4 .4-.7.9-1.4 1.4-2l.7 1c-.4.5-.7 1-1 1.5-.5 1-.7 2-.5 3 .2 1 .6 1.9 1.4 2.6.8.7 1.8 1.1 2.9 1.1s2.1-.4 2.9-1.1c.8-.7 1.3-1.6 1.4-2.6.2-1 0-2-.5-3-.5-1-1.3-1.9-2.2-2.6-.9-.8-2-1.4-3.1-1.8-1.2-.4-2.4-.6-3.6-.5.4-1.2 1-2.3 1.8-3.2 1-1 2.2-1.8 3.5-2.3 1.4-.5 2.8-.7 4.2-.6.7.1 1.3.2 2 .4l-.5 1.4c-.5-.2-1-.3-1.5-.3-1.1-.1-2.3.1-3.4.5s-2 1-2.8 1.8c-.6.6-1 1.3-1.4 2 1 0 2 .2 3 .5 1.2.4 2.4 1.1 3.4 2 1 .9 1.9 1.9 2.5 3.1.6 1.2.9 2.5.8 3.8-.2 1.5-.8 2.7-2 3.7-1.1.9-2.4 1.4-3.9 1.4z"/>
+                        </svg>
+                        <span className="text-neon-pink font-bold">Élevée</span>
+                      </>
+                    ) : (
+                      <>
+                        <svg className="w-5 h-5 text-neon-blue" viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M12 23c-1.5 0-2.8-.5-3.9-1.4-1.1-1-1.8-2.2-2-3.6-.2-1.4.1-2.7.8-4 .4-.7.9-1.4 1.4-2l.7 1c-.4.5-.7 1-1 1.5-.5 1-.7 2-.5 3 .2 1 .6 1.9 1.4 2.6.8.7 1.8 1.1 2.9 1.1s2.1-.4 2.9-1.1c.8-.7 1.3-1.6 1.4-2.6.2-1 0-2-.5-3-.5-1-1.3-1.9-2.2-2.6-.9-.8-2-1.4-3.1-1.8-1.2-.4-2.4-.6-3.6-.5.4-1.2 1-2.3 1.8-3.2 1-1 2.2-1.8 3.5-2.3 1.4-.5 2.8-.7 4.2-.6.7.1 1.3.2 2 .4l-.5 1.4c-.5-.2-1-.3-1.5-.3-1.1-.1-2.3.1-3.4.5s-2 1-2.8 1.8c-.6.6-1 1.3-1.4 2 1 0 2 .2 3 .5 1.2.4 2.4 1.1 3.4 2 1 .9 1.9 1.9 2.5 3.1.6 1.2.9 2.5.8 3.8-.2 1.5-.8 2.7-2 3.7-1.1.9-2.4 1.4-3.9 1.4z"/>
+                        </svg>
+                        <span className="text-neon-blue font-medium">Active</span>
+                      </>
+                    )}
+                  </div>
                 </div>
               </div>
 
@@ -804,8 +828,33 @@ export function GameClient({
                   </div>
                 </div>
                 <div className="text-right">
-                  <div className="text-white/40 text-xs uppercase">Clics</div>
-                  <div className="font-bold text-neon-purple text-2xl">{game.total_clicks}</div>
+                  <div className="text-white/40 text-xs uppercase">Activité</div>
+                  <div className="flex items-center gap-1.5 justify-end">
+                    {game.status === 'ended' ? (
+                      <span className="text-white/50 font-medium text-lg">Terminé</span>
+                    ) : isUrgent ? (
+                      <>
+                        <svg className="w-6 h-6 text-danger animate-pulse" viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M12 23c-1.5 0-2.8-.5-3.9-1.4-1.1-1-1.8-2.2-2-3.6-.2-1.4.1-2.7.8-4 .4-.7.9-1.4 1.4-2l.7 1c-.4.5-.7 1-1 1.5-.5 1-.7 2-.5 3 .2 1 .6 1.9 1.4 2.6.8.7 1.8 1.1 2.9 1.1s2.1-.4 2.9-1.1c.8-.7 1.3-1.6 1.4-2.6.2-1 0-2-.5-3-.5-1-1.3-1.9-2.2-2.6-.9-.8-2-1.4-3.1-1.8-1.2-.4-2.4-.6-3.6-.5.4-1.2 1-2.3 1.8-3.2 1-1 2.2-1.8 3.5-2.3 1.4-.5 2.8-.7 4.2-.6.7.1 1.3.2 2 .4l-.5 1.4c-.5-.2-1-.3-1.5-.3-1.1-.1-2.3.1-3.4.5s-2 1-2.8 1.8c-.6.6-1 1.3-1.4 2 1 0 2 .2 3 .5 1.2.4 2.4 1.1 3.4 2 1 .9 1.9 1.9 2.5 3.1.6 1.2.9 2.5.8 3.8-.2 1.5-.8 2.7-2 3.7-1.1.9-2.4 1.4-3.9 1.4z"/>
+                        </svg>
+                        <span className="text-danger font-bold text-lg">Intense</span>
+                      </>
+                    ) : timeLeft <= 5 * 60 * 1000 ? (
+                      <>
+                        <svg className="w-6 h-6 text-neon-pink" viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M12 23c-1.5 0-2.8-.5-3.9-1.4-1.1-1-1.8-2.2-2-3.6-.2-1.4.1-2.7.8-4 .4-.7.9-1.4 1.4-2l.7 1c-.4.5-.7 1-1 1.5-.5 1-.7 2-.5 3 .2 1 .6 1.9 1.4 2.6.8.7 1.8 1.1 2.9 1.1s2.1-.4 2.9-1.1c.8-.7 1.3-1.6 1.4-2.6.2-1 0-2-.5-3-.5-1-1.3-1.9-2.2-2.6-.9-.8-2-1.4-3.1-1.8-1.2-.4-2.4-.6-3.6-.5.4-1.2 1-2.3 1.8-3.2 1-1 2.2-1.8 3.5-2.3 1.4-.5 2.8-.7 4.2-.6.7.1 1.3.2 2 .4l-.5 1.4c-.5-.2-1-.3-1.5-.3-1.1-.1-2.3.1-3.4.5s-2 1-2.8 1.8c-.6.6-1 1.3-1.4 2 1 0 2 .2 3 .5 1.2.4 2.4 1.1 3.4 2 1 .9 1.9 1.9 2.5 3.1.6 1.2.9 2.5.8 3.8-.2 1.5-.8 2.7-2 3.7-1.1.9-2.4 1.4-3.9 1.4z"/>
+                        </svg>
+                        <span className="text-neon-pink font-bold text-lg">Élevée</span>
+                      </>
+                    ) : (
+                      <>
+                        <svg className="w-6 h-6 text-neon-blue" viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M12 23c-1.5 0-2.8-.5-3.9-1.4-1.1-1-1.8-2.2-2-3.6-.2-1.4.1-2.7.8-4 .4-.7.9-1.4 1.4-2l.7 1c-.4.5-.7 1-1 1.5-.5 1-.7 2-.5 3 .2 1 .6 1.9 1.4 2.6.8.7 1.8 1.1 2.9 1.1s2.1-.4 2.9-1.1c.8-.7 1.3-1.6 1.4-2.6.2-1 0-2-.5-3-.5-1-1.3-1.9-2.2-2.6-.9-.8-2-1.4-3.1-1.8-1.2-.4-2.4-.6-3.6-.5.4-1.2 1-2.3 1.8-3.2 1-1 2.2-1.8 3.5-2.3 1.4-.5 2.8-.7 4.2-.6.7.1 1.3.2 2 .4l-.5 1.4c-.5-.2-1-.3-1.5-.3-1.1-.1-2.3.1-3.4.5s-2 1-2.8 1.8c-.6.6-1 1.3-1.4 2 1 0 2 .2 3 .5 1.2.4 2.4 1.1 3.4 2 1 .9 1.9 1.9 2.5 3.1.6 1.2.9 2.5.8 3.8-.2 1.5-.8 2.7-2 3.7-1.1.9-2.4 1.4-3.9 1.4z"/>
+                        </svg>
+                        <span className="text-neon-blue font-medium text-lg">Active</span>
+                      </>
+                    )}
+                  </div>
                 </div>
               </div>
 
