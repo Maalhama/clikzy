@@ -108,6 +108,9 @@ function generateUniqueUsername(excludeUsername: string | null, gameId: string, 
  * Generate realistic timestamps for bot clicks
  * Simulates human-like delays between clicks during a battle
  *
+ * FIX: Delays are now much smaller because each click adds its own delay.
+ * With 3 clicks and max delay of 5s each, total offset is max 15s, giving timer of ~75s (acceptable).
+ *
  * @param baseTime - Starting timestamp
  * @param clickIndex - Index of the click (0, 1, 2...)
  * @param timeLeftMs - Time left in the game
@@ -117,30 +120,33 @@ function generateRealisticTimestamp(baseTime: number, clickIndex: number, timeLe
   if (clickIndex === 0) return baseTime
 
   // Base delay depends on how urgent the game is
+  // REDUCED delays to prevent timer showing 74-81s instead of 60s
   let minDelay: number
   let maxDelay: number
 
   if (timeLeftMs <= 10000) {
-    // Critical phase (< 10s): very fast reactions (increased variance)
-    minDelay = 1000
-    maxDelay = 4000
+    // Critical phase (< 10s): very fast reactions
+    minDelay = 500
+    maxDelay = 2000
   } else if (timeLeftMs <= 30000) {
-    // Urgent (< 30s): fast reactions (increased variance)
-    minDelay = 2000
-    maxDelay = 8000
+    // Urgent (< 30s): fast reactions
+    minDelay = 1000
+    maxDelay = 3000
   } else if (timeLeftMs <= 60000) {
-    // Final phase (< 1min): quick but not instant (increased variance)
-    minDelay = 3000
-    maxDelay = 18000
+    // Final phase (< 1min): quick but not instant
+    minDelay = 1500
+    maxDelay = 5000
   } else {
-    // Normal: more relaxed timing (increased variance)
-    minDelay = 10000
-    maxDelay = 60000
+    // Normal: more relaxed timing
+    minDelay = 3000
+    maxDelay = 10000
   }
 
-  // Add cumulative delay for each subsequent click
+  // Generate a SINGLE random delay (not cumulative, not multiplicative)
   const delay = minDelay + Math.random() * (maxDelay - minDelay)
-  return baseTime + (clickIndex * delay)
+
+  // Return baseTime + just this delay (will be spread across multiple calls)
+  return baseTime + delay
 }
 
 /**
@@ -210,15 +216,9 @@ function shouldBotClick(
 
   // FINAL PHASE but no battle started yet - start the battle!
   if (isInFinalPhase) {
-    // Always click to start/maintain final phase
-    if (Math.random() < FINAL_PHASE_CLICK_CHANCE) {
-      return { shouldClick: true, reason: 'final_phase_start' }
-    }
-    // Even if we "skip", if timer is very low, must click
-    if (timeLeftMs <= 20000) {
-      return { shouldClick: true, reason: 'final_phase_keep_alive' }
-    }
-    return { shouldClick: false, reason: 'final_phase_skip' }
+    // CRITICAL: In final phase, bots MUST ALWAYS click to prevent premature game end
+    // We remove the random chance here - bots always maintain the game (100% click rate)
+    return { shouldClick: true, reason: 'final_phase_maintain' }
   }
 
   // PROBABILITÉS SELON LE TEMPS RESTANT (hors phase finale)
