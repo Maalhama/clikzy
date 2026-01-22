@@ -631,39 +631,50 @@ export function GameClient({
             </ul>
           </div>
 
-          {/* Mobile: Recent Activity */}
+          {/* Mobile: Game Rules */}
           <div className="mt-6 rounded-2xl bg-bg-secondary/30 border border-white/10 overflow-hidden">
             <div className="px-4 py-3 border-b border-white/10">
               <div className="flex items-center gap-2">
                 <svg className="w-4 h-4 text-neon-purple" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
-                <span className="text-white font-bold text-sm">Activité récente</span>
+                <span className="text-white font-bold text-sm">RÈGLES DU JEU</span>
               </div>
             </div>
-            <div className="p-2 space-y-1">
-              {recentClicks.length > 0 ? (
-                recentClicks.slice(0, 3).map((click, index) => (
-                  <LiveClickItem key={click.id} click={click} isNew={index === 0} />
-                ))
-              ) : (
-                [0, 1, 2].map((index) => (
-                  <div key={index} className="flex items-center gap-3 px-3 py-2 rounded-lg bg-bg-secondary/10 border border-dashed border-white/5">
-                    <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center flex-shrink-0">
-                      <span className="text-white/20 text-xs">?</span>
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="h-3 w-20 bg-white/5 rounded mb-1" />
-                      <div className="h-2 w-16 bg-white/5 rounded" />
-                    </div>
-                    {index === 0 && (
-                      <div className="text-white/20 text-[10px] whitespace-nowrap">
-                        En attente...
-                      </div>
-                    )}
-                  </div>
-                ))
-              )}
+            <div className="p-4 space-y-3">
+              <div className="flex items-start gap-3">
+                <div className="w-7 h-7 rounded-lg bg-neon-purple/20 border border-neon-purple/30 flex items-center justify-center flex-shrink-0">
+                  <svg className="w-4 h-4 text-neon-purple" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122" />
+                  </svg>
+                </div>
+                <div>
+                  <p className="text-white text-sm font-medium">Clique pour participer</p>
+                  <p className="text-white/50 text-xs">Chaque clic coûte 1 crédit</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <div className="w-7 h-7 rounded-lg bg-success/20 border border-success/30 flex items-center justify-center flex-shrink-0">
+                  <svg className="w-4 h-4 text-success" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M5 16L3 5l5.5 5L12 4l3.5 6L21 5l-2 11H5zm14 3c0 .6-.4 1-1 1H6c-.6 0-1-.4-1-1v-1h14v1z"/>
+                  </svg>
+                </div>
+                <div>
+                  <p className="text-white text-sm font-medium">Le dernier clic gagne</p>
+                  <p className="text-white/50 text-xs">Quand le timer atteint 0, le dernier cliqueur remporte le lot</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <div className="w-7 h-7 rounded-lg bg-neon-pink/20 border border-neon-pink/30 flex items-center justify-center flex-shrink-0">
+                  <svg className="w-4 h-4 text-neon-pink" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                </div>
+                <div>
+                  <p className="text-white text-sm font-medium">Phase finale</p>
+                  <p className="text-white/50 text-xs">Quand il reste moins d&apos;1 min, chaque clic remet le timer à 1 min</p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -934,39 +945,50 @@ export function GameClient({
                 </div>
               )}
 
-              {/* Recent Activity - Desktop Compact */}
+              {/* Game Rules - Desktop Compact */}
               <div className="rounded-xl bg-bg-secondary/30 border border-white/10 overflow-hidden">
                 <div className="px-4 py-3 border-b border-white/10">
                   <div className="flex items-center gap-2">
                     <svg className="w-4 h-4 text-neon-purple" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                     </svg>
-                    <span className="text-white font-bold text-sm">Activité récente</span>
+                    <span className="text-white font-bold text-sm">RÈGLES DU JEU</span>
                   </div>
                 </div>
-                <div className="p-2 space-y-1">
-                  {recentClicks.length > 0 ? (
-                    recentClicks.slice(0, 3).map((click, index) => (
-                      <LiveClickItem key={click.id} click={click} isNew={index === 0} />
-                    ))
-                  ) : (
-                    [0, 1, 2].map((index) => (
-                      <div key={index} className="flex items-center gap-3 px-3 py-2 rounded-lg bg-bg-secondary/10 border border-dashed border-white/5">
-                        <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center flex-shrink-0">
-                          <span className="text-white/20 text-xs">?</span>
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="h-3 w-20 bg-white/5 rounded mb-1" />
-                          <div className="h-2 w-16 bg-white/5 rounded" />
-                        </div>
-                        {index === 0 && (
-                          <div className="text-white/20 text-[10px] whitespace-nowrap">
-                            En attente...
-                          </div>
-                        )}
-                      </div>
-                    ))
-                  )}
+                <div className="p-4 space-y-3">
+                  <div className="flex items-start gap-3">
+                    <div className="w-7 h-7 rounded-lg bg-neon-purple/20 border border-neon-purple/30 flex items-center justify-center flex-shrink-0">
+                      <svg className="w-4 h-4 text-neon-purple" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122" />
+                      </svg>
+                    </div>
+                    <div>
+                      <p className="text-white text-sm font-medium">Clique pour participer</p>
+                      <p className="text-white/50 text-xs">Chaque clic coûte 1 crédit</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <div className="w-7 h-7 rounded-lg bg-success/20 border border-success/30 flex items-center justify-center flex-shrink-0">
+                      <svg className="w-4 h-4 text-success" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M5 16L3 5l5.5 5L12 4l3.5 6L21 5l-2 11H5zm14 3c0 .6-.4 1-1 1H6c-.6 0-1-.4-1-1v-1h14v1z"/>
+                      </svg>
+                    </div>
+                    <div>
+                      <p className="text-white text-sm font-medium">Le dernier clic gagne</p>
+                      <p className="text-white/50 text-xs">Quand le timer atteint 0, le dernier cliqueur remporte le lot</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <div className="w-7 h-7 rounded-lg bg-neon-pink/20 border border-neon-pink/30 flex items-center justify-center flex-shrink-0">
+                      <svg className="w-4 h-4 text-neon-pink" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                      </svg>
+                    </div>
+                    <div>
+                      <p className="text-white text-sm font-medium">Phase finale</p>
+                      <p className="text-white/50 text-xs">Quand il reste moins d&apos;1 min, chaque clic remet le timer à 1 min</p>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
