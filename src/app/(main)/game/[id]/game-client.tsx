@@ -6,7 +6,6 @@ import Image from 'next/image'
 import { useGame } from '@/hooks/useGame'
 import { useTimer } from '@/hooks/useTimer'
 import { useSounds } from '@/hooks/useSounds'
-import { useGameCache, savePlayerClickToCache } from '@/hooks/useGameCache'
 import { useCredits } from '@/contexts/CreditsContext'
 import { clickGame } from '@/actions/game'
 import { GAME_CONSTANTS } from '@/lib/constants'
@@ -204,40 +203,6 @@ export function GameClient({
     }
   }, [])
 
-  // Read bot data from shared cache (bots run on lobby, not here)
-  const { cachedData } = useGameCache({
-    gameId: game.id,
-    initialTotalClicks: game.total_clicks,
-    initialEndTime: game.end_time,
-    initialLastUser: game.last_click_username,
-  })
-
-  // Apply cached game state from lobby (for fast sync between DB updates)
-  // Note: Click feed is now from DB via useGame, not localStorage
-  useEffect(() => {
-    if (!cachedData) return
-
-    // Check if cache has newer game state
-    const hasNewerClicks = cachedData.totalClicks > game.total_clicks
-    const hasNewerLeader = cachedData.lastUser && cachedData.lastUser !== game.last_click_username
-    const hasNewerEndTime = cachedData.endTime && cachedData.endTime > game.end_time
-
-    if (hasNewerClicks || hasNewerLeader || hasNewerEndTime) {
-      // Update game state with cached data (fast sync)
-      optimisticUpdate({
-        last_click_username: cachedData.lastUser || game.last_click_username,
-        total_clicks: Math.max(cachedData.totalClicks, game.total_clicks),
-        end_time: cachedData.endTime && cachedData.endTime > game.end_time
-          ? cachedData.endTime
-          : game.end_time,
-        status: game.status === 'ended' ? game.status :
-          (cachedData.endTime && (cachedData.endTime - Date.now()) <= GAME_CONSTANTS.FINAL_PHASE_THRESHOLD
-            ? 'final_phase'
-            : game.status),
-      })
-    }
-  }, [cachedData, game.total_clicks, game.last_click_username, game.end_time, game.status, optimisticUpdate])
-
   const handleClick = useCallback(() => {
     if (isPending || !hasCredits || !canClick) return
 
@@ -271,15 +236,6 @@ export function GameClient({
       end_time: newEndTime,
       status: currentTimeLeft <= GAME_CONSTANTS.FINAL_PHASE_THRESHOLD ? 'final_phase' : game.status,
     })
-
-    // Save to cache so lobby shows real player as leader (not bot)
-    savePlayerClickToCache(
-      game.id,
-      username,
-      newEndTime,
-      newTotalClicks,
-      game.item.name
-    )
 
     startTransition(async () => {
       const result = await clickGame(game.id)

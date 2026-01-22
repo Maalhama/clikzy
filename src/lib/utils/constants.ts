@@ -1,7 +1,7 @@
 // Timer constants
 export const INITIAL_DURATION = 24 * 60 * 60 * 1000 // 24 hours in ms
 export const FINAL_PHASE_THRESHOLD = 60 * 1000 // 1 minute in ms
-export const FINAL_PHASE_RESET = 70 * 1000 // Reset to 70s (10s buffer for cron)
+export const FINAL_PHASE_RESET = 60 * 1000 // Reset to 60s
 export const CLICK_COOLDOWN = 1000 // 1 second between clicks
 
 // Credits

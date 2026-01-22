@@ -6,50 +6,6 @@ import { GAME_CONSTANTS } from '@/lib/constants'
 import type { RealtimeChannel } from '@supabase/supabase-js'
 import type { GameWithItem } from '@/types/database'
 
-// Shared localStorage key with useGameBots for synchronization
-const STORAGE_KEY = 'clikzy_bot_cache'
-
-// Poll interval - faster for more responsive sync
-const POLL_INTERVAL = 300 // 300ms
-
-interface CachedRecentClick {
-  id: string
-  gameId: string
-  username: string
-  itemName: string
-  timestamp: number
-}
-
-interface CachedGameData {
-  totalClicks: number
-  lastUser: string
-  endTime: number
-  updatedAt: number
-}
-
-interface BotCache {
-  games: Record<string, CachedGameData>
-  recentClicks: CachedRecentClick[]
-  expiry: number
-}
-
-// Load the entire cache from localStorage
-function loadBotCache(): BotCache | null {
-  if (typeof window === 'undefined') return null
-  try {
-    const cached = localStorage.getItem(STORAGE_KEY)
-    if (!cached) return null
-    const data: BotCache = JSON.parse(cached)
-    if (Date.now() > data.expiry) {
-      localStorage.removeItem(STORAGE_KEY)
-      return null
-    }
-    return data
-  } catch {
-    return null
-  }
-}
-
 interface ClickNotification {
   id: string
   username: string
@@ -58,20 +14,11 @@ interface ClickNotification {
   timestamp: number
 }
 
-interface BotClick {
-  id: string
-  gameId: string
-  username: string
-  timestamp: number
-}
-
 interface LobbyRealtimeData {
   games: GameWithFinalPhaseTracking[]
   recentClicks: ClickNotification[]
   isConnected: boolean
   error: Error | null
-  addBotClicks: (botClicks: BotClick[]) => void
-  applyCachedLeaders: (cachedData: Record<string, { leader: string; clicks: number; endTime: number | null }>) => void
 }
 
 interface GameUpdate {
@@ -97,9 +44,6 @@ export function useLobbyRealtime(
   const [error, setError] = useState<Error | null>(null)
 
   const channelRef = useRef<RealtimeChannel | null>(null)
-
-  // Track ORIGINAL end_time from database (to prevent infinite extensions)
-  const originalEndTimesRef = useRef<Record<string, number>>({})
 
   // Track known game IDs to detect new games
   const knownGameIdsRef = useRef<Set<string>>(new Set())
@@ -165,11 +109,6 @@ export function useLobbyRealtime(
 
     // Process initial games and track final phase entry
     const gamesWithTracking: GameWithFinalPhaseTracking[] = initialGames.map((game) => {
-      // Store original end times from database
-      if (!originalEndTimesRef.current[game.id] || game.end_time > originalEndTimesRef.current[game.id]) {
-        originalEndTimesRef.current[game.id] = game.end_time
-      }
-
       // Check if game is in final phase
       const timeLeft = game.end_time - now
       const inFinalPhase = timeLeft > 0 && timeLeft <= GAME_CONSTANTS.FINAL_PHASE_THRESHOLD
@@ -192,98 +131,6 @@ export function useLobbyRealtime(
     setGames(gamesWithTracking)
   }, [initialGames])
 
-  // Helper to check if a game is in final phase
-  const isInFinalPhase = useCallback((endTime: number) => {
-    const now = Date.now()
-    const timeLeft = endTime - now
-    return timeLeft > 0 && timeLeft <= GAME_CONSTANTS.FINAL_PHASE_THRESHOLD
-  }, [])
-
-  // Poll localStorage cache for updates from lobby bots
-  useEffect(() => {
-    const pollCache = () => {
-      const cache = loadBotCache()
-      if (!cache) return
-
-      const now = Date.now()
-
-      // Apply ALL cached game data to games state
-      // This ensures lobby always shows the latest bot data
-      if (cache.games && Object.keys(cache.games).length > 0) {
-        setGames((prevGames) =>
-          prevGames.map((game) => {
-            // NEVER update ended games - they stay ended
-            if (game.status === 'ended') return game
-
-            const cached = cache.games[game.id]
-            if (!cached || !cached.lastUser) return game
-
-            // Check if ORIGINAL game timer has expired (should be ended)
-            // This prevents cache from "resurrecting" a game that should have ended
-            const originalEndTime = originalEndTimesRef.current[game.id] || game.end_time
-            if (originalEndTime <= now && cached.endTime <= now) {
-              // Original timer expired AND cache doesn't have a valid future time
-              // Game should be ended, don't apply cache updates
-              return game
-            }
-
-            // Only update if cached data is different/better
-            const shouldUpdate =
-              cached.totalClicks > game.total_clicks ||
-              cached.lastUser !== game.last_click_username ||
-              cached.endTime > game.end_time
-
-            if (!shouldUpdate) return game
-
-            const newEndTime = Math.max(cached.endTime, game.end_time)
-            const wasInFinalPhase = isInFinalPhase(game.end_time)
-            const nowInFinalPhase = isInFinalPhase(newEndTime)
-
-            // Track when game FIRST enters final phase
-            let enteredFinalPhaseAt = game.enteredFinalPhaseAt
-            if (nowInFinalPhase && !wasInFinalPhase && !finalPhaseEntryRef.current[game.id]) {
-              // Game just entered final phase - record timestamp
-              finalPhaseEntryRef.current[game.id] = now
-              enteredFinalPhaseAt = now
-            } else if (finalPhaseEntryRef.current[game.id]) {
-              // Already tracked - use stored value
-              enteredFinalPhaseAt = finalPhaseEntryRef.current[game.id]
-            }
-
-            return {
-              ...game,
-              last_click_username: cached.lastUser,
-              total_clicks: Math.max(cached.totalClicks, game.total_clicks),
-              end_time: newEndTime,
-              status: nowInFinalPhase ? 'final_phase' : game.status,
-              enteredFinalPhaseAt,
-            }
-          })
-        )
-      }
-
-      // Update recent clicks from cache
-      if (cache.recentClicks && cache.recentClicks.length > 0) {
-        setRecentClicks(
-          cache.recentClicks.slice(0, 5).map(click => ({
-            id: click.id,
-            username: click.username,
-            game_id: click.gameId,
-            item_name: click.itemName,
-            timestamp: click.timestamp,
-          }))
-        )
-      }
-    }
-
-    // Poll frequently for responsive sync
-    const interval = setInterval(pollCache, POLL_INTERVAL)
-    // Also check immediately on mount
-    pollCache()
-
-    return () => clearInterval(interval)
-  }, [])
-
   // Add click notification (no auto-remove - rotates through 3 slots)
   const addClickNotification = useCallback(
     (username: string, gameId: string, itemName: string) => {
@@ -298,104 +145,6 @@ export function useLobbyRealtime(
       // Keep only the 3 most recent clicks (for the 3 visible slots)
       // New click goes to position 1, others shift down
       setRecentClicks((prev) => [notification, ...prev].slice(0, 3))
-    },
-    []
-  )
-
-  // Process bot clicks and integrate them into the game state
-  const processedBotClicksRef = useRef<Set<string>>(new Set())
-
-  const addBotClicks = useCallback(
-    (botClicks: BotClick[]) => {
-      // Filter out already processed clicks
-      const newClicks = botClicks.filter(
-        (click) => !processedBotClicksRef.current.has(click.id)
-      )
-
-      if (newClicks.length === 0) return
-
-      // Mark as processed
-      newClicks.forEach((click) => {
-        processedBotClicksRef.current.add(click.id)
-      })
-
-      // Keep the set from growing indefinitely
-      if (processedBotClicksRef.current.size > 1000) {
-        const entries = Array.from(processedBotClicksRef.current)
-        processedBotClicksRef.current = new Set(entries.slice(-500))
-      }
-
-      // Group clicks by game
-      const clicksByGame = new Map<string, BotClick[]>()
-      newClicks.forEach((click) => {
-        const existing = clicksByGame.get(click.gameId) || []
-        existing.push(click)
-        clicksByGame.set(click.gameId, existing)
-      })
-
-      // Update games with bot clicks
-      setGames((prevGames) => {
-        const updatedGames = prevGames.map((game) => {
-          const gameClicks = clicksByGame.get(game.id)
-          if (!gameClicks || gameClicks.length === 0) return game
-
-          // Get the most recent click for this game
-          const lastClick = gameClicks.reduce((latest, click) =>
-            click.timestamp > latest.timestamp ? click : latest
-          )
-
-          // Calculate new end_time if in final phase (< 1 minute)
-          const now = Date.now()
-          const timeLeft = game.end_time - now
-          let newEndTime = game.end_time
-
-          // Reset timer to 1 minute if in final phase
-          if (timeLeft > 0 && timeLeft <= GAME_CONSTANTS.FINAL_PHASE_THRESHOLD) {
-            newEndTime = now + GAME_CONSTANTS.TIMER_RESET_VALUE
-          }
-
-          return {
-            ...game,
-            total_clicks: game.total_clicks + gameClicks.length,
-            last_click_username: lastClick.username,
-            end_time: newEndTime,
-            status: timeLeft <= GAME_CONSTANTS.FINAL_PHASE_THRESHOLD ? 'final_phase' : game.status,
-          }
-        })
-        return updatedGames
-      })
-
-      // Add notifications OUTSIDE of setGames to avoid duplicates
-      newClicks.forEach((click) => {
-        // Find the game to get item name
-        const game = games.find(g => g.id === click.gameId)
-        if (game) {
-          addClickNotification(click.username, click.gameId, game.item?.name || 'Item')
-        }
-      })
-    },
-    [addClickNotification, games]
-  )
-
-  // Apply cached bot data to games (for persistence across page loads)
-  const applyCachedLeaders = useCallback(
-    (cachedData: Record<string, { leader: string; clicks: number; endTime: number | null }>) => {
-      setGames((prevGames) =>
-        prevGames.map((game) => {
-          const cached = cachedData[game.id]
-          // Only apply if game doesn't already have a leader from DB
-          if (cached && !game.last_click_username) {
-            return {
-              ...game,
-              last_click_username: cached.leader,
-              total_clicks: game.total_clicks + cached.clicks,
-              // Apply cached endTime if it's newer
-              end_time: cached.endTime && cached.endTime > game.end_time ? cached.endTime : game.end_time,
-            }
-          }
-          return game
-        })
-      )
     },
     []
   )
@@ -571,7 +320,5 @@ export function useLobbyRealtime(
     recentClicks,
     isConnected,
     error,
-    addBotClicks,
-    applyCachedLeaders,
   }
 }

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
-import { generateUsername } from '@/lib/bots/usernameGenerator'
+import { generateUsername, generateDeterministicUsername } from '@/lib/bots/usernameGenerator'
 
 /**
  * Server-side bot system with FULL INTELLIGENCE
@@ -46,8 +46,8 @@ const SUSPENSE_CHANCE = 0.7                  // 70% du temps, attendre le suspen
 const PLAYER_RESPONSE_CHANCE = 0.98          // 98% de chance de répondre à un vrai joueur
 const REAL_PLAYER_WINDOW = 30 * 1000         // Considérer un clic comme "récent" si < 30s
 
-// Configuration du cron (toutes les 5 minutes)
-const CRON_INTERVAL = 5 * 60 * 1000          // 5 minutes entre chaque exécution
+// Configuration du cron (toutes les 1 minute)
+const CRON_INTERVAL = 1 * 60 * 1000          // 1 minute entre chaque exécution
 const CLICKS_PER_CRON_MIN = 0                // Min clics par jeu par exécution
 const CLICKS_PER_CRON_MAX = 3                // Max clics par jeu par exécution
 
@@ -88,14 +88,16 @@ function isRealPlayerClick(lastClickUserId: string | null): boolean {
 
 /**
  * Generate a unique bot username different from the excluded one
- * Tries up to 10 times to get a different username
+ * Uses deterministic username based on game + timestamp for consistency
  */
-function generateUniqueUsername(excludeUsername: string | null): string {
-  let attempts = 0
-  let username = generateUsername()
+function generateUniqueUsername(excludeUsername: string | null, gameId: string, timestamp: number): string {
+  // Use deterministic username based on game + timestamp
+  const seed = `${gameId}-${timestamp}`
+  let username = generateDeterministicUsername(seed)
 
+  let attempts = 0
   while (username === excludeUsername && attempts < 10) {
-    username = generateUsername()
+    username = generateDeterministicUsername(`${seed}-${attempts}`)
     attempts++
   }
 
@@ -119,21 +121,21 @@ function generateRealisticTimestamp(baseTime: number, clickIndex: number, timeLe
   let maxDelay: number
 
   if (timeLeftMs <= 10000) {
-    // Critical phase (< 10s): very fast reactions
-    minDelay = 200
-    maxDelay = 1500
-  } else if (timeLeftMs <= 30000) {
-    // Urgent (< 30s): fast reactions
+    // Critical phase (< 10s): very fast reactions (increased variance)
     minDelay = 500
     maxDelay = 3000
-  } else if (timeLeftMs <= 60000) {
-    // Final phase (< 1min): quick but not instant
+  } else if (timeLeftMs <= 30000) {
+    // Urgent (< 30s): fast reactions (increased variance)
     minDelay = 1000
-    maxDelay = 8000
+    maxDelay = 5000
+  } else if (timeLeftMs <= 60000) {
+    // Final phase (< 1min): quick but not instant (increased variance)
+    minDelay = 2000
+    maxDelay = 12000
   } else {
-    // Normal: more relaxed timing
-    minDelay = 5000
-    maxDelay = 30000
+    // Normal: more relaxed timing (increased variance)
+    minDelay = 8000
+    maxDelay = 45000
   }
 
   // Add cumulative delay for each subsequent click
@@ -292,9 +294,16 @@ export async function GET(request: NextRequest) {
       winner?: string
     }> = []
 
+    // Track cumulative delay between games to spread clicks across time
+    let gameProcessingDelay = 0
+
     for (const game of activeGames) {
+      // Add random delay between games (0-5 seconds spread) to avoid all bots clicking at the same time
+      gameProcessingDelay += Math.floor(Math.random() * 5000)
+      const gameNow = now + gameProcessingDelay
+
       const endTime = game.end_time as number
-      const timeLeft = endTime - now
+      const timeLeft = endTime - gameNow
       const battleDuration = getBattleDuration(game.id)
 
       // Parse battle_start_time if exists
@@ -305,7 +314,7 @@ export async function GET(request: NextRequest) {
       // Check if last click was from a real player (recently)
       const lastClickAt = game.last_click_at ? new Date(game.last_click_at).getTime() : 0
       const isRecentRealPlayer = isRealPlayerClick(game.last_click_user_id) &&
-        (now - lastClickAt) < REAL_PLAYER_WINDOW
+        (gameNow - lastClickAt) < REAL_PLAYER_WINDOW
 
       // If game has ended, mark it and record winner
       if (timeLeft <= 0) {
@@ -425,7 +434,7 @@ export async function GET(request: NextRequest) {
 
       for (let i = 0; i < clickCount; i++) {
         // Generate unique username different from previous clicks
-        let newUsername = generateUniqueUsername(lastUsername)
+        let newUsername = generateUniqueUsername(lastUsername, game.id, gameNow + i)
 
         // Also ensure we don't repeat within this batch
         let batchAttempts = 0
@@ -438,7 +447,7 @@ export async function GET(request: NextRequest) {
         lastUsername = newUsername
 
         // Generate realistic timestamp with human-like delays
-        const clickTimestamp = generateRealisticTimestamp(now, i, timeLeft)
+        const clickTimestamp = generateRealisticTimestamp(gameNow, i, timeLeft)
 
         // Store click for insertion
         botClicks.push({
@@ -446,18 +455,23 @@ export async function GET(request: NextRequest) {
           item_name: getItemName(game.item),
           clicked_at: new Date(clickTimestamp).toISOString(),
         })
+      }
 
-        // Trigger final phase if time < 1 minute
-        // Use 70 seconds buffer to prevent race condition with 1-minute cron interval
-        // This gives 10s safety margin for cron delays/network latency
-        if (game.status === 'active' && timeLeft <= FINAL_PHASE_THRESHOLD) {
-          newEndTime = now + 70000 // Reset to 1:10 (buffer for cron timing)
-          newStatus = 'final_phase'
-          shouldSetBattleStart = true
-        } else if (game.status === 'final_phase') {
-          // In final phase, reset to 1:10 (buffer for cron timing)
-          newEndTime = now + 70000
-        }
+      // Get the timestamp of the LAST click to calculate newEndTime correctly
+      // This fixes the 68s bug: newEndTime should be 60s from the last click, not from gameNow
+      const lastClickTimestamp = botClicks.length > 0
+        ? new Date(botClicks[botClicks.length - 1].clicked_at).getTime()
+        : gameNow
+
+      // Trigger final phase if time < 1 minute
+      // Use 60 seconds reset from the LAST click timestamp (cron runs every 1 minute)
+      if (game.status === 'active' && timeLeft <= FINAL_PHASE_THRESHOLD) {
+        newEndTime = lastClickTimestamp + 60000 // Reset to 60s from last click
+        newStatus = 'final_phase'
+        shouldSetBattleStart = true
+      } else if (game.status === 'final_phase') {
+        // In final phase, reset to 60s from last click
+        newEndTime = lastClickTimestamp + 60000
       }
 
       // Build update data
