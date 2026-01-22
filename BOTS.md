@@ -103,9 +103,11 @@ Cron-job.org (toutes les 1 minute)
 **Phase 2 : Finale - Bataille (30min-1h59min)**
 - Timer reset à 60s à chaque clic
 - Durée de bataille aléatoire par jeu (déterministe selon gameId)
-- Clics intensifs des bots (98% de chance)
-- Wind-down dans les 5 dernières minutes (30% de chance)
-- Après la durée de bataille → 0% de clics (laisse gagner)
+- **Règle absolue** : Si timer atteint 0, le jeu est gagné (dernier cliqueur)
+- Bots cliquent AVANT que timer atteigne 0 (zone 1-59s)
+- Pendant bataille active : 98% de clics → Timer n'atteint presque jamais 0
+- Wind-down (5 dernières min) : 30% de clics → Chance que jeu se termine
+- Après la bataille : 0% de clics → Jeu se termine, gagnant déclaré
 
 **Exemple concret** :
 - Jeu A : `battleDuration = 45min`
@@ -206,11 +208,44 @@ if (isRealPlayerClick(last_click_user_id)) {
 - 98% de chance de répondre immédiatement
 - En phase finale : réponse GARANTIE (100%)
 
-**Résultat** : Les joueurs réels ne gagnent JAMAIS (sauf si tous les bots sont en wind-down)
+**Résultat** : Les joueurs réels ne gagnent JAMAIS (sauf si bataille terminée ou wind-down)
 
 ---
 
-### 2. Timer Reset
+### 2. Clics Réalistes (Zone 1-59s)
+
+**Principe** : Les bots ne cliquent JAMAIS quand timer = 0. Ils cliquent entre 1s et 59s.
+
+**Comment ça fonctionne** :
+- Cron s'exécute toutes les **1 minute** (60 secondes)
+- Quand le cron tourne, il vérifie tous les jeux actifs
+- Pour chaque jeu, il décide si les bots cliquent (selon probabilités)
+- Si bots cliquent → Timer reset à 60s
+- Si bots ne cliquent pas → Timer continue de descendre → Peut atteindre 0 → Gagnant
+
+**Décalage entre jeux** :
+- Jeu 1 traité à `cron_time + 3s` → Timer reset à `17:40:03`
+- Jeu 2 traité à `cron_time + 15s` → Timer reset à `17:40:15`
+- Jeu 3 traité à `cron_time + 22s` → Timer reset à `17:40:22`
+- → Les timers sont naturellement décalés
+
+**Exemple de timeline** :
+```
+17:40:00 - Cron démarre
+17:40:03 - Bot clique sur Jeu 1 (timer était à 45s) → Reset à 60s
+17:40:15 - Bot clique sur Jeu 2 (timer était à 33s) → Reset à 60s
+17:40:22 - Bot ne clique PAS sur Jeu 3 (wind-down) → Timer continue
+17:40:50 - Jeu 3 arrive à 0s → Gagnant déclaré
+```
+
+**Zones de clic** :
+- Bataille active (98%) : Bots cliquent presque toujours → Timer rarement < 30s
+- Wind-down (30%) : Bots cliquent parfois → Timer peut descendre à 0
+- Bataille terminée (0%) : Bots ne cliquent plus → Timer atteint 0
+
+---
+
+### 3. Timer Reset
 
 **RÈGLE ABSOLUE** : Le timer reset TOUJOURS à **EXACTEMENT 60 secondes**.
 
@@ -225,7 +260,7 @@ newEndTime = gameNow + 60000  // EXACTEMENT 60s, pas de variance
 
 ---
 
-### 3. Usernames Déterministes
+### 4. Usernames Déterministes
 
 ```typescript
 generateDeterministicUsername(seed: string)
@@ -242,7 +277,7 @@ generateDeterministicUsername(seed: string)
 
 ---
 
-### 4. Délais Entre Clics
+### 5. Délais Entre Clics
 
 ```typescript
 generateRealisticTimestamp(baseTime, clickIndex, timeLeftMs)
@@ -261,7 +296,7 @@ generateRealisticTimestamp(baseTime, clickIndex, timeLeftMs)
 
 ---
 
-### 5. Décalage Entre Jeux
+### 6. Décalage Entre Jeux
 
 ```typescript
 gameProcessingDelay += Math.floor(Math.random() * 20000) // 0-20s

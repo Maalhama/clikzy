@@ -318,17 +318,9 @@ export async function GET(request: NextRequest) {
       const isRecentRealPlayer = isRealPlayerClick(game.last_click_user_id) &&
         (gameNow - lastClickAt) < REAL_PLAYER_WINDOW
 
-      // CRITICAL: Check battle duration FIRST before ending game
-      // Games in battle should continue even if timer is at 0, until battle duration is over
-      const isBattleOngoing = battleStartTime &&
-        (gameNow - battleStartTime.getTime()) < battleDuration
-
-      // If game timer is at 0 BUT battle is still ongoing, bot MUST click to maintain game
-      if (timeLeft <= 0 && isBattleOngoing) {
-        // Battle still ongoing - don't end the game, let shouldBotClick logic handle it
-        // This will reset the timer and continue the battle
-      } else if (timeLeft <= 0) {
-        // Battle is over OR no battle started - end the game
+      // If timer has reached 0, game is over - someone wins
+      // Bots should click BEFORE timer reaches 0 (between 1-59s)
+      if (timeLeft <= 0) {
         const winnerUsername = game.last_click_username || null
         const winnerId = game.last_click_user_id || null
         const itemName = getItemName(game.item)
