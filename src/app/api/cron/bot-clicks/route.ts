@@ -174,15 +174,23 @@ export async function GET(request: NextRequest) {
           const username = generateDeterministicUsername(clickSeed)
 
           // Insérer le clic en DB avec le timestamp décalé
-          await supabase.from('clicks').insert({
+          currentTotalClicks++
+
+          const { error: insertError } = await supabase.from('clicks').insert({
             game_id: game.id,
             username,
             is_bot: true,
             item_name: itemName,
             clicked_at: new Date(clickTime).toISOString(),
+            sequence_number: currentTotalClicks,
+            credits_spent: 0,
           })
 
-          currentTotalClicks++
+          if (insertError) {
+            console.error(`[CRON] Click insert error: ${insertError.message}`)
+            currentTotalClicks-- // Rollback count on error
+            continue
+          }
           lastUsername = username
 
           // Reset timer seulement si < 60s au moment du clic
