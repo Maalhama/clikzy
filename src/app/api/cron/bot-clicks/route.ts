@@ -263,13 +263,12 @@ export async function GET(request: NextRequest) {
             }
           }
         } else {
-          // Phase normale - juste mettre à jour le leader si pas de joueur réel
-          if (!hasRealPlayer) {
-            updates.last_click_username = botUsername
-            action = `bot_click (${botUsername})`
-          } else {
-            action = `real_player_active (${game.last_click_username})`
-          }
+          // Phase normale - les bots cliquent comme des vrais joueurs
+          updates.last_click_username = botUsername
+          updates.last_click_user_id = null // Bot prend le lead
+          action = hasRealPlayer
+            ? `bot_took_lead (${botUsername}) from ${game.last_click_username}`
+            : `bot_click (${botUsername})`
         }
 
         if (Object.keys(updates).length > 0) {
