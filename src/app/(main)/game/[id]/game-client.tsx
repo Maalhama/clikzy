@@ -614,25 +614,19 @@ export function GameClient({
             </ul>
           </div>
 
-          {/* Mobile: Live Activity Feed */}
+          {/* Mobile: Recent Activity */}
           <div className="mt-6 rounded-2xl bg-bg-secondary/30 border border-white/10 overflow-hidden">
-            <div className="px-4 py-3 border-b border-white/10 flex items-center justify-between">
+            <div className="px-4 py-3 border-b border-white/10">
               <div className="flex items-center gap-2">
                 <svg className="w-4 h-4 text-neon-purple" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                <span className="text-white font-bold text-sm">Activité en direct</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <span className={`w-1.5 h-1.5 rounded-full ${isConnected ? 'bg-success animate-pulse' : 'bg-danger'}`} />
-                <span className="text-white/40 text-xs">
-                  {isConnected ? 'Connecté' : 'Connexion...'}
-                </span>
+                <span className="text-white font-bold text-sm">Activité récente</span>
               </div>
             </div>
             <div className="p-2 space-y-1">
               {recentClicks.length > 0 ? (
-                recentClicks.slice(0, 5).map((click, index) => (
+                recentClicks.slice(0, 3).map((click, index) => (
                   <LiveClickItem key={click.id} click={click} isNew={index === 0} />
                 ))
               ) : (
@@ -923,23 +917,23 @@ export function GameClient({
                 </div>
               )}
 
-              {/* Live Activity Feed - Desktop Compact */}
+              {/* Recent Activity - Desktop Compact */}
               <div className="rounded-xl bg-bg-secondary/30 border border-white/10 overflow-hidden">
-                <div className="px-4 py-3 border-b border-white/10 flex items-center justify-between">
+                <div className="px-4 py-3 border-b border-white/10">
                   <div className="flex items-center gap-2">
                     <svg className="w-4 h-4 text-neon-purple" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
-                    <span className="text-white font-bold text-sm">Activité en direct</span>
+                    <span className="text-white font-bold text-sm">Activité récente</span>
                   </div>
                 </div>
-                <div className="p-2 space-y-1 max-h-[220px] overflow-y-auto">
+                <div className="p-2 space-y-1">
                   {recentClicks.length > 0 ? (
-                    recentClicks.slice(0, 6).map((click, index) => (
+                    recentClicks.slice(0, 3).map((click, index) => (
                       <LiveClickItem key={click.id} click={click} isNew={index === 0} />
                     ))
                   ) : (
-                    [0, 1, 2, 3, 4].map((index) => (
+                    [0, 1, 2].map((index) => (
                       <div key={index} className="flex items-center gap-3 px-3 py-2 rounded-lg bg-bg-secondary/10 border border-dashed border-white/5">
                         <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center flex-shrink-0">
                           <span className="text-white/20 text-xs">?</span>
