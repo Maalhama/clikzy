@@ -6,11 +6,10 @@ import type { GameClick } from './useGame'
 
 /**
  * ============================================
- * SIMULATION FRONTEND DES BOTS CLIKZY v2
+ * SIMULATION FRONTEND DES BOTS CLIKZY v3
  * ============================================
  *
- * Simulation simplifiée et robuste des clics de bots.
- * Utilise un interval au lieu de timeouts chaînés.
+ * Simulation robuste avec refs pour éviter les re-renders.
  */
 
 interface UseBotSimulationProps {
@@ -61,39 +60,52 @@ export function useBotSimulation({
   enabled = true,
 }: UseBotSimulationProps) {
 
-  const lastClickTimeRef = useRef<number>(Date.now())
+  // Utiliser des refs pour toutes les valeurs qui changent fréquemment
+  const endTimeRef = useRef(endTime)
+  const statusRef = useRef(status)
+  const addClickRef = useRef(addClick)
+  const optimisticUpdateRef = useRef(optimisticUpdate)
+  const lastClickTimeRef = useRef<number>(0)
   const lastUsernameRef = useRef<string | null>(lastClickUsername)
+  const personalityRef = useRef(getGamePersonality(gameId))
 
-  // Update ref when lastClickUsername changes
-  useEffect(() => {
-    lastUsernameRef.current = lastClickUsername
-  }, [lastClickUsername])
+  // Mettre à jour les refs quand les props changent
+  useEffect(() => { endTimeRef.current = endTime }, [endTime])
+  useEffect(() => { statusRef.current = status }, [status])
+  useEffect(() => { addClickRef.current = addClick }, [addClick])
+  useEffect(() => { optimisticUpdateRef.current = optimisticUpdate }, [optimisticUpdate])
+  useEffect(() => { lastUsernameRef.current = lastClickUsername }, [lastClickUsername])
 
   useEffect(() => {
     if (!enabled) return
     if (status !== 'active' && status !== 'final_phase') return
 
-    const personality = getGamePersonality(gameId)
+    console.log(`[BOT SIM] Starting simulation for game ${gameId}, status: ${status}`)
 
-    // Interval qui vérifie toutes les secondes si on doit cliquer
+    // Premier clic rapide (3-8 secondes)
+    lastClickTimeRef.current = Date.now() - 50000
+
+    // Interval qui vérifie toutes les secondes
     const intervalId = setInterval(() => {
       const now = Date.now()
-      const timeLeft = endTime - now
+      const currentEndTime = endTimeRef.current
+      const currentStatus = statusRef.current
+      const timeLeft = currentEndTime - now
 
-      // Jeu terminé
-      if (timeLeft <= 0) {
+      // Jeu terminé ou status changé
+      if (timeLeft <= 0 || (currentStatus !== 'active' && currentStatus !== 'final_phase')) {
         return
       }
 
       const timeSinceLastClick = now - lastClickTimeRef.current
+      const personality = personalityRef.current
 
       // Déterminer le délai minimum entre clics selon la phase
       let minDelay: number
       let shouldResetTimer = false
 
-      if (status === 'final_phase' || timeLeft <= 60000) {
+      if (currentStatus === 'final_phase' || timeLeft <= 60000) {
         // Phase finale: 3 clics par minute = ~20 secondes entre clics
-        // Délai aléatoire entre 8s et 25s
         minDelay = 8000 + Math.random() * 17000
         shouldResetTimer = true
       } else if (timeLeft <= 15 * 60 * 1000) {
@@ -107,17 +119,19 @@ export function useBotSimulation({
         minDelay = 140000 + Math.random() * 100000
       }
 
-      // Ajuster selon la personnalité du jeu
+      // Ajuster selon la personnalité
       minDelay = minDelay / personality
 
-      // Vérifier si assez de temps s'est écoulé
+      // Pas encore le moment de cliquer
       if (timeSinceLastClick < minDelay) {
         return
       }
 
-      // Probabilité de cliquer (pour ajouter de la variance)
-      const clickProbability = status === 'final_phase' ? 0.8 : 0.6
+      // Probabilité de cliquer
+      const clickProbability = currentStatus === 'final_phase' ? 0.9 : 0.7
       if (Math.random() > clickProbability) {
+        // Reset le timer pour réessayer
+        lastClickTimeRef.current = now - minDelay + 3000
         return
       }
 
@@ -133,16 +147,16 @@ export function useBotSimulation({
       }
 
       // Ajouter au feed
-      addClick(simulatedClick)
+      addClickRef.current(simulatedClick)
 
       // Mettre à jour le state
       if (shouldResetTimer) {
-        optimisticUpdate({
+        optimisticUpdateRef.current({
           end_time: now + 60000,
           last_click_username: username,
         })
       } else {
-        optimisticUpdate({
+        optimisticUpdateRef.current({
           last_click_username: username,
         })
       }
@@ -151,20 +165,15 @@ export function useBotSimulation({
       lastClickTimeRef.current = now
       lastUsernameRef.current = username
 
-      console.log(`[BOT SIM] ${username} clicked (${status}, ${Math.floor(timeLeft/1000)}s left)`)
+      console.log(`[BOT SIM] ${username} clicked (${currentStatus}, ${Math.floor(timeLeft/1000)}s left)`)
 
-    }, 1000) // Check toutes les secondes
+    }, 1000)
 
     return () => {
+      console.log(`[BOT SIM] Stopping simulation for game ${gameId}`)
       clearInterval(intervalId)
     }
-  }, [enabled, status, gameId, endTime, addClick, optimisticUpdate])
-
-  // Reset lastClickTime quand on entre sur la page
-  useEffect(() => {
-    // Premier clic plus rapide (2-5 secondes après l'entrée)
-    lastClickTimeRef.current = Date.now() - 50000 + Math.random() * 5000
-  }, [gameId])
+  }, [enabled, gameId, status]) // Seulement gameId et status initial en dépendance
 
   return null
 }
