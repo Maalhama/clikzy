@@ -17,9 +17,10 @@ import { createClient, SupabaseClient } from '@supabase/supabase-js'
  * - 90-100%: probabilité de clic décroissante
  * - >100%: bots arrêtent, timer descend à 0
  *
- * Fréquence: toutes les ~30 secondes (2 crons décalés sur cron-job.org)
- * - Cron 1: /api/cron/bot-clicks (exécute immédiatement)
- * - Cron 2: /api/cron/bot-clicks?delay=30 (attend 30s puis exécute)
+ * Fréquence: 3 crons par minute sur cron-job.org (timeout 30s)
+ * - Cron 1: /api/cron/bot-clicks (0-25s aléatoire)
+ * - Cron 2: /api/cron/bot-clicks?delay=10 (10s + 0-15s = 10-25s)
+ * - Cron 3: /api/cron/bot-clicks?delay=20 (20s + 0-5s = 20-25s)
  */
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
@@ -143,17 +144,22 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  // Délai aléatoire 0-15s pour éviter les clics trop prévisibles
-  const randomDelay = Math.floor(Math.random() * 15)
-
-  // Support pour le cron décalé : ?delay=30 attend 30 secondes avant d'exécuter
+  // Support pour 3 crons décalés (timeout cron-job.org = 30s, donc max 25s)
+  // - Cron 1: pas de delay → 0-25s aléatoire
+  // - Cron 2: ?delay=10 → 10s + 0-15s = 10-25s
+  // - Cron 3: ?delay=20 → 20s + 0-5s = 20-25s
   const delayParam = request.nextUrl.searchParams.get('delay')
   const fixedDelay = delayParam ? parseInt(delayParam, 10) : 0
+  const validFixedDelay = fixedDelay > 0 && fixedDelay <= 20 ? fixedDelay : 0
 
-  const totalDelay = (fixedDelay > 0 && fixedDelay <= 55 ? fixedDelay : 0) + randomDelay
+  // Délai aléatoire ajusté pour que total < 25s
+  const maxRandomDelay = Math.max(5, 25 - validFixedDelay)
+  const randomDelay = Math.floor(Math.random() * maxRandomDelay)
+
+  const totalDelay = validFixedDelay + randomDelay
 
   if (totalDelay > 0) {
-    console.log(`[CRON] Waiting ${totalDelay}s (fixed: ${fixedDelay}s + random: ${randomDelay}s)`)
+    console.log(`[CRON] Waiting ${totalDelay}s (fixed: ${validFixedDelay}s + random: ${randomDelay}s)`)
     await new Promise(resolve => setTimeout(resolve, totalDelay * 1000))
   }
 
