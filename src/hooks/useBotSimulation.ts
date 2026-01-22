@@ -103,7 +103,8 @@ export function useBotSimulation({
 
       if (currentStatus === 'final_phase' || timeLeft <= 60000) {
         minDelay = 8000 + (getDeterministicSeed(gameId, Math.floor(now / 5000)) % 17000)
-        shouldResetTimer = true
+        // Reset timer SEULEMENT si timeLeft < 60s (pas juste le status)
+        shouldResetTimer = timeLeft <= 60000
       } else if (timeLeft <= 15 * 60 * 1000) {
         minDelay = 40000 + (getDeterministicSeed(gameId, Math.floor(now / 10000)) % 40000)
       } else if (timeLeft <= 30 * 60 * 1000) {

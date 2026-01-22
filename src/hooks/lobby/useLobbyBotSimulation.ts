@@ -71,14 +71,12 @@ export function useLobbyBotSimulation({
 
     // Seed basé sur le timestamp arrondi à la seconde pour synchronisation
     const roundedTime = Math.floor(now / 1000)
-    const seed = getDeterministicSeed(game.id, roundedTime)
-    const random = seededRandom(seed)
 
     // Générer username déterministe
     const username = generateDeterministicUsername(`${game.id}-${roundedTime}-bot`)
 
-    // Déterminer si on reset le timer (phase finale)
-    const shouldResetTimer = game.status === 'final_phase' || timeLeft <= 60000
+    // Reset timer SEULEMENT si timeLeft < 60s (pas juste le status)
+    const shouldResetTimer = timeLeft <= 60000
 
     // Mettre à jour le jeu
     onGameUpdateRef.current(game.id, {
