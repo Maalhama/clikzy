@@ -209,9 +209,9 @@ export function useBotSimulation({
         return
       }
 
-      // Si joueur réel est leader en phase finale (mais pas dans zone de snipe), attendre
-      if (hasRealPlayer && isInFinalPhase) {
-        return // Laisser croire au joueur qu'il va gagner
+      // Si joueur réel est leader, ne pas prendre le lead (sync avec CRON et lobby)
+      if (hasRealPlayer) {
+        return // Le joueur réel garde le lead
       }
 
       // Comportement normal des bots - délais augmentés pour plus de suspense
