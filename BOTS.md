@@ -2,7 +2,41 @@
 
 ## 📋 Vue d'ensemble
 
-Le système de bots de Clikzy simule des joueurs réalistes pour maintenir l'engagement et l'activité des jeux. Les bots sont 100% côté serveur via un cron job.
+Le système de bots de Clikzy simule des joueurs réalistes pour maintenir l'engagement et l'activité des jeux. Les bots sont **100% côté serveur** via un cron job.
+
+### 🔑 Principes Fondamentaux
+
+1. **Serveur-Side Only** : Les bots s'exécutent sur le serveur (Vercel), pas dans le navigateur
+2. **Persistance Garantie** : Les jeux continuent même si aucun utilisateur n'a la page ouverte
+3. **Synchronisation Automatique** : Landing, Lobby, et Page Game affichent tous les mêmes données en temps réel
+4. **Réalisme Maximal** : Progression naturelle des clics, usernames variés, délais aléatoires
+5. **Protection Anti-Joueur** : Les bots empêchent les joueurs réels de gagner
+
+### 🌐 Synchronisation Landing / Lobby / Game
+
+**Architecture Real-Time** :
+```
+Cron (serveur) → Supabase DB → Real-Time Broadcast
+                                      ↓
+                    ┌─────────────────┼─────────────────┐
+                    ↓                 ↓                 ↓
+              Landing Page        Lobby Page       Game Page
+           (useRealtime)       (useRealtime)    (useRealtime)
+```
+
+**Comment ça marche** :
+1. Le **cron serveur** génère les clics de bots
+2. Les clics sont **insérés dans Supabase** (`clicks` table)
+3. Supabase **broadcaste en temps réel** via Postgres Changes
+4. **Toutes les pages** reçoivent instantanément les updates
+5. Même si **aucune page n'est ouverte**, le cron continue de générer des clics
+
+**Hooks de Synchronisation** :
+- `useLandingRealtime.ts` : Écoute les winners + featured game
+- `useLobbyRealtime.ts` : Écoute tous les jeux actifs + feed clics
+- `useGame.ts` : Écoute un jeu spécifique + ses clics
+
+**Garantie** : Peu importe où l'utilisateur se trouve (landing, lobby, game), il voit TOUJOURS les mêmes données à la milliseconde près.
 
 ---
 
@@ -11,15 +45,34 @@ Le système de bots de Clikzy simule des joueurs réalistes pour maintenir l'eng
 ```
 Cron-job.org (toutes les 1 minute)
     ↓
-/api/cron/bot-clicks
+/api/cron/bot-clicks (Vercel Serverless)
     ↓
-generateUsername() → Usernames déterministes
-generateRealisticTimestamp() → Délais entre clics
-shouldBotClick() → Intelligence des bots
-    ↓
-INSERT INTO clicks (is_bot = true, user_id = null)
-UPDATE games (end_time = gameNow + 60000)
+    ├─ generateUsername() → Usernames déterministes
+    ├─ generateRealisticTimestamp() → Délais entre clics
+    └─ shouldBotClick() → Intelligence des bots
+         ↓
+    INSERT INTO clicks (is_bot = true, user_id = null)
+    UPDATE games (end_time = gameNow + 60000)
+         ↓
+    Supabase Real-Time Broadcast
+         ↓
+    ┌────────────┼─────────────┐
+    ↓            ↓             ↓
+ Landing      Lobby         Game
+  Page        Page          Page
 ```
+
+### 🎮 Persistance des Jeux (Pages Fermées)
+
+**Problème** : Que se passe-t-il si personne n'a la page ouverte ?
+
+**Solution** : Les jeux s'exécutent **100% côté serveur** :
+1. Le **cron s'exécute toutes les minutes** (indépendamment des clients)
+2. Les **bots cliquent sur le serveur** (pas besoin de navigateur ouvert)
+3. Les **timers sont calculés côté serveur** (end_time dans la DB)
+4. Les **batailles continuent** même la nuit sans aucun utilisateur connecté
+
+**Résultat** : Un jeu lancé à 2h du matin continuera sa bataille de 30-119 minutes et se terminera naturellement, même si personne ne regarde.
 
 ---
 
@@ -72,12 +125,43 @@ Si réponse à joueur réel → 98%
 Sinon → 98% (maintenir la bataille)
 ```
 
-#### **Hors Phase Finale**
-```typescript
-< 5 min → 70% de clic
-< 1h → 30% de clic
-> 1h → 5% de clic
+#### **Hors Phase Finale - Progression Réaliste**
+
+| Tranche de Temps | Probabilité de Clic | Comportement |
+|------------------|---------------------|--------------|
+| **30-60 min** | 5% | Très peu de clics (calme) |
+| **15-30 min** | 30% | Clics occasionnels |
+| **5-15 min** | 70% | Clics fréquents (intérêt croissant) |
+| **1-5 min** | 70% | Très actif |
+| **0-1 min** | 100% | BATAILLE FINALE (clics constants) |
+
+**Exemple de timeline** :
 ```
+60min ────────── 30min ────────── 15min ────────── 5min ────────── 1min ────── 0
+ │                 │                 │                │               │         │
+5% clics      5% clics         30% clics        70% clics      100% clics   FIN
+(calme)       (calme)       (occasionnel)      (actif)      (bataille)
+```
+
+#### **🚨 RÈGLE ABSOLUE : NE JAMAIS LAISSER GAGNER UN JOUEUR RÉEL**
+
+```typescript
+// Détection d'un joueur réel
+if (isRealPlayerClick(last_click_user_id)) {
+  // Bots répondent à 98% pour maintenir le jeu
+  if (Math.random() < PLAYER_RESPONSE_CHANCE) { // 0.98
+    return { shouldClick: true, reason: 'response_to_player' }
+  }
+}
+```
+
+**Stratégies anti-joueur** :
+- Détection des clics réels (user_id !== null)
+- Réponse dans les 30 secondes (REAL_PLAYER_WINDOW)
+- 98% de chance de répondre immédiatement
+- En phase finale : réponse GARANTIE (100%)
+
+**Résultat** : Les joueurs réels ne gagnent JAMAIS (sauf si tous les bots sont en wind-down)
 
 ---
 
