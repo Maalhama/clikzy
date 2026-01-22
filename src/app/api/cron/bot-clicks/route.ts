@@ -1,65 +1,119 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
+import { createClient, SupabaseClient } from '@supabase/supabase-js'
 import { generateUsername, generateDeterministicUsername } from '@/lib/bots/usernameGenerator'
 
 /**
- * Server-side bot system with FULL INTELLIGENCE
- * Replicates the client-side bot behavior but persists to database
+ * ============================================
+ * SYSTÈME DE BOTS CLIKZY v3.0
+ * ============================================
  *
- * RÉALISME:
- * - Chaque clic vient d'un bot DIFFÉRENT du précédent
- * - Timestamps variés et réalistes entre les clics
- * - Patterns de clics qui simulent de vrais utilisateurs
+ * Architecture 100% serveur-side via cron-job.org (toutes les 60s)
+ *
+ * RÈGLES FONDAMENTALES:
+ * 1. Timer reset TOUJOURS à EXACTEMENT 60 secondes
+ * 2. En phase finale avec bataille active → bots cliquent à 95-100%
+ * 3. Bataille dure 30min à 1h59min (déterministe par gameId)
+ * 4. Les bots ne laissent JAMAIS un joueur réel gagner (sauf fin de bataille)
+ * 5. Chaque jeu est traité indépendamment avec son propre décalage temporel
  */
+
+// ============================================
+// CONFIGURATION
+// ============================================
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
 const CRON_SECRET = process.env.CRON_SECRET
 
+const CONFIG = {
+  // Durée de bataille en phase finale
+  MIN_BATTLE_DURATION: 30 * 60 * 1000,   // 30 minutes
+  MAX_BATTLE_DURATION: 119 * 60 * 1000,  // 1h59 max
+  WIND_DOWN_DURATION: 5 * 60 * 1000,     // 5 dernières minutes = ralentissement
+  WIND_DOWN_CLICK_CHANCE: 0.30,          // 30% pendant le ralentissement
+
+  // Seuils de temps
+  FINAL_PHASE_THRESHOLD: 60 * 1000,      // < 1 minute = phase finale
+  INTERESTED_THRESHOLD: 5 * 60 * 1000,   // < 5 minutes = intéressé
+  CASUAL_THRESHOLD: 60 * 60 * 1000,      // < 1 heure = occasionnel
+
+  // Probabilités de clic selon la phase (HORS bataille)
+  FINAL_PHASE_CLICK_CHANCE: 1.0,         // 100% TOUJOURS en phase finale
+  INTERESTED_CLICK_CHANCE: 0.70,         // 70%
+  CASUAL_CLICK_CHANCE: 0.30,             // 30%
+  RARE_CLICK_CHANCE: 0.05,               // 5%
+
+  // Probabilités pendant bataille active
+  BATTLE_CLICK_CHANCE: 0.98,             // 98% pendant bataille
+  BATTLE_URGENT_CLICK_CHANCE: 1.0,       // 100% si timer < 15s
+
+  // Réponse aux joueurs réels
+  PLAYER_RESPONSE_CHANCE: 0.98,          // 98% de répondre
+  REAL_PLAYER_WINDOW: 30 * 1000,         // Clic réel récent = < 30s
+  SUSPENSE_THRESHOLD: 10 * 1000,         // Attendre timer < 10s pour suspense
+  SUSPENSE_CHANCE: 0.70,                 // 70% du temps on attend le suspense
+
+  // Probabilités de TRAITEMENT d'un jeu ce tour (indépendance entre jeux)
+  PROC_URGENT: 1.0,                      // < 10s: 100% traité
+  PROC_VERY_URGENT: 0.85,                // < 30s: 85% traité
+  PROC_FINAL: 0.65,                      // < 60s: 65% traité
+  PROC_INTERESTED: 0.40,                 // < 5min: 40% traité
+  PROC_CASUAL: 0.30,                     // > 5min: 30% traité
+
+  // Nombre de clics générés selon urgence
+  CLICKS_PANIC: { min: 4, max: 6 },      // < 10s: 4-6 clics
+  CLICKS_URGENT: { min: 3, max: 5 },     // < 30s: 3-5 clics
+  CLICKS_FINAL: { min: 2, max: 4 },      // < 60s: 2-4 clics
+  CLICKS_INTERESTED: { min: 1, max: 3 }, // < 5min: 1-3 clics
+  CLICKS_CASUAL: { min: 1, max: 2 },     // > 5min: 1-2 clics
+
+  // Délais entre clics pour le feed live
+  DELAY_PANIC: { min: 200, max: 800 },     // Ultra rapide
+  DELAY_URGENT: { min: 500, max: 1500 },   // Très rapide
+  DELAY_FINAL: { min: 1000, max: 3000 },   // Rapide
+  DELAY_NORMAL: { min: 2000, max: 6000 },  // Normal
+
+  // Décalage max entre jeux (pour timestamps variés)
+  MAX_GAME_OFFSET: 15000,                // 0-15 secondes
+} as const
+
 // ============================================
-// CONFIGURATION DES BOTS INTELLIGENTS
-// (Même config que useLobbyBots.ts)
+// TYPES
 // ============================================
 
-// Durée de bataille EN PHASE FINALE (avant de laisser quelqu'un gagner)
-// Note: Le jeu commence avec 1h de timer, puis la bataille dure 30min-1h59min
-// Durée totale max = 1h + 1h59min = 2h59min
-const MIN_BATTLE_DURATION = 30 * 60 * 1000   // 30 minutes minimum
-const MAX_BATTLE_DURATION = 119 * 60 * 1000  // 1h59 maximum
+interface GameData {
+  id: string
+  item_id: string
+  status: string
+  end_time: number
+  total_clicks: number
+  last_click_username: string | null
+  last_click_user_id: string | null
+  last_click_at: string | null
+  battle_start_time: string | null
+  item: { name: string }[] | { name: string } | null
+}
 
-// Phase de ralentissement progressif avant fin de bataille
-const WIND_DOWN_DURATION = 5 * 60 * 1000     // 5 minutes de ralentissement
-const WIND_DOWN_CLICK_CHANCE = 0.3           // 30% de chance pendant le ralentissement
+interface ProcessResult {
+  gameId: string
+  itemName: string
+  clicks: number
+  reason: string
+  newStatus?: string
+  winner?: string
+}
 
-// Seuils de temps pour le comportement des bots
-const FINAL_PHASE_THRESHOLD = 60 * 1000      // < 1 minute = phase finale
-const INTERESTED_THRESHOLD = 5 * 60 * 1000   // < 5 minutes = bots intéressés
-const CASUAL_THRESHOLD = 60 * 60 * 1000      // < 1 heure = clics occasionnels
-
-// Probabilités de clic selon la phase
-const FINAL_PHASE_CLICK_CHANCE = 0.95        // 95% de chance de cliquer en phase finale
-const INTERESTED_CLICK_CHANCE = 0.7          // 70% quand intéressé
-const CASUAL_CLICK_CHANCE = 0.3              // 30% occasionnel
-const RARE_CLICK_CHANCE = 0.05               // 5% quand beaucoup de temps
-
-// Réponse aux vrais joueurs (DOPAMINE!)
-const SUSPENSE_THRESHOLD = 10 * 1000         // Attendre que le timer soit < 10s
-const SUSPENSE_CHANCE = 0.7                  // 70% du temps, attendre le suspense
-const PLAYER_RESPONSE_CHANCE = 0.98          // 98% de chance de répondre à un vrai joueur
-const REAL_PLAYER_WINDOW = 30 * 1000         // Considérer un clic comme "récent" si < 30s
-
-// Configuration du cron (toutes les 1 minute - limitation cron-job.org)
-// Pour compenser : plus de clics par exécution + décalage temporel étendu
-const CRON_INTERVAL = 1 * 60 * 1000          // 1 minute entre chaque exécution
-const CLICKS_PER_CRON_MIN = 0                // Min clics par jeu par exécution
-const CLICKS_PER_CRON_MAX = 6                // Max clics par jeu par exécution
+interface BotDecision {
+  shouldClick: boolean
+  reason: string
+}
 
 // ============================================
-// HELPER FUNCTIONS
+// FONCTIONS UTILITAIRES
 // ============================================
 
 /**
- * Hash function for deterministic random based on game ID
+ * Hash déterministe pour obtenir une durée de bataille stable par jeu
  */
 function hashString(str: string): number {
   let hash = 0
@@ -72,130 +126,158 @@ function hashString(str: string): number {
 }
 
 /**
- * Get deterministic battle duration for a game
- * Same game always gets same battle duration
+ * Durée de bataille déterministe (30min à 1h59min)
+ * Même gameId = même durée, toujours
  */
 function getBattleDuration(gameId: string): number {
   const hash = hashString(gameId)
-  const range = MAX_BATTLE_DURATION - MIN_BATTLE_DURATION
-  return MIN_BATTLE_DURATION + (hash % range)
+  const range = CONFIG.MAX_BATTLE_DURATION - CONFIG.MIN_BATTLE_DURATION
+  return CONFIG.MIN_BATTLE_DURATION + (hash % range)
 }
 
 /**
- * Check if a click was from a real player (not a bot)
- * Real players have user IDs, bots don't
+ * Vérifie si le dernier clic vient d'un vrai joueur (pas un bot)
  */
-function isRealPlayerClick(lastClickUserId: string | null): boolean {
-  return lastClickUserId !== null && lastClickUserId !== ''
+function isRealPlayerClick(userId: string | null): boolean {
+  return userId !== null && userId !== ''
 }
 
 /**
- * Generate a unique bot username different from the excluded one
- * Uses deterministic username based on game + timestamp for consistency
+ * Extrait le nom de l'item depuis la structure Supabase
  */
-function generateUniqueUsername(excludeUsername: string | null, gameId: string, timestamp: number): string {
-  // Use deterministic username based on game + timestamp
+function getItemName(item: GameData['item']): string {
+  if (Array.isArray(item) && item[0]?.name) return item[0].name
+  if (item && typeof item === 'object' && 'name' in item) return item.name
+  return 'Unknown'
+}
+
+/**
+ * Génère un username unique différent du précédent
+ */
+function generateUniqueUsername(
+  excludeUsername: string | null,
+  usedUsernames: Set<string>,
+  gameId: string,
+  timestamp: number
+): string {
   const seed = `${gameId}-${timestamp}`
   let username = generateDeterministicUsername(seed)
 
   let attempts = 0
-  while (username === excludeUsername && attempts < 10) {
+  while ((username === excludeUsername || usedUsernames.has(username)) && attempts < 10) {
     username = generateDeterministicUsername(`${seed}-${attempts}`)
     attempts++
+  }
+
+  // Fallback si vraiment on ne trouve pas
+  if (username === excludeUsername || usedUsernames.has(username)) {
+    username = generateUsername()
   }
 
   return username
 }
 
 /**
- * Generate realistic timestamps for bot clicks
- * Simulates human-like delays between clicks during a battle
- *
- * FIX: Delays are now much smaller because each click adds its own delay.
- * With 3 clicks and max delay of 5s each, total offset is max 15s, giving timer of ~75s (acceptable).
- *
- * @param baseTime - Starting timestamp
- * @param clickIndex - Index of the click (0, 1, 2...)
- * @param timeLeftMs - Time left in the game
- * @returns Realistic timestamp for this click
+ * Génère un timestamp réaliste pour un clic (délai humain)
  */
-function generateRealisticTimestamp(baseTime: number, clickIndex: number, timeLeftMs: number): number {
+function generateClickTimestamp(baseTime: number, clickIndex: number, timeLeftMs: number): number {
   if (clickIndex === 0) return baseTime
 
-  // Base delay depends on how urgent the game is
-  // REDUCED delays to prevent timer showing 74-81s instead of 60s
-  let minDelay: number
-  let maxDelay: number
+  let delay: { min: number; max: number }
 
   if (timeLeftMs <= 10000) {
-    // Critical phase (< 10s): ultra fast reactions (clics quasi-instantanés)
-    minDelay = 200
-    maxDelay = 800
+    delay = CONFIG.DELAY_PANIC
   } else if (timeLeftMs <= 30000) {
-    // Urgent (< 30s): très rapides (compétition intense)
-    minDelay = 500
-    maxDelay = 1500
+    delay = CONFIG.DELAY_URGENT
   } else if (timeLeftMs <= 60000) {
-    // Final phase (< 1min): rapides mais pas instantanés
-    minDelay = 1000
-    maxDelay = 3000
+    delay = CONFIG.DELAY_FINAL
   } else {
-    // Normal: délais plus naturels
-    minDelay = 2000
-    maxDelay = 6000
+    delay = CONFIG.DELAY_NORMAL
   }
 
-  // Generate a SINGLE random delay (not cumulative, not multiplicative)
-  const delay = minDelay + Math.random() * (maxDelay - minDelay)
-
-  // Return baseTime + just this delay (will be spread across multiple calls)
-  return baseTime + delay
+  return baseTime + delay.min + Math.random() * (delay.max - delay.min)
 }
 
 /**
- * Decide if bot should click based on time left and context
+ * Détermine le nombre de clics à générer selon l'urgence
+ */
+function getClickCount(timeLeftMs: number): number {
+  let config: { min: number; max: number }
+
+  if (timeLeftMs <= 10000) {
+    config = CONFIG.CLICKS_PANIC
+  } else if (timeLeftMs <= 30000) {
+    config = CONFIG.CLICKS_URGENT
+  } else if (timeLeftMs <= 60000) {
+    config = CONFIG.CLICKS_FINAL
+  } else if (timeLeftMs <= CONFIG.INTERESTED_THRESHOLD) {
+    config = CONFIG.CLICKS_INTERESTED
+  } else {
+    config = CONFIG.CLICKS_CASUAL
+  }
+
+  return config.min + Math.floor(Math.random() * (config.max - config.min + 1))
+}
+
+/**
+ * Probabilité de traiter un jeu ce tour (indépendance entre jeux)
+ */
+function getProcessingProbability(timeLeftMs: number): number {
+  if (timeLeftMs <= 10000) return CONFIG.PROC_URGENT
+  if (timeLeftMs <= 30000) return CONFIG.PROC_VERY_URGENT
+  if (timeLeftMs <= 60000) return CONFIG.PROC_FINAL
+  if (timeLeftMs <= CONFIG.INTERESTED_THRESHOLD) return CONFIG.PROC_INTERESTED
+  return CONFIG.PROC_CASUAL
+}
+
+// ============================================
+// LOGIQUE DE DÉCISION DES BOTS
+// ============================================
+
+/**
+ * Décide si un bot doit cliquer sur ce jeu
  *
- * CRITICAL: Bots MUST maintain the battle for the full duration (30-119 min)
- * even when no real players are present. This ensures realistic game activity.
+ * PRIORITÉS:
+ * 1. Si bataille terminée → NE PAS cliquer (laisser gagner)
+ * 2. Si wind-down (5 dernières min) → 30% de chance
+ * 3. Si réponse à joueur réel → 98% (avec suspense si timer > 10s)
+ * 4. Si bataille active → 98-100% selon urgence
+ * 5. Si phase finale sans bataille → 100% toujours
+ * 6. Sinon → probabilités progressives selon timer
  */
 function shouldBotClick(
   timeLeftMs: number,
   isResponseToRealPlayer: boolean,
   battleStartTime: Date | null,
   battleDuration: number,
-  gameStatus: string // 'active' | 'final_phase'
-): { shouldClick: boolean; reason: string } {
+  gameStatus: string
+): BotDecision {
 
-  // CHECK BATTLE STATE FIRST (durée de bataille)
-  // Use game status instead of timer to handle 65s buffer correctly
-  const isInFinalPhase = gameStatus === 'final_phase' || timeLeftMs <= FINAL_PHASE_THRESHOLD
+  const isInFinalPhase = gameStatus === 'final_phase' || timeLeftMs <= CONFIG.FINAL_PHASE_THRESHOLD
 
+  // ============ BATAILLE EN COURS ============
   if (battleStartTime && isInFinalPhase) {
     const battleElapsed = Date.now() - battleStartTime.getTime()
     const timeUntilBattleEnd = battleDuration - battleElapsed
 
-    // Bataille terminée - laisser quelqu'un gagner
+    // Bataille TERMINÉE → laisser le gagnant remporter
     if (battleElapsed >= battleDuration) {
       return { shouldClick: false, reason: 'battle_ended' }
     }
 
-    // CRITICAL: Battle is still ongoing - bot MUST click to keep game alive
-    // This ensures the battle lasts the full 30-119 minutes
-
-    // Phase de ralentissement (5 dernières minutes de bataille)
-    if (timeUntilBattleEnd <= WIND_DOWN_DURATION) {
-      // During wind-down, reduce click rate but STILL click sometimes
-      if (Math.random() < WIND_DOWN_CLICK_CHANCE) {
+    // WIND-DOWN (5 dernières minutes) → réduire les clics
+    if (timeUntilBattleEnd <= CONFIG.WIND_DOWN_DURATION) {
+      if (Math.random() < CONFIG.WIND_DOWN_CLICK_CHANCE) {
         return { shouldClick: true, reason: 'wind_down_click' }
       }
       return { shouldClick: false, reason: 'wind_down_skip' }
     }
 
-    // RÉPONSE AUX VRAIS JOUEURS (DOPAMINE!) - only during active battle
+    // Réponse à un VRAI JOUEUR (dopamine!)
     if (isResponseToRealPlayer) {
-      // 70% du temps, attendre que timer < 10 secondes (suspense!)
-      if (timeLeftMs > SUSPENSE_THRESHOLD && Math.random() < SUSPENSE_CHANCE) {
-        // But if timer is very low, MUST click to keep game alive
+      // Créer du suspense: attendre que timer < 10s (70% du temps)
+      if (timeLeftMs > CONFIG.SUSPENSE_THRESHOLD && Math.random() < CONFIG.SUSPENSE_CHANCE) {
+        // Mais si timer devient critique, on doit cliquer quand même
         if (timeLeftMs <= 15000) {
           return { shouldClick: true, reason: 'keep_alive_suspense' }
         }
@@ -204,62 +286,55 @@ function shouldBotClick(
       return { shouldClick: true, reason: 'response_to_player' }
     }
 
-    // Normal battle: Click probability based on timer urgency
-    // More urgent = more likely to click (realistic competitive behavior)
+    // BATAILLE NORMALE → cliquer selon urgence
     if (timeLeftMs <= 15000) {
-      // < 15s: ULTRA URGENT - bots fight hard (100%)
+      // ULTRA URGENT → 100%
       return { shouldClick: true, reason: 'battle_ultra_urgent' }
-    } else if (timeLeftMs <= 30000) {
-      // < 30s: Very urgent - bots very active (99%)
-      if (Math.random() < 0.99) {
-        return { shouldClick: true, reason: 'battle_very_urgent' }
-      }
-      return { shouldClick: false, reason: 'battle_rare_skip' }
-    } else {
-      // > 30s: Normal battle pace (95%)
-      if (Math.random() < 0.95) {
-        return { shouldClick: true, reason: 'battle_maintain' }
-      }
-      return { shouldClick: false, reason: 'battle_variance' }
     }
+
+    // Normal → 98%
+    if (Math.random() < CONFIG.BATTLE_CLICK_CHANCE) {
+      return { shouldClick: true, reason: 'battle_maintain' }
+    }
+    return { shouldClick: false, reason: 'battle_variance' }
   }
 
-  // FINAL PHASE but no battle started yet - start the battle!
+  // ============ PHASE FINALE (pas encore de bataille) ============
   if (isInFinalPhase) {
-    // CRITICAL: In final phase, bots MUST ALWAYS click to prevent premature game end
-    // We remove the random chance here - bots always maintain the game (100% click rate)
-    return { shouldClick: true, reason: 'final_phase_maintain' }
+    // TOUJOURS cliquer pour démarrer/maintenir la bataille
+    return { shouldClick: true, reason: 'final_phase_start' }
   }
 
-  // PROBABILITÉS SELON LE TEMPS RESTANT (hors phase finale)
-  if (timeLeftMs <= INTERESTED_THRESHOLD) {
-    // Intéressé (< 5 minutes): actif
-    if (Math.random() < INTERESTED_CLICK_CHANCE) {
+  // ============ HORS PHASE FINALE ============
+  if (timeLeftMs <= CONFIG.INTERESTED_THRESHOLD) {
+    // < 5 minutes → 70%
+    if (Math.random() < CONFIG.INTERESTED_CLICK_CHANCE) {
       return { shouldClick: true, reason: 'interested' }
     }
     return { shouldClick: false, reason: 'interested_skip' }
   }
 
-  if (timeLeftMs <= CASUAL_THRESHOLD) {
-    // Occasionnel (< 1 heure): quelques clics
-    if (Math.random() < CASUAL_CLICK_CHANCE) {
+  if (timeLeftMs <= CONFIG.CASUAL_THRESHOLD) {
+    // < 1 heure → 30%
+    if (Math.random() < CONFIG.CASUAL_CLICK_CHANCE) {
       return { shouldClick: true, reason: 'casual' }
     }
     return { shouldClick: false, reason: 'casual_skip' }
   }
 
-  // Beaucoup de temps (> 1 heure): très rare
-  if (Math.random() < RARE_CLICK_CHANCE) {
+  // > 1 heure → 5%
+  if (Math.random() < CONFIG.RARE_CLICK_CHANCE) {
     return { shouldClick: true, reason: 'rare' }
   }
   return { shouldClick: false, reason: 'rare_skip' }
 }
 
 // ============================================
-// MAIN ENDPOINT
+// ENDPOINT PRINCIPAL
 // ============================================
 
 export async function GET(request: NextRequest) {
+  // Vérification auth
   const authHeader = request.headers.get('authorization')
   if (CRON_SECRET && authHeader !== `Bearer ${CRON_SECRET}`) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -269,8 +344,9 @@ export async function GET(request: NextRequest) {
     const supabase = createClient(supabaseUrl, supabaseServiceKey)
     const now = Date.now()
 
-    // Get all active games
+    // ============ FETCH JEUX ACTIFS ============
     console.log('🔍 [BOT-CRON] Fetching active games...')
+
     const { data: activeGames, error: fetchError } = await supabase
       .from('games')
       .select(`
@@ -292,229 +368,151 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Failed to fetch games' }, { status: 500 })
     }
 
-    console.log(`✅ [BOT-CRON] Found ${activeGames?.length || 0} active games`)
-
     if (!activeGames || activeGames.length === 0) {
-      console.log('⚠️ [BOT-CRON] No active games found - ending execution')
+      console.log('⚠️ [BOT-CRON] No active games')
       return NextResponse.json({ message: 'No active games', processed: 0 })
     }
 
-    console.log('🎮 [BOT-CRON] Games to process:', activeGames.map(g => ({
-      id: g.id.substring(0, 8),
-      status: g.status,
-      timeLeft: Math.floor((g.end_time - now) / 1000) + 's'
-    })))
+    console.log(`✅ [BOT-CRON] Found ${activeGames.length} games:`,
+      activeGames.map(g => ({
+        id: g.id.substring(0, 8),
+        status: g.status,
+        timeLeft: Math.floor(((g.end_time as number) - now) / 1000) + 's',
+        clicks: g.total_clicks
+      }))
+    )
 
-    const results: Array<{
-      gameId: string
-      itemName: string
-      clicks: number
-      reason: string
-      newStatus?: string
-      winner?: string
-    }> = []
+    const results: ProcessResult[] = []
 
-    for (const game of activeGames) {
-      // Generate independent random delay for each game (0-15 seconds)
-      // NOT cumulative - each game gets its own timestamp offset for natural variation
-      const gameProcessingDelay = Math.floor(Math.random() * 15000)
-      const gameNow = now + gameProcessingDelay
-
-      const endTime = game.end_time as number
-      const timeLeft = endTime - gameNow
+    // ============ TRAITEMENT DE CHAQUE JEU ============
+    for (const game of activeGames as GameData[]) {
+      const endTime = game.end_time
+      const timeLeft = endTime - now
       const battleDuration = getBattleDuration(game.id)
+      const itemName = getItemName(game.item)
 
-      // TEMPORAIRE : Tous les jeux sont traités à chaque tour (pas de skip)
-      // Permet de tester si le cron fonctionne et génère bien des clics
-
-      // Parse battle_start_time if exists
+      // Parse battle_start_time
       const battleStartTime = game.battle_start_time
         ? new Date(game.battle_start_time)
         : null
 
-      // Check if last click was from a real player (recently)
+      // Vérifier si dernier clic = joueur réel récent
       const lastClickAt = game.last_click_at ? new Date(game.last_click_at).getTime() : 0
       const isRecentRealPlayer = isRealPlayerClick(game.last_click_user_id) &&
-        (gameNow - lastClickAt) < REAL_PLAYER_WINDOW
+        (now - lastClickAt) < CONFIG.REAL_PLAYER_WINDOW
 
-      // REMOVED: Timer <= 0 check moved AFTER bot decision
-      // Let shouldBotClick() decide if game should continue (battle ongoing)
-      // If bots should click, timer will be reset. Otherwise, game ends below.
+      // ============ PROBABILITÉ DE TRAITEMENT ============
+      // Chaque jeu a une probabilité indépendante d'être traité ce tour
+      const processingProb = getProcessingProbability(timeLeft)
+      if (Math.random() > processingProb) {
+        console.log(`⏭️ [${game.id.substring(0, 8)}] Skipped this round (prob: ${Math.round(processingProb * 100)}%)`)
+        results.push({
+          gameId: game.id,
+          itemName,
+          clicks: 0,
+          reason: 'random_skip'
+        })
+        continue
+      }
 
-      // Decide if bot should click
+      // ============ DÉCISION: CLIQUER OU NON ============
       const decision = shouldBotClick(
         timeLeft,
         isRecentRealPlayer,
         battleStartTime,
         battleDuration,
-        game.status as string
+        game.status
       )
 
+      // ============ SI BOT NE CLIQUE PAS ============
       if (!decision.shouldClick) {
-        // Bot decided not to click - if timer is negative, end the game
+        // Timer expiré ET bot ne clique pas → FIN DU JEU
         if (timeLeft <= 0) {
-          const winnerUsername = game.last_click_username || null
-          const winnerId = game.last_click_user_id || null
-          const itemName = getItemName(game.item)
+          console.log(`🏆 [${game.id.substring(0, 8)}] Game ending - ${decision.reason}`)
 
-          await supabase
-            .from('games')
-            .update({
-              status: 'ended',
-              ended_at: new Date().toISOString(),
-              winner_id: winnerId,
-            })
-            .eq('id', game.id)
-
-          // Create winner record
-          if (winnerUsername || game.total_clicks > 0) {
-            const isBot = !winnerId
-            let username = winnerUsername
-            if (winnerId && !username) {
-              const { data: winnerProfile } = await supabase
-                .from('profiles')
-                .select('username')
-                .eq('id', winnerId)
-                .single()
-              username = winnerProfile?.username || 'Joueur'
-            }
-
-            await supabase.from('winners').insert({
-              game_id: game.id,
-              user_id: winnerId || null,
-              username: username || 'Bot',
-              item_id: game.item_id,
-              item_name: itemName,
-              total_clicks_in_game: game.total_clicks || 0,
-              is_bot: isBot,
-            })
-
-            if (winnerId) {
-              const { data: profile } = await supabase
-                .from('profiles')
-                .select('total_wins')
-                .eq('id', winnerId)
-                .single()
-              if (profile) {
-                await supabase
-                  .from('profiles')
-                  .update({ total_wins: (profile.total_wins ?? 0) + 1 })
-                  .eq('id', winnerId)
-              }
-            }
-          }
+          await endGame(supabase, game, itemName)
 
           results.push({
             gameId: game.id,
             itemName,
             clicks: 0,
-            reason: 'game_ended_no_bot_click',
+            reason: decision.reason,
             newStatus: 'ended',
-            winner: winnerUsername || (game.total_clicks > 0 ? 'Bot' : 'Aucun'),
+            winner: game.last_click_username || 'Bot'
           })
           continue
         }
 
-        // Timer still positive, just skip this round
+        // Timer pas expiré → juste skip
         results.push({
           gameId: game.id,
-          itemName: getItemName(game.item),
+          itemName,
           clicks: 0,
-          reason: decision.reason,
+          reason: decision.reason
         })
         continue
       }
 
-      // Determine number of clicks based on urgency
-      // Cron à 1min = plus de clics par tour pour compenser
-      let clickCount = 1
-      if (timeLeft <= 10000) {
-        // < 10s: PANIQUE! 4-6 bots cliquent (ultra compétitif)
-        clickCount = 4 + Math.floor(Math.random() * 3) // 4-6 clics
-      } else if (timeLeft <= 30000) {
-        // < 30s: Très actif, 3-5 bots cliquent
-        clickCount = 3 + Math.floor(Math.random() * 3) // 3-5 clics
-      } else if (timeLeft <= FINAL_PHASE_THRESHOLD) {
-        // < 60s: Phase finale, 2-4 bots cliquent
-        clickCount = 2 + Math.floor(Math.random() * 3) // 2-4 clics
-      } else if (timeLeft <= INTERESTED_THRESHOLD) {
-        // < 5min: Actif, 1-3 clics
-        clickCount = 1 + Math.floor(Math.random() * 3) // 1-3 clics
-      } else {
-        // > 5min: Occasionnel, 1-2 clics
-        clickCount = Math.random() < 0.5 ? 1 : 2
+      // ============ GÉNÉRATION DES CLICS ============
+      const clickCount = getClickCount(timeLeft)
+      const usedUsernames = new Set<string>()
+      if (game.last_click_username) {
+        usedUsernames.add(game.last_click_username)
       }
 
-      // Generate bot clicks with REALISTIC behavior
-      // Each click comes from a DIFFERENT bot than the previous one
-      let lastUsername = game.last_click_username
-      let newEndTime = endTime
-      let newStatus = game.status
-      let shouldSetBattleStart = false
       const botClicks: Array<{
         username: string
-        item_name: string
         clicked_at: string
       }> = []
 
-      // Track usernames used in this batch to avoid duplicates
-      const usedUsernames = new Set<string>()
-      if (lastUsername) {
-        usedUsernames.add(lastUsername)
-      }
+      // Décalage temporel pour ce jeu (0-15s)
+      const gameOffset = Math.floor(Math.random() * CONFIG.MAX_GAME_OFFSET)
+      const gameTime = now + gameOffset
+
+      let lastUsername = game.last_click_username
 
       for (let i = 0; i < clickCount; i++) {
-        // Generate unique username different from previous clicks
-        let newUsername = generateUniqueUsername(lastUsername, game.id, gameNow + i)
+        const username = generateUniqueUsername(lastUsername, usedUsernames, game.id, gameTime + i)
+        usedUsernames.add(username)
+        lastUsername = username
 
-        // Also ensure we don't repeat within this batch
-        let batchAttempts = 0
-        while (usedUsernames.has(newUsername) && batchAttempts < 10) {
-          newUsername = generateUsername()
-          batchAttempts++
-        }
+        const clickTimestamp = generateClickTimestamp(gameTime, i, timeLeft)
 
-        usedUsernames.add(newUsername)
-        lastUsername = newUsername
-
-        // Generate realistic timestamp with human-like delays
-        const clickTimestamp = generateRealisticTimestamp(gameNow, i, timeLeft)
-
-        // Store click for insertion
         botClicks.push({
-          username: newUsername,
-          item_name: getItemName(game.item),
-          clicked_at: new Date(clickTimestamp).toISOString(),
+          username,
+          clicked_at: new Date(clickTimestamp).toISOString()
         })
       }
 
-      // Trigger final phase if time < 1 minute
-      // Reset to EXACTLY 60 seconds from NOW (not gameNow with delay) to ensure timer shows exactly 01:00
-      if (game.status === 'active' && timeLeft <= FINAL_PHASE_THRESHOLD) {
-        newEndTime = now + 60000 // EXACTLY 60 seconds from real now
+      // ============ CALCUL DU NOUVEAU ÉTAT ============
+      let newEndTime = endTime
+      let newStatus = game.status
+      let shouldSetBattleStart = false
+
+      // Passage en phase finale si timer < 1 minute
+      if (game.status === 'active' && timeLeft <= CONFIG.FINAL_PHASE_THRESHOLD) {
         newStatus = 'final_phase'
         shouldSetBattleStart = true
-      } else if (game.status === 'final_phase') {
-        // In final phase, ALWAYS reset to EXACTLY 60 seconds from real now
+      }
+
+      // RESET TIMER À EXACTEMENT 60 SECONDES
+      // On utilise `now` (pas gameTime) pour que le timer affiche 01:00 pile
+      if (newStatus === 'final_phase') {
         newEndTime = now + 60000
       }
 
-      // Get the timestamp of the LAST click for last_click_at field (feed live variety)
-      const lastClickTimestamp = botClicks.length > 0
-        ? new Date(botClicks[botClicks.length - 1].clicked_at).getTime()
-        : gameNow
+      // ============ UPDATE DATABASE ============
+      const lastClick = botClicks[botClicks.length - 1]
 
-      // Build update data
       const updateData: Record<string, unknown> = {
         total_clicks: (game.total_clicks || 0) + clickCount,
-        last_click_username: lastUsername,
-        last_click_user_id: null, // Bot click = no user ID
-        last_click_at: new Date(lastClickTimestamp).toISOString(),
+        last_click_username: lastClick.username,
+        last_click_user_id: null,
+        last_click_at: lastClick.clicked_at,
         end_time: newEndTime,
         status: newStatus,
       }
 
-      // Set battle start time when entering final phase
       if (shouldSetBattleStart && !battleStartTime) {
         updateData.battle_start_time = new Date().toISOString()
       }
@@ -525,56 +523,60 @@ export async function GET(request: NextRequest) {
         .eq('id', game.id)
 
       if (updateError) {
-        console.error(`Error updating game ${game.id}:`, updateError)
+        console.error(`❌ [${game.id.substring(0, 8)}] Update error:`, updateError)
         continue
       }
 
-      // Insert bot clicks into clicks table for the live feed
-      if (botClicks.length > 0) {
-        const currentTotal = (game.total_clicks || 0)
-        const clicksToInsert = botClicks.map((click, index) => ({
-          game_id: game.id,
-          user_id: null as string | null,
-          username: click.username,
-          item_name: click.item_name,
-          is_bot: true,
-          clicked_at: click.clicked_at,
-          credits_spent: 0,
-          sequence_number: currentTotal + index + 1,
-        }))
+      // ============ INSERT CLICS DANS LE FEED ============
+      const currentTotal = game.total_clicks || 0
+      const clicksToInsert = botClicks.map((click, index) => ({
+        game_id: game.id,
+        user_id: null as string | null,
+        username: click.username,
+        item_name: itemName,
+        is_bot: true,
+        clicked_at: click.clicked_at,
+        credits_spent: 0,
+        sequence_number: currentTotal + index + 1,
+      }))
 
-        const { error: clicksError } = await supabase
-          .from('clicks')
-          .insert(clicksToInsert)
+      const { error: clicksError } = await supabase
+        .from('clicks')
+        .insert(clicksToInsert)
 
-        if (clicksError) {
-          console.error(`Error inserting clicks for game ${game.id}:`, clicksError)
-        }
+      if (clicksError) {
+        console.error(`❌ [${game.id.substring(0, 8)}] Clicks insert error:`, clicksError)
       }
+
+      console.log(`✅ [${game.id.substring(0, 8)}] ${clickCount} clicks - ${decision.reason}`)
 
       results.push({
         gameId: game.id,
-        itemName: getItemName(game.item),
+        itemName,
         clicks: clickCount,
         reason: decision.reason,
-        newStatus: newStatus !== game.status ? newStatus : undefined,
+        newStatus: newStatus !== game.status ? newStatus : undefined
       })
     }
 
+    // ============ RÉSUMÉ ============
     const totalClicks = results.reduce((sum, r) => sum + r.clicks, 0)
     const clickedGames = results.filter(r => r.clicks > 0).length
+    const endedGames = results.filter(r => r.newStatus === 'ended').length
 
-    console.log(`Bot intelligence: ${totalClicks} clicks on ${clickedGames}/${results.length} games`)
+    console.log(`📊 [BOT-CRON] Summary: ${totalClicks} clicks on ${clickedGames}/${results.length} games, ${endedGames} ended`)
 
     return NextResponse.json({
       message: `Processed ${results.length} games, ${totalClicks} bot clicks`,
       processed: results.length,
       totalClicks,
       clickedGames,
-      games: results,
+      endedGames,
+      games: results
     })
+
   } catch (error) {
-    console.error('Bot cron error:', error)
+    console.error('❌ [BOT-CRON] Fatal error:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
@@ -583,8 +585,69 @@ export async function POST(request: NextRequest) {
   return GET(request)
 }
 
-function getItemName(item: unknown): string {
-  if (Array.isArray(item) && item[0]?.name) return item[0].name
-  if (item && typeof item === 'object' && 'name' in item) return (item as { name: string }).name
-  return 'Unknown'
+// ============================================
+// FONCTIONS AUXILIAIRES
+// ============================================
+
+/**
+ * Termine un jeu et crée l'enregistrement du gagnant
+ */
+async function endGame(
+  supabase: SupabaseClient,
+  game: GameData,
+  itemName: string
+): Promise<void> {
+  const winnerId = game.last_click_user_id || null
+  const winnerUsername = game.last_click_username || 'Bot'
+  const isBot = !winnerId
+
+  // Update game status
+  await supabase
+    .from('games')
+    .update({
+      status: 'ended',
+      ended_at: new Date().toISOString(),
+      winner_id: winnerId,
+    })
+    .eq('id', game.id)
+
+  // Récupérer le username si c'est un vrai joueur
+  let finalUsername = winnerUsername
+  if (winnerId && !finalUsername) {
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('username')
+      .eq('id', winnerId)
+      .single()
+    finalUsername = profile?.username || 'Joueur'
+  }
+
+  // Créer l'enregistrement du gagnant
+  if (game.total_clicks > 0 || winnerUsername) {
+    await supabase.from('winners').insert({
+      game_id: game.id,
+      user_id: winnerId,
+      username: finalUsername,
+      item_id: game.item_id,
+      item_name: itemName,
+      total_clicks_in_game: game.total_clicks || 0,
+      is_bot: isBot,
+    })
+
+    // Incrémenter les wins du joueur si c'est un vrai
+    if (winnerId) {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('total_wins')
+        .eq('id', winnerId)
+        .single()
+
+      if (profile) {
+        await supabase
+          .from('profiles')
+          .update({ total_wins: (profile.total_wins ?? 0) + 1 })
+          .eq('id', winnerId)
+      }
+    }
+  }
 }
