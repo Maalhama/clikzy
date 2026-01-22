@@ -4,15 +4,16 @@ import { generateDeterministicUsername } from '@/lib/bots/usernameGenerator'
 
 /**
  * ============================================
- * CRON BOT CLICKS - Clikzy v6.0
+ * CRON BOT CLICKS - Clikzy v7.0
  * ============================================
  *
  * Ce cron gère:
- * - Les clics de bots (persistés en DB)
+ * - Les clics de bots (persistés en DB avec timestamps décalés)
  * - La fin des jeux (timer = 0)
  * - La création des records de gagnants
  *
  * Fréquence: toutes les 60 secondes
+ * Génère plusieurs clics répartis sur les 60 dernières secondes
  */
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
@@ -55,30 +56,43 @@ function getGamePersonality(gameId: string): number {
   return 0.7 + (Math.abs(hash) % 60) / 100 // 0.7 à 1.3
 }
 
-// Calcule combien de clics un bot devrait faire en 60 secondes
+// Calcule combien de clics simuler sur les 60 dernières secondes
 function calculateBotClicks(game: GameData, now: number): number {
   const timeLeft = game.end_time - now
   if (timeLeft <= 0) return 0
 
   const personality = getGamePersonality(game.id)
 
-  // Phase finale (< 60s): 2-4 clics par minute
+  // Phase finale (< 60s): 3-5 clics par minute
   if (timeLeft <= 60000) {
-    return Math.floor(2 + Math.random() * 3 * personality)
+    return Math.floor(3 + Math.random() * 3 * personality)
   }
 
-  // Active (< 15min): 1-2 clics par minute
+  // Active (< 15min): 2-3 clics par minute
   if (timeLeft <= 15 * 60 * 1000) {
+    return Math.floor(2 + Math.random() * 2 * personality)
+  }
+
+  // Building (< 30min): 1-2 clics par minute
+  if (timeLeft <= 30 * 60 * 1000) {
     return Math.floor(1 + Math.random() * 2 * personality)
   }
 
-  // Building (< 30min): 0-1 clic par minute
-  if (timeLeft <= 30 * 60 * 1000) {
-    return Math.random() < 0.7 * personality ? 1 : 0
-  }
+  // Positioning (> 30min): 0-1 clic par minute
+  return Math.random() < 0.6 * personality ? 1 : 0
+}
 
-  // Positioning (> 30min): 0-1 clic par minute (rare)
-  return Math.random() < 0.4 * personality ? 1 : 0
+// Génère des timestamps décalés sur les 60 dernières secondes
+function generateClickTimestamps(count: number, now: number): number[] {
+  const timestamps: number[] = []
+  for (let i = 0; i < count; i++) {
+    // Répartir les clics sur les 60 dernières secondes
+    // Avec un peu d'aléatoire pour le réalisme
+    const offset = Math.floor((60000 / count) * i + Math.random() * (60000 / count / 2))
+    timestamps.push(now - 60000 + offset)
+  }
+  // Trier par ordre chronologique
+  return timestamps.sort((a, b) => a - b)
 }
 
 // ============================================
@@ -141,39 +155,46 @@ export async function GET(request: NextRequest) {
         continue
       }
 
-      // Simuler des clics de bots
+      // Calculer combien de clics simuler
       const clickCount = calculateBotClicks(game, now)
 
       if (clickCount > 0) {
+        // Générer les timestamps répartis sur les 60 dernières secondes
+        const timestamps = generateClickTimestamps(clickCount, now)
+
         let currentEndTime = game.end_time
         let currentTotalClicks = game.total_clicks
         let lastUsername = game.last_click_username
 
         for (let i = 0; i < clickCount; i++) {
+          const clickTime = timestamps[i]
+
           // Générer un username unique pour ce clic
-          const clickSeed = `${game.id}-${now}-${i}`
+          const clickSeed = `${game.id}-${clickTime}-${i}`
           const username = generateDeterministicUsername(clickSeed)
 
-          // Insérer le clic en DB
+          // Insérer le clic en DB avec le timestamp décalé
           await supabase.from('clicks').insert({
             game_id: game.id,
             username,
             is_bot: true,
             item_name: itemName,
+            clicked_at: new Date(clickTime).toISOString(),
           })
 
           currentTotalClicks++
           lastUsername = username
 
-          // Reset timer seulement si < 60s
-          const currentTimeLeft = currentEndTime - now
-          if (currentTimeLeft <= 60000 && currentTimeLeft > 0) {
-            currentEndTime = now + 60000
+          // Reset timer seulement si < 60s au moment du clic
+          const clickTimeLeft = currentEndTime - clickTime
+          if (clickTimeLeft <= 60000 && clickTimeLeft > 0) {
+            currentEndTime = clickTime + 60000
           }
         }
 
         // Update le jeu avec les nouveaux clics
-        const newStatus = (currentEndTime - now) <= 60000 ? 'final_phase' : game.status
+        const finalTimeLeft = currentEndTime - now
+        const newStatus = finalTimeLeft <= 60000 ? 'final_phase' : game.status
 
         await supabase
           .from('games')
@@ -189,11 +210,11 @@ export async function GET(request: NextRequest) {
 
         results.push({
           gameId: game.id,
-          action: `${clickCount} bot clicks`,
+          action: `${clickCount} bot clicks (spread over 60s)`,
           clicks: clickCount
         })
 
-        console.log(`[CRON] ${game.id.substring(0, 8)}: ${clickCount} bot clicks (${Math.floor(timeLeft/1000)}s left)`)
+        console.log(`[CRON] ${game.id.substring(0, 8)}: ${clickCount} clicks, timeLeft=${Math.floor(finalTimeLeft/1000)}s`)
       } else {
         results.push({
           gameId: game.id,
