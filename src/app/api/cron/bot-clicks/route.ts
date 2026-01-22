@@ -307,14 +307,40 @@ export async function GET(request: NextRequest) {
     let gameProcessingDelay = 0
 
     for (const game of activeGames) {
-      // Add small random delay between games (0-3 seconds) to avoid perfect sync
-      // With 15s cron, we want tighter timing for more realistic competition
-      gameProcessingDelay += Math.floor(Math.random() * 3000)
+      // Add random delay between games (0-8 seconds) to spread bot activity
+      // Creates natural staggered clicking pattern across different games
+      gameProcessingDelay += Math.floor(Math.random() * 8000)
       const gameNow = now + gameProcessingDelay
 
       const endTime = game.end_time as number
       const timeLeft = endTime - gameNow
       const battleDuration = getBattleDuration(game.id)
+
+      // CRITICAL: Decide if we process this game THIS round
+      // Not all games are processed every 15 seconds - creates realistic independent bot activity
+      // Probability based on urgency: more urgent = more likely to be processed
+      let processingProbability = 0.3 // Default 30% for normal games
+
+      if (timeLeft <= 10000) {
+        processingProbability = 1.0 // 100% - always process urgent games
+      } else if (timeLeft <= 30000) {
+        processingProbability = 0.85 // 85% - very often
+      } else if (timeLeft <= 60000) {
+        processingProbability = 0.65 // 65% - often
+      } else if (timeLeft <= 5 * 60 * 1000) {
+        processingProbability = 0.4 // 40% - sometimes
+      }
+
+      // Random skip - creates staggered bot activity across games
+      if (Math.random() > processingProbability) {
+        results.push({
+          gameId: game.id,
+          itemName: getItemName(game.item),
+          clicks: 0,
+          reason: 'random_skip_this_round',
+        })
+        continue
+      }
 
       // Parse battle_start_time if exists
       const battleStartTime = game.battle_start_time

@@ -219,9 +219,18 @@ if (isRealPlayerClick(last_click_user_id)) {
 **Comment ça fonctionne** :
 - Cron s'exécute toutes les **15 secondes** (ultra-réactif !)
 - Quand le cron tourne, il vérifie tous les jeux actifs
-- Pour chaque jeu, il décide si les bots cliquent (selon probabilités + urgence)
+- **IMPORTANT** : Pas tous les jeux sont traités à chaque tour ! (clics indépendants par jeu)
+- Pour chaque jeu, décision aléatoire si on traite ce jeu (selon urgence du timer)
+- Si jeu traité : décision si bots cliquent (selon probabilités + urgence)
 - Si bots cliquent → Timer reset à 60s
 - Si bots ne cliquent pas → Timer continue de descendre → Peut atteindre 0 → Gagnant
+
+**Probabilité de traiter un jeu** (indépendance entre jeux) :
+- Timer < 10s : 100% (toujours traité)
+- Timer < 30s : 85% (très souvent traité)
+- Timer < 60s : 65% (souvent traité)
+- Timer < 5min : 40% (parfois traité)
+- Timer > 5min : 30% (rarement traité)
 
 **Réactivité selon urgence du timer** :
 - Timer < 10s : 2-4 clics quasi-instantanés (délai 200-800ms entre clics)
@@ -230,22 +239,33 @@ if (isRealPlayerClick(last_click_user_id)) {
 - Timer > 60s : 1 clic occasionnel (délai 2-6s)
 
 **Décalage entre jeux** :
-- Jeu 1 traité à `cron_time + 0.5s` → Timer reset à `17:40:00.5`
-- Jeu 2 traité à `cron_time + 1.8s` → Timer reset à `17:40:01.8`
-- Jeu 3 traité à `cron_time + 2.3s` → Timer reset à `17:40:02.3`
-- → Décalage naturel de 0-3s entre jeux
+- Chaque jeu est traité avec un décalage de 0-8s
+- Certains jeux peuvent être skipés (pas traités ce tour)
+- → Clics indépendants et naturels sur chaque jeu
 
-**Exemple de timeline** :
+**Exemple de timeline (6 jeux actifs)** :
 ```
-17:40:00 - Cron démarre
-17:40:00.5 - 2 bots cliquent sur Jeu 1 (timer était à 8s) → Reset à 60s
-17:40:01.8 - 1 bot clique sur Jeu 2 (timer était à 43s) → Reset à 60s
+17:40:00 - Cron démarre (6 jeux actifs)
+  → Jeu 1 (timer 8s) : Traité à +2s → 2 bots cliquent → Reset à 60s
+  → Jeu 2 (timer 43s) : SKIP (random 35%) → Pas de clic
+  → Jeu 3 (timer 25s) : Traité à +7s → 1 bot clique → Reset à 60s
+  → Jeu 4 (timer 52s) : SKIP (random 35%) → Pas de clic
+  → Jeu 5 (timer 12s) : Traité à +3s → 3 bots cliquent → Reset à 60s
+  → Jeu 6 (timer 5min) : SKIP (random 70%) → Pas de clic
+
 17:40:15 - Cron suivant
-17:40:15.2 - 3 bots cliquent sur Jeu 1 (timer à 45s)
+  → Jeu 1 (timer 45s) : Traité à +1s → 1 bot clique → Reset à 60s
+  → Jeu 2 (timer 28s) : Traité à +6s → 2 bots cliquent → Reset à 60s
+  → Jeu 3 (timer 52s) : SKIP (random 35%)
+  → Jeu 4 (timer 37s) : Traité à +4s → 1 bot clique → Reset à 60s
+  → Jeu 5 (timer 47s) : SKIP (random 35%)
+  → Jeu 6 (timer 4min 45s) : Traité à +2s → 1 bot clique → Reset à 60s
+
 17:40:30 - Cron suivant
-17:40:30.1 - Bot ne clique PAS sur Jeu 3 (wind-down) → Timer continue
-17:40:42 - Jeu 3 arrive à 0s → Gagnant déclaré
+  → ...différents jeux traités aléatoirement...
 ```
+
+**Résultat** : Les bots semblent être des joueurs indépendants qui sont actifs sur différents jeux à différents moments. Très réaliste !
 
 **Zones de clic** :
 - Bataille active (98%) : Bots cliquent presque toujours → Timer rarement < 30s
