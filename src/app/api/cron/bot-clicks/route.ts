@@ -190,10 +190,12 @@ export async function GET(request: NextRequest) {
         // Entrer en phase finale si nécessaire
         if (isInFinalPhase && game.status !== 'final_phase') {
           updates.status = 'final_phase'
-          // Marquer le début de la bataille si pas déjà fait
-          if (!game.battle_start_time) {
-            updates.battle_start_time = new Date().toISOString()
-          }
+        }
+
+        // Toujours définir battle_start_time si en phase finale et pas encore défini
+        if (isInFinalPhase && !game.battle_start_time) {
+          updates.battle_start_time = new Date().toISOString()
+          console.log(`[CRON] Setting battle_start_time for game ${game.id.substring(0, 8)}`)
         }
 
         // Calculer la progression de la bataille
