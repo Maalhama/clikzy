@@ -284,15 +284,15 @@ export async function GET(request: NextRequest) {
       const battleDuration = getBattleDuration(game.id)
       const battleStartTime = game.battle_start_time ? new Date(game.battle_start_time) : null
 
-      // ============ TIMER EXPIRÉ → FIN DU JEU ============
+      // ============ TIMER EXPIRÉ → DÉCISION ============
       if (timeLeft <= 0) {
         // Vérifier si la bataille est terminée
         const battleEnded = battleStartTime &&
           (Date.now() - battleStartTime.getTime()) >= battleDuration
 
-        if (battleEnded || !battleStartTime) {
-          // Terminer le jeu
-          console.log(`[BOT] Game ${game.id.substring(0, 8)} ended - timer reached 0`)
+        // Si pas de bataille OU bataille terminée → FIN DU JEU
+        if (!battleStartTime || battleEnded) {
+          console.log(`[BOT] Game ${game.id.substring(0, 8)} ended - timer at 0, battle done`)
 
           await endGame(supabase, game, itemName)
 
@@ -305,8 +305,9 @@ export async function GET(request: NextRequest) {
           continue
         }
 
-        // Bataille pas encore terminée mais timer à 0 → les bots doivent cliquer
-        // (cas rare, ne devrait pas arriver souvent)
+        // Bataille EN COURS mais timer négatif → on continue, les bots vont cliquer
+        // C'est NORMAL - le cron tourne toutes les 60s, le timer peut passer en négatif entre deux tours
+        console.log(`[BOT] Game ${game.id.substring(0, 8)} timer negative (${Math.floor(timeLeft/1000)}s) but battle ongoing, continuing...`)
       }
 
       // ============ DÉCISION DE CLIC ============

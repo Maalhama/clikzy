@@ -1,8 +1,13 @@
-# 🤖 Documentation Système de Bots - Clikzy v4.0
+# 🤖 Documentation Système de Bots - Clikzy v5.0
 
 ## 📋 Vue d'ensemble
 
-Le système de bots simule des joueurs réalistes. Chaque jeu est **UNIQUE** avec son propre comportement aléatoire.
+Le système de bots simule des joueurs réalistes avec une **architecture hybride**:
+
+1. **Backend (Cron)**: Enregistre les vrais clics en base de données toutes les 60s
+2. **Frontend (Simulation)**: Affiche les clics en temps réel pour une expérience fluide
+
+Chaque jeu est **UNIQUE** avec son propre comportement aléatoire.
 
 ---
 
@@ -85,9 +90,64 @@ Ce facteur multiplie les probabilités de clic.
 
 ---
 
+## 🖥️ Simulation Frontend
+
+### Architecture Hybride
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                        UTILISATEUR                          │
+│                    (voit les clics en temps réel)           │
+└─────────────────────────────────────────────────────────────┘
+                              ▲
+                              │
+┌─────────────────────────────┴─────────────────────────────┐
+│                     FRONTEND (React)                       │
+│  ┌─────────────────────────────────────────────────────┐  │
+│  │           useBotSimulation Hook                      │  │
+│  │  - Calcule les timings des clics (même logique)     │  │
+│  │  - Affiche les clics visuellement                   │  │
+│  │  - Met à jour le timer optimistiquement             │  │
+│  └─────────────────────────────────────────────────────┘  │
+│                              ▲                             │
+│                              │ Sync Realtime               │
+└──────────────────────────────┼────────────────────────────┘
+                               │
+┌──────────────────────────────┴────────────────────────────┐
+│                      BACKEND (Cron)                        │
+│  - Enregistre les vrais clics en DB toutes les 60s        │
+│  - Met à jour le timer officiellement                      │
+│  - Gère la fin du jeu                                      │
+└───────────────────────────────────────────────────────────┘
+```
+
+### Fichiers
+
+| Fichier | Rôle |
+|---------|------|
+| `src/hooks/useBotSimulation.ts` | Hook de simulation frontend |
+| `src/app/api/cron/bot-clicks/route.ts` | Backend cron (vrais clics) |
+
+### Fonctionnement
+
+1. **Frontend**: Calcule quand les bots devraient cliquer
+2. **Frontend**: Affiche les clics visuellement avec `addClick()`
+3. **Frontend**: Met à jour le timer avec `optimisticUpdate()`
+4. **Backend**: Cron enregistre les vrais clics toutes les 60s
+5. **Supabase Realtime**: Synchronise le frontend avec les vrais clics
+
+### Avantages
+
+- ✅ Expérience temps réel fluide (pas d'attente de 60s)
+- ✅ Clics espacés aléatoirement (réaliste)
+- ✅ Synchronisation automatique avec le backend
+- ✅ Pas de coût supplémentaire (pas de serveur dédié)
+
+---
+
 ## 🔧 Configuration Technique
 
-### Cron
+### Cron (Backend)
 - **Fréquence**: Toutes les 60 secondes (cron-job.org)
 - **URL**: `https://clikzy.vercel.app/api/cron/bot-clicks`
 - **Auth**: `Authorization: Bearer ${CRON_SECRET}`
@@ -150,5 +210,23 @@ newEndTime = now + 60000
 
 ---
 
-**Version**: 4.0
+**Version**: 5.0
 **Dernière mise à jour**: 22/01/2026
+
+---
+
+## 📁 Fichiers du Système
+
+```
+src/
+├── hooks/
+│   └── useBotSimulation.ts      # Simulation frontend temps réel
+├── app/
+│   └── api/
+│       └── cron/
+│           └── bot-clicks/
+│               └── route.ts     # Backend cron (vrais clics DB)
+└── lib/
+    └── bots/
+        └── usernameGenerator.ts # Génération de pseudos réalistes
+```

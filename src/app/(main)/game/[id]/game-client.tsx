@@ -6,6 +6,7 @@ import Image from 'next/image'
 import { useGame } from '@/hooks/useGame'
 import { useTimer } from '@/hooks/useTimer'
 import { useSounds } from '@/hooks/useSounds'
+import { useBotSimulation } from '@/hooks/useBotSimulation'
 import { useCredits } from '@/contexts/CreditsContext'
 import { clickGame } from '@/actions/game'
 import { GAME_CONSTANTS } from '@/lib/constants'
@@ -162,6 +163,18 @@ export function GameClient({
 
   const { timeLeft, isUrgent, isEnded } = useTimer({ endTime: game.end_time })
   const { playClick, playWin, playHeartbeat, stopAll: stopSounds } = useSounds(true)
+
+  // Simulation des clics de bots côté client pour une expérience temps réel
+  useBotSimulation({
+    gameId: game.id,
+    endTime: game.end_time,
+    status: game.status,
+    battleStartTime: game.battle_start_time,
+    lastClickUsername: game.last_click_username,
+    addClick,
+    optimisticUpdate,
+    enabled: game.status === 'active' || game.status === 'final_phase',
+  })
 
   const isCritical = timeLeft <= 10000 && timeLeft > 0
   const isWinner = game.status === 'ended' && game.winner_id === userId
