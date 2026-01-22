@@ -337,77 +337,9 @@ export async function GET(request: NextRequest) {
       const isRecentRealPlayer = isRealPlayerClick(game.last_click_user_id) &&
         (gameNow - lastClickAt) < REAL_PLAYER_WINDOW
 
-      // If timer has reached 0, game is over - someone wins
-      // Bots should click BEFORE timer reaches 0 (between 1-59s)
-      if (timeLeft <= 0) {
-        const winnerUsername = game.last_click_username || null
-        const winnerId = game.last_click_user_id || null
-        const itemName = getItemName(game.item)
-
-        // Update game with winner info
-        await supabase
-          .from('games')
-          .update({
-            status: 'ended',
-            ended_at: new Date().toISOString(),
-            winner_id: winnerId,
-          })
-          .eq('id', game.id)
-
-        // Create winner record for both real players and bots
-        if (winnerUsername || game.total_clicks > 0) {
-          const isBot = !winnerId
-
-          // Get username for real players from profile
-          let username = winnerUsername
-          if (winnerId && !username) {
-            const { data: winnerProfile } = await supabase
-              .from('profiles')
-              .select('username')
-              .eq('id', winnerId)
-              .single()
-            username = winnerProfile?.username || 'Joueur'
-          }
-
-          await supabase
-            .from('winners')
-            .insert({
-              game_id: game.id,
-              user_id: winnerId || null,
-              username: username || 'Bot',
-              item_id: game.item_id,
-              item_name: itemName,
-              total_clicks_in_game: game.total_clicks || 0,
-              is_bot: isBot,
-            })
-
-          // Update real player's profile stats (not bots)
-          if (winnerId) {
-            const { data: profile } = await supabase
-              .from('profiles')
-              .select('total_wins')
-              .eq('id', winnerId)
-              .single()
-
-            if (profile) {
-              await supabase
-                .from('profiles')
-                .update({ total_wins: (profile.total_wins ?? 0) + 1 })
-                .eq('id', winnerId)
-            }
-          }
-        }
-
-        results.push({
-          gameId: game.id,
-          itemName,
-          clicks: 0,
-          reason: 'game_ended',
-          newStatus: 'ended',
-          winner: winnerUsername || (game.total_clicks > 0 ? 'Bot' : 'Aucun'),
-        })
-        continue
-      }
+      // REMOVED: Timer <= 0 check moved AFTER bot decision
+      // Let shouldBotClick() decide if game should continue (battle ongoing)
+      // If bots should click, timer will be reset. Otherwise, game ends below.
 
       // Decide if bot should click
       const decision = shouldBotClick(
@@ -419,6 +351,71 @@ export async function GET(request: NextRequest) {
       )
 
       if (!decision.shouldClick) {
+        // Bot decided not to click - if timer is negative, end the game
+        if (timeLeft <= 0) {
+          const winnerUsername = game.last_click_username || null
+          const winnerId = game.last_click_user_id || null
+          const itemName = getItemName(game.item)
+
+          await supabase
+            .from('games')
+            .update({
+              status: 'ended',
+              ended_at: new Date().toISOString(),
+              winner_id: winnerId,
+            })
+            .eq('id', game.id)
+
+          // Create winner record
+          if (winnerUsername || game.total_clicks > 0) {
+            const isBot = !winnerId
+            let username = winnerUsername
+            if (winnerId && !username) {
+              const { data: winnerProfile } = await supabase
+                .from('profiles')
+                .select('username')
+                .eq('id', winnerId)
+                .single()
+              username = winnerProfile?.username || 'Joueur'
+            }
+
+            await supabase.from('winners').insert({
+              game_id: game.id,
+              user_id: winnerId || null,
+              username: username || 'Bot',
+              item_id: game.item_id,
+              item_name: itemName,
+              total_clicks_in_game: game.total_clicks || 0,
+              is_bot: isBot,
+            })
+
+            if (winnerId) {
+              const { data: profile } = await supabase
+                .from('profiles')
+                .select('total_wins')
+                .eq('id', winnerId)
+                .single()
+              if (profile) {
+                await supabase
+                  .from('profiles')
+                  .update({ total_wins: (profile.total_wins ?? 0) + 1 })
+                  .eq('id', winnerId)
+              }
+            }
+          }
+
+          results.push({
+            gameId: game.id,
+            itemName,
+            clicks: 0,
+            reason: 'game_ended_no_bot_click',
+            newStatus: 'ended',
+            winner: winnerUsername || (game.total_clicks > 0 ? 'Bot' : 'Aucun'),
+          })
+          continue
+        }
+
+        // Timer still positive, just skip this round
         results.push({
           gameId: game.id,
           itemName: getItemName(game.item),
