@@ -1,15 +1,16 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
-import { generateDeterministicUsername, generateUsername } from '@/lib/bots/usernameGenerator'
+import { generateDeterministicUsername } from '@/lib/bots/usernameGenerator'
 import type { GameClick } from './useGame'
 
 /**
  * ============================================
- * SIMULATION FRONTEND DES BOTS CLIKZY v3
+ * SIMULATION FRONTEND DES BOTS CLIKZY v4
  * ============================================
  *
- * Simulation robuste avec refs pour éviter les re-renders.
+ * Utilise un seed déterministe pour synchroniser
+ * les clics entre la page jeu et le lobby.
  */
 
 interface UseBotSimulationProps {
@@ -23,7 +24,9 @@ interface UseBotSimulationProps {
   enabled?: boolean
 }
 
-function hashString(str: string): number {
+// Seed déterministe basé sur gameId + timestamp arrondi (MÊME QUE LOBBY)
+function getDeterministicSeed(gameId: string, roundedTime: number): number {
+  const str = `${gameId}-${roundedTime}`
   let hash = 0
   for (let i = 0; i < str.length; i++) {
     const char = str.charCodeAt(i)
@@ -34,19 +37,17 @@ function hashString(str: string): number {
 }
 
 function getGamePersonality(gameId: string): number {
-  const hash = hashString(gameId + '-personality')
-  return 0.7 + (hash % 60) / 100
+  const seed = getDeterministicSeed(gameId, 0)
+  return 0.7 + (seed % 60) / 100
 }
 
-function generateUniqueUsername(excludeUsername: string | null, gameId: string): string {
-  const seed = `${gameId}-${Date.now()}-${Math.random()}`
-  let username = generateDeterministicUsername(seed)
-
-  if (username === excludeUsername) {
-    username = generateUsername()
+// Générateur pseudo-aléatoire déterministe
+function seededRandom(seed: number): () => number {
+  let state = seed
+  return () => {
+    state = (state * 1103515245 + 12345) & 0x7fffffff
+    return state / 0x7fffffff
   }
-
-  return username
 }
 
 export function useBotSimulation({
@@ -60,7 +61,6 @@ export function useBotSimulation({
   enabled = true,
 }: UseBotSimulationProps) {
 
-  // Utiliser des refs pour toutes les valeurs qui changent fréquemment
   const endTimeRef = useRef(endTime)
   const statusRef = useRef(status)
   const addClickRef = useRef(addClick)
@@ -69,7 +69,6 @@ export function useBotSimulation({
   const lastUsernameRef = useRef<string | null>(lastClickUsername)
   const personalityRef = useRef(getGamePersonality(gameId))
 
-  // Mettre à jour les refs quand les props changent
   useEffect(() => { endTimeRef.current = endTime }, [endTime])
   useEffect(() => { statusRef.current = status }, [status])
   useEffect(() => { addClickRef.current = addClick }, [addClick])
@@ -82,17 +81,15 @@ export function useBotSimulation({
 
     console.log(`[BOT SIM] Starting simulation for game ${gameId}, status: ${status}`)
 
-    // Premier clic rapide (3-8 secondes)
+    // Premier clic rapide
     lastClickTimeRef.current = Date.now() - 50000
 
-    // Interval qui vérifie toutes les secondes
     const intervalId = setInterval(() => {
       const now = Date.now()
       const currentEndTime = endTimeRef.current
       const currentStatus = statusRef.current
       const timeLeft = currentEndTime - now
 
-      // Jeu terminé ou status changé
       if (timeLeft <= 0 || (currentStatus !== 'active' && currentStatus !== 'final_phase')) {
         return
       }
@@ -100,44 +97,41 @@ export function useBotSimulation({
       const timeSinceLastClick = now - lastClickTimeRef.current
       const personality = personalityRef.current
 
-      // Déterminer le délai minimum entre clics selon la phase
+      // Déterminer le délai minimum (DÉTERMINISTE - même que lobby)
       let minDelay: number
       let shouldResetTimer = false
 
       if (currentStatus === 'final_phase' || timeLeft <= 60000) {
-        // Phase finale: 3 clics par minute = ~20 secondes entre clics
-        minDelay = 8000 + Math.random() * 17000
+        minDelay = 8000 + (getDeterministicSeed(gameId, Math.floor(now / 5000)) % 17000)
         shouldResetTimer = true
       } else if (timeLeft <= 15 * 60 * 1000) {
-        // Phase active: 1 clic par minute
-        minDelay = 40000 + Math.random() * 40000
+        minDelay = 40000 + (getDeterministicSeed(gameId, Math.floor(now / 10000)) % 40000)
       } else if (timeLeft <= 30 * 60 * 1000) {
-        // Phase building: 1 clic toutes les 1.5 minutes
-        minDelay = 70000 + Math.random() * 50000
+        minDelay = 70000 + (getDeterministicSeed(gameId, Math.floor(now / 15000)) % 50000)
       } else {
-        // Phase positioning: 1 clic toutes les 3 minutes
-        minDelay = 140000 + Math.random() * 100000
+        minDelay = 140000 + (getDeterministicSeed(gameId, Math.floor(now / 20000)) % 100000)
       }
 
-      // Ajuster selon la personnalité
       minDelay = minDelay / personality
 
-      // Pas encore le moment de cliquer
       if (timeSinceLastClick < minDelay) {
         return
       }
 
-      // Probabilité de cliquer
+      // Seed pour décision de clic (SYNCHRONISÉ entre clients)
+      const clickSeed = getDeterministicSeed(gameId, Math.floor(now / 1000))
+      const clickRandom = seededRandom(clickSeed)
+
       const clickProbability = currentStatus === 'final_phase' ? 0.9 : 0.7
-      if (Math.random() > clickProbability) {
-        // Reset le timer pour réessayer
+      if (clickRandom() > clickProbability) {
         lastClickTimeRef.current = now - minDelay + 3000
         return
       }
 
-      // Générer le clic
-      const username = generateUniqueUsername(lastUsernameRef.current, gameId)
-      const clickId = `sim-${gameId}-${now}-${Math.random().toString(36).substr(2, 6)}`
+      // Générer le clic (username DÉTERMINISTE basé sur timestamp arrondi)
+      const roundedTime = Math.floor(now / 1000)
+      const username = generateDeterministicUsername(`${gameId}-${roundedTime}-bot`)
+      const clickId = `sim-${gameId}-${roundedTime}`
 
       const simulatedClick: GameClick = {
         id: clickId,
@@ -146,10 +140,8 @@ export function useBotSimulation({
         isBot: true,
       }
 
-      // Ajouter au feed
       addClickRef.current(simulatedClick)
 
-      // Mettre à jour le state
       if (shouldResetTimer) {
         optimisticUpdateRef.current({
           end_time: now + 60000,
@@ -161,7 +153,6 @@ export function useBotSimulation({
         })
       }
 
-      // Mettre à jour les refs
       lastClickTimeRef.current = now
       lastUsernameRef.current = username
 
@@ -173,7 +164,7 @@ export function useBotSimulation({
       console.log(`[BOT SIM] Stopping simulation for game ${gameId}`)
       clearInterval(intervalId)
     }
-  }, [enabled, gameId, status]) // Seulement gameId et status initial en dépendance
+  }, [enabled, gameId, status])
 
   return null
 }

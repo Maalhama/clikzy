@@ -19,6 +19,8 @@ interface LobbyRealtimeData {
   recentClicks: ClickNotification[]
   isConnected: boolean
   error: Error | null
+  updateGame: (gameId: string, updates: Partial<GameWithItem>) => void
+  addClickNotification: (username: string, gameId: string, itemName: string) => void
 }
 
 interface GameUpdate {
@@ -145,6 +147,18 @@ export function useLobbyRealtime(
       // Keep only the 3 most recent clicks (for the 3 visible slots)
       // New click goes to position 1, others shift down
       setRecentClicks((prev) => [notification, ...prev].slice(0, 3))
+    },
+    []
+  )
+
+  // Update a specific game (for bot simulation)
+  const updateGame = useCallback(
+    (gameId: string, updates: Partial<GameWithItem>) => {
+      setGames((prevGames) =>
+        prevGames.map((game) =>
+          game.id === gameId ? { ...game, ...updates } : game
+        )
+      )
     },
     []
   )
@@ -320,5 +334,7 @@ export function useLobbyRealtime(
     recentClicks,
     isConnected,
     error,
+    updateGame,
+    addClickNotification,
   }
 }

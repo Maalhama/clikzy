@@ -13,7 +13,7 @@ import {
 import { FloatingTimer } from '@/components/landing/widgets/FloatingTimer'
 import { useLobbyFilters } from '@/hooks/lobby/useLobbyFilters'
 import { useLobbyRealtime } from '@/hooks/lobby/useLobbyRealtime'
-// import { useLobbyBots } from '@/hooks/lobby/useLobbyBots' // Disabled - using server bots
+import { useLobbyBotSimulation } from '@/hooks/lobby/useLobbyBotSimulation'
 import { useFavorites } from '@/hooks/useFavorites'
 import { usePullToRefresh } from '@/hooks/usePullToRefresh'
 import type { GameWithItem } from '@/types/database'
@@ -52,11 +52,23 @@ export function LobbyClient({
   })
 
   // Real-time updates - reads from shared cache
-  const { games, recentClicks, isConnected } = useLobbyRealtime(initialGames)
+  const { games, recentClicks, isConnected, updateGame, addClickNotification } = useLobbyRealtime(initialGames)
 
-  // Client-side bots DISABLED - using server-side bots via cron instead
-  // This ensures all devices (Mac, mobile, etc.) see the same bot activity
-  // useLobbyBots(games, true)
+  // Bot simulation - uses deterministic seed for sync across devices
+  useLobbyBotSimulation({
+    games,
+    onGameUpdate: useCallback((gameId: string, updates: { total_clicks?: number; last_click_username?: string; end_time?: number }) => {
+      updateGame(gameId, updates)
+      // Add to click feed if we have a username
+      if (updates.last_click_username) {
+        const game = games.find(g => g.id === gameId)
+        if (game?.item?.name) {
+          addClickNotification(updates.last_click_username, gameId, game.item.name)
+        }
+      }
+    }, [updateGame, addClickNotification, games]),
+    enabled: true,
+  })
 
   // Filters, sorting and pagination
   const {
