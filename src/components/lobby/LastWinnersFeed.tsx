@@ -38,10 +38,10 @@ const WinnerItem = memo(function WinnerItem({
         ${isNew ? 'bg-success/20 animate-[fadeInSlide_0.3s_ease-out]' : 'bg-bg-secondary/30'}
       `}
     >
-      {/* Trophy icon */}
-      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-yellow-500 to-orange-500 flex items-center justify-center flex-shrink-0">
-        <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
-          <path d="M12 2C13.1 2 14 2.9 14 4V5H16C17.1 5 18 5.9 18 7V8C18 10.21 16.21 12 14 12C13.93 12.01 13.85 12 13.78 12C13.41 13.23 12.49 14.22 11.28 14.69L10 15.24V17H12C13.1 17 14 17.9 14 19V20H6V19C6 17.9 6.9 17 8 17H10V15.24L8.72 14.69C7.51 14.22 6.59 13.23 6.22 12C6.15 12 6.07 12.01 6 12C3.79 12 2 10.21 2 8V7C2 5.9 2.9 5 4 5H6V4C6 2.9 6.9 2 8 2H12M4 7V8C4 9.1 4.9 10 6 10V7H4M14 7V10C15.1 10 16 9.1 16 8V7H14Z" />
+      {/* Crown icon */}
+      <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-success/20 to-emerald-500/20 border border-success/30 flex items-center justify-center flex-shrink-0">
+        <svg className="w-4 h-4 text-success" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M5 16L3 5l5.5 5L12 4l3.5 6L21 5l-2 11H5zm14 3c0 .6-.4 1-1 1H6c-.6 0-1-.4-1-1v-1h14v1z"/>
         </svg>
       </div>
 
@@ -70,10 +70,10 @@ const WinnerItem = memo(function WinnerItem({
 const EmptySlot = memo(function EmptySlot({ index }: { index: number }) {
   return (
     <div className="flex items-center gap-3 px-3 py-2 rounded-lg bg-bg-secondary/10 border border-dashed border-white/5">
-      {/* Trophy placeholder */}
-      <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center flex-shrink-0">
-        <svg className="w-4 h-4 text-white/20" fill="currentColor" viewBox="0 0 24 24">
-          <path d="M12 2C13.1 2 14 2.9 14 4V5H16C17.1 5 18 5.9 18 7V8C18 10.21 16.21 12 14 12C13.93 12.01 13.85 12 13.78 12C13.41 13.23 12.49 14.22 11.28 14.69L10 15.24V17H12C13.1 17 14 17.9 14 19V20H6V19C6 17.9 6.9 17 8 17H10V15.24L8.72 14.69C7.51 14.22 6.59 13.23 6.22 12C6.15 12 6.07 12.01 6 12C3.79 12 2 10.21 2 8V7C2 5.9 2.9 5 4 5H6V4C6 2.9 6.9 2 8 2H12M4 7V8C4 9.1 4.9 10 6 10V7H4M14 7V10C15.1 10 16 9.1 16 8V7H14Z" />
+      {/* Crown placeholder */}
+      <div className="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center flex-shrink-0">
+        <svg className="w-4 h-4 text-white/20" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M5 16L3 5l5.5 5L12 4l3.5 6L21 5l-2 11H5zm14 3c0 .6-.4 1-1 1H6c-.6 0-1-.4-1-1v-1h14v1z"/>
         </svg>
       </div>
 
@@ -103,8 +103,8 @@ export const LastWinnersFeed = memo(function LastWinnersFeed({
       {/* Header */}
       <div className="px-4 py-3 border-b border-white/10 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <svg className="w-4 h-4 text-yellow-500" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M12 2C13.1 2 14 2.9 14 4V5H16C17.1 5 18 5.9 18 7V8C18 10.21 16.21 12 14 12C13.93 12.01 13.85 12 13.78 12C13.41 13.23 12.49 14.22 11.28 14.69L10 15.24V17H12C13.1 17 14 17.9 14 19V20H6V19C6 17.9 6.9 17 8 17H10V15.24L8.72 14.69C7.51 14.22 6.59 13.23 6.22 12C6.15 12 6.07 12.01 6 12C3.79 12 2 10.21 2 8V7C2 5.9 2.9 5 4 5H6V4C6 2.9 6.9 2 8 2H12M4 7V8C4 9.1 4.9 10 6 10V7H4M14 7V10C15.1 10 16 9.1 16 8V7H14Z" />
+          <svg className="w-4 h-4 text-success" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M5 16L3 5l5.5 5L12 4l3.5 6L21 5l-2 11H5zm14 3c0 .6-.4 1-1 1H6c-.6 0-1-.4-1-1v-1h14v1z"/>
           </svg>
           <span className="text-white font-bold text-sm">DERNIERS GAGNANTS</span>
         </div>
