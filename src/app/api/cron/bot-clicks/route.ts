@@ -21,7 +21,9 @@ const CRON_SECRET = process.env.CRON_SECRET
 // (Même config que useLobbyBots.ts)
 // ============================================
 
-// Durée de bataille (avant de laisser quelqu'un gagner)
+// Durée de bataille EN PHASE FINALE (avant de laisser quelqu'un gagner)
+// Note: Le jeu commence avec 1h de timer, puis la bataille dure 30min-1h59min
+// Durée totale max = 1h + 1h59min = 2h59min
 const MIN_BATTLE_DURATION = 30 * 60 * 1000   // 30 minutes minimum
 const MAX_BATTLE_DURATION = 119 * 60 * 1000  // 1h59 maximum
 

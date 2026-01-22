@@ -11,6 +11,7 @@ Le système de bots de Clikzy simule des joueurs réalistes pour maintenir l'eng
 3. **Synchronisation Automatique** : Landing, Lobby, et Page Game affichent tous les mêmes données en temps réel
 4. **Réalisme Maximal** : Progression naturelle des clics, usernames variés, délais aléatoires
 5. **Protection Anti-Joueur** : Les bots empêchent les joueurs réels de gagner
+6. **Durée des Jeux** : Timer initial 1h → Phase finale (bataille 30min-1h59min) → Durée totale max 2h59min
 
 ### 🌐 Synchronisation Landing / Lobby / Game
 
@@ -72,7 +73,50 @@ Cron-job.org (toutes les 1 minute)
 3. Les **timers sont calculés côté serveur** (end_time dans la DB)
 4. Les **batailles continuent** même la nuit sans aucun utilisateur connecté
 
-**Résultat** : Un jeu lancé à 2h du matin continuera sa bataille de 30min à 1h59min et se terminera naturellement, même si personne ne regarde.
+**Résultat** : Un jeu lancé à 2h du matin commence avec 1h de timer, puis entre en phase finale avec une bataille de 30min à 1h59min (durée totale max 2h59min), et se termine naturellement même si personne ne regarde.
+
+---
+
+## ⏱️ Structure de Durée des Jeux
+
+### Timeline complète d'un jeu
+
+```
+[PHASE ACTIVE]          [PHASE FINALE - BATAILLE]
+      1h                    30min à 1h59min
+  ┌────────┐           ┌─────────────────────┐
+  │        │           │                     │
+  │  60min │  ───────→ │  Resets à 60s       │  ───→  FIN
+  │        │           │  (bataille intense) │
+  └────────┘           └─────────────────────┘
+
+  Durée totale maximum = 1h + 1h59min = 2h59min
+```
+
+### Phases détaillées
+
+**Phase 1 : Active (1h)**
+- Timer initial = 60 minutes
+- Clics occasionnels des bots (progression réaliste)
+- Quand timer < 60s → Entrée en phase finale
+
+**Phase 2 : Finale - Bataille (30min-1h59min)**
+- Timer reset à 60s à chaque clic
+- Durée de bataille aléatoire par jeu (déterministe selon gameId)
+- Clics intensifs des bots (98% de chance)
+- Wind-down dans les 5 dernières minutes (30% de chance)
+- Après la durée de bataille → 0% de clics (laisse gagner)
+
+**Exemple concret** :
+- Jeu A : `battleDuration = 45min`
+  - Phase active : 1h
+  - Phase finale : 45min de bataille
+  - **Durée totale : 1h45min**
+
+- Jeu B : `battleDuration = 1h59min`
+  - Phase active : 1h
+  - Phase finale : 1h59min de bataille
+  - **Durée totale : 2h59min (maximum possible)**
 
 ---
 
@@ -83,9 +127,10 @@ Cron-job.org (toutes les 1 minute)
 #### Constantes Principales
 
 ```typescript
-// Durée de bataille
+// Durée de bataille EN PHASE FINALE (resets à 60s)
+// Note: Jeu commence avec 1h, puis bataille 30min-1h59min = max 2h59min total
 MIN_BATTLE_DURATION = 30 * 60 * 1000   // 30 min
-MAX_BATTLE_DURATION = 119 * 60 * 1000  // 1h59
+MAX_BATTLE_DURATION = 119 * 60 * 1000  // 1h59 max
 
 // Seuils de temps
 FINAL_PHASE_THRESHOLD = 60 * 1000      // < 1 minute
@@ -119,7 +164,7 @@ Les bots décident de cliquer selon :
 
 #### **Phase Finale AVEC bataille active**
 ```typescript
-Si bataille terminée (>30min à 1h59min) → 0% (laisser gagner)
+Si bataille terminée (>30min à 1h59min en phase finale) → 0% (laisser gagner)
 Si wind-down (5 dernières min) → 30%
 Si réponse à joueur réel → 98%
 Sinon → 98% (maintenir la bataille)
