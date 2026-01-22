@@ -3,16 +3,19 @@ import { createClient, SupabaseClient } from '@supabase/supabase-js'
 
 /**
  * ============================================
- * CRON DE GESTION DES JEUX - Clikzy v9.0
+ * CRON DE GESTION DES JEUX - Clikzy v10.0
  * ============================================
  *
  * Ce cron gère:
  * - La mise à jour des leaders (last_click_username) pour simuler l'activité
+ * - Le système de bataille en phase finale (30min à 1h59min)
  * - La fin des jeux (timer = 0)
  * - La création des records de gagnants
  *
- * Les clics visuels sont simulés côté FRONTEND.
- * Le cron maintient l'état DB pour la persistance entre visites.
+ * Système de bataille:
+ * - 0-90% de la durée: bots cliquent normalement
+ * - 90-100%: probabilité de clic décroissante
+ * - >100%: bots arrêtent, timer descend à 0
  *
  * Fréquence: toutes les 60 secondes
  */
@@ -83,7 +86,47 @@ interface GameData {
   total_clicks: number
   last_click_username: string | null
   last_click_user_id: string | null
+  battle_start_time: string | null
   item: { name: string }[] | { name: string } | null
+}
+
+// ============================================
+// SYSTÈME DE BATAILLE (durée limitée de la phase finale)
+// ============================================
+
+const BATTLE_MIN_DURATION = 30 * 60 * 1000  // 30 minutes min
+const BATTLE_MAX_DURATION = 119 * 60 * 1000 // 1h59 max
+
+function getBattleDuration(gameId: string): number {
+  // Durée déterministe basée sur gameId (30min à 1h59min)
+  const hash = hashString(gameId + '-battle')
+  return BATTLE_MIN_DURATION + (hash % (BATTLE_MAX_DURATION - BATTLE_MIN_DURATION))
+}
+
+function getBattleProgress(gameId: string, battleStartTime: string | null): number {
+  if (!battleStartTime) return 0
+
+  const battleStart = new Date(battleStartTime).getTime()
+  const elapsed = Date.now() - battleStart
+  const totalDuration = getBattleDuration(gameId)
+
+  return Math.min(1, elapsed / totalDuration)
+}
+
+function shouldBotClick(gameId: string, battleProgress: number): boolean {
+  // 0-90%: clics normaux (100% chance)
+  // 90-100%: probabilité décroissante
+  // >100%: plus de clics
+
+  if (battleProgress >= 1) return false
+  if (battleProgress < 0.9) return true
+
+  // 90-100%: probabilité linéaire décroissante de 100% à 0%
+  const remainingProgress = (1 - battleProgress) / 0.1 // 1.0 à 0.0
+  const seed = hashString(`${gameId}-${Math.floor(Date.now() / 60000)}`)
+  const random = (seed % 100) / 100
+
+  return random < remainingProgress
 }
 
 function getItemName(item: GameData['item']): string {
@@ -107,7 +150,7 @@ export async function GET(request: NextRequest) {
       .from('games')
       .select(`
         id, item_id, status, end_time, total_clicks,
-        last_click_username, last_click_user_id,
+        last_click_username, last_click_user_id, battle_start_time,
         item:items(name)
       `)
       .in('status', ['active', 'final_phase'])
@@ -142,25 +185,41 @@ export async function GET(request: NextRequest) {
         // Jeu encore actif - simuler l'activité des bots
         const updates: Record<string, unknown> = {}
         let action = `active (${Math.floor(timeLeft / 1000)}s left)`
+        const isInFinalPhase = timeLeft <= 60000
 
-        // Mettre à jour le status si nécessaire
-        if (timeLeft <= 60000 && game.status !== 'final_phase') {
+        // Entrer en phase finale si nécessaire
+        if (isInFinalPhase && game.status !== 'final_phase') {
           updates.status = 'final_phase'
+          // Marquer le début de la bataille si pas déjà fait
+          if (!game.battle_start_time) {
+            updates.battle_start_time = new Date().toISOString()
+          }
         }
 
-        // Simuler un clic de bot SEULEMENT si le dernier clic n'est pas d'un joueur réel
-        // (last_click_user_id = null signifie que c'est un bot ou pas de clic)
+        // Calculer la progression de la bataille
+        const battleProgress = getBattleProgress(game.id, game.battle_start_time)
+        const battleDurationMin = Math.round(getBattleDuration(game.id) / 60000)
+
+        // Simuler un clic de bot SEULEMENT si:
+        // 1. Le dernier clic n'est pas d'un joueur réel
+        // 2. La bataille n'est pas terminée (pour la phase finale)
         if (!game.last_click_user_id) {
           const minuteSeed = Math.floor(now / 60000)
           const botUsername = generateDeterministicUsername(`${game.id}-cron-${minuteSeed}`)
 
-          updates.last_click_username = botUsername
-
-          // En phase finale, reset le timer aussi
-          if (timeLeft <= 60000) {
-            updates.end_time = now + 60000
-            action = `bot_click_final (${botUsername})`
+          if (isInFinalPhase) {
+            // Phase finale - vérifier si les bots doivent encore cliquer
+            if (shouldBotClick(game.id, battleProgress)) {
+              updates.last_click_username = botUsername
+              updates.end_time = now + 60000
+              action = `bot_click_final (${botUsername}) [battle: ${Math.round(battleProgress * 100)}%/${battleDurationMin}min]`
+            } else {
+              // Bataille terminée - laisser le timer descendre
+              action = `battle_ending (${Math.round(battleProgress * 100)}%) - letting timer run down`
+            }
           } else {
+            // Phase normale - juste mettre à jour le leader
+            updates.last_click_username = botUsername
             action = `bot_click (${botUsername})`
           }
         } else {

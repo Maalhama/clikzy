@@ -6,11 +6,17 @@ import type { GameWithItem } from '@/types/database'
 
 /**
  * ============================================
- * SIMULATION BOTS POUR LE LOBBY
+ * SIMULATION BOTS POUR LE LOBBY v2
  * ============================================
  *
  * Simule les clics de bots pour tous les jeux du lobby.
  * Utilise un seed déterministe pour synchroniser avec la page jeu.
+ *
+ * Système de bataille (phase finale):
+ * - Durée: 30min à 1h59min (déterministe par jeu)
+ * - 0-90%: bots cliquent normalement
+ * - 90-100%: probabilité décroissante
+ * - >100%: bots arrêtent, timer descend à 0
  */
 
 interface UseLobbyBotSimulationProps {
@@ -47,6 +53,39 @@ function seededRandom(seed: number): () => number {
 function getGamePersonality(gameId: string): number {
   const seed = getDeterministicSeed(gameId, 0)
   return 0.7 + (seed % 60) / 100
+}
+
+// ============================================
+// SYSTÈME DE BATAILLE (durée limitée de la phase finale)
+// ============================================
+
+const BATTLE_MIN_DURATION = 30 * 60 * 1000  // 30 minutes min
+const BATTLE_MAX_DURATION = 119 * 60 * 1000 // 1h59 max
+
+function getBattleDuration(gameId: string): number {
+  const hash = getDeterministicSeed(gameId + '-battle', 0)
+  return BATTLE_MIN_DURATION + (hash % (BATTLE_MAX_DURATION - BATTLE_MIN_DURATION))
+}
+
+function getBattleProgress(gameId: string, battleStartTime: string | null): number {
+  if (!battleStartTime) return 0
+
+  const battleStart = new Date(battleStartTime).getTime()
+  const elapsed = Date.now() - battleStart
+  const totalDuration = getBattleDuration(gameId)
+
+  return Math.min(1.5, elapsed / totalDuration)
+}
+
+function shouldBotClickInBattle(gameId: string, battleProgress: number): boolean {
+  if (battleProgress >= 1) return false
+  if (battleProgress < 0.9) return true
+
+  const remainingProgress = (1 - battleProgress) / 0.1
+  const seed = getDeterministicSeed(gameId, Math.floor(Date.now() / 5000))
+  const random = (seed % 100) / 100
+
+  return random < remainingProgress
 }
 
 export function useLobbyBotSimulation({
@@ -112,6 +151,17 @@ export function useLobbyBotSimulation({
         const timeLeft = game.end_time - now
         if (timeLeft <= 0) return
 
+        const isInFinalPhase = game.status === 'final_phase' || timeLeft <= 60000
+
+        // Vérifier si la bataille est terminée (phase finale seulement)
+        if (isInFinalPhase && game.battle_start_time) {
+          const battleProgress = getBattleProgress(game.id, game.battle_start_time)
+          if (!shouldBotClickInBattle(game.id, battleProgress)) {
+            // Bataille terminée - laisser le timer descendre
+            return
+          }
+        }
+
         const lastClickTime = lastClickTimesRef.current.get(game.id) || 0
         const timeSinceLastClick = now - lastClickTime
         const personality = getGamePersonality(game.id)
@@ -119,7 +169,7 @@ export function useLobbyBotSimulation({
         // Déterminer le délai minimum selon la phase
         let minDelay: number
 
-        if (game.status === 'final_phase' || timeLeft <= 60000) {
+        if (isInFinalPhase) {
           // Phase finale: 3 clics par minute
           minDelay = 8000 + (getDeterministicSeed(game.id, Math.floor(now / 5000)) % 17000)
         } else if (timeLeft <= 15 * 60 * 1000) {
@@ -143,7 +193,7 @@ export function useLobbyBotSimulation({
         const clickRandom = seededRandom(clickSeed)
 
         // Probabilité de cliquer
-        const probability = game.status === 'final_phase' ? 0.9 : 0.7
+        const probability = isInFinalPhase ? 0.9 : 0.7
         if (clickRandom() > probability) {
           // Reset timer pour réessayer
           lastClickTimesRef.current.set(game.id, now - minDelay + 3000)

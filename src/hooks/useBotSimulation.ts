@@ -6,11 +6,17 @@ import type { GameClick } from './useGame'
 
 /**
  * ============================================
- * SIMULATION FRONTEND DES BOTS CLIKZY v4
+ * SIMULATION FRONTEND DES BOTS CLIKZY v5
  * ============================================
  *
  * Utilise un seed déterministe pour synchroniser
  * les clics entre la page jeu et le lobby.
+ *
+ * Système de bataille (phase finale):
+ * - Durée: 30min à 1h59min (déterministe par jeu)
+ * - 0-90%: bots cliquent normalement
+ * - 90-100%: probabilité décroissante
+ * - >100%: bots arrêtent, timer descend à 0
  */
 
 interface UseBotSimulationProps {
@@ -50,6 +56,40 @@ function seededRandom(seed: number): () => number {
   }
 }
 
+// ============================================
+// SYSTÈME DE BATAILLE (durée limitée de la phase finale)
+// ============================================
+
+const BATTLE_MIN_DURATION = 30 * 60 * 1000  // 30 minutes min
+const BATTLE_MAX_DURATION = 119 * 60 * 1000 // 1h59 max
+
+function getBattleDuration(gameId: string): number {
+  const hash = getDeterministicSeed(gameId + '-battle', 0)
+  return BATTLE_MIN_DURATION + (hash % (BATTLE_MAX_DURATION - BATTLE_MIN_DURATION))
+}
+
+function getBattleProgress(gameId: string, battleStartTime: string | null): number {
+  if (!battleStartTime) return 0
+
+  const battleStart = new Date(battleStartTime).getTime()
+  const elapsed = Date.now() - battleStart
+  const totalDuration = getBattleDuration(gameId)
+
+  return Math.min(1.5, elapsed / totalDuration) // Cap à 150% pour éviter des valeurs infinies
+}
+
+function shouldBotClickInBattle(gameId: string, battleProgress: number): boolean {
+  if (battleProgress >= 1) return false
+  if (battleProgress < 0.9) return true
+
+  // 90-100%: probabilité linéaire décroissante
+  const remainingProgress = (1 - battleProgress) / 0.1
+  const seed = getDeterministicSeed(gameId, Math.floor(Date.now() / 5000))
+  const random = (seed % 100) / 100
+
+  return random < remainingProgress
+}
+
 export function useBotSimulation({
   gameId,
   endTime,
@@ -63,6 +103,7 @@ export function useBotSimulation({
 
   const endTimeRef = useRef(endTime)
   const statusRef = useRef(status)
+  const battleStartTimeRef = useRef(battleStartTime)
   const addClickRef = useRef(addClick)
   const optimisticUpdateRef = useRef(optimisticUpdate)
   const lastClickTimeRef = useRef<number>(0)
@@ -71,6 +112,7 @@ export function useBotSimulation({
 
   useEffect(() => { endTimeRef.current = endTime }, [endTime])
   useEffect(() => { statusRef.current = status }, [status])
+  useEffect(() => { battleStartTimeRef.current = battleStartTime }, [battleStartTime])
   useEffect(() => { addClickRef.current = addClick }, [addClick])
   useEffect(() => { optimisticUpdateRef.current = optimisticUpdate }, [optimisticUpdate])
   useEffect(() => { lastUsernameRef.current = lastClickUsername }, [lastClickUsername])
@@ -96,12 +138,22 @@ export function useBotSimulation({
 
       const timeSinceLastClick = now - lastClickTimeRef.current
       const personality = personalityRef.current
+      const isInFinalPhase = currentStatus === 'final_phase' || timeLeft <= 60000
+
+      // Vérifier si la bataille est terminée (phase finale seulement)
+      if (isInFinalPhase && battleStartTimeRef.current) {
+        const battleProgress = getBattleProgress(gameId, battleStartTimeRef.current)
+        if (!shouldBotClickInBattle(gameId, battleProgress)) {
+          // Bataille terminée - laisser le timer descendre
+          return
+        }
+      }
 
       // Déterminer le délai minimum (DÉTERMINISTE - même que lobby)
       let minDelay: number
       let shouldResetTimer = false
 
-      if (currentStatus === 'final_phase' || timeLeft <= 60000) {
+      if (isInFinalPhase) {
         minDelay = 8000 + (getDeterministicSeed(gameId, Math.floor(now / 5000)) % 17000)
         // Reset timer SEULEMENT si timeLeft < 60s (pas juste le status)
         shouldResetTimer = timeLeft <= 60000
@@ -123,7 +175,7 @@ export function useBotSimulation({
       const clickSeed = getDeterministicSeed(gameId, Math.floor(now / 1000))
       const clickRandom = seededRandom(clickSeed)
 
-      const clickProbability = currentStatus === 'final_phase' ? 0.9 : 0.7
+      const clickProbability = isInFinalPhase ? 0.9 : 0.7
       if (clickRandom() > clickProbability) {
         lastClickTimeRef.current = now - minDelay + 3000
         return
