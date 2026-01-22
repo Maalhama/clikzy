@@ -206,11 +206,12 @@ export function useLobbyBotSimulation({
         const timeSinceLastClick = now - lastClickTime
         const personality = getGamePersonality(game.id)
 
-        // Déterminer le délai minimum selon la phase
+        // Déterminer le délai minimum selon la phase - augmentés pour plus de suspense
         let minDelay: number
 
         if (isInFinalPhase) {
-          minDelay = 8000 + (getDeterministicSeed(game.id, Math.floor(now / 5000)) % 17000)
+          // Phase finale : attendre 25-50s pour laisser le timer descendre bas
+          minDelay = 25000 + (getDeterministicSeed(game.id, Math.floor(now / 5000)) % 25000)
         } else if (timeLeft <= 15 * 60 * 1000) {
           minDelay = 40000 + (getDeterministicSeed(game.id, Math.floor(now / 10000)) % 40000)
         } else if (timeLeft <= 30 * 60 * 1000) {
@@ -226,7 +227,8 @@ export function useLobbyBotSimulation({
         const clickSeed = getDeterministicSeed(game.id, Math.floor(now / 1000))
         const clickRandom = seededRandom(clickSeed)
 
-        const probability = isInFinalPhase ? 0.9 : 0.7
+        // Probabilité réduite en phase finale (50%) pour plus de suspense
+        const probability = isInFinalPhase ? 0.5 : 0.7
         if (clickRandom() > probability) {
           lastClickTimesRef.current.set(game.id, now - minDelay + 3000)
           return

@@ -214,12 +214,13 @@ export function useBotSimulation({
         return // Laisser croire au joueur qu'il va gagner
       }
 
-      // Comportement normal des bots
+      // Comportement normal des bots - délais augmentés pour plus de suspense
       let minDelay: number
       let shouldResetTimer = false
 
       if (isInFinalPhase) {
-        minDelay = 8000 + (getDeterministicSeed(gameId, Math.floor(now / 5000)) % 17000)
+        // Phase finale : attendre 25-50s pour laisser le timer descendre bas
+        minDelay = 25000 + (getDeterministicSeed(gameId, Math.floor(now / 5000)) % 25000)
         shouldResetTimer = timeLeft <= 60000
       } else if (timeLeft <= 15 * 60 * 1000) {
         minDelay = 40000 + (getDeterministicSeed(gameId, Math.floor(now / 10000)) % 40000)
@@ -239,7 +240,8 @@ export function useBotSimulation({
       const clickSeed = getDeterministicSeed(gameId, Math.floor(now / 1000))
       const clickRandom = seededRandom(clickSeed)
 
-      const clickProbability = isInFinalPhase ? 0.9 : 0.7
+      // Probabilité réduite en phase finale (50%) pour plus de suspense
+      const clickProbability = isInFinalPhase ? 0.5 : 0.7
       if (clickRandom() > clickProbability) {
         lastClickTimeRef.current = now - minDelay + 3000
         return
