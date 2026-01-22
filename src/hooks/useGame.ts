@@ -110,8 +110,17 @@ export function useGame(initialGame: GameWithItem) {
               }
 
               setRecentClicks((prev) => {
-                // Avoid duplicates
+                // Avoid duplicates by ID
                 if (prev.some(c => c.id === click.id)) return prev
+
+                // Avoid duplicates by username + recent timestamp (within 5s)
+                const clickTime = new Date(click.clicked_at).getTime()
+                const isDuplicate = prev.some(c =>
+                  c.username === click.username &&
+                  Math.abs(new Date(c.clickedAt).getTime() - clickTime) < 5000
+                )
+                if (isDuplicate) return prev
+
                 return [newClick, ...prev].slice(0, 10)
               })
             }
@@ -142,7 +151,17 @@ export function useGame(initialGame: GameWithItem) {
   // Add a click to the feed (for optimistic updates from real player clicks)
   const addClick = useCallback((click: GameClick) => {
     setRecentClicks((prev) => {
+      // Avoid duplicates by ID
       if (prev.some(c => c.id === click.id)) return prev
+
+      // Avoid duplicates by username + recent timestamp (within 5s)
+      const clickTime = new Date(click.clickedAt).getTime()
+      const isDuplicate = prev.some(c =>
+        c.username === click.username &&
+        Math.abs(new Date(c.clickedAt).getTime() - clickTime) < 5000
+      )
+      if (isDuplicate) return prev
+
       return [click, ...prev].slice(0, 10)
     })
   }, [])
