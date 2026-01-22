@@ -3,15 +3,16 @@ import { createClient, SupabaseClient } from '@supabase/supabase-js'
 
 /**
  * ============================================
- * CRON DE GESTION DES JEUX - Clikzy v8.0
+ * CRON DE GESTION DES JEUX - Clikzy v9.0
  * ============================================
  *
- * Ce cron gère uniquement:
+ * Ce cron gère:
+ * - La mise à jour des leaders (last_click_username) pour simuler l'activité
  * - La fin des jeux (timer = 0)
  * - La création des records de gagnants
  *
- * Les clics de bots sont simulés côté FRONTEND pour
- * une expérience fluide sans incohérences de données.
+ * Les clics visuels sont simulés côté FRONTEND.
+ * Le cron maintient l'état DB pour la persistance entre visites.
  *
  * Fréquence: toutes les 60 secondes
  */
@@ -19,6 +20,60 @@ import { createClient, SupabaseClient } from '@supabase/supabase-js'
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
 const CRON_SECRET = process.env.CRON_SECRET
+
+// ============================================
+// GÉNÉRATEUR DE PSEUDOS DÉTERMINISTE
+// (Réplique de src/lib/bots/usernameGenerator.ts)
+// ============================================
+
+const ALL_FIRST_NAMES = [
+  // Français
+  'Lucas', 'Hugo', 'Theo', 'Nathan', 'Mathis', 'Enzo', 'Louis', 'Gabriel',
+  'Thomas', 'Antoine', 'Maxime', 'Alexandre', 'Emma', 'Léa', 'Chloé', 'Manon',
+  'Camille', 'Sarah', 'Julie', 'Marie', 'Laura', 'Clara', 'Jade', 'Zoé',
+  // Ibériques
+  'Pablo', 'Diego', 'Carlos', 'Miguel', 'María', 'Carmen', 'Ana', 'Lucía',
+  // Maghrébins
+  'Mohamed', 'Ahmed', 'Youssef', 'Karim', 'Mehdi', 'Amine', 'Fatima', 'Amina',
+  'Yasmine', 'Nadia', 'Samira', 'Nour', 'Lina', 'Sara', 'Rayan', 'Adam',
+  // Africains
+  'Mamadou', 'Moussa', 'Ibrahima', 'Ousmane', 'Fatou', 'Aminata', 'Awa',
+]
+
+const SUFFIXES = [
+  '', '59', '62', '75', '69', '13', '33', '93', '94', '77', '78',
+  '95', '96', '97', '98', '99', '00', '01', '02', '03', '04',
+  '_off', '_real', '_fr', '_gaming', 'music', 'pro', 'x', 'zz',
+  '2k', '123', '007',
+]
+
+function hashString(str: string): number {
+  let hash = 0
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i)
+    hash = ((hash << 5) - hash) + char
+    hash = hash & hash
+  }
+  return Math.abs(hash)
+}
+
+function generateDeterministicUsername(seed: string): string {
+  const hash = hashString(seed)
+  const firstName = ALL_FIRST_NAMES[hash % ALL_FIRST_NAMES.length]
+  const suffixIndex = Math.floor(hash / ALL_FIRST_NAMES.length) % SUFFIXES.length
+  const suffix = SUFFIXES[suffixIndex]
+
+  const patterns = [
+    (fn: string, sfx: string) => fn.toLowerCase() + sfx,
+    (fn: string, sfx: string) => fn + sfx,
+    (fn: string, sfx: string) => fn.toLowerCase() + (sfx.startsWith('_') ? sfx : '_' + sfx),
+    (fn: string, sfx: string) => fn.toLowerCase() + sfx.replace(/_/g, ''),
+  ]
+
+  const patternIndex = Math.floor(hash / (ALL_FIRST_NAMES.length * SUFFIXES.length)) % patterns.length
+  const result = patterns[patternIndex](firstName, suffix)
+  return result.replace(/__+/g, '_').replace(/_$/, '')
+}
 
 interface GameData {
   id: string
@@ -84,23 +139,46 @@ export async function GET(request: NextRequest) {
           action: ended ? 'ended' : 'already_ended'
         })
       } else {
+        // Jeu encore actif - simuler l'activité des bots
+        const updates: Record<string, unknown> = {}
+        let action = `active (${Math.floor(timeLeft / 1000)}s left)`
+
         // Mettre à jour le status si nécessaire
         if (timeLeft <= 60000 && game.status !== 'final_phase') {
+          updates.status = 'final_phase'
+        }
+
+        // Simuler un clic de bot SEULEMENT si le dernier clic n'est pas d'un joueur réel
+        // (last_click_user_id = null signifie que c'est un bot ou pas de clic)
+        if (!game.last_click_user_id) {
+          const minuteSeed = Math.floor(now / 60000)
+          const botUsername = generateDeterministicUsername(`${game.id}-cron-${minuteSeed}`)
+
+          updates.last_click_username = botUsername
+
+          // En phase finale, reset le timer aussi
+          if (timeLeft <= 60000) {
+            updates.end_time = now + 60000
+            action = `bot_click_final (${botUsername})`
+          } else {
+            action = `bot_click (${botUsername})`
+          }
+        } else {
+          // Un joueur réel est leader - on ne fait rien
+          action = `real_player_leading (${game.last_click_username})`
+        }
+
+        if (Object.keys(updates).length > 0) {
           await supabase
             .from('games')
-            .update({ status: 'final_phase' })
+            .update(updates)
             .eq('id', game.id)
-
-          results.push({
-            gameId: game.id,
-            action: 'entered_final_phase'
-          })
-        } else {
-          results.push({
-            gameId: game.id,
-            action: `active (${Math.floor(timeLeft / 1000)}s left)`
-          })
         }
+
+        results.push({
+          gameId: game.id,
+          action
+        })
       }
     }
 
