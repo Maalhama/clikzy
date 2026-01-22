@@ -218,7 +218,7 @@ export async function GET(request: NextRequest) {
             if (shouldSnipe || shouldNormalClick) {
               updates.last_click_username = botUsername
               updates.last_click_user_id = null // Effacer le joueur réel
-              updates.end_time = now + 60000
+              updates.end_time = now + 75000
 
               if (shouldSnipe) {
                 action = `bot_snipe! (${botUsername}) stole from ${game.last_click_username} at ${Math.floor(timeLeft/1000)}s`
@@ -234,7 +234,7 @@ export async function GET(request: NextRequest) {
             if (hasRealPlayer && timeLeft <= 10000) {
               updates.last_click_username = botUsername
               updates.last_click_user_id = null
-              updates.end_time = now + 60000
+              updates.end_time = now + 75000
               action = `bot_snipe_endgame! (${botUsername}) - battle ended but can't let player win`
             } else {
               action = `battle_ending (${Math.round(battleProgress * 100)}%) - letting timer run down`
