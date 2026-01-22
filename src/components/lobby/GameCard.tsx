@@ -250,6 +250,9 @@ export const GameCard = memo(function GameCard({ game, index = 0, isFavorite = f
   const isUrgent = !isEnded && timeLeft > 0 && timeLeft <= FINAL_PHASE_THRESHOLD
   const isCritical = !isEnded && timeLeft > 0 && timeLeft <= 10000
 
+  // Cap display at 60s in final phase (cron uses 75s for safety buffer)
+  const displayTimeLeft = isUrgent ? Math.min(timeLeft, FINAL_PHASE_THRESHOLD) : timeLeft
+
   // Duration since entering final phase
   const enteredFinalPhaseAt = 'enteredFinalPhaseAt' in game ? game.enteredFinalPhaseAt : undefined
   const [finalPhaseDuration, setFinalPhaseDuration] = useState<number>(0)
@@ -646,7 +649,7 @@ export const GameCard = memo(function GameCard({ game, index = 0, isFavorite = f
                   }
                 `}
               >
-                {isWaiting ? formatTime(timeUntilStart) : formatTime(timeLeft)}
+                {isWaiting ? formatTime(timeUntilStart) : formatTime(displayTimeLeft)}
               </span>
             </div>
 
@@ -660,7 +663,7 @@ export const GameCard = memo(function GameCard({ game, index = 0, isFavorite = f
                     ${isUrgent ? 'bg-danger' : 'bg-neon-blue'}
                   `}
                   style={{
-                    width: `${Math.min(100, (timeLeft / FINAL_PHASE_THRESHOLD) * 100)}%`,
+                    width: `${Math.min(100, (displayTimeLeft / FINAL_PHASE_THRESHOLD) * 100)}%`,
                   }}
                 />
               </div>

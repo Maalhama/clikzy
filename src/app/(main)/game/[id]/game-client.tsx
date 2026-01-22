@@ -162,6 +162,9 @@ export function GameClient({
   const [creditsAnimation, setCreditsAnimation] = useState(false)
 
   const { timeLeft, isUrgent, isEnded } = useTimer({ endTime: game.end_time })
+
+  // Cap display at 60s in final phase (cron uses 75s for safety buffer)
+  const displayTimeLeft = isUrgent ? Math.min(timeLeft, 60000) : timeLeft
   const { playClick, playWin, playHeartbeat, stopAll: stopSounds } = useSounds(true)
 
   // Simulation pour expérience visuelle fluide
@@ -429,7 +432,7 @@ export function GameClient({
                         isCritical ? 'text-danger animate-pulse' : isUrgent ? 'text-danger' : 'text-neon-blue'
                       }`}
                     >
-                      {game.status === 'waiting' ? '--:--' : formatTime(timeLeft)}
+                      {game.status === 'waiting' ? '--:--' : formatTime(displayTimeLeft)}
                     </span>
                   </div>
                   {game.status !== 'waiting' && (
@@ -437,7 +440,7 @@ export function GameClient({
                       <div
                         suppressHydrationWarning
                         className={`h-full rounded-full transition-all duration-300 ${isUrgent ? 'bg-danger' : 'bg-neon-blue'}`}
-                        style={{ width: `${Math.min(100, (timeLeft / 60000) * 100)}%` }}
+                        style={{ width: `${Math.min(100, (displayTimeLeft / 60000) * 100)}%` }}
                       />
                     </div>
                   )}
@@ -787,7 +790,7 @@ export function GameClient({
                         isCritical ? 'text-danger animate-pulse' : isUrgent ? 'text-danger' : 'text-neon-blue'
                       }`}
                     >
-                      {game.status === 'waiting' ? '--:--' : formatTime(timeLeft)}
+                      {game.status === 'waiting' ? '--:--' : formatTime(displayTimeLeft)}
                     </div>
                   </div>
 
@@ -797,7 +800,7 @@ export function GameClient({
                       <div
                         suppressHydrationWarning
                         className={`h-full rounded-full transition-all duration-300 ${isUrgent ? 'bg-danger' : 'bg-neon-blue'}`}
-                        style={{ width: `${Math.min(100, (timeLeft / 60000) * 100)}%` }}
+                        style={{ width: `${Math.min(100, (displayTimeLeft / 60000) * 100)}%` }}
                       />
                     </div>
                   )}
