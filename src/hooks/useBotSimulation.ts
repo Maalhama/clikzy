@@ -6,11 +6,11 @@ import type { GameClick } from './useGame'
 
 /**
  * ============================================
- * SIMULATION FRONTEND DES BOTS CLIKZY v5
+ * SIMULATION FRONTEND DES BOTS CLIKZY v6
  * ============================================
  *
- * Utilise un seed déterministe pour synchroniser
- * les clics entre la page jeu et le lobby.
+ * Synchronise les clics de bots avec la DB via API
+ * pour que le lobby affiche le même leader que la page jeu.
  *
  * Système de bataille (phase finale):
  * - Durée: 30min à 1h59min (déterministe par jeu)
@@ -18,6 +18,19 @@ import type { GameClick } from './useGame'
  * - 90-100%: probabilité décroissante
  * - >100%: bots arrêtent, timer descend à 0
  */
+
+// Sync bot click to database (fire and forget)
+async function syncBotClickToDb(gameId: string, username: string) {
+  try {
+    await fetch('/api/games/bot-click', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ gameId, username }),
+    })
+  } catch (error) {
+    console.error('[BOT SIM] Failed to sync to DB:', error)
+  }
+}
 
 interface UseBotSimulationProps {
   gameId: string
@@ -174,6 +187,7 @@ export function useBotSimulation({
           last_click_username: username,
           last_click_user_id: null, // Bot reprend le lead
         })
+        syncBotClickToDb(gameId, username) // Sync to DB for lobby
 
         lastClickTimeRef.current = now
         lastUsernameRef.current = username
@@ -198,6 +212,7 @@ export function useBotSimulation({
           last_click_username: username,
           last_click_user_id: null,
         })
+        syncBotClickToDb(gameId, username) // Sync to DB for lobby
 
         lastClickTimeRef.current = now
         console.log(`[BOT SIM] ENDGAME SNIPE! ${username} - can't let player win`)
@@ -266,6 +281,7 @@ export function useBotSimulation({
           last_click_username: username,
         })
       }
+      syncBotClickToDb(gameId, username) // Sync to DB for lobby
 
       lastClickTimeRef.current = now
       lastUsernameRef.current = username
