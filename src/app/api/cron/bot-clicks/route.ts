@@ -304,13 +304,10 @@ export async function GET(request: NextRequest) {
       winner?: string
     }> = []
 
-    // Track cumulative delay between games to spread clicks across time
-    let gameProcessingDelay = 0
-
     for (const game of activeGames) {
-      // Add random delay between games (0-15 seconds) to spread bot activity
-      // With 1min cron, we spread clicks across the full minute for realism
-      gameProcessingDelay += Math.floor(Math.random() * 15000)
+      // Generate independent random delay for each game (0-15 seconds)
+      // NOT cumulative - each game gets its own timestamp offset for natural variation
+      const gameProcessingDelay = Math.floor(Math.random() * 15000)
       const gameNow = now + gameProcessingDelay
 
       const endTime = game.end_time as number
@@ -318,18 +315,16 @@ export async function GET(request: NextRequest) {
       const battleDuration = getBattleDuration(game.id)
 
       // CRITICAL: Decide if we process this game THIS round
-      // Not all games are processed every 15 seconds - creates realistic independent bot activity
+      // Not all games are processed every round - creates realistic independent bot activity
       // Probability based on urgency: more urgent = more likely to be processed
       let processingProbability = 0.3 // Default 30% for normal games
 
-      if (timeLeft <= 10000) {
-        processingProbability = 1.0 // 100% - always process urgent games
-      } else if (timeLeft <= 30000) {
-        processingProbability = 0.85 // 85% - very often
+      if (timeLeft <= 30000) {
+        processingProbability = 1.0 // 100% - ALWAYS process when < 30s (prevent premature end)
       } else if (timeLeft <= 60000) {
-        processingProbability = 0.65 // 65% - often
+        processingProbability = 0.9 // 90% - almost always in final phase
       } else if (timeLeft <= 5 * 60 * 1000) {
-        processingProbability = 0.4 // 40% - sometimes
+        processingProbability = 0.5 // 50% - sometimes
       }
 
       // Random skip - creates staggered bot activity across games
