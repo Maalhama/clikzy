@@ -29,10 +29,12 @@ export async function getRecentWinners(limit: number = 10): Promise<WinnerData[]
     .from('winners')
     .select(`
       id,
+      username,
       item_name,
       item_value,
       total_clicks_in_game,
       won_at,
+      is_bot,
       profiles!winners_user_id_fkey (
         username
       ),
@@ -51,17 +53,20 @@ export async function getRecentWinners(limit: number = 10): Promise<WinnerData[]
   // Cast to expected type
   type WinnerRow = {
     id: string
+    username: string | null
     item_name: string
     item_value: number | null
     total_clicks_in_game: number | null
     won_at: string
+    is_bot: boolean
     profiles: { username: string } | null
     items: { image_url: string } | null
   }
 
   return (winners as WinnerRow[]).map((w) => ({
     id: w.id,
-    username: w.profiles?.username || 'Joueur anonyme',
+    // Use winners.username for bots, profiles.username for real players
+    username: w.username || w.profiles?.username || 'Joueur anonyme',
     itemName: w.item_name,
     itemValue: w.item_value ? Number(w.item_value) : null,
     itemImage: w.items?.image_url || '/products/default.svg',
