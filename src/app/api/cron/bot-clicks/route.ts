@@ -122,20 +122,20 @@ function generateRealisticTimestamp(baseTime: number, clickIndex: number, timeLe
 
   if (timeLeftMs <= 10000) {
     // Critical phase (< 10s): very fast reactions (increased variance)
-    minDelay = 500
-    maxDelay = 3000
+    minDelay = 1000
+    maxDelay = 4000
   } else if (timeLeftMs <= 30000) {
     // Urgent (< 30s): fast reactions (increased variance)
-    minDelay = 1000
-    maxDelay = 5000
+    minDelay = 2000
+    maxDelay = 8000
   } else if (timeLeftMs <= 60000) {
     // Final phase (< 1min): quick but not instant (increased variance)
-    minDelay = 2000
-    maxDelay = 12000
+    minDelay = 3000
+    maxDelay = 18000
   } else {
     // Normal: more relaxed timing (increased variance)
-    minDelay = 8000
-    maxDelay = 45000
+    minDelay = 10000
+    maxDelay = 60000
   }
 
   // Add cumulative delay for each subsequent click
@@ -298,8 +298,8 @@ export async function GET(request: NextRequest) {
     let gameProcessingDelay = 0
 
     for (const game of activeGames) {
-      // Add random delay between games (0-5 seconds spread) to avoid all bots clicking at the same time
-      gameProcessingDelay += Math.floor(Math.random() * 5000)
+      // Add random delay between games (0-20 seconds spread) to avoid all bots clicking at the same time
+      gameProcessingDelay += Math.floor(Math.random() * 20000)
       const gameNow = now + gameProcessingDelay
 
       const endTime = game.end_time as number
@@ -464,14 +464,16 @@ export async function GET(request: NextRequest) {
         : gameNow
 
       // Trigger final phase if time < 1 minute
-      // Use 60 seconds reset from the LAST click timestamp (cron runs every 1 minute)
+      // Use 58-62 seconds reset from the LAST click timestamp (cron runs every 1 minute)
       if (game.status === 'active' && timeLeft <= FINAL_PHASE_THRESHOLD) {
-        newEndTime = lastClickTimestamp + 60000 // Reset to 60s from last click
+        const resetTime = 58000 + Math.floor(Math.random() * 4000) // 58-62s
+        newEndTime = lastClickTimestamp + resetTime
         newStatus = 'final_phase'
         shouldSetBattleStart = true
       } else if (game.status === 'final_phase') {
-        // In final phase, reset to 60s from last click
-        newEndTime = lastClickTimestamp + 60000
+        // In final phase, reset to 58-62s from last click
+        const resetTime = 58000 + Math.floor(Math.random() * 4000) // 58-62s
+        newEndTime = lastClickTimestamp + resetTime
       }
 
       // Build update data
@@ -479,7 +481,7 @@ export async function GET(request: NextRequest) {
         total_clicks: (game.total_clicks || 0) + clickCount,
         last_click_username: lastUsername,
         last_click_user_id: null, // Bot click = no user ID
-        last_click_at: new Date().toISOString(),
+        last_click_at: new Date(lastClickTimestamp).toISOString(),
         end_time: newEndTime,
         status: newStatus,
       }
