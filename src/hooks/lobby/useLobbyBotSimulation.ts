@@ -122,7 +122,7 @@ export function useLobbyBotSimulation({
     onGameUpdateRef.current(game.id, {
       total_clicks: (game.total_clicks || 0) + 1,
       last_click_username: username,
-      end_time: shouldResetTimer ? now + 60000 : game.end_time,
+      end_time: shouldResetTimer ? now + 75000 : game.end_time,
     })
 
     // Mettre à jour le temps du dernier clic
@@ -173,7 +173,7 @@ export function useLobbyBotSimulation({
             total_clicks: (game.total_clicks || 0) + 1,
             last_click_username: username,
             last_click_user_id: null, // Bot reprend
-            end_time: now + 60000,
+            end_time: now + 75000,
           })
           lastClickTimesRef.current.set(game.id, now)
           console.log(`[LOBBY BOT] SNIPE! ${username} stole from real player`)
@@ -189,7 +189,7 @@ export function useLobbyBotSimulation({
             total_clicks: (game.total_clicks || 0) + 1,
             last_click_username: username,
             last_click_user_id: null,
-            end_time: now + 60000,
+            end_time: now + 75000,
           })
           lastClickTimesRef.current.set(game.id, now)
           console.log(`[LOBBY BOT] ENDGAME SNIPE! ${username}`)

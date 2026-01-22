@@ -170,7 +170,7 @@ export function useBotSimulation({
 
         addClickRef.current(simulatedClick)
         optimisticUpdateRef.current({
-          end_time: now + 60000,
+          end_time: now + 75000,
           last_click_username: username,
           last_click_user_id: null, // Bot reprend le lead
         })
@@ -194,7 +194,7 @@ export function useBotSimulation({
           isBot: true,
         })
         optimisticUpdateRef.current({
-          end_time: now + 60000,
+          end_time: now + 75000,
           last_click_username: username,
           last_click_user_id: null,
         })
@@ -261,7 +261,7 @@ export function useBotSimulation({
 
       if (shouldResetTimer) {
         optimisticUpdateRef.current({
-          end_time: now + 60000,
+          end_time: now + 75000,
           last_click_username: username,
         })
       } else {
