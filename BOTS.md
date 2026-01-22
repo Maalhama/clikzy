@@ -145,9 +145,9 @@ INTERESTED_CLICK_CHANCE = 0.7          // 70%
 CASUAL_CLICK_CHANCE = 0.3              // 30%
 RARE_CLICK_CHANCE = 0.05               // 5%
 
-// Cron
-CRON_INTERVAL = 1 * 60 * 1000          // 1 minute
-CLICKS_PER_CRON_MAX = 3                // Max 3 clics par exécution
+// Cron (ultra-réactif pour bots compétitifs)
+CRON_INTERVAL = 15 * 1000              // 15 secondes (bots très réactifs)
+CLICKS_PER_CRON_MAX = 4                // Max 4 clics par exécution
 ```
 
 ---
@@ -217,25 +217,34 @@ if (isRealPlayerClick(last_click_user_id)) {
 **Principe** : Les bots ne cliquent JAMAIS quand timer = 0. Ils cliquent entre 1s et 59s.
 
 **Comment ça fonctionne** :
-- Cron s'exécute toutes les **1 minute** (60 secondes)
+- Cron s'exécute toutes les **15 secondes** (ultra-réactif !)
 - Quand le cron tourne, il vérifie tous les jeux actifs
-- Pour chaque jeu, il décide si les bots cliquent (selon probabilités)
+- Pour chaque jeu, il décide si les bots cliquent (selon probabilités + urgence)
 - Si bots cliquent → Timer reset à 60s
 - Si bots ne cliquent pas → Timer continue de descendre → Peut atteindre 0 → Gagnant
 
+**Réactivité selon urgence du timer** :
+- Timer < 10s : 2-4 clics quasi-instantanés (délai 200-800ms entre clics)
+- Timer < 30s : 1-3 clics très rapides (délai 500-1500ms)
+- Timer < 60s : 1-2 clics rapides (délai 1-3s)
+- Timer > 60s : 1 clic occasionnel (délai 2-6s)
+
 **Décalage entre jeux** :
-- Jeu 1 traité à `cron_time + 3s` → Timer reset à `17:40:03`
-- Jeu 2 traité à `cron_time + 15s` → Timer reset à `17:40:15`
-- Jeu 3 traité à `cron_time + 22s` → Timer reset à `17:40:22`
-- → Les timers sont naturellement décalés
+- Jeu 1 traité à `cron_time + 0.5s` → Timer reset à `17:40:00.5`
+- Jeu 2 traité à `cron_time + 1.8s` → Timer reset à `17:40:01.8`
+- Jeu 3 traité à `cron_time + 2.3s` → Timer reset à `17:40:02.3`
+- → Décalage naturel de 0-3s entre jeux
 
 **Exemple de timeline** :
 ```
 17:40:00 - Cron démarre
-17:40:03 - Bot clique sur Jeu 1 (timer était à 45s) → Reset à 60s
-17:40:15 - Bot clique sur Jeu 2 (timer était à 33s) → Reset à 60s
-17:40:22 - Bot ne clique PAS sur Jeu 3 (wind-down) → Timer continue
-17:40:50 - Jeu 3 arrive à 0s → Gagnant déclaré
+17:40:00.5 - 2 bots cliquent sur Jeu 1 (timer était à 8s) → Reset à 60s
+17:40:01.8 - 1 bot clique sur Jeu 2 (timer était à 43s) → Reset à 60s
+17:40:15 - Cron suivant
+17:40:15.2 - 3 bots cliquent sur Jeu 1 (timer à 45s)
+17:40:30 - Cron suivant
+17:40:30.1 - Bot ne clique PAS sur Jeu 3 (wind-down) → Timer continue
+17:40:42 - Jeu 3 arrive à 0s → Gagnant déclaré
 ```
 
 **Zones de clic** :
@@ -378,8 +387,16 @@ ORDER BY end_time ASC;
 ## 🔧 Configuration Cron-job.org
 
 **URL** : `https://clikzy.vercel.app/api/cron/bot-clicks`
-**Fréquence** : `* * * * *` (toutes les minutes)
+**Fréquence** : **Toutes les 15 secondes** (bots ultra-réactifs)
 **Header** : `Authorization: Bearer ${CRON_SECRET}`
+
+**Configuration sur cron-job.org** :
+1. Va sur ton job existant
+2. Clique sur "Edit"
+3. Dans "Schedule", sélectionne "Every 15 seconds"
+4. Sauvegarde
+
+**Syntaxe cron** : `*/15 * * * * *` (toutes les 15 secondes)
 
 **Où trouver CRON_SECRET** :
 - Production : Variables d'environnement Vercel

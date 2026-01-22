@@ -48,10 +48,10 @@ const SUSPENSE_CHANCE = 0.7                  // 70% du temps, attendre le suspen
 const PLAYER_RESPONSE_CHANCE = 0.98          // 98% de chance de répondre à un vrai joueur
 const REAL_PLAYER_WINDOW = 30 * 1000         // Considérer un clic comme "récent" si < 30s
 
-// Configuration du cron (toutes les 1 minute)
-const CRON_INTERVAL = 1 * 60 * 1000          // 1 minute entre chaque exécution
+// Configuration du cron (toutes les 15 secondes pour réactivité maximale)
+const CRON_INTERVAL = 15 * 1000              // 15 secondes entre chaque exécution
 const CLICKS_PER_CRON_MIN = 0                // Min clics par jeu par exécution
-const CLICKS_PER_CRON_MAX = 3                // Max clics par jeu par exécution
+const CLICKS_PER_CRON_MAX = 4                // Max clics par jeu par exécution (plus en phase critique)
 
 // ============================================
 // HELPER FUNCTIONS
@@ -127,21 +127,21 @@ function generateRealisticTimestamp(baseTime: number, clickIndex: number, timeLe
   let maxDelay: number
 
   if (timeLeftMs <= 10000) {
-    // Critical phase (< 10s): very fast reactions
-    minDelay = 500
-    maxDelay = 2000
+    // Critical phase (< 10s): ultra fast reactions (clics quasi-instantanés)
+    minDelay = 200
+    maxDelay = 800
   } else if (timeLeftMs <= 30000) {
-    // Urgent (< 30s): fast reactions
+    // Urgent (< 30s): très rapides (compétition intense)
+    minDelay = 500
+    maxDelay = 1500
+  } else if (timeLeftMs <= 60000) {
+    // Final phase (< 1min): rapides mais pas instantanés
     minDelay = 1000
     maxDelay = 3000
-  } else if (timeLeftMs <= 60000) {
-    // Final phase (< 1min): quick but not instant
-    minDelay = 1500
-    maxDelay = 5000
   } else {
-    // Normal: more relaxed timing
-    minDelay = 3000
-    maxDelay = 10000
+    // Normal: délais plus naturels
+    minDelay = 2000
+    maxDelay = 6000
   }
 
   // Generate a SINGLE random delay (not cumulative, not multiplicative)
@@ -203,17 +203,24 @@ function shouldBotClick(
       return { shouldClick: true, reason: 'response_to_player' }
     }
 
-    // Normal battle: ALWAYS click to maintain the game
-    // Add small variation for realism (98% click rate during battle)
-    if (Math.random() < 0.98) {
-      return { shouldClick: true, reason: 'battle_maintain' }
-    }
-    // 2% chance to skip, but only if timer has enough buffer
-    if (timeLeftMs > 30000) {
+    // Normal battle: Click probability based on timer urgency
+    // More urgent = more likely to click (realistic competitive behavior)
+    if (timeLeftMs <= 15000) {
+      // < 15s: ULTRA URGENT - bots fight hard (100%)
+      return { shouldClick: true, reason: 'battle_ultra_urgent' }
+    } else if (timeLeftMs <= 30000) {
+      // < 30s: Very urgent - bots very active (99%)
+      if (Math.random() < 0.99) {
+        return { shouldClick: true, reason: 'battle_very_urgent' }
+      }
+      return { shouldClick: false, reason: 'battle_rare_skip' }
+    } else {
+      // > 30s: Normal battle pace (95%)
+      if (Math.random() < 0.95) {
+        return { shouldClick: true, reason: 'battle_maintain' }
+      }
       return { shouldClick: false, reason: 'battle_variance' }
     }
-    // Timer too low, must click
-    return { shouldClick: true, reason: 'battle_keep_alive' }
   }
 
   // FINAL PHASE but no battle started yet - start the battle!
@@ -300,8 +307,9 @@ export async function GET(request: NextRequest) {
     let gameProcessingDelay = 0
 
     for (const game of activeGames) {
-      // Add random delay between games (0-20 seconds spread) to avoid all bots clicking at the same time
-      gameProcessingDelay += Math.floor(Math.random() * 20000)
+      // Add small random delay between games (0-3 seconds) to avoid perfect sync
+      // With 15s cron, we want tighter timing for more realistic competition
+      gameProcessingDelay += Math.floor(Math.random() * 3000)
       const gameNow = now + gameProcessingDelay
 
       const endTime = game.end_time as number
@@ -409,12 +417,21 @@ export async function GET(request: NextRequest) {
         continue
       }
 
-      // Determine number of clicks (1-3 based on phase)
+      // Determine number of clicks based on urgency
+      // More urgent = more bots clicking simultaneously (realistic competition)
       let clickCount = 1
-      if (timeLeft <= FINAL_PHASE_THRESHOLD) {
-        clickCount = 1 + Math.floor(Math.random() * CLICKS_PER_CRON_MAX)
+      if (timeLeft <= 10000) {
+        // < 10s: PANIQUE! 2-4 bots cliquent (ultra compétitif)
+        clickCount = 2 + Math.floor(Math.random() * 3) // 2-4 clics
+      } else if (timeLeft <= 30000) {
+        // < 30s: Très actif, 1-3 bots cliquent
+        clickCount = 1 + Math.floor(Math.random() * 3) // 1-3 clics
+      } else if (timeLeft <= FINAL_PHASE_THRESHOLD) {
+        // < 60s: Phase finale, 1-2 bots cliquent
+        clickCount = 1 + Math.floor(Math.random() * 2) // 1-2 clics
       } else if (timeLeft <= INTERESTED_THRESHOLD) {
-        clickCount = 1 + Math.floor(Math.random() * 2)
+        // < 5min: Occasionnel
+        clickCount = Math.random() < 0.7 ? 1 : 2
       }
 
       // Generate bot clicks with REALISTIC behavior
