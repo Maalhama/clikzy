@@ -270,6 +270,7 @@ export async function GET(request: NextRequest) {
     const now = Date.now()
 
     // Get all active games
+    console.log('🔍 [BOT-CRON] Fetching active games...')
     const { data: activeGames, error: fetchError } = await supabase
       .from('games')
       .select(`
@@ -287,13 +288,22 @@ export async function GET(request: NextRequest) {
       .in('status', ['active', 'final_phase'])
 
     if (fetchError) {
-      console.error('Error fetching games:', fetchError)
+      console.error('❌ [BOT-CRON] Error fetching games:', fetchError)
       return NextResponse.json({ error: 'Failed to fetch games' }, { status: 500 })
     }
 
+    console.log(`✅ [BOT-CRON] Found ${activeGames?.length || 0} active games`)
+
     if (!activeGames || activeGames.length === 0) {
+      console.log('⚠️ [BOT-CRON] No active games found - ending execution')
       return NextResponse.json({ message: 'No active games', processed: 0 })
     }
+
+    console.log('🎮 [BOT-CRON] Games to process:', activeGames.map(g => ({
+      id: g.id.substring(0, 8),
+      status: g.status,
+      timeLeft: Math.floor((g.end_time - now) / 1000) + 's'
+    })))
 
     const results: Array<{
       gameId: string
