@@ -282,28 +282,34 @@ if (isRealPlayerClick(last_click_user_id)) {
 
 ---
 
-### 3. Timer Reset et Désynchronisation
+### 3. Timer Reset
 
-**RÈGLE** : Le timer reset à **60 secondes + décalage aléatoire (0-15s)**.
+**RÈGLE ABSOLUE** : Le timer reset TOUJOURS à **EXACTEMENT 60 secondes**.
 
 ```typescript
-// Chaque jeu a un décalage aléatoire unique
-const gameOffset = Math.floor(Math.random() * 15000)  // 0-15s
-newEndTime = now + 60000 + gameOffset
+newEndTime = now + 60000  // EXACTEMENT 60s, pas de variance
 ```
 
-**Pourquoi le décalage ?**
-- Sans décalage, tous les jeux afficheraient le même timer (ex: tous à 00:29)
-- Avec décalage, les timers sont variés (ex: 00:45, 00:32, 00:51)
-- Donne l'illusion que les bots cliquent à des moments différents
+**Pourquoi pas de décalage ?**
+- Un décalage créerait des timers > 60s (01:04, 01:05) ce qui est illogique
+- Le timer en phase finale doit toujours afficher 01:00 après un clic
+- La variété vient des probabilités de skip (certains jeux ne sont pas traités)
 
-**Résultat** : Timers entre 60s et 75s, désynchronisés entre les jeux ✅
+### 4. Protection contre les Résurrections
 
-### 4. Protection contre les Race Conditions
+**Problème** : Un jeu avec timer négatif peut être "ressuscité" si les bots cliquent dessus.
 
-**Problème** : Si deux exécutions du cron se chevauchent, ou si un jeu termine entre le fetch et l'update.
+**Solution 1** : Terminaison forcée si timer très négatif.
 
-**Solution** : Clause WHERE sur le status dans les updates.
+```typescript
+// Si le timer est < -5s, le jeu a expiré et doit être terminé
+if (timeLeft < -5000) {
+  await endGame(supabase, game, itemName)
+  continue
+}
+```
+
+**Solution 2** : Clause WHERE sur le status dans les updates.
 
 ```typescript
 // Update SEULEMENT si le jeu est encore actif

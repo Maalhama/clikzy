@@ -384,16 +384,11 @@ export async function GET(request: NextRequest) {
 
     const results: ProcessResult[] = []
 
-    // Mélanger l'ordre des jeux pour que le décalage soit imprévisible
+    // Mélanger l'ordre des jeux pour un traitement imprévisible
     const shuffledGames = [...(activeGames as GameData[])].sort(() => Math.random() - 0.5)
 
     // ============ TRAITEMENT DE CHAQUE JEU ============
-    for (let gameIndex = 0; gameIndex < shuffledGames.length; gameIndex++) {
-      const game = shuffledGames[gameIndex]
-
-      // Décalage UNIQUE par jeu basé sur sa position dans l'ordre mélangé
-      // Chaque jeu a un décalage de 0-15s, réparti de manière aléatoire
-      const gameOffset = Math.floor(Math.random() * 15000)
+    for (const game of shuffledGames) {
 
       const endTime = game.end_time
       const timeLeft = endTime - now
@@ -409,6 +404,33 @@ export async function GET(request: NextRequest) {
       const lastClickAt = game.last_click_at ? new Date(game.last_click_at).getTime() : 0
       const isRecentRealPlayer = isRealPlayerClick(game.last_click_user_id) &&
         (now - lastClickAt) < CONFIG.REAL_PLAYER_WINDOW
+
+      // ============ VÉRIFICATION TIMER EXPIRÉ ============
+      // Si le timer est TRÈS négatif (< -5s), le jeu a expiré et doit être terminé
+      // Cela évite les "résurrections" de jeux qui auraient dû se terminer
+      if (timeLeft < -5000) {
+        console.log(`💀 [${game.id.substring(0, 8)}] Timer très négatif (${Math.floor(timeLeft/1000)}s), terminaison forcée`)
+
+        const ended = await endGame(supabase, game, itemName)
+        if (ended) {
+          results.push({
+            gameId: game.id,
+            itemName,
+            clicks: 0,
+            reason: 'expired_forced_end',
+            newStatus: 'ended',
+            winner: game.last_click_username || 'Bot'
+          })
+        } else {
+          results.push({
+            gameId: game.id,
+            itemName,
+            clicks: 0,
+            reason: 'already_ended'
+          })
+        }
+        continue
+      }
 
       // ============ PROBABILITÉ DE TRAITEMENT ============
       // Chaque jeu a une probabilité indépendante d'être traité ce tour
@@ -474,8 +496,9 @@ export async function GET(request: NextRequest) {
         clicked_at: string
       }> = []
 
-      // Temps de base pour les clics (avec le décalage du jeu)
-      const gameTime = now + gameOffset
+      // Temps de base pour les clics (petit décalage aléatoire 0-5s pour le feed)
+      const feedOffset = Math.floor(Math.random() * 5000)
+      const gameTime = now + feedOffset
 
       let lastUsername = game.last_click_username
 
@@ -503,11 +526,10 @@ export async function GET(request: NextRequest) {
         shouldSetBattleStart = true
       }
 
-      // RESET TIMER À 60 SECONDES + DÉCALAGE ALÉATOIRE
-      // Chaque jeu a un décalage différent (0-15s) pour désynchroniser les timers
-      // Ex: Jeu A = 60s, Jeu B = 68s, Jeu C = 72s, etc.
+      // RESET TIMER À EXACTEMENT 60 SECONDES
+      // Pas de décalage - le timer doit toujours afficher 01:00 après un clic
       if (newStatus === 'final_phase') {
-        newEndTime = now + 60000 + gameOffset
+        newEndTime = now + 60000
       }
 
       // ============ UPDATE DATABASE ============
