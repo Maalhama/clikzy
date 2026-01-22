@@ -25,8 +25,9 @@ interface UseBotSimulationProps {
   status: string
   battleStartTime: string | null
   lastClickUsername: string | null
+  lastClickUserId: string | null
   addClick: (click: GameClick) => void
-  optimisticUpdate: (update: { end_time?: number; last_click_username?: string }) => void
+  optimisticUpdate: (update: { end_time?: number; last_click_username?: string; last_click_user_id?: string | null }) => void
   enabled?: boolean
 }
 
@@ -96,6 +97,7 @@ export function useBotSimulation({
   status,
   battleStartTime,
   lastClickUsername,
+  lastClickUserId,
   addClick,
   optimisticUpdate,
   enabled = true,
@@ -104,6 +106,7 @@ export function useBotSimulation({
   const endTimeRef = useRef(endTime)
   const statusRef = useRef(status)
   const battleStartTimeRef = useRef(battleStartTime)
+  const lastClickUserIdRef = useRef(lastClickUserId)
   const addClickRef = useRef(addClick)
   const optimisticUpdateRef = useRef(optimisticUpdate)
   const lastClickTimeRef = useRef<number>(0)
@@ -113,6 +116,7 @@ export function useBotSimulation({
   useEffect(() => { endTimeRef.current = endTime }, [endTime])
   useEffect(() => { statusRef.current = status }, [status])
   useEffect(() => { battleStartTimeRef.current = battleStartTime }, [battleStartTime])
+  useEffect(() => { lastClickUserIdRef.current = lastClickUserId }, [lastClickUserId])
   useEffect(() => { addClickRef.current = addClick }, [addClick])
   useEffect(() => { optimisticUpdateRef.current = optimisticUpdate }, [optimisticUpdate])
   useEffect(() => { lastUsernameRef.current = lastClickUsername }, [lastClickUsername])
@@ -139,23 +143,83 @@ export function useBotSimulation({
       const timeSinceLastClick = now - lastClickTimeRef.current
       const personality = personalityRef.current
       const isInFinalPhase = currentStatus === 'final_phase' || timeLeft <= 60000
+      const hasRealPlayer = !!lastClickUserIdRef.current
 
       // Vérifier si la bataille est terminée (phase finale seulement)
+      let battleEnded = false
       if (isInFinalPhase && battleStartTimeRef.current) {
         const battleProgress = getBattleProgress(gameId, battleStartTimeRef.current)
-        if (!shouldBotClickInBattle(gameId, battleProgress)) {
-          // Bataille terminée - laisser le timer descendre
-          return
-        }
+        battleEnded = !shouldBotClickInBattle(gameId, battleProgress)
       }
 
-      // Déterminer le délai minimum (DÉTERMINISTE - même que lobby)
+      // SNIPE LOGIC: Si joueur réel est leader et timer < 15s, on snipe immédiatement
+      const shouldSnipe = hasRealPlayer && isInFinalPhase && timeLeft <= 15000
+
+      if (shouldSnipe) {
+        // Snipe immédiat - pas de délai
+        const roundedTime = Math.floor(now / 1000)
+        const username = generateDeterministicUsername(`${gameId}-${roundedTime}-snipe`)
+        const clickId = `snipe-${gameId}-${roundedTime}`
+
+        const simulatedClick: GameClick = {
+          id: clickId,
+          username,
+          clickedAt: new Date().toISOString(),
+          isBot: true,
+        }
+
+        addClickRef.current(simulatedClick)
+        optimisticUpdateRef.current({
+          end_time: now + 60000,
+          last_click_username: username,
+          last_click_user_id: null, // Bot reprend le lead
+        })
+
+        lastClickTimeRef.current = now
+        lastUsernameRef.current = username
+
+        console.log(`[BOT SIM] SNIPE! ${username} stole from real player at ${Math.floor(timeLeft/1000)}s`)
+        return
+      }
+
+      // Si bataille terminée mais joueur réel est leader et timer < 10s, snipe quand même
+      if (battleEnded && hasRealPlayer && timeLeft <= 10000) {
+        const roundedTime = Math.floor(now / 1000)
+        const username = generateDeterministicUsername(`${gameId}-${roundedTime}-endsnipe`)
+
+        addClickRef.current({
+          id: `endsnipe-${gameId}-${roundedTime}`,
+          username,
+          clickedAt: new Date().toISOString(),
+          isBot: true,
+        })
+        optimisticUpdateRef.current({
+          end_time: now + 60000,
+          last_click_username: username,
+          last_click_user_id: null,
+        })
+
+        lastClickTimeRef.current = now
+        console.log(`[BOT SIM] ENDGAME SNIPE! ${username} - can't let player win`)
+        return
+      }
+
+      // Si bataille terminée et pas de snipe nécessaire, laisser timer descendre
+      if (battleEnded) {
+        return
+      }
+
+      // Si joueur réel est leader en phase finale (mais pas dans zone de snipe), attendre
+      if (hasRealPlayer && isInFinalPhase) {
+        return // Laisser croire au joueur qu'il va gagner
+      }
+
+      // Comportement normal des bots
       let minDelay: number
       let shouldResetTimer = false
 
       if (isInFinalPhase) {
         minDelay = 8000 + (getDeterministicSeed(gameId, Math.floor(now / 5000)) % 17000)
-        // Reset timer SEULEMENT si timeLeft < 60s (pas juste le status)
         shouldResetTimer = timeLeft <= 60000
       } else if (timeLeft <= 15 * 60 * 1000) {
         minDelay = 40000 + (getDeterministicSeed(gameId, Math.floor(now / 10000)) % 40000)

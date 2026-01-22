@@ -24,6 +24,7 @@ interface UseLobbyBotSimulationProps {
   onGameUpdate: (gameId: string, updates: {
     total_clicks?: number
     last_click_username?: string
+    last_click_user_id?: string | null
     end_time?: number
   }) => void
   enabled?: boolean
@@ -152,15 +153,54 @@ export function useLobbyBotSimulation({
         if (timeLeft <= 0) return
 
         const isInFinalPhase = game.status === 'final_phase' || timeLeft <= 60000
+        const hasRealPlayer = !!game.last_click_user_id
 
-        // Vérifier si la bataille est terminée (phase finale seulement)
+        // Vérifier si la bataille est terminée
+        let battleEnded = false
         if (isInFinalPhase && game.battle_start_time) {
           const battleProgress = getBattleProgress(game.id, game.battle_start_time)
-          if (!shouldBotClickInBattle(game.id, battleProgress)) {
-            // Bataille terminée - laisser le timer descendre
-            return
-          }
+          battleEnded = !shouldBotClickInBattle(game.id, battleProgress)
         }
+
+        // SNIPE: Si joueur réel est leader et timer < 15s, sniper immédiatement
+        const shouldSnipe = hasRealPlayer && isInFinalPhase && timeLeft <= 15000
+
+        if (shouldSnipe) {
+          const roundedTime = Math.floor(now / 1000)
+          const username = generateDeterministicUsername(`${game.id}-${roundedTime}-snipe`)
+
+          onGameUpdateRef.current(game.id, {
+            total_clicks: (game.total_clicks || 0) + 1,
+            last_click_username: username,
+            last_click_user_id: null, // Bot reprend
+            end_time: now + 60000,
+          })
+          lastClickTimesRef.current.set(game.id, now)
+          console.log(`[LOBBY BOT] SNIPE! ${username} stole from real player`)
+          return
+        }
+
+        // Si bataille terminée mais joueur réel leader et timer < 10s, snipe quand même
+        if (battleEnded && hasRealPlayer && timeLeft <= 10000) {
+          const roundedTime = Math.floor(now / 1000)
+          const username = generateDeterministicUsername(`${game.id}-${roundedTime}-endsnipe`)
+
+          onGameUpdateRef.current(game.id, {
+            total_clicks: (game.total_clicks || 0) + 1,
+            last_click_username: username,
+            last_click_user_id: null,
+            end_time: now + 60000,
+          })
+          lastClickTimesRef.current.set(game.id, now)
+          console.log(`[LOBBY BOT] ENDGAME SNIPE! ${username}`)
+          return
+        }
+
+        // Si bataille terminée, laisser timer descendre
+        if (battleEnded) return
+
+        // Si joueur réel leader en phase finale (hors zone snipe), attendre
+        if (hasRealPlayer && isInFinalPhase) return
 
         const lastClickTime = lastClickTimesRef.current.get(game.id) || 0
         const timeSinceLastClick = now - lastClickTime
@@ -170,32 +210,24 @@ export function useLobbyBotSimulation({
         let minDelay: number
 
         if (isInFinalPhase) {
-          // Phase finale: 3 clics par minute
           minDelay = 8000 + (getDeterministicSeed(game.id, Math.floor(now / 5000)) % 17000)
         } else if (timeLeft <= 15 * 60 * 1000) {
-          // Phase active: 1 clic par minute
           minDelay = 40000 + (getDeterministicSeed(game.id, Math.floor(now / 10000)) % 40000)
         } else if (timeLeft <= 30 * 60 * 1000) {
-          // Phase building
           minDelay = 70000 + (getDeterministicSeed(game.id, Math.floor(now / 15000)) % 50000)
         } else {
-          // Phase positioning
           minDelay = 140000 + (getDeterministicSeed(game.id, Math.floor(now / 20000)) % 100000)
         }
 
         minDelay = minDelay / personality
 
-        // Pas encore le moment
         if (timeSinceLastClick < minDelay) return
 
-        // Seed pour décision de clic (synchronisé entre clients)
         const clickSeed = getDeterministicSeed(game.id, Math.floor(now / 1000))
         const clickRandom = seededRandom(clickSeed)
 
-        // Probabilité de cliquer
         const probability = isInFinalPhase ? 0.9 : 0.7
         if (clickRandom() > probability) {
-          // Reset timer pour réessayer
           lastClickTimesRef.current.set(game.id, now - minDelay + 3000)
           return
         }

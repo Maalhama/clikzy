@@ -171,6 +171,7 @@ export function GameClient({
     status: game.status,
     battleStartTime: game.battle_start_time,
     lastClickUsername: game.last_click_username,
+    lastClickUserId: game.last_click_user_id,
     addClick,
     optimisticUpdate,
     enabled: game.status === 'active' || game.status === 'final_phase',
