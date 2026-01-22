@@ -1,6 +1,7 @@
 import { Suspense } from 'react'
 import { createClient } from '@/lib/supabase/server'
 import { checkAndResetDailyCredits } from '@/actions/credits'
+import { getRecentWinners } from '@/actions/winners'
 import { LobbyClient } from './LobbyClient'
 import { GameCardSkeleton } from '@/components/lobby'
 import { SOON_THRESHOLD, ROTATION_HOURS } from '@/lib/constants/rotation'
@@ -77,7 +78,7 @@ async function getLobbyData() {
   const soonThreshold = new Date(Date.now() + SOON_THRESHOLD).toISOString()
 
   // Run all queries in parallel for faster loading
-  const [creditsResult, activeGamesResult, soonGamesResult, endedGamesResult] = await Promise.all([
+  const [creditsResult, activeGamesResult, soonGamesResult, endedGamesResult, winnersResult] = await Promise.all([
     checkAndResetDailyCredits(),
     supabase
       .from('games')
@@ -98,7 +99,8 @@ async function getLobbyData() {
       .eq('status', 'ended')
       .gte('end_time', endedGamesStartTime)
       .order('end_time', { ascending: false })
-      .limit(100)
+      .limit(100),
+    getRecentWinners(10)
   ])
 
   const credits = creditsResult.success ? (creditsResult.data?.credits ?? 0) : 0
@@ -116,7 +118,9 @@ async function getLobbyData() {
     ...recentlyEndedGames,
   ]
 
-  return { games, credits, wasReset }
+  const winners = winnersResult
+
+  return { games, credits, wasReset, winners }
 }
 
 function LobbyLoading() {
@@ -165,7 +169,7 @@ function LobbyLoading() {
 }
 
 export default async function LobbyPage() {
-  const { games, credits, wasReset } = await getLobbyData()
+  const { games, credits, wasReset, winners } = await getLobbyData()
 
   return (
     <Suspense fallback={<LobbyLoading />}>
@@ -173,6 +177,7 @@ export default async function LobbyPage() {
         initialGames={games}
         credits={credits}
         wasReset={wasReset}
+        winners={winners}
       />
     </Suspense>
   )

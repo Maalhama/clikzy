@@ -6,10 +6,11 @@ import {
   LobbyHeader,
   GameFilters,
   GameCard,
-  LiveClicksFeed,
+  LastWinnersFeed,
   Pagination,
   PullToRefreshIndicator,
 } from '@/components/lobby'
+import type { WinnerData } from '@/actions/winners'
 import { FloatingTimer } from '@/components/landing/widgets/FloatingTimer'
 import { useLobbyFilters } from '@/hooks/lobby/useLobbyFilters'
 import { useLobbyRealtime } from '@/hooks/lobby/useLobbyRealtime'
@@ -22,12 +23,14 @@ interface LobbyClientProps {
   initialGames: GameWithItem[]
   credits: number
   wasReset: boolean
+  winners: WinnerData[]
 }
 
 export function LobbyClient({
   initialGames,
   credits,
   wasReset,
+  winners,
 }: LobbyClientProps) {
   // Search state
   const [searchQuery, setSearchQuery] = useState('')
@@ -52,7 +55,7 @@ export function LobbyClient({
   })
 
   // Real-time updates - reads from shared cache
-  const { games, recentClicks, isConnected, updateGame, addClickNotification } = useLobbyRealtime(initialGames)
+  const { games, updateGame, addClickNotification } = useLobbyRealtime(initialGames)
 
   // Bot simulation pour expérience visuelle fluide
   useLobbyBotSimulation({
@@ -273,17 +276,17 @@ export function LobbyClient({
               )}
             </div>
 
-            {/* Live feed sidebar - desktop only */}
+            {/* Winners sidebar - desktop only */}
             <div className="hidden lg:block w-80 flex-shrink-0">
               <div className="sticky top-24">
-                <LiveClicksFeed clicks={recentClicks} isConnected={isConnected} />
+                <LastWinnersFeed winners={winners} />
               </div>
             </div>
           </div>
 
-          {/* Mobile live feed */}
+          {/* Mobile winners feed */}
           <div className="lg:hidden mt-8">
-            <LiveClicksFeed clicks={recentClicks} isConnected={isConnected} />
+            <LastWinnersFeed winners={winners} />
           </div>
         </div>
       </div>
