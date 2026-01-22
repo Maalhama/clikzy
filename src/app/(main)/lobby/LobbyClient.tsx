@@ -54,21 +54,21 @@ export function LobbyClient({
   // Real-time updates - reads from shared cache
   const { games, recentClicks, isConnected, updateGame, addClickNotification } = useLobbyRealtime(initialGames)
 
-  // Bot simulation - uses deterministic seed for sync across devices
-  useLobbyBotSimulation({
-    games,
-    onGameUpdate: useCallback((gameId: string, updates: { total_clicks?: number; last_click_username?: string; end_time?: number }) => {
-      updateGame(gameId, updates)
-      // Add to click feed if we have a username
-      if (updates.last_click_username) {
-        const game = games.find(g => g.id === gameId)
-        if (game?.item?.name) {
-          addClickNotification(updates.last_click_username, gameId, game.item.name)
-        }
-      }
-    }, [updateGame, addClickNotification, games]),
-    enabled: true,
-  })
+  // Bot simulation désactivée - les clics sont gérés par le cron backend
+  // Cela garantit que tous les clics sont persistés en DB et visibles après refresh
+  // useLobbyBotSimulation({
+  //   games,
+  //   onGameUpdate: useCallback((gameId: string, updates: { total_clicks?: number; last_click_username?: string; end_time?: number }) => {
+  //     updateGame(gameId, updates)
+  //     if (updates.last_click_username) {
+  //       const game = games.find(g => g.id === gameId)
+  //       if (game?.item?.name) {
+  //         addClickNotification(updates.last_click_username, gameId, game.item.name)
+  //       }
+  //     }
+  //   }, [updateGame, addClickNotification, games]),
+  //   enabled: true,
+  // })
 
   // Filters, sorting and pagination
   const {
