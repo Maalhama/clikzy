@@ -72,7 +72,7 @@ Cron-job.org (toutes les 1 minute)
 3. Les **timers sont calculés côté serveur** (end_time dans la DB)
 4. Les **batailles continuent** même la nuit sans aucun utilisateur connecté
 
-**Résultat** : Un jeu lancé à 2h du matin continuera sa bataille de 30-119 minutes et se terminera naturellement, même si personne ne regarde.
+**Résultat** : Un jeu lancé à 2h du matin continuera sa bataille de 30min à 1h59min et se terminera naturellement, même si personne ne regarde.
 
 ---
 
@@ -119,7 +119,7 @@ Les bots décident de cliquer selon :
 
 #### **Phase Finale AVEC bataille active**
 ```typescript
-Si bataille terminée (>30-119 min) → 0% (laisser gagner)
+Si bataille terminée (>30min à 1h59min) → 0% (laisser gagner)
 Si wind-down (5 dernières min) → 30%
 Si réponse à joueur réel → 98%
 Sinon → 98% (maintenir la bataille)
