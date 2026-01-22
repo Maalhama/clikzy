@@ -314,29 +314,8 @@ export async function GET(request: NextRequest) {
       const timeLeft = endTime - gameNow
       const battleDuration = getBattleDuration(game.id)
 
-      // CRITICAL: Decide if we process this game THIS round
-      // Not all games are processed every round - creates realistic independent bot activity
-      // Probability based on urgency: more urgent = more likely to be processed
-      let processingProbability = 0.3 // Default 30% for normal games
-
-      if (timeLeft <= 30000) {
-        processingProbability = 1.0 // 100% - ALWAYS process when < 30s (prevent premature end)
-      } else if (timeLeft <= 60000) {
-        processingProbability = 0.9 // 90% - almost always in final phase
-      } else if (timeLeft <= 5 * 60 * 1000) {
-        processingProbability = 0.5 // 50% - sometimes
-      }
-
-      // Random skip - creates staggered bot activity across games
-      if (Math.random() > processingProbability) {
-        results.push({
-          gameId: game.id,
-          itemName: getItemName(game.item),
-          clicks: 0,
-          reason: 'random_skip_this_round',
-        })
-        continue
-      }
+      // TEMPORAIRE : Tous les jeux sont traités à chaque tour (pas de skip)
+      // Permet de tester si le cron fonctionne et génère bien des clics
 
       // Parse battle_start_time if exists
       const battleStartTime = game.battle_start_time
