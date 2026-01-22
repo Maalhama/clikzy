@@ -163,8 +163,8 @@ export function GameClient({
 
   const { timeLeft, isUrgent, isEnded } = useTimer({ endTime: game.end_time })
 
-  // Cap at 60s (cron uses 65s for safety, display shows max 01:00)
-  const displayTimeLeft = Math.min(timeLeft, 60000)
+  // Display actual time (everything resets to 60s)
+  const displayTimeLeft = timeLeft
   const { playClick, playWin, playHeartbeat, stopAll: stopSounds } = useSounds(true)
 
   // Simulation pour expérience visuelle fluide

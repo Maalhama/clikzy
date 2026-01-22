@@ -3,7 +3,7 @@ import { createClient, SupabaseClient } from '@supabase/supabase-js'
 
 /**
  * ============================================
- * CRON DE GESTION DES JEUX - Clikzy v10.0
+ * CRON DE GESTION DES JEUX - Clikzy v11.0
  * ============================================
  *
  * Ce cron gère:
@@ -17,7 +17,9 @@ import { createClient, SupabaseClient } from '@supabase/supabase-js'
  * - 90-100%: probabilité de clic décroissante
  * - >100%: bots arrêtent, timer descend à 0
  *
- * Fréquence: toutes les 60 secondes
+ * Fréquence: toutes les ~30 secondes (2 crons décalés sur cron-job.org)
+ * - Cron 1: /api/cron/bot-clicks (exécute immédiatement)
+ * - Cron 2: /api/cron/bot-clicks?delay=30 (attend 30s puis exécute)
  */
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
@@ -141,6 +143,16 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
+  // Support pour le cron décalé : ?delay=30 attend 30 secondes avant d'exécuter
+  const delayParam = request.nextUrl.searchParams.get('delay')
+  if (delayParam) {
+    const delaySeconds = parseInt(delayParam, 10)
+    if (!isNaN(delaySeconds) && delaySeconds > 0 && delaySeconds <= 55) {
+      console.log(`[CRON] Waiting ${delaySeconds}s before execution...`)
+      await new Promise(resolve => setTimeout(resolve, delaySeconds * 1000))
+    }
+  }
+
   try {
     const supabase = createClient(supabaseUrl, supabaseServiceKey)
     const now = Date.now()
@@ -218,7 +230,7 @@ export async function GET(request: NextRequest) {
             if (shouldSnipe || shouldNormalClick) {
               updates.last_click_username = botUsername
               updates.last_click_user_id = null // Effacer le joueur réel
-              updates.end_time = now + 65000
+              updates.end_time = now + 60000
 
               if (shouldSnipe) {
                 action = `bot_snipe! (${botUsername}) stole from ${game.last_click_username} at ${Math.floor(timeLeft/1000)}s`
@@ -234,7 +246,7 @@ export async function GET(request: NextRequest) {
             if (hasRealPlayer && timeLeft <= 10000) {
               updates.last_click_username = botUsername
               updates.last_click_user_id = null
-              updates.end_time = now + 65000
+              updates.end_time = now + 60000
               action = `bot_snipe_endgame! (${botUsername}) - battle ended but can't let player win`
             } else {
               action = `battle_ending (${Math.round(battleProgress * 100)}%) - letting timer run down`

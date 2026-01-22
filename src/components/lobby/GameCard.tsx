@@ -250,8 +250,8 @@ export const GameCard = memo(function GameCard({ game, index = 0, isFavorite = f
   const isUrgent = !isEnded && timeLeft > 0 && timeLeft <= FINAL_PHASE_THRESHOLD
   const isCritical = !isEnded && timeLeft > 0 && timeLeft <= 10000
 
-  // Cap at 60s (cron uses 65s for safety, display shows max 01:00)
-  const displayTimeLeft = Math.min(timeLeft, FINAL_PHASE_THRESHOLD)
+  // Display actual time (everything resets to 60s)
+  const displayTimeLeft = timeLeft
 
   // Duration since entering final phase
   const enteredFinalPhaseAt = 'enteredFinalPhaseAt' in game ? game.enteredFinalPhaseAt : undefined
