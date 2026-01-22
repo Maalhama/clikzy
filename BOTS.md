@@ -1,0 +1,328 @@
+# 🤖 Documentation Système de Bots - Clikzy
+
+## 📋 Vue d'ensemble
+
+Le système de bots de Clikzy simule des joueurs réalistes pour maintenir l'engagement et l'activité des jeux. Les bots sont 100% côté serveur via un cron job.
+
+---
+
+## 🏗️ Architecture
+
+```
+Cron-job.org (toutes les 1 minute)
+    ↓
+/api/cron/bot-clicks
+    ↓
+generateUsername() → Usernames déterministes
+generateRealisticTimestamp() → Délais entre clics
+shouldBotClick() → Intelligence des bots
+    ↓
+INSERT INTO clicks (is_bot = true, user_id = null)
+UPDATE games (end_time = gameNow + 60000)
+```
+
+---
+
+## ⚙️ Configuration
+
+### Fichier : `/src/app/api/cron/bot-clicks/route.ts`
+
+#### Constantes Principales
+
+```typescript
+// Durée de bataille
+MIN_BATTLE_DURATION = 30 * 60 * 1000   // 30 min
+MAX_BATTLE_DURATION = 119 * 60 * 1000  // 1h59
+
+// Seuils de temps
+FINAL_PHASE_THRESHOLD = 60 * 1000      // < 1 minute
+INTERESTED_THRESHOLD = 5 * 60 * 1000   // < 5 minutes
+CASUAL_THRESHOLD = 60 * 60 * 1000      // < 1 heure
+
+// Probabilités de clic
+FINAL_PHASE_CLICK_CHANCE = 100%        // TOUJOURS cliquer
+INTERESTED_CLICK_CHANCE = 0.7          // 70%
+CASUAL_CLICK_CHANCE = 0.3              // 30%
+RARE_CLICK_CHANCE = 0.05               // 5%
+
+// Cron
+CRON_INTERVAL = 1 * 60 * 1000          // 1 minute
+CLICKS_PER_CRON_MAX = 3                // Max 3 clics par exécution
+```
+
+---
+
+## 🎯 Logique des Bots
+
+### 1. Intelligence de Décision (`shouldBotClick`)
+
+Les bots décident de cliquer selon :
+
+#### **Phase Finale (<60s) SANS bataille**
+```typescript
+→ 100% de clic (TOUJOURS)
+→ Raison : "final_phase_maintain"
+```
+
+#### **Phase Finale AVEC bataille active**
+```typescript
+Si bataille terminée (>30-119 min) → 0% (laisser gagner)
+Si wind-down (5 dernières min) → 30%
+Si réponse à joueur réel → 98%
+Sinon → 98% (maintenir la bataille)
+```
+
+#### **Hors Phase Finale**
+```typescript
+< 5 min → 70% de clic
+< 1h → 30% de clic
+> 1h → 5% de clic
+```
+
+---
+
+### 2. Timer Reset
+
+**RÈGLE ABSOLUE** : Le timer reset TOUJOURS à **EXACTEMENT 60 secondes**.
+
+```typescript
+newEndTime = gameNow + 60000  // EXACTEMENT 60s, pas de variance
+```
+
+**Pourquoi pas `lastClickTimestamp + 60000` ?**
+- Les clics ont des délais (0.5-5s) pour le feed live
+- Si on utilise `lastClickTimestamp`, le timer afficherait 61-65s
+- Solution : `gameNow + 60000` → Timer affiché = 01:00 pile ✅
+
+---
+
+### 3. Usernames Déterministes
+
+```typescript
+generateDeterministicUsername(seed: string)
+```
+
+**Seed** : `${gameId}-${timestamp}`
+
+**Avantages** :
+- Cohérence entre les utilisateurs
+- Pas de random() → Même seed = même username
+- Usernames réalistes : `lucas75`, `emma_off`, `TheRealNaïm`
+
+**Pool** : 400+ prénoms (français, ibériques, maghrébins, africains)
+
+---
+
+### 4. Délais Entre Clics
+
+```typescript
+generateRealisticTimestamp(baseTime, clickIndex, timeLeftMs)
+```
+
+**Délais selon la phase** :
+
+| Phase | Délai | Usage |
+|-------|-------|-------|
+| Critique (<10s) | 0.5-2s | Feed live uniquement |
+| Urgent (<30s) | 1-3s | Feed live uniquement |
+| Phase finale (<60s) | 1.5-5s | Feed live uniquement |
+| Normal | 3-10s | Feed live uniquement |
+
+**IMPORTANT** : Ces délais n'affectent PAS le timer (qui reset toujours à 60s).
+
+---
+
+### 5. Décalage Entre Jeux
+
+```typescript
+gameProcessingDelay += Math.floor(Math.random() * 20000) // 0-20s
+const gameNow = now + gameProcessingDelay
+```
+
+**Effet** :
+- Jeu 1 traité à `now + 3s`
+- Jeu 2 traité à `now + 15s`
+- Jeu 3 traité à `now + 22s`
+- → Les timers sont décalés de 3s, 15s, 22s
+
+---
+
+## 🗄️ Base de Données
+
+### Table `clicks`
+
+```sql
+user_id         UUID    NULL (pour les bots)
+username        TEXT    'lucas75', 'emma_off', etc.
+is_bot          BOOLEAN true
+credits_spent   INTEGER 0
+clicked_at      TIMESTAMP
+```
+
+### Table `games`
+
+```sql
+last_click_username   TEXT
+last_click_user_id    UUID (NULL pour bots)
+last_click_at         TIMESTAMP
+end_time              BIGINT (ms timestamp)
+total_clicks          INTEGER
+battle_start_time     TIMESTAMP (début phase finale)
+```
+
+---
+
+## 🐛 Bugs Historiques (RÉSOLUS)
+
+### Bug 1 : Timer à 68-74s au lieu de 60s
+**Cause** : `newEndTime = lastClickTimestamp + 60000`
+**Solution** : `newEndTime = gameNow + 60000`
+
+### Bug 2 : Jeux terminés prématurément
+**Cause** : 5% de chance de ne pas cliquer en phase finale
+**Solution** : 100% de clics en phase finale
+
+### Bug 3 : Tous les bots cliquent en même temps
+**Cause** : Tous les jeux utilisaient le même `now`
+**Solution** : Délai cumulatif 0-20s entre chaque jeu
+
+---
+
+## 📊 Métriques & Surveillance
+
+### Requête : Voir les clics de bots récents
+
+```sql
+SELECT username, item_name, clicked_at, game_id
+FROM clicks
+WHERE is_bot = true
+ORDER BY clicked_at DESC
+LIMIT 20;
+```
+
+### Requête : Voir les jeux actifs
+
+```sql
+SELECT id, status, end_time, total_clicks, last_click_username
+FROM games
+WHERE status IN ('active', 'final_phase')
+ORDER BY end_time ASC;
+```
+
+---
+
+## 🔧 Configuration Cron-job.org
+
+**URL** : `https://clikzy.vercel.app/api/cron/bot-clicks`
+**Fréquence** : `* * * * *` (toutes les minutes)
+**Header** : `Authorization: Bearer ${CRON_SECRET}`
+
+**Où trouver CRON_SECRET** :
+- Production : Variables d'environnement Vercel
+- Local : `.env.local`
+
+---
+
+## ✅ Checklist de Test
+
+Quand tu testes les bots :
+
+1. ✅ Les timers affichent EXACTEMENT 01:00
+2. ✅ Les timers sont légèrement décalés entre les jeux (0-20s)
+3. ✅ Les usernames sont variés et réalistes
+4. ✅ Les clics apparaissent dans le feed live avec des délais naturels
+5. ✅ Les jeux NE se terminent PAS prématurément en phase finale
+6. ✅ Les compteurs de clics augmentent progressivement
+
+---
+
+## 🚨 Points Critiques à NE JAMAIS MODIFIER
+
+### 1. Timer Reset
+```typescript
+// ✅ CORRECT
+newEndTime = gameNow + 60000
+
+// ❌ INCORRECT
+newEndTime = lastClickTimestamp + 60000  // Affiche 61-65s
+```
+
+### 2. Clics en Phase Finale
+```typescript
+// ✅ CORRECT - 100% de clics
+if (isInFinalPhase) {
+  return { shouldClick: true, reason: 'final_phase_maintain' }
+}
+
+// ❌ INCORRECT - Risque de fin prématurée
+if (Math.random() < 0.95) { ... }
+```
+
+### 3. Délai Entre Jeux
+```typescript
+// ✅ CORRECT - Décalage réaliste
+gameProcessingDelay += Math.floor(Math.random() * 20000) // 0-20s
+
+// ❌ INCORRECT - Tous synchronisés
+const gameNow = now  // Pas de décalage
+```
+
+---
+
+## 📝 Logs & Debugging
+
+### Activer les logs détaillés
+
+Dans le cron, ajoute des `console.log` :
+
+```typescript
+console.log(`Bot intelligence: ${totalClicks} clicks on ${clickedGames}/${results.length} games`)
+```
+
+### Voir les logs sur Vercel
+
+1. Va sur **vercel.com** → Projet Clikzy
+2. **Logs** → Filtre par `/api/cron/bot-clicks`
+3. Regarde les réponses JSON
+
+---
+
+## 🎯 Prochaines Évolutions Possibles
+
+- [ ] Adapter le nombre de clics selon l'heure (moins de bots la nuit)
+- [ ] Bots "premium" qui cliquent plus souvent
+- [ ] Pattern de clics selon le type de produit
+- [ ] Simulation de "streaks" (un bot qui clique plusieurs fois de suite)
+
+---
+
+## 📚 Fichiers Importants
+
+| Fichier | Description |
+|---------|-------------|
+| `/src/app/api/cron/bot-clicks/route.ts` | Logique principale des bots |
+| `/src/lib/bots/usernameGenerator.ts` | Génération de usernames |
+| `/src/lib/utils/constants.ts` | Constantes (FINAL_PHASE_RESET, etc.) |
+| `CLAUDE.md` | Config crons (fréquence, URL) |
+
+---
+
+## 🔐 Sécurité
+
+### Authentification
+- Header `Authorization: Bearer ${CRON_SECRET}` obligatoire
+- Rejet avec 401 si header incorrect
+
+### Rate Limiting
+- Exécution toutes les 1 minute (pas plus fréquent)
+- Max 3 clics par jeu par exécution
+
+### Validation
+- Vérification `status IN ('active', 'final_phase')`
+- Vérification `end_time > now`
+- Séquence anti-triche (`sequence_number`)
+
+---
+
+**Dernière mise à jour** : 22/01/2026
+**Version** : 2.0 (Timer exact 60s + 100% clics phase finale)
