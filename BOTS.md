@@ -234,10 +234,10 @@ if (isRealPlayerClick(last_click_user_id)) {
 - Timer > 5min : 30% (rarement traité)
 
 **Nombre de clics selon urgence** (compensation pour cron 1min) :
-- Timer < 10s : 4-6 clics (PANIQUE - multiple bots)
-- Timer < 30s : 3-5 clics (très actif)
-- Timer < 60s : 2-4 clics (actif)
-- Timer < 5min : 1-3 clics (occasionnel)
+- Timer < 10s : 6-10 clics (PANIQUE - multiple bots)
+- Timer < 30s : 5-8 clics (très actif)
+- Timer < 60s : 4-7 clics (actif)
+- Timer < 5min : 2-4 clics (occasionnel)
 - Timer > 5min : 1-2 clics (rare)
 
 **Délais entre clics** :
@@ -282,18 +282,46 @@ if (isRealPlayerClick(last_click_user_id)) {
 
 ---
 
-### 3. Timer Reset
+### 3. Timer Reset et Désynchronisation
 
-**RÈGLE ABSOLUE** : Le timer reset TOUJOURS à **EXACTEMENT 60 secondes**.
+**RÈGLE** : Le timer reset à **60 secondes + décalage aléatoire (0-15s)**.
 
 ```typescript
-newEndTime = gameNow + 60000  // EXACTEMENT 60s, pas de variance
+// Chaque jeu a un décalage aléatoire unique
+const gameOffset = Math.floor(Math.random() * 15000)  // 0-15s
+newEndTime = now + 60000 + gameOffset
 ```
 
-**Pourquoi pas `lastClickTimestamp + 60000` ?**
-- Les clics ont des délais (0.5-5s) pour le feed live
-- Si on utilise `lastClickTimestamp`, le timer afficherait 61-65s
-- Solution : `gameNow + 60000` → Timer affiché = 01:00 pile ✅
+**Pourquoi le décalage ?**
+- Sans décalage, tous les jeux afficheraient le même timer (ex: tous à 00:29)
+- Avec décalage, les timers sont variés (ex: 00:45, 00:32, 00:51)
+- Donne l'illusion que les bots cliquent à des moments différents
+
+**Résultat** : Timers entre 60s et 75s, désynchronisés entre les jeux ✅
+
+### 4. Protection contre les Race Conditions
+
+**Problème** : Si deux exécutions du cron se chevauchent, ou si un jeu termine entre le fetch et l'update.
+
+**Solution** : Clause WHERE sur le status dans les updates.
+
+```typescript
+// Update SEULEMENT si le jeu est encore actif
+const { data } = await supabase
+  .from('games')
+  .update(updateData)
+  .eq('id', game.id)
+  .in('status', ['active', 'final_phase'])  // Protection!
+  .select('id')
+
+// Si rien n'a été modifié, le jeu a été terminé entre-temps
+if (!data || data.length === 0) {
+  console.log('Game was ended by another process, skipping')
+  continue
+}
+```
+
+**Résultat** : Impossible de réactiver un jeu terminé ✅
 
 ---
 

@@ -60,11 +60,11 @@ const CONFIG = {
   PROC_INTERESTED: 0.40,                 // < 5min: 40% traité
   PROC_CASUAL: 0.30,                     // > 5min: 30% traité
 
-  // Nombre de clics générés selon urgence
-  CLICKS_PANIC: { min: 4, max: 6 },      // < 10s: 4-6 clics
-  CLICKS_URGENT: { min: 3, max: 5 },     // < 30s: 3-5 clics
-  CLICKS_FINAL: { min: 2, max: 4 },      // < 60s: 2-4 clics
-  CLICKS_INTERESTED: { min: 1, max: 3 }, // < 5min: 1-3 clics
+  // Nombre de clics générés selon urgence (AUGMENTÉ pour phase finale)
+  CLICKS_PANIC: { min: 6, max: 10 },     // < 10s: 6-10 clics (PANIQUE!)
+  CLICKS_URGENT: { min: 5, max: 8 },     // < 30s: 5-8 clics
+  CLICKS_FINAL: { min: 4, max: 7 },      // < 60s: 4-7 clics
+  CLICKS_INTERESTED: { min: 2, max: 4 }, // < 5min: 2-4 clics
   CLICKS_CASUAL: { min: 1, max: 2 },     // > 5min: 1-2 clics
 
   // Délais entre clics pour le feed live
@@ -384,8 +384,17 @@ export async function GET(request: NextRequest) {
 
     const results: ProcessResult[] = []
 
+    // Mélanger l'ordre des jeux pour que le décalage soit imprévisible
+    const shuffledGames = [...(activeGames as GameData[])].sort(() => Math.random() - 0.5)
+
     // ============ TRAITEMENT DE CHAQUE JEU ============
-    for (const game of activeGames as GameData[]) {
+    for (let gameIndex = 0; gameIndex < shuffledGames.length; gameIndex++) {
+      const game = shuffledGames[gameIndex]
+
+      // Décalage UNIQUE par jeu basé sur sa position dans l'ordre mélangé
+      // Chaque jeu a un décalage de 0-15s, réparti de manière aléatoire
+      const gameOffset = Math.floor(Math.random() * 15000)
+
       const endTime = game.end_time
       const timeLeft = endTime - now
       const battleDuration = getBattleDuration(game.id)
@@ -465,8 +474,7 @@ export async function GET(request: NextRequest) {
         clicked_at: string
       }> = []
 
-      // Décalage temporel pour ce jeu (0-15s)
-      const gameOffset = Math.floor(Math.random() * CONFIG.MAX_GAME_OFFSET)
+      // Temps de base pour les clics (avec le décalage du jeu)
       const gameTime = now + gameOffset
 
       let lastUsername = game.last_click_username
@@ -495,10 +503,11 @@ export async function GET(request: NextRequest) {
         shouldSetBattleStart = true
       }
 
-      // RESET TIMER À EXACTEMENT 60 SECONDES
-      // On utilise `now` (pas gameTime) pour que le timer affiche 01:00 pile
+      // RESET TIMER À 60 SECONDES + DÉCALAGE ALÉATOIRE
+      // Chaque jeu a un décalage différent (0-15s) pour désynchroniser les timers
+      // Ex: Jeu A = 60s, Jeu B = 68s, Jeu C = 72s, etc.
       if (newStatus === 'final_phase') {
-        newEndTime = now + 60000
+        newEndTime = now + 60000 + gameOffset
       }
 
       // ============ UPDATE DATABASE ============
@@ -517,13 +526,29 @@ export async function GET(request: NextRequest) {
         updateData.battle_start_time = new Date().toISOString()
       }
 
-      const { error: updateError } = await supabase
+      // IMPORTANT: Ajouter clause WHERE sur status pour éviter de réactiver un jeu terminé
+      // Si le jeu a été terminé entre le fetch et l'update, l'update ne fera rien
+      const { data: updateResult, error: updateError } = await supabase
         .from('games')
         .update(updateData)
         .eq('id', game.id)
+        .in('status', ['active', 'final_phase'])
+        .select('id')
 
       if (updateError) {
         console.error(`❌ [${game.id.substring(0, 8)}] Update error:`, updateError)
+        continue
+      }
+
+      // Si l'update n'a rien modifié, le jeu a été terminé entre-temps
+      if (!updateResult || updateResult.length === 0) {
+        console.log(`⚠️ [${game.id.substring(0, 8)}] Game was ended by another process, skipping`)
+        results.push({
+          gameId: game.id,
+          itemName,
+          clicks: 0,
+          reason: 'already_ended'
+        })
         continue
       }
 
@@ -596,13 +621,13 @@ async function endGame(
   supabase: SupabaseClient,
   game: GameData,
   itemName: string
-): Promise<void> {
+): Promise<boolean> {
   const winnerId = game.last_click_user_id || null
   const winnerUsername = game.last_click_username || 'Bot'
   const isBot = !winnerId
 
-  // Update game status
-  await supabase
+  // Update game status - ONLY if still active/final_phase (avoid race condition)
+  const { data: updateResult } = await supabase
     .from('games')
     .update({
       status: 'ended',
@@ -610,6 +635,14 @@ async function endGame(
       winner_id: winnerId,
     })
     .eq('id', game.id)
+    .in('status', ['active', 'final_phase'])
+    .select('id')
+
+  // Si l'update n'a rien modifié, le jeu était déjà terminé
+  if (!updateResult || updateResult.length === 0) {
+    console.log(`⚠️ [${game.id.substring(0, 8)}] Game was already ended, skipping winner creation`)
+    return false
+  }
 
   // Récupérer le username si c'est un vrai joueur
   let finalUsername = winnerUsername
@@ -650,4 +683,6 @@ async function endGame(
       }
     }
   }
+
+  return true
 }
