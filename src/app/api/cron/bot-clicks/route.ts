@@ -143,14 +143,18 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
+  // Délai aléatoire 0-15s pour éviter les clics trop prévisibles
+  const randomDelay = Math.floor(Math.random() * 15)
+
   // Support pour le cron décalé : ?delay=30 attend 30 secondes avant d'exécuter
   const delayParam = request.nextUrl.searchParams.get('delay')
-  if (delayParam) {
-    const delaySeconds = parseInt(delayParam, 10)
-    if (!isNaN(delaySeconds) && delaySeconds > 0 && delaySeconds <= 55) {
-      console.log(`[CRON] Waiting ${delaySeconds}s before execution...`)
-      await new Promise(resolve => setTimeout(resolve, delaySeconds * 1000))
-    }
+  const fixedDelay = delayParam ? parseInt(delayParam, 10) : 0
+
+  const totalDelay = (fixedDelay > 0 && fixedDelay <= 55 ? fixedDelay : 0) + randomDelay
+
+  if (totalDelay > 0) {
+    console.log(`[CRON] Waiting ${totalDelay}s (fixed: ${fixedDelay}s + random: ${randomDelay}s)`)
+    await new Promise(resolve => setTimeout(resolve, totalDelay * 1000))
   }
 
   try {
