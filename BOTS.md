@@ -145,9 +145,10 @@ INTERESTED_CLICK_CHANCE = 0.7          // 70%
 CASUAL_CLICK_CHANCE = 0.3              // 30%
 RARE_CLICK_CHANCE = 0.05               // 5%
 
-// Cron (ultra-réactif pour bots compétitifs)
-CRON_INTERVAL = 15 * 1000              // 15 secondes (bots très réactifs)
-CLICKS_PER_CRON_MAX = 4                // Max 4 clics par exécution
+// Cron (limitation à 1 minute par cron-job.org)
+// Compensation : Plus de clics + décalage étendu
+CRON_INTERVAL = 1 * 60 * 1000          // 1 minute
+CLICKS_PER_CRON_MAX = 6                // Max 6 clics par exécution
 ```
 
 ---
@@ -217,11 +218,11 @@ if (isRealPlayerClick(last_click_user_id)) {
 **Principe** : Les bots ne cliquent JAMAIS quand timer = 0. Ils cliquent entre 1s et 59s.
 
 **Comment ça fonctionne** :
-- Cron s'exécute toutes les **15 secondes** (ultra-réactif !)
+- Cron s'exécute toutes les **1 minute** (limitation cron-job.org)
 - Quand le cron tourne, il vérifie tous les jeux actifs
 - **IMPORTANT** : Pas tous les jeux sont traités à chaque tour ! (clics indépendants par jeu)
 - Pour chaque jeu, décision aléatoire si on traite ce jeu (selon urgence du timer)
-- Si jeu traité : décision si bots cliquent (selon probabilités + urgence)
+- Si jeu traité : génération de **plusieurs clics** (4-6 clics si urgent) étalés dans le temps
 - Si bots cliquent → Timer reset à 60s
 - Si bots ne cliquent pas → Timer continue de descendre → Peut atteindre 0 → Gagnant
 
@@ -232,40 +233,47 @@ if (isRealPlayerClick(last_click_user_id)) {
 - Timer < 5min : 40% (parfois traité)
 - Timer > 5min : 30% (rarement traité)
 
-**Réactivité selon urgence du timer** :
-- Timer < 10s : 2-4 clics quasi-instantanés (délai 200-800ms entre clics)
-- Timer < 30s : 1-3 clics très rapides (délai 500-1500ms)
-- Timer < 60s : 1-2 clics rapides (délai 1-3s)
-- Timer > 60s : 1 clic occasionnel (délai 2-6s)
+**Nombre de clics selon urgence** (compensation pour cron 1min) :
+- Timer < 10s : 4-6 clics (PANIQUE - multiple bots)
+- Timer < 30s : 3-5 clics (très actif)
+- Timer < 60s : 2-4 clics (actif)
+- Timer < 5min : 1-3 clics (occasionnel)
+- Timer > 5min : 1-2 clics (rare)
+
+**Délais entre clics** :
+- Timer < 10s : 200-800ms (ultra rapide)
+- Timer < 30s : 500-1500ms (rapide)
+- Timer < 60s : 1-3s (moyen)
+- Timer > 60s : 2-6s (relaxé)
 
 **Décalage entre jeux** :
-- Chaque jeu est traité avec un décalage de 0-8s
+- Chaque jeu est traité avec un décalage de 0-15s
 - Certains jeux peuvent être skipés (pas traités ce tour)
-- → Clics indépendants et naturels sur chaque jeu
+- Clics étalés sur toute la minute → Illusion de réactivité constante
 
 **Exemple de timeline (6 jeux actifs)** :
 ```
 17:40:00 - Cron démarre (6 jeux actifs)
-  → Jeu 1 (timer 8s) : Traité à +2s → 2 bots cliquent → Reset à 60s
+  → Jeu 1 (timer 8s) : Traité à +2s → 5 bots cliquent → Reset à 60s
   → Jeu 2 (timer 43s) : SKIP (random 35%) → Pas de clic
-  → Jeu 3 (timer 25s) : Traité à +7s → 1 bot clique → Reset à 60s
+  → Jeu 3 (timer 25s) : Traité à +7s → 4 bots cliquent → Reset à 60s
   → Jeu 4 (timer 52s) : SKIP (random 35%) → Pas de clic
-  → Jeu 5 (timer 12s) : Traité à +3s → 3 bots cliquent → Reset à 60s
+  → Jeu 5 (timer 12s) : Traité à +11s → 6 bots cliquent → Reset à 60s
   → Jeu 6 (timer 5min) : SKIP (random 70%) → Pas de clic
 
-17:40:15 - Cron suivant
-  → Jeu 1 (timer 45s) : Traité à +1s → 1 bot clique → Reset à 60s
-  → Jeu 2 (timer 28s) : Traité à +6s → 2 bots cliquent → Reset à 60s
+17:41:00 - Cron suivant (1 minute plus tard)
+  → Jeu 1 (timer 45s) : Traité à +3s → 3 bots cliquent → Reset à 60s
+  → Jeu 2 (timer 28s) : Traité à +9s → 4 bots cliquent → Reset à 60s
   → Jeu 3 (timer 52s) : SKIP (random 35%)
-  → Jeu 4 (timer 37s) : Traité à +4s → 1 bot clique → Reset à 60s
+  → Jeu 4 (timer 37s) : Traité à +14s → 3 bots cliquent → Reset à 60s
   → Jeu 5 (timer 47s) : SKIP (random 35%)
-  → Jeu 6 (timer 4min 45s) : Traité à +2s → 1 bot clique → Reset à 60s
+  → Jeu 6 (timer 4min 45s) : Traité à +5s → 2 bots cliquent → Reset à 60s
 
-17:40:30 - Cron suivant
+17:42:00 - Cron suivant
   → ...différents jeux traités aléatoirement...
 ```
 
-**Résultat** : Les bots semblent être des joueurs indépendants qui sont actifs sur différents jeux à différents moments. Très réaliste !
+**Résultat** : Avec 4-6 clics par jeu + décalage 0-15s + probabilités indépendantes, les bots semblent très actifs et réalistes malgré le cron à 1 minute !
 
 **Zones de clic** :
 - Bataille active (98%) : Bots cliquent presque toujours → Timer rarement < 30s
@@ -407,16 +415,21 @@ ORDER BY end_time ASC;
 ## 🔧 Configuration Cron-job.org
 
 **URL** : `https://clikzy.vercel.app/api/cron/bot-clicks`
-**Fréquence** : **Toutes les 15 secondes** (bots ultra-réactifs)
+**Fréquence** : **Toutes les 1 minute** (limitation plateforme)
 **Header** : `Authorization: Bearer ${CRON_SECRET}`
 
 **Configuration sur cron-job.org** :
 1. Va sur ton job existant
 2. Clique sur "Edit"
-3. Dans "Schedule", sélectionne "Every 15 seconds"
+3. Dans "Schedule", sélectionne **"Chaque 1 minute"**
 4. Sauvegarde
 
-**Syntaxe cron** : `*/15 * * * * *` (toutes les 15 secondes)
+**Syntaxe cron** : `* * * * *` (toutes les minutes)
+
+**Note** : La réactivité est maintenue grâce à :
+- 4-6 clics générés par jeu urgent
+- Décalage de 0-15s entre les jeux
+- Probabilités de traitement indépendantes
 
 **Où trouver CRON_SECRET** :
 - Production : Variables d'environnement Vercel

@@ -48,10 +48,11 @@ const SUSPENSE_CHANCE = 0.7                  // 70% du temps, attendre le suspen
 const PLAYER_RESPONSE_CHANCE = 0.98          // 98% de chance de répondre à un vrai joueur
 const REAL_PLAYER_WINDOW = 30 * 1000         // Considérer un clic comme "récent" si < 30s
 
-// Configuration du cron (toutes les 15 secondes pour réactivité maximale)
-const CRON_INTERVAL = 15 * 1000              // 15 secondes entre chaque exécution
+// Configuration du cron (toutes les 1 minute - limitation cron-job.org)
+// Pour compenser : plus de clics par exécution + décalage temporel étendu
+const CRON_INTERVAL = 1 * 60 * 1000          // 1 minute entre chaque exécution
 const CLICKS_PER_CRON_MIN = 0                // Min clics par jeu par exécution
-const CLICKS_PER_CRON_MAX = 4                // Max clics par jeu par exécution (plus en phase critique)
+const CLICKS_PER_CRON_MAX = 6                // Max clics par jeu par exécution
 
 // ============================================
 // HELPER FUNCTIONS
@@ -307,9 +308,9 @@ export async function GET(request: NextRequest) {
     let gameProcessingDelay = 0
 
     for (const game of activeGames) {
-      // Add random delay between games (0-8 seconds) to spread bot activity
-      // Creates natural staggered clicking pattern across different games
-      gameProcessingDelay += Math.floor(Math.random() * 8000)
+      // Add random delay between games (0-15 seconds) to spread bot activity
+      // With 1min cron, we spread clicks across the full minute for realism
+      gameProcessingDelay += Math.floor(Math.random() * 15000)
       const gameNow = now + gameProcessingDelay
 
       const endTime = game.end_time as number
@@ -444,20 +445,23 @@ export async function GET(request: NextRequest) {
       }
 
       // Determine number of clicks based on urgency
-      // More urgent = more bots clicking simultaneously (realistic competition)
+      // Cron à 1min = plus de clics par tour pour compenser
       let clickCount = 1
       if (timeLeft <= 10000) {
-        // < 10s: PANIQUE! 2-4 bots cliquent (ultra compétitif)
-        clickCount = 2 + Math.floor(Math.random() * 3) // 2-4 clics
+        // < 10s: PANIQUE! 4-6 bots cliquent (ultra compétitif)
+        clickCount = 4 + Math.floor(Math.random() * 3) // 4-6 clics
       } else if (timeLeft <= 30000) {
-        // < 30s: Très actif, 1-3 bots cliquent
-        clickCount = 1 + Math.floor(Math.random() * 3) // 1-3 clics
+        // < 30s: Très actif, 3-5 bots cliquent
+        clickCount = 3 + Math.floor(Math.random() * 3) // 3-5 clics
       } else if (timeLeft <= FINAL_PHASE_THRESHOLD) {
-        // < 60s: Phase finale, 1-2 bots cliquent
-        clickCount = 1 + Math.floor(Math.random() * 2) // 1-2 clics
+        // < 60s: Phase finale, 2-4 bots cliquent
+        clickCount = 2 + Math.floor(Math.random() * 3) // 2-4 clics
       } else if (timeLeft <= INTERESTED_THRESHOLD) {
-        // < 5min: Occasionnel
-        clickCount = Math.random() < 0.7 ? 1 : 2
+        // < 5min: Actif, 1-3 clics
+        clickCount = 1 + Math.floor(Math.random() * 3) // 1-3 clics
+      } else {
+        // > 5min: Occasionnel, 1-2 clics
+        clickCount = Math.random() < 0.5 ? 1 : 2
       }
 
       // Generate bot clicks with REALISTIC behavior
