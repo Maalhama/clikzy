@@ -327,6 +327,14 @@ async function endGame(
     finalUsername = profile?.username || winnerUsername
   }
 
+  // Récupérer la valeur de l'item
+  const { data: itemData } = await supabase
+    .from('items')
+    .select('retail_value')
+    .eq('id', game.item_id)
+    .single()
+  const itemValue = itemData?.retail_value || 0
+
   if (game.total_clicks > 0 || winnerUsername) {
     await supabase.from('winners').insert({
       game_id: game.id,
@@ -334,6 +342,7 @@ async function endGame(
       username: finalUsername,
       item_id: game.item_id,
       item_name: itemName,
+      item_value: itemValue,
       total_clicks_in_game: game.total_clicks || 0,
       is_bot: isBot,
     })
