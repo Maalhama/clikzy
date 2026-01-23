@@ -152,7 +152,7 @@ export async function GET(request: NextRequest) {
       .from('games')
       .select('id, end_time')
       .in('status', ['active', 'final_phase'])
-      .lt('end_time', preCheckNow + 30000) // Jeux avec < 30s restantes - URGENT, skip delay!
+      .lt('end_time', preCheckNow + 55000) // Jeux avec < 55s restantes - skip delay to be safe
 
     const hasCriticalGames = criticalGames && criticalGames.length > 0
 
@@ -246,28 +246,19 @@ export async function GET(request: NextRequest) {
             // Tant que la bataille est en cours (< 100%), le bot DOIT cliquer pour maintenir le timer
             // Priorité absolue: maintenir le timer au-dessus de 0
 
-            // Pour le suspense: seuil aléatoire entre 8-25s basé sur gameId
+            // Pour le suspense: seuil aléatoire entre 30-50s basé sur gameId
+            // Doit être > intervalle cron (60s) soustrait du reset (90s) = 30s minimum
             const clickThresholdSeed = hashString(`${game.id}-threshold-${Math.floor(now / 60000)}`)
-            const clickThreshold = 8000 + (clickThresholdSeed % 17000) // 8s à 25s
+            const clickThreshold = 30000 + (clickThresholdSeed % 20000) // 30s à 50s
 
-            // Probabilité de clic: 70% (pour varier les moments)
-            const clickProbSeed = hashString(`${game.id}-prob-${Math.floor(now / 30000)}`)
-            const shouldClickNow = (clickProbSeed % 100) < 70
-
-            if (timeLeft <= clickThreshold && shouldClickNow) {
-              // Timer critique - bot clique pour sauver la bataille
+            if (timeLeft <= clickThreshold) {
+              // Timer sous le seuil - bot clique pour maintenir la bataille
               updates.last_click_username = botUsername
               updates.last_click_user_id = null
               updates.end_time = now + 90000 // Reset à 90s
               action = `bot_click_final (${botUsername}) SAVED at ${Math.floor(timeLeft/1000)}s! [battle: ${Math.round(battleProgress * 100)}%/${battleDurationMin}min]`
-            } else if (timeLeft <= 5000) {
-              // URGENCE ABSOLUE: < 5s, toujours cliquer!
-              updates.last_click_username = botUsername
-              updates.last_click_user_id = null
-              updates.end_time = now + 90000
-              action = `bot_EMERGENCY (${botUsername}) at ${Math.floor(timeLeft/1000)}s! [battle: ${Math.round(battleProgress * 100)}%/${battleDurationMin}min]`
             } else {
-              // Attendre pour le suspense
+              // Attendre pour le suspense (timer descend de 90s vers ~30-50s)
               action = `waiting (threshold: ${Math.floor(clickThreshold/1000)}s) - ${Math.floor(timeLeft/1000)}s left [battle: ${Math.round(battleProgress * 100)}%/${battleDurationMin}min]`
             }
           } else {
