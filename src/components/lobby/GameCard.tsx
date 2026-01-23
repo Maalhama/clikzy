@@ -203,6 +203,18 @@ function formatDuration(ms: number): string {
   return `${hours}h${minutes % 60}min`
 }
 
+// Helper to format "time ago" (il y a...)
+function formatTimeAgo(ms: number): string {
+  const seconds = Math.floor(ms / 1000)
+  if (seconds < 60) return `il y a ${seconds}s`
+  const minutes = Math.floor(seconds / 60)
+  if (minutes < 60) return `il y a ${minutes}min`
+  const hours = Math.floor(minutes / 60)
+  if (hours < 24) return `il y a ${hours}h`
+  const days = Math.floor(hours / 24)
+  return `il y a ${days}j`
+}
+
 export const GameCard = memo(function GameCard({ game, index = 0, isFavorite = false, onToggleFavorite }: GameCardProps) {
   const [timeLeft, setTimeLeft] = useState(() =>
     game.end_time ? calculateTimeLeft(game.end_time) : 0
@@ -273,23 +285,24 @@ export const GameCard = memo(function GameCard({ game, index = 0, isFavorite = f
     return () => clearInterval(interval)
   }, [isUrgent, enteredFinalPhaseAt])
 
-  // Duration since game ended
+  // Duration since game ended (use ended_at if available)
   const [endedDuration, setEndedDuration] = useState<number>(0)
 
   useEffect(() => {
-    if (!isEnded || !game.end_time) {
+    const endedAt = game.ended_at ? new Date(game.ended_at).getTime() : game.end_time
+    if (!isEnded || !endedAt) {
       setEndedDuration(0)
       return
     }
 
     const updateDuration = () => {
-      setEndedDuration(Date.now() - game.end_time)
+      setEndedDuration(Date.now() - endedAt)
     }
 
     updateDuration()
     const interval = setInterval(updateDuration, 60000) // Update every minute for ended games
     return () => clearInterval(interval)
-  }, [isEnded, game.end_time])
+  }, [isEnded, game.end_time, game.ended_at])
 
   // Get leader/winner name: real one or generate a consistent fake one
   const leaderName = useMemo(() => {
@@ -436,13 +449,10 @@ export const GameCard = memo(function GameCard({ game, index = 0, isFavorite = f
       {/* Won badge */}
       {isEnded && (
         <div className="absolute top-3 right-3 z-20 flex items-center gap-1.5">
-          {/* Game duration badge (how long the game lasted) */}
-          {game.start_time && game.end_time && (
-            <div className="px-2 py-1 rounded-full bg-white/10 text-white/60 text-[10px] font-medium backdrop-blur-sm flex items-center gap-1">
-              <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              {formatDuration((game.ended_at ? new Date(game.ended_at).getTime() : game.end_time) - new Date(game.start_time).getTime())}
+          {/* Time ago badge (il y a...) */}
+          {endedDuration > 0 && (
+            <div className="px-2 py-1 rounded-full bg-white/10 text-white/60 text-[10px] font-medium backdrop-blur-sm">
+              {formatTimeAgo(endedDuration)}
             </div>
           )}
           {/* Status badge */}
@@ -749,6 +759,15 @@ export const GameCard = memo(function GameCard({ game, index = 0, isFavorite = f
               <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
             <span className="text-success/80 font-medium">Partie terminée</span>
+            {/* Total game duration badge */}
+            {game.start_time && (game.ended_at || game.end_time) && (
+              <span className="px-2 py-0.5 rounded-full bg-success/10 text-success/70 text-[10px] font-medium flex items-center gap-1">
+                <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                {formatDuration((game.ended_at ? new Date(game.ended_at).getTime() : game.end_time) - new Date(game.start_time).getTime())}
+              </span>
+            )}
           </div>
         ) : isWaiting ? (
           <div className="py-3 rounded-xl text-center font-bold text-sm bg-neon-purple/20 text-neon-purple border border-neon-purple/30 flex items-center justify-center gap-2">

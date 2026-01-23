@@ -230,10 +230,10 @@ export async function GET(request: NextRequest) {
             // Tant que la bataille est en cours (< 100%), le bot DOIT cliquer pour maintenir le timer
             // Priorité absolue: maintenir le timer au-dessus de 0
 
-            // Seuil aléatoire FIXE par jeu entre 20-40s pour désynchroniser les clics
-            // Avec 3 crons (intervalle ~20s), 20s minimum est safe (90s - 20s*3 = 30s marge)
+            // Seuil aléatoire FIXE par jeu entre 45-65s pour désynchroniser les clics
+            // Gap max entre crons = 40s (:20 à :00), donc seuil minimum = 45s pour garantir survie
             const clickThresholdSeed = hashString(`${game.id}-click-threshold`)
-            const clickThreshold = 20000 + (clickThresholdSeed % 20000) // 20s à 40s par jeu
+            const clickThreshold = 45000 + (clickThresholdSeed % 20000) // 45s à 65s par jeu
 
             if (timeLeft <= clickThreshold) {
               // Timer sous le seuil de ce jeu - bot clique
