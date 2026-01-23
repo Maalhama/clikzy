@@ -30,6 +30,7 @@ interface GameUpdate {
   last_click_username: string | null
   last_click_user_id: string | null
   status: 'waiting' | 'active' | 'final_phase' | 'ended'
+  battle_start_time: string | null
 }
 
 // Extended game type with final phase entry tracking
@@ -119,9 +120,15 @@ export function useLobbyRealtime(
       let enteredFinalPhaseAt = finalPhaseEntryRef.current[game.id]
       if (inFinalPhase && !enteredFinalPhaseAt) {
         // Game is in final phase but we haven't tracked it yet
-        // Use "now" as the entry time (best approximation for existing final phase games)
-        finalPhaseEntryRef.current[game.id] = now
-        enteredFinalPhaseAt = now
+        // Use battle_start_time from database if available, otherwise fall back to "now"
+        if (game.battle_start_time) {
+          const battleStartTimestamp = new Date(game.battle_start_time).getTime()
+          finalPhaseEntryRef.current[game.id] = battleStartTimestamp
+          enteredFinalPhaseAt = battleStartTimestamp
+        } else {
+          finalPhaseEntryRef.current[game.id] = now
+          enteredFinalPhaseAt = now
+        }
       }
 
       return {
@@ -257,9 +264,15 @@ export function useLobbyRealtime(
 
                 let enteredFinalPhaseAt = game.enteredFinalPhaseAt
                 if (nowInFinalPhase && !wasInFinalPhase && !finalPhaseEntryRef.current[game.id]) {
-                  // Game just entered final phase - record timestamp
-                  finalPhaseEntryRef.current[game.id] = now
-                  enteredFinalPhaseAt = now
+                  // Game just entered final phase - use battle_start_time from DB or record now
+                  if (updated.battle_start_time) {
+                    const battleStartTimestamp = new Date(updated.battle_start_time).getTime()
+                    finalPhaseEntryRef.current[game.id] = battleStartTimestamp
+                    enteredFinalPhaseAt = battleStartTimestamp
+                  } else {
+                    finalPhaseEntryRef.current[game.id] = now
+                    enteredFinalPhaseAt = now
+                  }
                 } else if (finalPhaseEntryRef.current[game.id]) {
                   enteredFinalPhaseAt = finalPhaseEntryRef.current[game.id]
                 }
