@@ -2,8 +2,10 @@
 
 import React, { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Trophy, Clock, Zap, Star, ChevronRight, X } from 'lucide-react';
+import { Trophy, Clock, Zap, ChevronRight, X, Sparkles } from 'lucide-react';
 import confetti from 'canvas-confetti';
+
+import { WheelIcon, ScratchIcon, PachinkoIcon, CreditIcon } from '@/components/mini-games/GameIcons';
 
 import { useCredits } from '@/contexts/CreditsContext';
 import { useCountdown } from '@/hooks/useCountdown';
@@ -34,7 +36,7 @@ const GAME_CONFIG = {
   wheel: {
     id: 'wheel' as MiniGameType,
     title: 'Roue de la Fortune',
-    icon: '🎡',
+    IconComponent: WheelIcon,
     description: 'Faites tourner la roue et tentez de gagner jusqu\'à 10 crédits !',
     color: 'var(--neon-purple)',
     glowClass: 'neon-glow',
@@ -44,7 +46,7 @@ const GAME_CONFIG = {
   scratch: {
     id: 'scratch' as MiniGameType,
     title: 'Carte à Gratter',
-    icon: '🎴',
+    IconComponent: ScratchIcon,
     description: 'Grattez la carte pour révéler votre gain instantanément !',
     color: 'var(--neon-pink)',
     glowClass: 'neon-glow-pink',
@@ -54,7 +56,7 @@ const GAME_CONFIG = {
   pachinko: {
     id: 'pachinko' as MiniGameType,
     title: 'Pachinko',
-    icon: '🎰',
+    IconComponent: PachinkoIcon,
     description: 'Lancez la bille et regardez-la tomber vers votre récompense !',
     color: 'var(--neon-blue)',
     glowClass: 'neon-glow-blue',
@@ -254,8 +256,11 @@ export default function MiniGamesClient({ initialEligibility }: MiniGamesClientP
               {/* Loading state */}
               {isLoading && (
                 <div className="p-12 text-center">
-                  <div className="text-6xl mb-4 animate-bounce">
-                    {GAME_CONFIG[activeGame].icon}
+                  <div className="w-24 h-24 mx-auto mb-4">
+                    {React.createElement(GAME_CONFIG[activeGame].IconComponent, {
+                      className: 'w-full h-full',
+                      animate: true
+                    })}
                   </div>
                   <p className="text-[var(--text-secondary)]">Chargement...</p>
                 </div>
@@ -293,32 +298,144 @@ export default function MiniGamesClient({ initialEligibility }: MiniGamesClientP
 
               {/* Result */}
               {result && (
-                <div className="relative z-10 text-center py-12 px-8">
+                <div className="relative z-10 text-center py-12 px-8 overflow-hidden">
+                  {/* Background glow effect */}
+                  {result.creditsWon > 0 && (
+                    <div className="absolute inset-0 pointer-events-none">
+                      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-[#FFB800] opacity-10 blur-[100px] rounded-full animate-pulse" />
+                    </div>
+                  )}
+
+                  {/* Floating sparkles for wins */}
+                  {result.creditsWon > 0 && (
+                    <div className="absolute inset-0 pointer-events-none overflow-hidden">
+                      {[...Array(8)].map((_, i) => (
+                        <motion.div
+                          key={i}
+                          initial={{
+                            opacity: 0,
+                            y: 100,
+                            x: Math.random() * 300 - 150,
+                            scale: 0.5
+                          }}
+                          animate={{
+                            opacity: [0, 1, 0],
+                            y: -100,
+                            rotate: 360,
+                            scale: [0.5, 1, 0.5]
+                          }}
+                          transition={{
+                            duration: 2 + Math.random(),
+                            repeat: Infinity,
+                            delay: i * 0.3
+                          }}
+                          className="absolute left-1/2"
+                          style={{ top: `${50 + Math.random() * 30}%` }}
+                        >
+                          <Sparkles
+                            size={16 + Math.random() * 16}
+                            className={i % 2 === 0 ? 'text-[#FFB800]' : 'text-[#9B5CFF]'}
+                          />
+                        </motion.div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Trophy icon with enhanced animation */}
                   <motion.div
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1, rotate: [0, 10, -10, 0] }}
-                    className={`w-24 h-24 ${result.creditsWon > 0 ? 'bg-[var(--success)]' : 'bg-[var(--bg-tertiary)]'} rounded-full flex items-center justify-center mx-auto mb-6 ${result.creditsWon > 0 ? 'neon-glow-success' : ''}`}
+                    initial={{ scale: 0, rotateY: 180 }}
+                    animate={{
+                      scale: 1,
+                      rotateY: 0,
+                      y: result.creditsWon > 0 ? [0, -10, 0] : 0
+                    }}
+                    transition={{
+                      scale: { type: "spring", stiffness: 200, damping: 15 },
+                      y: { duration: 2, repeat: Infinity, ease: "easeInOut" }
+                    }}
+                    className={`relative w-28 h-28 mx-auto mb-6`}
                   >
-                    <Trophy className={result.creditsWon > 0 ? 'text-[var(--bg-primary)]' : 'text-[var(--text-secondary)]'} size={48} />
+                    {/* Rotating ring for wins */}
+                    {result.creditsWon > 0 && (
+                      <motion.div
+                        animate={{ rotate: 360 }}
+                        transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
+                        className="absolute inset-[-8px] rounded-full border-2 border-dashed border-[#FFB800]/30"
+                      />
+                    )}
+                    <div className={`w-full h-full rounded-full flex items-center justify-center ${
+                      result.creditsWon >= 10
+                        ? 'bg-gradient-to-br from-[#FFB800] to-[#FF8C00] shadow-[0_0_40px_rgba(255,184,0,0.5)]'
+                        : result.creditsWon > 0
+                          ? 'bg-gradient-to-br from-[#9B5CFF] to-[#FF4FD8] shadow-[0_0_30px_rgba(155,92,255,0.4)]'
+                          : 'bg-[var(--bg-tertiary)]'
+                    }`}>
+                      <Trophy className={result.creditsWon > 0 ? 'text-white drop-shadow-lg' : 'text-[var(--text-secondary)]'} size={56} />
+                    </div>
                   </motion.div>
 
-                  <h2 className="text-4xl sm:text-5xl font-black text-white mb-2">
+                  {/* Result title with staggered letters for wins */}
+                  <motion.h2
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.2 }}
+                    className={`text-4xl sm:text-5xl font-black mb-2 ${
+                      result.creditsWon >= 10
+                        ? 'text-[#FFB800] drop-shadow-[0_0_20px_rgba(255,184,0,0.5)]'
+                        : 'text-white'
+                    }`}
+                  >
                     {result.creditsWon > 0 ? 'FÉLICITATIONS !' : 'PAS DE CHANCE !'}
-                  </h2>
-                  <p className="text-[var(--text-secondary)] text-xl mb-8">
+                  </motion.h2>
+
+                  <motion.p
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.3 }}
+                    className="text-[var(--text-secondary)] text-xl mb-6"
+                  >
                     {result.creditsWon > 0 ? 'Vous avez remporté' : 'Vous repartez avec'}
-                  </p>
+                  </motion.p>
 
-                  <div className={`text-6xl sm:text-7xl font-black ${result.creditsWon > 0 ? 'gradient-text-blue' : 'text-[var(--text-secondary)]'} mb-8`}>
-                    {result.creditsWon} <span className="text-2xl sm:text-3xl">CRÉDITS</span>
-                  </div>
+                  {/* Credits won with animated counter effect */}
+                  <motion.div
+                    initial={{ scale: 0.5, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ delay: 0.4, type: "spring", stiffness: 200 }}
+                    className="relative mb-8"
+                  >
+                    <div className={`flex items-center justify-center gap-3 ${
+                      result.creditsWon >= 10
+                        ? 'text-[#FFB800]'
+                        : result.creditsWon > 0
+                          ? 'text-white'
+                          : 'text-[var(--text-secondary)]'
+                    }`}>
+                      <CreditIcon className="w-12 h-12 sm:w-16 sm:h-16" />
+                      <span className="text-7xl sm:text-8xl font-black tracking-tight">
+                        {result.creditsWon}
+                      </span>
+                    </div>
+                    <span className={`text-lg sm:text-xl font-bold uppercase tracking-widest ${
+                      result.creditsWon > 0 ? 'text-white/60' : 'text-[var(--text-secondary)]'
+                    }`}>
+                      Crédits gagnés
+                    </span>
+                  </motion.div>
 
-                  <button
+                  <motion.button
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.5 }}
                     onClick={closeModal}
-                    className="gaming-btn-large w-full max-w-xs mx-auto"
+                    className={`w-full max-w-xs mx-auto py-4 px-8 rounded-xl font-black text-lg uppercase tracking-wider transition-all duration-300 ${
+                      result.creditsWon > 0
+                        ? 'bg-gradient-to-r from-[#9B5CFF] to-[#FF4FD8] text-white hover:shadow-[0_0_30px_rgba(155,92,255,0.5)] hover:scale-105'
+                        : 'bg-[var(--bg-tertiary)] text-white hover:bg-[var(--bg-secondary)]'
+                    }`}
                   >
                     CONTINUER
-                  </button>
+                  </motion.button>
                 </div>
               )}
             </motion.div>
@@ -330,7 +447,16 @@ export default function MiniGamesClient({ initialEligibility }: MiniGamesClientP
 }
 
 interface GameCardProps {
-  config: typeof GAME_CONFIG['wheel'];
+  config: {
+    id: MiniGameType;
+    title: string;
+    IconComponent: React.ComponentType<{ className?: string; animate?: boolean }>;
+    description: string;
+    color: string;
+    glowClass: string;
+    textClass: string;
+    gradient: string;
+  };
   eligibility: { canPlay: boolean; nextPlayAt: string | null };
   onPlay: () => void;
   index: number;
@@ -355,13 +481,13 @@ function GameCard({ config, eligibility, onPlay, index }: GameCardProps) {
       <div className={`absolute top-0 right-0 w-16 h-16 bg-gradient-to-br ${config.gradient} opacity-20 clip-angle-sm`} />
 
       {/* Max Reward Badge */}
-      <div className="absolute top-4 left-4 flex items-center gap-1.5 px-3 py-1 bg-black/40 rounded-full border border-white/10">
-        <Star size={12} className="text-[var(--warning)] fill-[var(--warning)]" />
-        <span className="text-[10px] font-bold text-white uppercase tracking-tighter">Max: 10 Crédits</span>
+      <div className="absolute top-4 left-4 flex items-center gap-1.5 px-3 py-1.5 bg-black/60 rounded-full border border-[#FFB800]/30 backdrop-blur-sm">
+        <CreditIcon className="w-4 h-4" />
+        <span className="text-[10px] font-bold text-[#FFB800] uppercase tracking-tighter">Max: 10</span>
       </div>
 
-      <div className={`text-7xl my-8 transition-transform duration-500 group-hover:scale-110 group-hover:rotate-12 ${isAvailable ? config.glowClass : 'opacity-40 grayscale'}`}>
-        {config.icon}
+      <div className={`w-24 h-24 my-8 transition-transform duration-500 group-hover:scale-110 ${isAvailable ? '' : 'opacity-40 grayscale'}`}>
+        <config.IconComponent className="w-full h-full" animate={isAvailable} />
       </div>
 
       <h3 className={`text-2xl font-black mb-3 ${isAvailable ? config.textClass : 'text-[var(--text-secondary)]'}`}>
