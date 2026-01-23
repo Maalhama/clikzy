@@ -62,7 +62,7 @@ const LOCAL_PRODUCTS = [
 function getProductImage(itemName: string, itemId: string): string {
   const nameLower = itemName.toLowerCase()
 
-  // Apple products
+  // Apple products (iPhone 17, etc.)
   if (nameLower.includes('iphone')) return '/products/iphone-15-pro.svg'
   if (nameLower.includes('macbook')) return '/products/macbook-pro.svg'
   if (nameLower.includes('airpods max')) return '/products/airpods-max.svg'
@@ -70,28 +70,46 @@ function getProductImage(itemName: string, itemId: string): string {
   if (nameLower.includes('ipad')) return '/products/ipad-pro.svg'
   if (nameLower.includes('apple watch')) return '/products/apple-watch.svg'
   if (nameLower.includes('imac')) return '/products/imac.svg'
+  if (nameLower.includes('apple pencil')) return '/products/ipad-pro.svg'
+  if (nameLower.includes('magic keyboard')) return '/products/gaming-keyboard.svg'
+  if (nameLower.includes('airtag')) return '/products/airpods-pro.svg'
 
   // Google products
   if (nameLower.includes('pixel') || nameLower.includes('google'))
     return '/products/google-pixel.svg'
 
-  // Gaming consoles & accessories
+  // OnePlus
+  if (nameLower.includes('oneplus')) return '/products/samsung-galaxy.svg'
+
+  // Gaming consoles & accessories (PS5 Pro, Switch 2, Quest 4, etc.)
   if (nameLower.includes('dualsense') || nameLower.includes('manette ps5') || nameLower.includes('controller ps5'))
     return '/products/ps5-controller.svg'
   if (nameLower.includes('playstation') || nameLower.includes('ps5'))
     return '/products/ps5.svg'
-  if (nameLower.includes('xbox')) return '/products/xbox-series-x.svg'
+  if (nameLower.includes('xbox') || nameLower.includes('manette xbox'))
+    return '/products/xbox-series-x.svg'
   if (nameLower.includes('nintendo') || nameLower.includes('switch'))
     return '/products/nintendo-switch.svg'
   if (nameLower.includes('steam deck')) return '/products/steam-deck.svg'
+  if (nameLower.includes('rog ally')) return '/products/steam-deck.svg'
   if (nameLower.includes('quest') || nameLower.includes('vr') || nameLower.includes('meta'))
     return '/products/meta-quest.svg'
 
-  // Gaming laptops / PC
-  if (nameLower.includes('rog') || nameLower.includes('asus') || nameLower.includes('gaming laptop') || nameLower.includes('razer') || nameLower.includes('alienware') || nameLower.includes('zephyrus'))
+  // Gaming laptops / PC (ROG Strix, etc.)
+  if (nameLower.includes('rog') || nameLower.includes('asus') || nameLower.includes('gaming laptop') || nameLower.includes('razer') || nameLower.includes('alienware') || nameLower.includes('zephyrus') || nameLower.includes('strix'))
     return '/products/gaming-laptop.svg'
 
-  // TVs - specific brands first
+  // Gaming peripherals (budget products)
+  if (nameLower.includes('razer') && (nameLower.includes('blackshark') || nameLower.includes('casque')))
+    return '/products/sony-headphones.svg'
+  if (nameLower.includes('steelseries') || nameLower.includes('arctis'))
+    return '/products/sony-headphones.svg'
+  if (nameLower.includes('elgato') || nameLower.includes('stream deck'))
+    return '/products/gaming-keyboard.svg'
+  if (nameLower.includes('seagate') || nameLower.includes('game drive'))
+    return '/products/gaming-keyboard.svg'
+
+  // TVs - specific brands first (G4, QN95D, Bravia 9, etc.)
   if (nameLower.includes('lg') && (nameLower.includes('tv') || nameLower.includes('oled')))
     return '/products/lg-tv.svg'
   if (nameLower.includes('samsung') && (nameLower.includes('tv') || nameLower.includes('qn')))
@@ -99,55 +117,82 @@ function getProductImage(itemName: string, itemId: string): string {
   if (nameLower.includes('sony') && (nameLower.includes('bravia') || nameLower.includes('tv')))
     return '/products/samsung-tv.svg'
 
-  // Samsung phones/watches
-  if (nameLower.includes('galaxy watch')) return '/products/apple-watch.svg'
+  // Samsung phones/watches (Galaxy S26, Watch 8, etc.)
+  if (nameLower.includes('galaxy watch') || nameLower.includes('galaxy buds'))
+    return '/products/apple-watch.svg'
   if (nameLower.includes('samsung') || nameLower.includes('galaxy'))
     return '/products/samsung-galaxy.svg'
+  if (nameLower.includes('smarttag')) return '/products/airpods-pro.svg'
 
-  // Audio - specific products first
+  // Audio - specific products first (Era 500, Stanmore IV, etc.)
+  if (nameLower.includes('sonos arc')) return '/products/soundbar.svg'
   if (nameLower.includes('sonos')) return '/products/sonos-speaker.svg'
   if (nameLower.includes('soundbar') || nameLower.includes('barre de son'))
     return '/products/soundbar.svg'
   if (nameLower.includes('marshall')) return '/products/bose-speaker.svg'
-  if (nameLower.includes('sony') && (nameLower.includes('casque') || nameLower.includes('headphone') || nameLower.includes('wh-1000')))
+  if (nameLower.includes('sony') && (nameLower.includes('casque') || nameLower.includes('headphone') || nameLower.includes('wh-1000') || nameLower.includes('wf-1000') || nameLower.includes('wh-ch')))
     return '/products/sony-headphones.svg'
   if (nameLower.includes('bose')) return '/products/bose-speaker.svg'
   if (nameLower.includes('jbl')) return '/products/jbl-speaker.svg'
+  if (nameLower.includes('beats')) return '/products/airpods-pro.svg'
+  if (nameLower.includes('ultimate ears') || nameLower.includes('boom'))
+    return '/products/jbl-speaker.svg'
 
   // Gaming peripherals
-  if (nameLower.includes('clavier') || nameLower.includes('keyboard') || nameLower.includes('logitech g pro x') && !nameLower.includes('superlight'))
+  if (nameLower.includes('clavier') || nameLower.includes('keyboard') || (nameLower.includes('logitech') && nameLower.includes('g915')))
     return '/products/gaming-keyboard.svg'
-  if (nameLower.includes('souris') || nameLower.includes('mouse') || nameLower.includes('superlight'))
+  if (nameLower.includes('souris') || nameLower.includes('mouse') || nameLower.includes('superlight') || nameLower.includes('deathadder'))
     return '/products/gaming-mouse.svg'
   if (nameLower.includes('chaise') || nameLower.includes('chair') || nameLower.includes('secretlab'))
     return '/products/gaming-chair.svg'
   if (nameLower.includes('ecran') || nameLower.includes('monitor') || nameLower.includes('odyssey'))
     return '/products/gaming-monitor.svg'
 
-  // Camera/Video - specific brands
+  // Camera/Video - specific brands (Alpha 7 V, EOS R8, Hero 14, etc.)
   if (nameLower.includes('sony') && (nameLower.includes('alpha') || nameLower.includes('a7')))
     return '/products/sony-camera.svg'
-  if (nameLower.includes('drone') || nameLower.includes('dji') || nameLower.includes('mavic') || nameLower.includes('avata') || nameLower.includes('pocket') || nameLower.includes('mini 4'))
+  if (nameLower.includes('drone') || nameLower.includes('dji') || nameLower.includes('mavic') || nameLower.includes('avata') || nameLower.includes('osmo') || nameLower.includes('mini 5'))
     return '/products/dji-drone.svg'
   if (nameLower.includes('gopro') || nameLower.includes('action cam') || nameLower.includes('hero'))
     return '/products/gopro-hero.svg'
   if (nameLower.includes('canon') || nameLower.includes('appareil photo') || nameLower.includes('eos'))
     return '/products/canon-camera.svg'
 
-  // Watches - specific brands
-  if (nameLower.includes('garmin') || nameLower.includes('fenix')) return '/products/garmin-watch.svg'
+  // Watches - specific brands (Fenix 8, Venu Sq 3, etc.)
+  if (nameLower.includes('garmin') || nameLower.includes('fenix') || nameLower.includes('venu'))
+    return '/products/garmin-watch.svg'
+  if (nameLower.includes('amazfit') || nameLower.includes('fitbit') || nameLower.includes('whoop') || nameLower.includes('huawei watch'))
+    return '/products/garmin-watch.svg'
+  if (nameLower.includes('xiaomi') && nameLower.includes('band'))
+    return '/products/garmin-watch.svg'
 
-  // Lifestyle - Dyson products
-  if (nameLower.includes('dyson') && (nameLower.includes('airwrap') || nameLower.includes('coiffure') || nameLower.includes('cheveux')))
+  // Lifestyle - Dyson products (V20, Airstrait, etc.)
+  if (nameLower.includes('dyson') && (nameLower.includes('airwrap') || nameLower.includes('airstrait') || nameLower.includes('coiffure') || nameLower.includes('cheveux')))
     return '/products/dyson-airwrap.svg'
-  if (nameLower.includes('dyson') || nameLower.includes('aspirateur') || nameLower.includes('v15'))
+  if (nameLower.includes('dyson') || nameLower.includes('aspirateur') || nameLower.includes('v15') || nameLower.includes('v20') || nameLower.includes('pure cool'))
     return '/products/dyson-vacuum.svg'
 
-  // Kitchen appliances
-  if (nameLower.includes('thermomix') || nameLower.includes('vorwerk') || nameLower.includes('robot cuisine') || nameLower.includes('tm6'))
+  // Kitchen appliances (TM7, Nespresso, Ninja, etc.)
+  if (nameLower.includes('thermomix') || nameLower.includes('vorwerk') || nameLower.includes('robot cuisine') || nameLower.includes('tm6') || nameLower.includes('tm7'))
+    return '/products/thermomix.svg'
+  if (nameLower.includes('nespresso') || nameLower.includes('ninja') || nameLower.includes('creami'))
     return '/products/thermomix.svg'
 
-  // Electric mobility - specific first
+  // Home smart devices
+  if (nameLower.includes('echo') || nameLower.includes('alexa') || nameLower.includes('nest hub'))
+    return '/products/sonos-speaker.svg'
+  if (nameLower.includes('philips hue') || nameLower.includes('nanoleaf'))
+    return '/products/sonos-speaker.svg'
+  if (nameLower.includes('ring') || nameLower.includes('eufy') || nameLower.includes('doorbell'))
+    return '/products/sonos-speaker.svg'
+  if (nameLower.includes('roomba') || nameLower.includes('irobot'))
+    return '/products/dyson-vacuum.svg'
+
+  // E-readers
+  if (nameLower.includes('kindle') || nameLower.includes('kobo') || nameLower.includes('liseuse'))
+    return '/products/ipad-pro.svg'
+
+  // Electric mobility - specific first (Scooter 5 Pro, S6, Cowboy 5, etc.)
   if (nameLower.includes('vespa')) return '/products/vespa.svg'
   if (nameLower.includes('bmw ce') || nameLower.includes('zero') || nameLower.includes('moto électrique') || nameLower.includes('moto electrique') || nameLower.includes('sr/f'))
     return '/products/electric-moto.svg'
@@ -165,12 +210,14 @@ function getProductImage(itemName: string, itemId: string): string {
     return '/products/louis-vuitton-bag.svg'
   if (nameLower.includes('jordan') || nameLower.includes('nike') || nameLower.includes('sneaker') || nameLower.includes('air'))
     return '/products/nike-jordan.svg'
-  if (nameLower.includes('ray-ban') || nameLower.includes('wayfarer') || nameLower.includes('lunettes'))
+  if (nameLower.includes('ray-ban') || nameLower.includes('wayfarer') || nameLower.includes('lunettes') || nameLower.includes('smart glasses'))
     return '/products/rayban-smart.svg'
 
-  // Gift cards
+  // Gift cards & accessories
   if (nameLower.includes('carte') || nameLower.includes('gift') || nameLower.includes('bon') || nameLower.includes('amazon'))
     return '/products/gift-card.svg'
+  if (nameLower.includes('anker') || nameLower.includes('power bank') || nameLower.includes('batterie') || nameLower.includes('magsafe') || nameLower.includes('belkin') || nameLower.includes('chargeur'))
+    return '/products/airpods-pro.svg'
 
   // TV fallback
   if (nameLower.includes('tv') || nameLower.includes('television') || nameLower.includes('oled') || nameLower.includes('qled'))
@@ -178,7 +225,7 @@ function getProductImage(itemName: string, itemId: string): string {
 
   // Watch fallback (after specific checks)
   if (nameLower.includes('watch') || nameLower.includes('montre'))
-    return '/products/rolex-watch.svg'
+    return '/products/apple-watch.svg'
 
   const hash = itemId
     .split('')

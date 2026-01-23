@@ -36,24 +36,24 @@ function formatRelativeTime(dateString: string): string {
   }
 }
 
-// Bot winners for toast notifications - diverse usernames
+// Bot winners for toast notifications - diverse usernames (2026 edition)
 const BOT_WINNERS = [
-  { username: 'Sami_paris', item: 'MacBook Pro', value: 2499, image: '/products/macbook-pro.svg' },
-  { username: 'EvaMusic', item: 'iPhone 15 Pro', value: 1299, image: '/products/iphone-15-pro.svg' },
-  { username: 'Ibra_sn', item: 'PlayStation 5', value: 549, image: '/products/ps5.svg' },
-  { username: 'MarineL', item: 'Sony WH-1000XM5', value: 379, image: '/products/sony-headphones.svg' },
-  { username: 'Bilal_69', item: 'AirPods Pro', value: 279, image: '/products/airpods-pro.svg' },
-  { username: 'ChloeGames', item: 'iPad Pro', value: 1099, image: '/products/ipad-pro.svg' },
-  { username: 'Amadou_ml', item: 'Apple Watch', value: 449, image: '/products/apple-watch.svg' },
-  { username: 'Sarah_lh', item: 'Samsung Galaxy S24', value: 1469, image: '/products/samsung-galaxy.svg' },
-  { username: 'Enzo_tls', item: 'MacBook Pro', value: 2499, image: '/products/macbook-pro.svg' },
-  { username: 'Khadija_ma', item: 'Nintendo Switch', value: 349, image: '/products/nintendo-switch.svg' },
-  { username: 'Lucas_44', item: 'AirPods Max', value: 579, image: '/products/airpods-max.svg' },
-  { username: 'Jade_bzh', item: 'Xbox Series X', value: 499, image: '/products/xbox-series-x.svg' },
-  { username: 'MohamedK', item: 'Steam Deck', value: 569, image: '/products/steam-deck.svg' },
-  { username: 'Lea_rns', item: 'Meta Quest 3', value: 549, image: '/products/meta-quest.svg' },
-  { username: 'Adama_ci', item: 'DJI Mini 4 Pro', value: 959, image: '/products/dji-drone.svg' },
-  { username: 'MathisPlay', item: 'GoPro Hero 12', value: 449, image: '/products/gopro-hero.svg' },
+  { username: 'Sami_paris', item: 'MacBook Pro M5', value: 4499, image: '/products/macbook-pro.svg' },
+  { username: 'EvaMusic', item: 'iPhone 17 Pro', value: 1229, image: '/products/iphone-15-pro.svg' },
+  { username: 'Ibra_sn', item: 'PlayStation 5 Pro', value: 799, image: '/products/ps5.svg' },
+  { username: 'MarineL', item: 'Sony WH-1000XM6', value: 399, image: '/products/sony-headphones.svg' },
+  { username: 'Bilal_69', item: 'AirPods Pro 3', value: 299, image: '/products/airpods-pro.svg' },
+  { username: 'ChloeGames', item: 'iPad Pro M4', value: 1499, image: '/products/ipad-pro.svg' },
+  { username: 'Amadou_ml', item: 'Apple Watch Ultra 3', value: 999, image: '/products/apple-watch.svg' },
+  { username: 'Sarah_lh', item: 'Samsung Galaxy S26 Ultra', value: 1399, image: '/products/samsung-galaxy.svg' },
+  { username: 'Enzo_tls', item: 'MacBook Air M4', value: 1599, image: '/products/macbook-pro.svg' },
+  { username: 'Khadija_ma', item: 'Nintendo Switch 2', value: 449, image: '/products/nintendo-switch.svg' },
+  { username: 'Lucas_44', item: 'AirPods Max 2', value: 549, image: '/products/airpods-max.svg' },
+  { username: 'Jade_bzh', item: 'Xbox Series X 2TB', value: 599, image: '/products/xbox-series-x.svg' },
+  { username: 'MohamedK', item: 'Steam Deck OLED 1TB', value: 679, image: '/products/steam-deck.svg' },
+  { username: 'Lea_rns', item: 'Meta Quest 4', value: 599, image: '/products/meta-quest.svg' },
+  { username: 'Adama_ci', item: 'DJI Mini 5 Pro', value: 999, image: '/products/dji-drone.svg' },
+  { username: 'MathisPlay', item: 'GoPro Hero 14', value: 499, image: '/products/gopro-hero.svg' },
 ]
 
 const TOAST_DURATION = 6000 // 6 seconds

@@ -72,7 +72,7 @@ const DEFAULT_PRODUCTS: Product[] = [
   },
   {
     id: '3',
-    name: 'MacBook Pro M3',
+    name: 'MacBook Pro M5',
     modelUrl: '/models/macbook_pro_m3_16_inch_2024.glb',
     fallbackType: 'laptop',
     fallbackColor: '#C0C0C0',
@@ -90,7 +90,7 @@ const DEFAULT_PRODUCTS: Product[] = [
   },
   {
     id: '5',
-    name: 'Apple Watch Series 9',
+    name: 'Apple Watch Series 11',
     modelUrl: '/models/apple_watch_series_9.glb',
     fallbackType: 'watch',
     fallbackColor: '#FF9500',

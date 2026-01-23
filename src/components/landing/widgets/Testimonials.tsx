@@ -21,21 +21,21 @@ interface TestimonialsProps {
   className?: string
 }
 
-// Bot testimonials - diverse usernames for social proof
+// Bot testimonials - diverse usernames for social proof (2026 edition)
 const BOT_TESTIMONIALS: Testimonial[] = [
   {
     id: '1',
     username: 'Nathan_bdx',
     text: "Le concept est simple mais vraiment addictif. J'ai gagné mon MacBook après 2 semaines. Livraison rapide, tout était conforme.",
-    itemWon: 'MacBook Pro 14"',
+    itemWon: 'MacBook Pro M5',
     rating: 5,
     date: 'Il y a 2 jours',
   },
   {
     id: '2',
     username: 'Aissatou_dk',
-    text: "J'étais sceptique au début mais le système est transparent. On voit les clics en temps réel. Ma PS5 est arrivée en 4 jours.",
-    itemWon: 'PlayStation 5',
+    text: "J'étais sceptique au début mais le système est transparent. On voit les clics en temps réel. Ma PS5 Pro est arrivée en 4 jours.",
+    itemWon: 'PlayStation 5 Pro',
     rating: 5,
     date: 'Il y a 1 semaine',
   },
@@ -43,7 +43,7 @@ const BOT_TESTIMONIALS: Testimonial[] = [
     id: '3',
     username: 'MaximeRun',
     text: "Le support répond vite et les paiements sont sécurisés. Bonne expérience globale, je recommande.",
-    itemWon: 'AirPods Pro 2',
+    itemWon: 'AirPods Pro 3',
     rating: 5,
     date: 'Il y a 3 jours',
   },
@@ -51,7 +51,7 @@ const BOT_TESTIMONIALS: Testimonial[] = [
     id: '4',
     username: 'Salma_mtp',
     text: "Interface claire et lots réguliers. J'ai gagné mon iPhone après plusieurs essais, le système est équilibré.",
-    itemWon: 'iPhone 15 Pro',
+    itemWon: 'iPhone 17 Pro',
     rating: 5,
     date: 'Il y a 5 jours',
   },
@@ -59,7 +59,7 @@ const BOT_TESTIMONIALS: Testimonial[] = [
     id: '5',
     username: 'Hugo_nantes',
     text: "Mes 10 clics gratuits quotidiens m'ont suffi pour gagner ! Le timer qui reset ajoute vraiment du suspense. Super concept.",
-    itemWon: 'Steam Deck OLED',
+    itemWon: 'Steam Deck OLED 1TB',
     rating: 5,
     date: 'Il y a 4 jours',
   },
@@ -67,7 +67,7 @@ const BOT_TESTIMONIALS: Testimonial[] = [
     id: '6',
     username: 'CamilleB_',
     text: "Enfin un jeu honnête où tout le monde a sa chance. J'ai reçu mon casque en parfait état. Je rejoue tous les jours !",
-    itemWon: 'Sony WH-1000XM5',
+    itemWon: 'Sony WH-1000XM6',
     rating: 5,
     date: 'Il y a 6 jours',
   },

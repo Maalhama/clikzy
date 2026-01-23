@@ -448,10 +448,10 @@ export function LandingClient({
             >
               {/* First set - reduced to 4 items for mobile performance */}
               {[
-                { name: 'iPhone 15 Pro', value: 1479, color: '#9B5CFF', image: '/products/iphone-15-pro.svg' },
-                { name: 'PlayStation 5', value: 549, color: '#3CCBFF', image: '/products/ps5.svg' },
-                { name: 'MacBook Pro', value: 2499, color: '#FF4FD8', image: '/products/macbook-pro.svg' },
-                { name: 'AirPods Pro', value: 279, color: '#00FF88', image: '/products/airpods-pro.svg' },
+                { name: 'iPhone 17 Pro', value: 1479, color: '#9B5CFF', image: '/products/iphone-15-pro.svg' },
+                { name: 'PlayStation 5 Pro', value: 799, color: '#3CCBFF', image: '/products/ps5.svg' },
+                { name: 'MacBook Pro M5', value: 4499, color: '#FF4FD8', image: '/products/macbook-pro.svg' },
+                { name: 'AirPods Pro 3', value: 299, color: '#00FF88', image: '/products/airpods-pro.svg' },
               ].map((prize, i) => (
                 <div
                   key={`a-${i}`}
@@ -477,10 +477,10 @@ export function LandingClient({
               ))}
               {/* Duplicate set for seamless loop */}
               {[
-                { name: 'iPhone 15 Pro', value: 1479, color: '#9B5CFF', image: '/products/iphone-15-pro.svg' },
-                { name: 'PlayStation 5', value: 549, color: '#3CCBFF', image: '/products/ps5.svg' },
-                { name: 'MacBook Pro', value: 2499, color: '#FF4FD8', image: '/products/macbook-pro.svg' },
-                { name: 'AirPods Pro', value: 279, color: '#00FF88', image: '/products/airpods-pro.svg' },
+                { name: 'iPhone 17 Pro', value: 1479, color: '#9B5CFF', image: '/products/iphone-15-pro.svg' },
+                { name: 'PlayStation 5 Pro', value: 799, color: '#3CCBFF', image: '/products/ps5.svg' },
+                { name: 'MacBook Pro M5', value: 4499, color: '#FF4FD8', image: '/products/macbook-pro.svg' },
+                { name: 'AirPods Pro 3', value: 299, color: '#00FF88', image: '/products/airpods-pro.svg' },
               ].map((prize, i) => (
                 <div
                   key={`b-${i}`}
@@ -885,7 +885,7 @@ export function LandingClient({
           {/* Compact winners list */}
           <div className="space-y-2">
             {(recentWinners.length > 0 ? recentWinners.slice(0, 4) : [
-              { id: '1', username: 'Alex42', item_name: 'iPhone 15 Pro', item_value: 1299, won_at: new Date().toISOString() },
+              { id: '1', username: 'Alex42', item_name: 'iPhone 17 Pro', item_value: 1229, won_at: new Date().toISOString() },
               { id: '2', username: 'GamerPro', item_name: 'PS5', item_value: 549, won_at: new Date().toISOString() },
               { id: '3', username: 'LuckyOne', item_name: 'AirPods Pro', item_value: 279, won_at: new Date().toISOString() },
               { id: '4', username: 'WinnerX', item_name: 'Nintendo Switch', item_value: 329, won_at: new Date().toISOString() },
@@ -968,7 +968,7 @@ export function LandingClient({
               <div className="winners-marquee-track">
                 <div className="winners-marquee-content">
                   {(recentWinners.length > 0 ? recentWinners : [
-                    { id: '1', username: 'Alex42', item_name: 'iPhone 15 Pro', item_value: 1299, won_at: new Date().toISOString() },
+                    { id: '1', username: 'Alex42', item_name: 'iPhone 17 Pro', item_value: 1229, won_at: new Date().toISOString() },
                     { id: '2', username: 'GamerPro', item_name: 'PS5', item_value: 549, won_at: new Date().toISOString() },
                     { id: '3', username: 'LuckyOne', item_name: 'AirPods Pro', item_value: 279, won_at: new Date().toISOString() },
                     { id: '4', username: 'WinnerX', item_name: 'Nintendo Switch', item_value: 329, won_at: new Date().toISOString() },
@@ -982,7 +982,7 @@ export function LandingClient({
                 </div>
                 <div className="winners-marquee-content">
                   {(recentWinners.length > 0 ? recentWinners : [
-                    { id: '1', username: 'Alex42', item_name: 'iPhone 15 Pro', item_value: 1299, won_at: new Date().toISOString() },
+                    { id: '1', username: 'Alex42', item_name: 'iPhone 17 Pro', item_value: 1229, won_at: new Date().toISOString() },
                     { id: '2', username: 'GamerPro', item_name: 'PS5', item_value: 549, won_at: new Date().toISOString() },
                     { id: '3', username: 'LuckyOne', item_name: 'AirPods Pro', item_value: 279, won_at: new Date().toISOString() },
                     { id: '4', username: 'WinnerX', item_name: 'Nintendo Switch', item_value: 329, won_at: new Date().toISOString() },

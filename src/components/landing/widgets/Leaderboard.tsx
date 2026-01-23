@@ -28,29 +28,29 @@ interface LeaderboardProps {
   className?: string
 }
 
-// Bot winners data - realistic winners with diverse usernames
+// Bot winners data - realistic winners with diverse usernames (2026 edition)
 // Different players for each period to show variety
 const BOT_WINNERS_DATA = {
   today: [
-    { rank: 1, username: 'Djibril_sn', wins: 2, totalValue: 2499, items: ['MacBook Pro 14"'] },
-    { rank: 2, username: 'ClaraMusic', wins: 1, totalValue: 1229, items: ['iPhone 15 Pro'] },
-    { rank: 3, username: 'Rayan_mtl', wins: 1, totalValue: 549, items: ['PlayStation 5'] },
-    { rank: 4, username: 'MelinaParis', wins: 1, totalValue: 379, items: ['Sony WH-1000XM5'] },
-    { rank: 5, username: 'Abdou_221', wins: 1, totalValue: 279, items: ['AirPods Pro 2'] },
+    { rank: 1, username: 'Djibril_sn', wins: 2, totalValue: 4499, items: ['MacBook Pro M5'] },
+    { rank: 2, username: 'ClaraMusic', wins: 1, totalValue: 1229, items: ['iPhone 17 Pro'] },
+    { rank: 3, username: 'Rayan_mtl', wins: 1, totalValue: 799, items: ['PlayStation 5 Pro'] },
+    { rank: 4, username: 'MelinaParis', wins: 1, totalValue: 399, items: ['Sony WH-1000XM6'] },
+    { rank: 5, username: 'Abdou_221', wins: 1, totalValue: 299, items: ['AirPods Pro 3'] },
   ],
   week: [
-    { rank: 1, username: 'Yasmine_dz', wins: 5, totalValue: 4507, items: ['MacBook Pro', 'iPhone 15 Pro', 'AirPods Pro'] },
-    { rank: 2, username: 'TomGamer78', wins: 4, totalValue: 3728, items: ['MacBook Pro', 'iPhone 15 Pro'] },
-    { rank: 3, username: 'Fatou_ndiaye', wins: 3, totalValue: 1377, items: ['PlayStation 5', 'Steam Deck', 'AirPods Pro'] },
-    { rank: 4, username: 'Alex_Lyon', wins: 2, totalValue: 1608, items: ['iPhone 15 Pro', 'Sony WH-1000XM5'] },
-    { rank: 5, username: 'Ines_bzh', wins: 2, totalValue: 1048, items: ['Xbox Series X', 'Meta Quest 3'] },
+    { rank: 1, username: 'Yasmine_dz', wins: 5, totalValue: 6027, items: ['MacBook Pro M5', 'iPhone 17 Pro', 'AirPods Pro 3'] },
+    { rank: 2, username: 'TomGamer78', wins: 4, totalValue: 5728, items: ['MacBook Pro M5', 'iPhone 17 Pro'] },
+    { rank: 3, username: 'Fatou_ndiaye', wins: 3, totalValue: 1777, items: ['PlayStation 5 Pro', 'Steam Deck OLED', 'AirPods Pro 3'] },
+    { rank: 4, username: 'Alex_Lyon', wins: 2, totalValue: 1628, items: ['iPhone 17 Pro', 'Sony WH-1000XM6'] },
+    { rank: 5, username: 'Ines_bzh', wins: 2, totalValue: 1198, items: ['Xbox Series X 2TB', 'Meta Quest 4'] },
   ],
   month: [
-    { rank: 1, username: 'Moussa_pro', wins: 12, totalValue: 8686, items: ['MacBook Pro x2', 'iPhone 15 Pro x3'] },
-    { rank: 2, username: 'JulieStyle', wins: 8, totalValue: 5957, items: ['MacBook Pro', 'Samsung Galaxy S24 x2'] },
-    { rank: 3, username: 'Karim_tunis', wins: 6, totalValue: 3327, items: ['PlayStation 5 x2', 'iPhone 15 Pro'] },
-    { rank: 4, username: 'LenaGaming', wins: 5, totalValue: 2987, items: ['iPhone 15 Pro', 'Sony WH-1000XM5 x2'] },
-    { rank: 5, username: 'Omar_casa', wins: 4, totalValue: 1656, items: ['Nintendo Switch', 'AirPods Max x2'] },
+    { rank: 1, username: 'Moussa_pro', wins: 12, totalValue: 12686, items: ['MacBook Pro M5 x2', 'iPhone 17 Pro x3'] },
+    { rank: 2, username: 'JulieStyle', wins: 8, totalValue: 7297, items: ['MacBook Pro M5', 'Samsung Galaxy S26 Ultra x2'] },
+    { rank: 3, username: 'Karim_tunis', wins: 6, totalValue: 3827, items: ['PlayStation 5 Pro x2', 'iPhone 17 Pro'] },
+    { rank: 4, username: 'LenaGaming', wins: 5, totalValue: 3027, items: ['iPhone 17 Pro', 'Sony WH-1000XM6 x2'] },
+    { rank: 5, username: 'Omar_casa', wins: 4, totalValue: 1996, items: ['Nintendo Switch 2', 'AirPods Max 2 x2'] },
   ],
 }
 

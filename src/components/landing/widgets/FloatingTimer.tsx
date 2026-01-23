@@ -6,20 +6,20 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useSounds } from '@/hooks/useSounds'
 import { useIsMobile } from '@/hooks/useIsMobile'
 
-// Fake products for non-logged-in users (urgency marketing)
+// Fake products for non-logged-in users (urgency marketing) - 2026 edition
 const FAKE_PRODUCTS = [
-  'iPhone 15 Pro',
-  'PlayStation 5',
-  'MacBook Air M3',
-  'Nintendo Switch OLED',
-  'AirPods Pro 2',
-  'Apple Watch Ultra',
-  'Samsung Galaxy S24',
-  'Xbox Series X',
-  'iPad Pro 12.9"',
-  'Meta Quest 3',
-  'Sony WH-1000XM5',
-  'DJI Mini 4 Pro',
+  'iPhone 17 Pro Max',
+  'PlayStation 5 Pro',
+  'MacBook Air M4',
+  'Nintendo Switch 2',
+  'AirPods Pro 3',
+  'Apple Watch Ultra 3',
+  'Samsung Galaxy S26 Ultra',
+  'Xbox Series X 2TB',
+  'iPad Pro M4',
+  'Meta Quest 4',
+  'Sony WH-1000XM6',
+  'DJI Mini 5 Pro',
 ]
 
 interface FloatingTimerProps {

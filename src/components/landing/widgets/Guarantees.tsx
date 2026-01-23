@@ -53,12 +53,12 @@ const GUARANTEES = [
   },
 ]
 
-// Delivery proofs with diverse usernames
+// Delivery proofs with diverse usernames - 2026 edition
 const DELIVERY_PROOFS = [
-  { id: 1, image: '/proofs/delivery-1.jpg', username: 'Rachid_75', item: 'iPhone 15 Pro' },
-  { id: 2, image: '/proofs/delivery-2.jpg', username: 'AmeliaFR', item: 'PlayStation 5' },
-  { id: 3, image: '/proofs/delivery-3.jpg', username: 'Youssef_dz', item: 'MacBook Air' },
-  { id: 4, image: '/proofs/delivery-4.jpg', username: 'ClementP', item: 'AirPods Pro' },
+  { id: 1, image: '/proofs/delivery-1.jpg', username: 'Rachid_75', item: 'iPhone 17 Pro' },
+  { id: 2, image: '/proofs/delivery-2.jpg', username: 'AmeliaFR', item: 'PlayStation 5 Pro' },
+  { id: 3, image: '/proofs/delivery-3.jpg', username: 'Youssef_dz', item: 'MacBook Air M4' },
+  { id: 4, image: '/proofs/delivery-4.jpg', username: 'ClementP', item: 'AirPods Pro 3' },
 ]
 
 export function Guarantees({ className = '' }: GuaranteesProps) {
