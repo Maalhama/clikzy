@@ -9,6 +9,7 @@ import { CreditPacksModal } from '@/components/modals/CreditPacksModal'
 import { GameHistorySection } from '@/components/profile/GameHistorySection'
 import { ReferralSection } from '@/components/profile/ReferralSection'
 import { BadgesSection } from '@/components/profile/BadgesSection'
+import { getProductSvg } from '@/lib/utils/productImages'
 import type { Badge } from '@/actions/badges'
 import {
   TrophyIcon,
@@ -51,42 +52,6 @@ interface ProfileClientProps {
     earned: number
     byRarity: { rarity: string; total: number; earned: number }[]
   }
-}
-
-// SVG products mapping
-function getProductImage(itemName: string, itemId: string): string {
-  const nameLower = itemName.toLowerCase()
-
-  if (nameLower.includes('iphone')) return '/products/iphone-15-pro.svg'
-  if (nameLower.includes('macbook')) return '/products/macbook-pro.svg'
-  if (nameLower.includes('airpods max')) return '/products/airpods-max.svg'
-  if (nameLower.includes('airpods')) return '/products/airpods-pro.svg'
-  if (nameLower.includes('ipad')) return '/products/ipad-pro.svg'
-  if (nameLower.includes('apple watch')) return '/products/apple-watch.svg'
-  if (nameLower.includes('playstation') || nameLower.includes('ps5')) return '/products/ps5.svg'
-  if (nameLower.includes('xbox')) return '/products/xbox-series-x.svg'
-  if (nameLower.includes('nintendo') || nameLower.includes('switch')) return '/products/nintendo-switch.svg'
-  if (nameLower.includes('samsung') || nameLower.includes('galaxy')) return '/products/samsung-galaxy.svg'
-  if (nameLower.includes('drone') || nameLower.includes('dji')) return '/products/dji-drone.svg'
-  if (nameLower.includes('gopro')) return '/products/gopro-hero.svg'
-  if (nameLower.includes('sony') && nameLower.includes('casque')) return '/products/sony-headphones.svg'
-  if (nameLower.includes('dyson')) return '/products/dyson-vacuum.svg'
-  if (nameLower.includes('rolex')) return '/products/rolex-watch.svg'
-  if (nameLower.includes('jordan') || nameLower.includes('nike')) return '/products/nike-jordan.svg'
-  if (nameLower.includes('tv')) return '/products/samsung-tv.svg'
-
-  const products = [
-    '/products/iphone-15-pro.svg',
-    '/products/ps5.svg',
-    '/products/macbook-pro.svg',
-    '/products/airpods-pro.svg',
-    '/products/apple-watch.svg',
-    '/products/nintendo-switch.svg',
-    '/products/samsung-galaxy.svg',
-    '/products/dji-drone.svg',
-  ]
-  const hash = itemId.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0)
-  return products[hash % products.length]
 }
 
 // Calculate player level based on stats
@@ -496,7 +461,7 @@ function WinCard({ win, index }: { win: WinnerWithItem; index: number }) {
     >
       <div className="relative w-14 h-14 rounded-lg bg-bg-primary/50 flex-shrink-0 overflow-hidden">
         <Image
-          src={getProductImage(win.item_name, win.item_id)}
+          src={getProductSvg(win.item_name, win.item_id)}
           alt={win.item_name}
           fill
           className="object-contain p-1.5"

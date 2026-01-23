@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import Image from 'next/image'
 import { motion, AnimatePresence } from 'framer-motion'
+import { getProductSvg } from '@/lib/utils/productImages'
 import type { GameHistoryItem } from '@/actions/gameHistory'
 
 interface GameHistorySectionProps {
@@ -13,31 +14,6 @@ interface GameHistorySectionProps {
     wins: number
     winRate: number
   }
-}
-
-// SVG products mapping
-function getProductImage(itemName: string): string {
-  const nameLower = itemName.toLowerCase()
-
-  if (nameLower.includes('iphone')) return '/products/iphone-15-pro.svg'
-  if (nameLower.includes('macbook')) return '/products/macbook-pro.svg'
-  if (nameLower.includes('airpods max')) return '/products/airpods-max.svg'
-  if (nameLower.includes('airpods')) return '/products/airpods-pro.svg'
-  if (nameLower.includes('ipad')) return '/products/ipad-pro.svg'
-  if (nameLower.includes('apple watch')) return '/products/apple-watch.svg'
-  if (nameLower.includes('playstation') || nameLower.includes('ps5')) return '/products/ps5.svg'
-  if (nameLower.includes('xbox')) return '/products/xbox-series-x.svg'
-  if (nameLower.includes('nintendo') || nameLower.includes('switch')) return '/products/nintendo-switch.svg'
-  if (nameLower.includes('samsung') || nameLower.includes('galaxy')) return '/products/samsung-galaxy.svg'
-  if (nameLower.includes('drone') || nameLower.includes('dji')) return '/products/dji-drone.svg'
-  if (nameLower.includes('gopro')) return '/products/gopro-hero.svg'
-  if (nameLower.includes('sony') && nameLower.includes('casque')) return '/products/sony-headphones.svg'
-  if (nameLower.includes('dyson')) return '/products/dyson-vacuum.svg'
-  if (nameLower.includes('rolex')) return '/products/rolex-watch.svg'
-  if (nameLower.includes('jordan') || nameLower.includes('nike')) return '/products/nike-jordan.svg'
-  if (nameLower.includes('tv')) return '/products/samsung-tv.svg'
-
-  return '/products/default.svg'
 }
 
 export function GameHistorySection({ history, stats }: GameHistorySectionProps) {
@@ -124,7 +100,7 @@ function HistoryCard({ game, index }: { game: GameHistoryItem; index: number }) 
       {/* Product Image */}
       <div className="relative w-12 h-12 rounded-lg bg-bg-primary/50 flex-shrink-0 overflow-hidden">
         <Image
-          src={getProductImage(game.itemName)}
+          src={getProductSvg(game.itemName)}
           alt={game.itemName}
           fill
           className="object-contain p-1"

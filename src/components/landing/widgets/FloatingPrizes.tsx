@@ -3,58 +3,22 @@
 import { useRef, useState, useEffect } from 'react'
 import Image from 'next/image'
 import { GiftIcon } from '@/components/ui/GamingIcons'
+import { getProductSvg } from '@/lib/utils/productImages'
 
 interface Prize {
   id: string
   name: string
   value: number
   color: 'purple' | 'blue' | 'pink'
-  image: string
 }
 
 const PRIZES: Prize[] = [
-  {
-    id: '1',
-    name: 'iPhone 17 Pro Max',
-    value: 1479,
-    color: 'purple',
-    image: '/products/iphone-15-pro.svg',
-  },
-  {
-    id: '2',
-    name: 'PlayStation 5 Pro',
-    value: 799,
-    color: 'blue',
-    image: '/products/ps5.svg',
-  },
-  {
-    id: '3',
-    name: 'MacBook Pro M5',
-    value: 4499,
-    color: 'pink',
-    image: '/products/macbook-pro.svg',
-  },
-  {
-    id: '4',
-    name: 'AirPods Pro 3',
-    value: 299,
-    color: 'purple',
-    image: '/products/airpods-pro.svg',
-  },
-  {
-    id: '5',
-    name: 'Apple Watch Ultra 3',
-    value: 999,
-    color: 'blue',
-    image: '/products/apple-watch.svg',
-  },
-  {
-    id: '6',
-    name: 'iPad Pro M4',
-    value: 1499,
-    color: 'pink',
-    image: '/products/ipad-pro.svg',
-  },
+  { id: '1', name: 'iPhone 17 Pro Max', value: 1479, color: 'purple' },
+  { id: '2', name: 'PlayStation 5 Pro', value: 799, color: 'blue' },
+  { id: '3', name: 'MacBook Pro M5', value: 4499, color: 'pink' },
+  { id: '4', name: 'AirPods Pro 3', value: 299, color: 'purple' },
+  { id: '5', name: 'Apple Watch Ultra 3', value: 999, color: 'blue' },
+  { id: '6', name: 'iPad Pro M4', value: 1499, color: 'pink' },
 ]
 
 const getColorStyles = (color: Prize['color']) => {
@@ -194,7 +158,7 @@ export function FloatingPrizes() {
                       style={{ background: `linear-gradient(135deg, ${colors.hex}10, transparent)` }}
                     >
                       <Image
-                        src={prize.image}
+                        src={getProductSvg(prize.name)}
                         alt={prize.name}
                         fill
                         className="object-contain p-2 transition-transform duration-300 group-hover:scale-110"
