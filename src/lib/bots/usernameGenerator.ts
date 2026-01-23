@@ -55,6 +55,43 @@ const REALISTIC_USERNAMES = [
   // Style gaming
   'dark.emma', 'ice.lucas', 'fire.theo', 'shadow.hugo', 'light.lea',
   'storm.nathan', 'frost.enzo', 'blaze.tom', 'nova.clara', 'venom.paul',
+
+  // ========== 100 NOUVEAUX PSEUDOS ==========
+
+  // Style Discord/Gaming moderne
+  'zKenzo', 'xMatis', 'iLouna', 'oRaphael', 'zAya', 'xKillian', 'iMaelys',
+  'NotLiam', 'NotMila', 'ImAxel', 'ImZoe', 'itzGabin', 'itzLola',
+  // Style TikTok français
+  'camille.off', 'arthur.ofc', 'oceane.ttv', 'mathis.live', 'romane.vlog',
+  'jules.daily', 'alice.snap', 'ethan.gram', 'celia.tkt', 'nolan.yt',
+  // Style numéro département
+  'alex_13', 'marine_69', 'kevin_59', 'laura_33', 'dylan_44', 'melissa_06',
+  'jordan_31', 'anais_34', 'florian_67', 'oceane_35', 'bastien_38', 'eva_83',
+  // Style prénom rare français
+  'titouan_', 'garance.fr', 'apolline_', 'marius.off', 'celestin_', 'capucine.music',
+  'augustin_', 'victorine.fr', 'leandre_', 'ambroise.off', 'clementine_', 'elouan.bzh',
+  // Style Belgique/Suisse
+  'maxence.be', 'eloise_ch', 'baptiste.be', 'agathe_ch', 'corentin.be', 'margaux_ch',
+  'thibault.be', 'justine_ch', 'quentin.be', 'clemence_ch', 'valentin.be', 'amelie_ch',
+  // Style Quebec
+  'alexis.qc', 'laurie_mtl', 'gabriel.qc', 'audrey_514', 'olivier.qc', 'maude_mtl',
+  'philippe.qc', 'karine_418', 'simon.qc', 'melanie_qc', 'mathieu.mtl', 'catherine_qc',
+  // Style Maghreb étendu
+  'sami_dz', 'amira.ma', 'yacine_tn', 'salma.dz', 'anis_ma', 'ines.tn',
+  'zakaria_dz', 'asma.ma', 'oussama_tn', 'meryem.dz', 'aymen_ma', 'chaima.tn',
+  // Style Afrique de l'Ouest étendu
+  'abdou_ml', 'mariam.ci', 'amadou_bf', 'aissatou.gn', 'boubacar_ne', 'kadiatou.sn',
+  'souleymane_ml', 'fatoumata.ci', 'lamine_bf', 'mariama.gn', 'diallo_ne', 'binta.sn',
+  // Style lettres répétées moderne
+  'axeel_', 'noaah', 'liaam_', 'maellee', 'evaaa_', 'louiss',
+  'huugo', 'inees_', 'yaann', 'louuise', 'raphhael', 'cloee_',
+  // Style minimaliste
+  'mths', 'cml', 'jls', 'mrn', 'ncls', 'vltn', 'rmn', 'pln', 'clt', 'fbn',
+  // Style emoji/symbole (sans emoji)
+  'la.vie.en.rose', 'petit.soleil', 'coeur.de.lion', 'etoile.filante', 'fleur.de.lys',
+  // Style anglicisme français
+  'french.boy', 'paris.girl', 'lyon.vibes', 'marseille.life', 'nice.mood',
+  'bordeaux.style', 'toulouse.gang', 'nantes.crew', 'lille.spirit', 'strasbourg.kid',
 ]
 
 /**
