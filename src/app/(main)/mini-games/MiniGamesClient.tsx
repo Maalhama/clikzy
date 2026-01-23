@@ -477,8 +477,17 @@ function GameCard({ config, eligibility, onPlay, index }: GameCardProps) {
       whileHover={{ y: -10 }}
       className="group relative glass rounded-2xl p-8 border border-[var(--bg-tertiary)] flex flex-col items-center text-center transition-all duration-300 hover:border-[var(--neon-purple)]/50 overflow-hidden"
     >
-      {/* Decorative Corner */}
-      <div className={`absolute top-0 right-0 w-16 h-16 bg-gradient-to-br ${config.gradient} opacity-20 clip-angle-sm`} />
+      {/* Decorative Corner Badge */}
+      <div className="absolute -top-1 -right-1">
+        {/* Glow effect */}
+        <div className={`absolute inset-0 bg-gradient-to-br ${config.gradient} blur-xl opacity-40`} />
+        {/* Ribbon badge */}
+        <div className={`relative bg-gradient-to-br ${config.gradient} text-white text-[9px] font-black uppercase tracking-wider px-6 py-1.5 transform rotate-45 translate-x-4 translate-y-3 shadow-lg`}>
+          <span className="drop-shadow-[0_1px_1px_rgba(0,0,0,0.5)]">Gratuit</span>
+        </div>
+        {/* Corner accent */}
+        <div className={`absolute top-0 right-0 w-12 h-12 bg-gradient-to-br ${config.gradient} opacity-20 rounded-bl-2xl`} />
+      </div>
 
       {/* Max Reward Badge */}
       <div className="absolute top-4 left-4 flex items-center gap-1.5 px-3 py-1.5 bg-black/60 rounded-full border border-[#FFB800]/30 backdrop-blur-sm">
