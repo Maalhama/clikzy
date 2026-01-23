@@ -145,34 +145,19 @@ export async function GET(request: NextRequest) {
   try {
     const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
-    // D'abord vérifier s'il y a des jeux en phase critique (< 45s)
-    // Si oui, on saute le délai pour ne pas manquer la bataille
-    const preCheckNow = Date.now()
-    const { data: criticalGames } = await supabase
-      .from('games')
-      .select('id, end_time')
-      .in('status', ['active', 'final_phase'])
-      .lt('end_time', preCheckNow + 65000) // Jeux avec < 65s restantes - skip delay (clic à 60s)
+    // 3 crons configurés avec delays 0, 20, 40 pour un intervalle effectif de ~20s
+    // Cron 1: /api/cron/bot-clicks (delay=0)
+    // Cron 2: /api/cron/bot-clicks?delay=20
+    // Cron 3: /api/cron/bot-clicks?delay=40
+    const delayParam = request.nextUrl.searchParams.get('delay')
+    const fixedDelay = delayParam ? parseInt(delayParam, 10) : 0
+    const validDelay = [0, 20, 40].includes(fixedDelay) ? fixedDelay : 0
 
-    const hasCriticalGames = criticalGames && criticalGames.length > 0
-
-    // Support pour 3 crons décalés (timeout cron-job.org = 30s, donc max 25s)
-    // SAUF si des jeux sont en phase critique
-    if (!hasCriticalGames) {
-      const delayParam = request.nextUrl.searchParams.get('delay')
-      const fixedDelay = delayParam ? parseInt(delayParam, 10) : 0
-      const validFixedDelay = fixedDelay > 0 && fixedDelay <= 20 ? fixedDelay : 0
-
-      const maxRandomDelay = Math.max(5, 25 - validFixedDelay)
-      const randomDelay = Math.floor(Math.random() * maxRandomDelay)
-      const totalDelay = validFixedDelay + randomDelay
-
-      if (totalDelay > 0) {
-        console.log(`[CRON] Waiting ${totalDelay}s (fixed: ${validFixedDelay}s + random: ${randomDelay}s)`)
-        await new Promise(resolve => setTimeout(resolve, totalDelay * 1000))
-      }
+    if (validDelay > 0) {
+      console.log(`[CRON] Waiting ${validDelay}s (cron ${validDelay === 20 ? '2' : '3'} of 3)`)
+      await new Promise(resolve => setTimeout(resolve, validDelay * 1000))
     } else {
-      console.log(`[CRON] CRITICAL: ${criticalGames.length} game(s) in final phase - skipping delay!`)
+      console.log(`[CRON] No delay (cron 1 of 3)`)
     }
 
     const now = Date.now()
@@ -246,16 +231,16 @@ export async function GET(request: NextRequest) {
             // Tant que la bataille est en cours (< 100%), le bot DOIT cliquer pour maintenir le timer
             // Priorité absolue: maintenir le timer au-dessus de 0
 
-            // TOUJOURS cliquer si timer < 60s (= intervalle cron) pour garantir la survie
-            // Le suspense vient de la descente de 90s → 60s (30 secondes de tension)
-            if (timeLeft <= 60000) {
-              // Timer critique - bot DOIT cliquer
+            // Avec 3 crons (intervalle ~20s), on peut cliquer à 25s pour max suspense
+            // Le timer descendra de 90s → ~25s avant chaque clic
+            if (timeLeft <= 25000) {
+              // Timer bas - bot clique pour sauver
               updates.last_click_username = botUsername
               updates.last_click_user_id = null
               updates.end_time = now + 90000 // Reset à 90s
               action = `bot_click_final (${botUsername}) SAVED at ${Math.floor(timeLeft/1000)}s! [battle: ${Math.round(battleProgress * 100)}%/${battleDurationMin}min]`
             } else {
-              // Timer > 60s - laisser descendre pour le suspense
+              // Timer > 25s - laisser descendre pour le suspense (90s → 25s = 65s de tension!)
               action = `waiting - ${Math.floor(timeLeft/1000)}s left [battle: ${Math.round(battleProgress * 100)}%/${battleDurationMin}min]`
             }
           } else {
