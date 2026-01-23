@@ -190,6 +190,10 @@ Les crons sont configurés sur **cron-job.org** (pas GitHub Actions) :
 
 Header requis : `Authorization: Bearer [CRON_SECRET]`
 
+## TODO - À faire
+
+- [ ] **Resend** : Créer un compte sur resend.com quand le nom de domaine sera acheté, puis ajouter `RESEND_API_KEY` dans `.env.local`
+
 ## Notes
 
 ### Notifications audio
