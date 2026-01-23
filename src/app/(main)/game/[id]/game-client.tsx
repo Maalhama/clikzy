@@ -460,7 +460,7 @@ export function GameClient({
                       <div
                         suppressHydrationWarning
                         className={`h-full rounded-full transition-all duration-300 ${isUrgent ? 'bg-danger' : 'bg-neon-blue'}`}
-                        style={{ width: `${Math.min(100, (displayTimeLeft / 60000) * 100)}%` }}
+                        style={{ width: `${Math.min(100, (displayTimeLeft / 90000) * 100)}%` }}
                       />
                     </div>
                   )}
@@ -834,7 +834,7 @@ export function GameClient({
                       <div
                         suppressHydrationWarning
                         className={`h-full rounded-full transition-all duration-300 ${isUrgent ? 'bg-danger' : 'bg-neon-blue'}`}
-                        style={{ width: `${Math.min(100, (displayTimeLeft / 60000) * 100)}%` }}
+                        style={{ width: `${Math.min(100, (displayTimeLeft / 90000) * 100)}%` }}
                       />
                     </div>
                   )}
