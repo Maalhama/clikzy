@@ -1,0 +1,16 @@
+# Robots.txt for CLIKZY
+# https://clikzy.fr
+
+User-agent: *
+Allow: /
+
+# Sitemaps
+Sitemap: https://clikzy.fr/sitemap.xml
+
+# Disallow admin and API routes
+Disallow: /api/
+Disallow: /admin/
+
+# Disallow auth pages from indexing
+Disallow: /auth/callback
+Disallow: /reset-password
