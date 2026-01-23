@@ -13,11 +13,12 @@ interface PachinkoProps {
 const SLOTS = [0, 1, 2, 5, 10, 5, 2, 1, 0]
 const BOARD_WIDTH = 320
 const BOARD_HEIGHT = 400
-const BALL_RADIUS = 10
-const PEG_RADIUS = 6
-const GRAVITY = 0.3
-const BOUNCE = 0.7
-const FRICTION = 0.99
+const BALL_RADIUS = 12
+const PEG_RADIUS = 7
+const GRAVITY = 0.15 // Ralenti pour une descente plus douce
+const BOUNCE = 0.65
+const FRICTION = 0.995
+const MAX_VELOCITY = 4 // Limite la vitesse max
 
 interface Ball {
   x: number
@@ -87,72 +88,183 @@ export default function Pachinko({
     const ctx = canvas.getContext('2d')
     if (!ctx) return
 
-    // Clear
-    ctx.fillStyle = '#0B0F1A'
+    // Background gradient
+    const bgGradient = ctx.createLinearGradient(0, 0, 0, BOARD_HEIGHT)
+    bgGradient.addColorStop(0, '#0B0F1A')
+    bgGradient.addColorStop(0.5, '#0D1220')
+    bgGradient.addColorStop(1, '#0B0F1A')
+    ctx.fillStyle = bgGradient
     ctx.fillRect(0, 0, BOARD_WIDTH, BOARD_HEIGHT)
 
-    // Draw pegs
-    pegsRef.current.forEach((peg) => {
+    // Subtle grid pattern
+    ctx.strokeStyle = 'rgba(155, 92, 255, 0.05)'
+    ctx.lineWidth = 1
+    for (let i = 0; i < BOARD_WIDTH; i += 20) {
       ctx.beginPath()
-      ctx.arc(peg.x, peg.y, PEG_RADIUS, 0, Math.PI * 2)
+      ctx.moveTo(i, 0)
+      ctx.lineTo(i, BOARD_HEIGHT)
+      ctx.stroke()
+    }
+    for (let i = 0; i < BOARD_HEIGHT; i += 20) {
+      ctx.beginPath()
+      ctx.moveTo(0, i)
+      ctx.lineTo(BOARD_WIDTH, i)
+      ctx.stroke()
+    }
 
+    // Draw pegs with better visuals
+    pegsRef.current.forEach((peg, index) => {
+      // Outer glow
+      ctx.beginPath()
+      ctx.arc(peg.x, peg.y, PEG_RADIUS + 3, 0, Math.PI * 2)
       if (peg.hit) {
-        ctx.fillStyle = '#FF4FD8'
-        ctx.shadowColor = '#FF4FD8'
-        ctx.shadowBlur = 15
+        ctx.fillStyle = 'rgba(255, 79, 216, 0.3)'
       } else {
-        ctx.fillStyle = '#9B5CFF'
-        ctx.shadowColor = '#9B5CFF'
-        ctx.shadowBlur = 8
+        ctx.fillStyle = 'rgba(155, 92, 255, 0.2)'
+      }
+      ctx.fill()
+
+      // Main peg with gradient
+      const pegGradient = ctx.createRadialGradient(
+        peg.x - 2, peg.y - 2, 0,
+        peg.x, peg.y, PEG_RADIUS
+      )
+      if (peg.hit) {
+        pegGradient.addColorStop(0, '#FF8BED')
+        pegGradient.addColorStop(0.5, '#FF4FD8')
+        pegGradient.addColorStop(1, '#D434B1')
+      } else {
+        // Alternate colors based on row
+        const row = Math.floor(index / 10)
+        if (row % 2 === 0) {
+          pegGradient.addColorStop(0, '#B88BFF')
+          pegGradient.addColorStop(0.5, '#9B5CFF')
+          pegGradient.addColorStop(1, '#6E36FF')
+        } else {
+          pegGradient.addColorStop(0, '#6EDBFF')
+          pegGradient.addColorStop(0.5, '#3CCBFF')
+          pegGradient.addColorStop(1, '#1DA1D1')
+        }
       }
 
+      ctx.beginPath()
+      ctx.arc(peg.x, peg.y, PEG_RADIUS, 0, Math.PI * 2)
+      ctx.fillStyle = pegGradient
+      ctx.shadowColor = peg.hit ? '#FF4FD8' : '#9B5CFF'
+      ctx.shadowBlur = peg.hit ? 20 : 10
       ctx.fill()
       ctx.shadowBlur = 0
+
+      // Highlight
+      ctx.beginPath()
+      ctx.arc(peg.x - 2, peg.y - 2, 2, 0, Math.PI * 2)
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.6)'
+      ctx.fill()
     })
 
-    // Draw slots at bottom
+    // Draw slots at bottom with better design
     const slotWidth = BOARD_WIDTH / SLOTS.length
-    const slotY = BOARD_HEIGHT - 40
+    const slotY = BOARD_HEIGHT - 50
+    const slotHeight = 50
+
+    // Slots background
+    ctx.fillStyle = '#0A0E17'
+    ctx.fillRect(0, slotY - 5, BOARD_WIDTH, slotHeight + 5)
 
     SLOTS.forEach((value, i) => {
-      const x = i * slotWidth
+      const x = i * slotWidth + 2
+      const width = slotWidth - 4
 
-      // Slot background
-      ctx.fillStyle = value === 10 ? '#FFB800' : value === 0 ? '#1E2942' : '#141B2D'
-      ctx.fillRect(x + 2, slotY, slotWidth - 4, 40)
+      // Slot gradient based on value
+      const slotGradient = ctx.createLinearGradient(x, slotY, x, slotY + slotHeight)
+      if (value === 10) {
+        slotGradient.addColorStop(0, '#FFD700')
+        slotGradient.addColorStop(0.5, '#FFB800')
+        slotGradient.addColorStop(1, '#FF8C00')
+      } else if (value === 5) {
+        slotGradient.addColorStop(0, '#2D1A3D')
+        slotGradient.addColorStop(1, '#1A0F24')
+      } else if (value === 0) {
+        slotGradient.addColorStop(0, '#1E2942')
+        slotGradient.addColorStop(1, '#141B2D')
+      } else {
+        slotGradient.addColorStop(0, '#141B2D')
+        slotGradient.addColorStop(1, '#0B0F1A')
+      }
 
-      // Slot border
-      ctx.strokeStyle = value === 10 ? '#FFB800' : '#3CCBFF'
+      // Draw slot
+      ctx.fillStyle = slotGradient
+      ctx.beginPath()
+      ctx.roundRect(x, slotY, width, slotHeight, [4, 4, 0, 0])
+      ctx.fill()
+
+      // Slot border glow
+      ctx.strokeStyle = value === 10 ? '#FFB800' : value === 5 ? '#FF4FD8' : value === 0 ? '#3E4A5E' : '#3CCBFF'
       ctx.lineWidth = value === 10 ? 2 : 1
-      ctx.strokeRect(x + 2, slotY, slotWidth - 4, 40)
+      ctx.shadowColor = value === 10 ? '#FFB800' : value === 5 ? '#FF4FD8' : '#3CCBFF'
+      ctx.shadowBlur = value === 10 ? 10 : value === 5 ? 5 : 3
+      ctx.stroke()
+      ctx.shadowBlur = 0
 
-      // Value text
-      ctx.fillStyle = value === 10 ? '#0B0F1A' : value === 0 ? '#8B9BB4' : '#FFFFFF'
-      ctx.font = value === 10 ? 'bold 18px Inter' : '14px Inter'
+      // Value text with glow
+      ctx.fillStyle = value === 10 ? '#0B0F1A' : value === 0 ? '#4A5568' : '#FFFFFF'
+      ctx.font = value === 10 ? 'bold 20px Inter' : value === 5 ? 'bold 16px Inter' : '14px Inter'
       ctx.textAlign = 'center'
       ctx.textBaseline = 'middle'
-      ctx.fillText(value.toString(), x + slotWidth / 2, slotY + 20)
+      if (value === 10) {
+        ctx.shadowColor = '#FFB800'
+        ctx.shadowBlur = 5
+      }
+      ctx.fillText(value.toString(), x + width / 2, slotY + slotHeight / 2)
+      ctx.shadowBlur = 0
+
+      // Dividers between slots
+      if (i > 0) {
+        ctx.beginPath()
+        ctx.moveTo(i * slotWidth, slotY)
+        ctx.lineTo(i * slotWidth, slotY + slotHeight)
+        ctx.strokeStyle = '#9B5CFF'
+        ctx.lineWidth = 2
+        ctx.shadowColor = '#9B5CFF'
+        ctx.shadowBlur = 5
+        ctx.stroke()
+        ctx.shadowBlur = 0
+      }
     })
 
     // Draw ball if exists
     if (ballRef.current) {
       const ball = ballRef.current
-      ctx.beginPath()
-      ctx.arc(ball.x, ball.y, BALL_RADIUS, 0, Math.PI * 2)
 
+      // Ball trail/glow
+      ctx.beginPath()
+      ctx.arc(ball.x, ball.y, BALL_RADIUS + 8, 0, Math.PI * 2)
+      ctx.fillStyle = 'rgba(60, 203, 255, 0.2)'
+      ctx.fill()
+
+      // Main ball with gradient
       const gradient = ctx.createRadialGradient(
-        ball.x - 3, ball.y - 3, 0,
+        ball.x - 4, ball.y - 4, 0,
         ball.x, ball.y, BALL_RADIUS
       )
       gradient.addColorStop(0, '#FFFFFF')
-      gradient.addColorStop(0.5, '#3CCBFF')
+      gradient.addColorStop(0.3, '#8BE5FF')
+      gradient.addColorStop(0.6, '#3CCBFF')
       gradient.addColorStop(1, '#0066FF')
 
+      ctx.beginPath()
+      ctx.arc(ball.x, ball.y, BALL_RADIUS, 0, Math.PI * 2)
       ctx.fillStyle = gradient
       ctx.shadowColor = '#3CCBFF'
-      ctx.shadowBlur = 15
+      ctx.shadowBlur = 25
       ctx.fill()
       ctx.shadowBlur = 0
+
+      // Ball highlight
+      ctx.beginPath()
+      ctx.arc(ball.x - 4, ball.y - 4, 4, 0, Math.PI * 2)
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.8)'
+      ctx.fill()
     }
   }, [])
 
@@ -188,6 +300,10 @@ export default function Pachinko({
     // Apply gravity
     ball.vy += GRAVITY
     ball.vx *= FRICTION
+
+    // Cap velocity for smoother animation
+    ball.vy = Math.min(ball.vy, MAX_VELOCITY)
+    ball.vx = Math.max(-MAX_VELOCITY, Math.min(MAX_VELOCITY, ball.vx))
 
     // Move ball
     ball.x += ball.vx

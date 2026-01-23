@@ -28,44 +28,107 @@ export default function ScratchCard({
     const width = canvas.width
     const height = canvas.height
 
-    // Metallic gradient
+    // Dark neon gradient background
     const gradient = ctx.createLinearGradient(0, 0, width, height)
-    gradient.addColorStop(0, '#777b7e')
-    gradient.addColorStop(0.2, '#baccde')
-    gradient.addColorStop(0.4, '#ffffff')
-    gradient.addColorStop(0.5, '#9a9da1')
-    gradient.addColorStop(0.7, '#ffffff')
-    gradient.addColorStop(1, '#777b7e')
+    gradient.addColorStop(0, '#1A1033')
+    gradient.addColorStop(0.3, '#2D1A4A')
+    gradient.addColorStop(0.5, '#3D2066')
+    gradient.addColorStop(0.7, '#2D1A4A')
+    gradient.addColorStop(1, '#1A1033')
 
     ctx.fillStyle = gradient
     ctx.fillRect(0, 0, width, height)
 
-    // Noise texture
-    for (let i = 0; i < 5000; i++) {
+    // Shimmer effect - diagonal stripes
+    ctx.globalAlpha = 0.1
+    for (let i = -height; i < width + height; i += 20) {
+      ctx.beginPath()
+      ctx.moveTo(i, 0)
+      ctx.lineTo(i + height, height)
+      ctx.strokeStyle = '#9B5CFF'
+      ctx.lineWidth = 8
+      ctx.stroke()
+    }
+    ctx.globalAlpha = 1
+
+    // Noise texture with neon colors
+    for (let i = 0; i < 3000; i++) {
       const x = Math.random() * width
       const y = Math.random() * height
-      const opacity = Math.random() * 0.15
-      ctx.fillStyle = `rgba(255, 255, 255, ${opacity})`
+      const opacity = Math.random() * 0.3
+      const colors = ['#9B5CFF', '#FF4FD8', '#3CCBFF']
+      ctx.fillStyle = colors[Math.floor(Math.random() * colors.length)]
+      ctx.globalAlpha = opacity
       ctx.fillRect(x, y, 1, 1)
     }
+    ctx.globalAlpha = 1
 
-    // Text
-    ctx.font = 'bold 24px "Inter", system-ui, sans-serif'
+    // Border glow effect
+    ctx.strokeStyle = '#9B5CFF'
+    ctx.lineWidth = 3
+    ctx.shadowColor = '#9B5CFF'
+    ctx.shadowBlur = 15
+    ctx.strokeRect(8, 8, width - 16, height - 16)
+    ctx.shadowBlur = 0
+
+    // Inner border
+    ctx.strokeStyle = '#FF4FD8'
+    ctx.lineWidth = 1
+    ctx.strokeRect(15, 15, width - 30, height - 30)
+
+    // Text with neon glow
+    ctx.font = 'bold 22px "Inter", system-ui, sans-serif'
     ctx.textAlign = 'center'
     ctx.textBaseline = 'middle'
 
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.3)'
-    ctx.fillText('GRATTEZ ICI', width / 2 + 1, height / 2 + 1)
+    // Text shadow/glow
+    ctx.shadowColor = '#FF4FD8'
+    ctx.shadowBlur = 20
+    ctx.fillStyle = '#FF4FD8'
+    ctx.fillText('GRATTEZ ICI', width / 2, height / 2 - 10)
+    ctx.shadowBlur = 0
 
-    const textGradient = ctx.createLinearGradient(0, height / 2 - 20, 0, height / 2 + 20)
-    textGradient.addColorStop(0, '#4a4a4a')
-    textGradient.addColorStop(1, '#2a2a2a')
-    ctx.fillStyle = textGradient
-    ctx.fillText('GRATTEZ ICI', width / 2, height / 2)
+    // Subtitle
+    ctx.font = 'bold 12px "Inter", system-ui, sans-serif'
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.5)'
+    ctx.fillText('✨ RÉVÉLEZ VOTRE GAIN ✨', width / 2, height / 2 + 20)
 
-    ctx.strokeStyle = 'rgba(255,255,255,0.4)'
+    // Corner decorations
+    const cornerSize = 20
+    ctx.strokeStyle = '#3CCBFF'
     ctx.lineWidth = 2
-    ctx.strokeRect(5, 5, width - 10, height - 10)
+    ctx.shadowColor = '#3CCBFF'
+    ctx.shadowBlur = 8
+
+    // Top-left
+    ctx.beginPath()
+    ctx.moveTo(5, 25)
+    ctx.lineTo(5, 5)
+    ctx.lineTo(25, 5)
+    ctx.stroke()
+
+    // Top-right
+    ctx.beginPath()
+    ctx.moveTo(width - 25, 5)
+    ctx.lineTo(width - 5, 5)
+    ctx.lineTo(width - 5, 25)
+    ctx.stroke()
+
+    // Bottom-left
+    ctx.beginPath()
+    ctx.moveTo(5, height - 25)
+    ctx.lineTo(5, height - 5)
+    ctx.lineTo(25, height - 5)
+    ctx.stroke()
+
+    // Bottom-right
+    ctx.beginPath()
+    ctx.moveTo(width - 25, height - 5)
+    ctx.lineTo(width - 5, height - 5)
+    ctx.lineTo(width - 5, height - 25)
+    ctx.stroke()
+
+    ctx.shadowBlur = 0
   }, [])
 
   useEffect(() => {
@@ -144,45 +207,92 @@ export default function ScratchCard({
       >
         {/* Prize Layer */}
         <div
-          className="absolute inset-0 rounded-2xl overflow-hidden flex flex-col items-center justify-center border-2 border-dashed border-white/20 bg-[#141B2D]"
+          className="absolute inset-0 rounded-2xl overflow-hidden flex flex-col items-center justify-center bg-gradient-to-br from-[#0B0F1A] via-[#141B2D] to-[#0B0F1A]"
         >
-          <div className="absolute inset-0 opacity-20 pointer-events-none">
-            <div className="absolute inset-0" style={{ background: 'radial-gradient(circle at center, #9B5CFF, transparent)' }} />
+          {/* Animated background glow */}
+          <div className="absolute inset-0 pointer-events-none">
+            <div className="absolute inset-0" style={{ background: 'radial-gradient(circle at 30% 30%, rgba(155, 92, 255, 0.3), transparent 50%)' }} />
+            <div className="absolute inset-0" style={{ background: 'radial-gradient(circle at 70% 70%, rgba(255, 79, 216, 0.3), transparent 50%)' }} />
           </div>
+
+          {/* Grid pattern */}
+          <div className="absolute inset-0 opacity-10" style={{
+            backgroundImage: 'linear-gradient(rgba(155, 92, 255, 0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(155, 92, 255, 0.5) 1px, transparent 1px)',
+            backgroundSize: '20px 20px'
+          }} />
 
           <motion.div
             initial={{ scale: 0.8, opacity: 0 }}
-            animate={isRevealed ? { scale: 1.1, opacity: 1 } : { scale: 0.9, opacity: 0.5 }}
+            animate={isRevealed ? { scale: 1, opacity: 1 } : { scale: 0.9, opacity: 0.3 }}
+            transition={{ type: 'spring', stiffness: 200, damping: 15 }}
             className="relative z-10 flex flex-col items-center"
           >
-            <div className="p-3 rounded-full bg-white/5 mb-2 border border-white/10">
-              <Trophy className="w-8 h-8 text-yellow-400" />
-            </div>
-            <span className="text-xs uppercase tracking-widest text-white/40 font-bold">Vous avez gagné</span>
-            <div className="flex items-baseline gap-1">
-              <span
-                className="text-6xl font-black tracking-tighter"
+            {/* Trophy with glow */}
+            <motion.div
+              className={`p-4 rounded-full mb-3 ${prizeAmount >= 5 ? 'bg-gradient-to-br from-[#FFB800] to-[#FF8C00]' : 'bg-gradient-to-br from-[#9B5CFF] to-[#FF4FD8]'}`}
+              animate={isRevealed ? {
+                boxShadow: prizeAmount >= 5
+                  ? ['0 0 20px rgba(255, 184, 0, 0.5)', '0 0 40px rgba(255, 184, 0, 0.8)', '0 0 20px rgba(255, 184, 0, 0.5)']
+                  : ['0 0 20px rgba(155, 92, 255, 0.5)', '0 0 40px rgba(155, 92, 255, 0.8)', '0 0 20px rgba(155, 92, 255, 0.5)']
+              } : {}}
+              transition={{ duration: 1.5, repeat: Infinity }}
+            >
+              <Trophy className={`w-8 h-8 ${prizeAmount >= 5 ? 'text-[#0B0F1A]' : 'text-white'}`} />
+            </motion.div>
+
+            <span className="text-[10px] uppercase tracking-[0.2em] text-[#9B5CFF] font-bold mb-1">Vous avez gagné</span>
+
+            <div className="flex items-baseline gap-2">
+              <motion.span
+                className="text-5xl font-black"
                 style={{
-                  background: 'linear-gradient(to bottom, #fff, #3CCBFF)',
+                  background: prizeAmount >= 5
+                    ? 'linear-gradient(to bottom, #FFD700, #FFB800, #FF8C00)'
+                    : 'linear-gradient(to bottom, #fff, #9B5CFF)',
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent',
-                  filter: 'drop-shadow(0 0 10px rgba(60, 203, 255, 0.5))'
                 }}
+                animate={isRevealed ? { scale: [1, 1.1, 1] } : {}}
+                transition={{ duration: 0.5, repeat: isRevealed ? 2 : 0 }}
               >
                 {prizeAmount}
-              </span>
-              <span className="text-xl font-bold text-white/80">CRÉDITS</span>
+              </motion.span>
+              <span className="text-lg font-bold text-white/60 uppercase tracking-wider">Crédits</span>
             </div>
           </motion.div>
 
+          {/* Shine effect on reveal */}
           <AnimatePresence>
             {isRevealed && (
-              <motion.div
-                initial={{ x: '-100%' }}
-                animate={{ x: '100%' }}
-                transition={{ duration: 1.5, repeat: Infinity, ease: 'linear' }}
-                className="absolute inset-0 w-1/2 bg-gradient-to-r from-transparent via-white/10 to-transparent skew-x-12"
-              />
+              <>
+                <motion.div
+                  initial={{ x: '-100%' }}
+                  animate={{ x: '200%' }}
+                  transition={{ duration: 1, ease: 'easeOut' }}
+                  className="absolute inset-0 w-1/3 bg-gradient-to-r from-transparent via-white/30 to-transparent skew-x-12"
+                />
+                {/* Particles */}
+                {[...Array(12)].map((_, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{
+                      opacity: 1,
+                      scale: 0,
+                      x: 150,
+                      y: 100
+                    }}
+                    animate={{
+                      opacity: 0,
+                      scale: 1,
+                      x: 150 + Math.cos(i * 30 * Math.PI / 180) * 120,
+                      y: 100 + Math.sin(i * 30 * Math.PI / 180) * 80
+                    }}
+                    transition={{ duration: 0.8, delay: i * 0.05 }}
+                    className="absolute w-2 h-2 rounded-full"
+                    style={{ backgroundColor: i % 3 === 0 ? '#FFB800' : i % 3 === 1 ? '#9B5CFF' : '#FF4FD8' }}
+                  />
+                ))}
+              </>
             )}
           </AnimatePresence>
         </div>
@@ -203,8 +313,17 @@ export default function ScratchCard({
         />
 
         {/* Frame */}
-        <div className={`absolute -inset-1 rounded-[20px] pointer-events-none z-30 transition-colors duration-500 border-2 ${isRevealed ? 'border-[#00FF88] animate-pulse' : 'border-white/10'
-          }`} />
+        <div className={`absolute -inset-1 rounded-[20px] pointer-events-none z-30 transition-all duration-500 border-2 ${
+          isRevealed
+            ? 'border-[#00FF88] shadow-[0_0_20px_rgba(0,255,136,0.5)]'
+            : 'border-[#9B5CFF]/30 shadow-[0_0_15px_rgba(155,92,255,0.2)]'
+        }`} />
+        {/* Outer glow ring */}
+        <div className={`absolute -inset-2 rounded-[24px] pointer-events-none z-25 transition-all duration-500 border ${
+          isRevealed
+            ? 'border-[#00FF88]/30'
+            : 'border-[#FF4FD8]/20'
+        }`} />
 
         {/* Sparkles */}
         {isScratching && !isRevealed && (

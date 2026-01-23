@@ -10,15 +10,16 @@ interface WheelOfFortuneProps {
   disabled?: boolean
 }
 
+// Couleurs DA : alternance dark/neon avec dégradés
 const SEGMENTS = [
-  { value: 0, color: '#1E2942', text: '#94A3B8' },
-  { value: 1, color: '#9B5CFF', text: '#FFFFFF' },
-  { value: 2, color: '#3CCBFF', text: '#FFFFFF' },
-  { value: 3, color: '#FF4FD8', text: '#FFFFFF' },
-  { value: 5, color: '#00D9FF', text: '#FFFFFF' },
-  { value: 2, color: '#00FF88', text: '#FFFFFF' },
-  { value: 1, color: '#FF6B35', text: '#FFFFFF' },
-  { value: 10, color: '#FFB800', text: '#0B0F1A', isSpecial: true },
+  { value: 0, color: '#0B0F1A', text: '#4A5568', borderColor: '#1E2942' },
+  { value: 1, color: '#1A1033', text: '#9B5CFF', borderColor: '#9B5CFF' },
+  { value: 2, color: '#0B0F1A', text: '#3CCBFF', borderColor: '#1E2942' },
+  { value: 3, color: '#2D1A3D', text: '#FF4FD8', borderColor: '#FF4FD8' },
+  { value: 5, color: '#0B0F1A', text: '#3CCBFF', borderColor: '#1E2942' },
+  { value: 2, color: '#1A2A33', text: '#3CCBFF', borderColor: '#3CCBFF' },
+  { value: 1, color: '#0B0F1A', text: '#9B5CFF', borderColor: '#1E2942' },
+  { value: 10, color: '#FFB800', text: '#0B0F1A', borderColor: '#FFD700', isSpecial: true },
 ]
 
 export default function WheelOfFortune({
@@ -76,22 +77,29 @@ export default function WheelOfFortune({
 
       {/* The Wheel Container */}
       <div className="relative">
-        {/* Outer Ring */}
-        <div className="absolute inset-[-12px] rounded-full border-[6px] border-[#141B2D] shadow-[0_0_30px_rgba(0,0,0,0.5)]" />
+        {/* Outer Ring with neon glow */}
+        <div className="absolute inset-[-12px] rounded-full border-[6px] border-[#141B2D] shadow-[0_0_30px_rgba(0,0,0,0.5),inset_0_0_20px_rgba(155,92,255,0.2)]" />
+        <div className="absolute inset-[-14px] rounded-full border-[2px] border-[#9B5CFF]/30" />
 
-        {/* Light Dots */}
+        {/* Light Dots - Neon colors */}
         <div className="absolute inset-[-12px] rounded-full">
-          {[...Array(12)].map((_, i) => (
-            <div
-              key={i}
-              className={`absolute w-2 h-2 rounded-full bg-white shadow-[0_0_8px_white] transition-opacity duration-300 ${isSpinning ? 'animate-pulse' : 'opacity-40'}`}
-              style={{
-                top: '50%',
-                left: '50%',
-                transform: `rotate(${i * 30}deg) translateY(-148px) translateX(-50%)`
-              }}
-            />
-          ))}
+          {[...Array(16)].map((_, i) => {
+            const colors = ['#9B5CFF', '#FF4FD8', '#3CCBFF', '#FFB800']
+            const color = colors[i % colors.length]
+            return (
+              <div
+                key={i}
+                className={`absolute w-2.5 h-2.5 rounded-full transition-all duration-300 ${isSpinning ? 'animate-pulse scale-125' : 'opacity-60'}`}
+                style={{
+                  top: '50%',
+                  left: '50%',
+                  transform: `rotate(${i * 22.5}deg) translateY(-152px) translateX(-50%)`,
+                  backgroundColor: color,
+                  boxShadow: `0 0 10px ${color}, 0 0 20px ${color}40`
+                }}
+              />
+            )
+          })}
         </div>
 
         {/* Main Wheel */}
@@ -105,6 +113,28 @@ export default function WheelOfFortune({
           }}
         >
           <svg viewBox="0 0 100 100" className="w-full h-full" style={{ transform: 'rotate(-90deg)' }}>
+            <defs>
+              {/* Glow filters for neon effect */}
+              <filter id="neonGlow" x="-50%" y="-50%" width="200%" height="200%">
+                <feGaussianBlur stdDeviation="1" result="coloredBlur"/>
+                <feMerge>
+                  <feMergeNode in="coloredBlur"/>
+                  <feMergeNode in="SourceGraphic"/>
+                </feMerge>
+              </filter>
+              <filter id="goldGlow" x="-50%" y="-50%" width="200%" height="200%">
+                <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+                <feMerge>
+                  <feMergeNode in="coloredBlur"/>
+                  <feMergeNode in="SourceGraphic"/>
+                </feMerge>
+              </filter>
+              {/* Radial gradient for depth */}
+              <radialGradient id="wheelDepth" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stopColor="rgba(255,255,255,0.1)" />
+                <stop offset="100%" stopColor="rgba(0,0,0,0.3)" />
+              </radialGradient>
+            </defs>
             {SEGMENTS.map((seg, i) => {
               const angle = 360 / SEGMENTS.length
               const startAngle = i * angle
@@ -122,13 +152,17 @@ export default function WheelOfFortune({
                   <path
                     d={pathData}
                     fill={seg.color}
-                    className="transition-all duration-500"
-                    stroke="rgba(0,0,0,0.3)"
-                    strokeWidth="0.5"
+                    stroke={seg.borderColor}
+                    strokeWidth="0.8"
+                    filter={seg.isSpecial ? 'url(#goldGlow)' : undefined}
                   />
                 </g>
               )
             })}
+            {/* Overlay for depth effect */}
+            <circle cx="50" cy="50" r="50" fill="url(#wheelDepth)" />
+            {/* Inner ring accent */}
+            <circle cx="50" cy="50" r="20" fill="none" stroke="rgba(155,92,255,0.3)" strokeWidth="0.5" />
           </svg>
 
           {/* Segment Values */}
