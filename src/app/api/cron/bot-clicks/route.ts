@@ -250,7 +250,7 @@ export async function GET(request: NextRequest) {
               // URGENCE: Timer critique (< 20s), TOUJOURS cliquer peu importe le leader
               updates.last_click_username = botUsername
               updates.last_click_user_id = null
-              updates.end_time = now + 60000
+              updates.end_time = now + 59000 // 59s to stay in final phase
               action = hasRealPlayer
                 ? `bot_emergency_click! (${botUsername}) saved at ${Math.floor(timeLeft/1000)}s [battle: ${Math.round(battleProgress * 100)}%/${battleDurationMin}min]`
                 : `bot_click_final (${botUsername}) at ${Math.floor(timeLeft/1000)}s [battle: ${Math.round(battleProgress * 100)}%/${battleDurationMin}min]`
@@ -262,7 +262,7 @@ export async function GET(request: NextRequest) {
                 if (snipeSeed % 2 === 0) {
                   updates.last_click_username = botUsername
                   updates.last_click_user_id = null
-                  updates.end_time = now + 60000
+                  updates.end_time = now + 59000 // 59s to stay in final phase
                   action = `bot_snipe (${botUsername}) at ${Math.floor(timeLeft/1000)}s [battle: ${Math.round(battleProgress * 100)}%/${battleDurationMin}min]`
                 } else {
                   action = `real_player_leading (${game.last_click_username}) - ${Math.floor(timeLeft/1000)}s left, building suspense...`
@@ -275,7 +275,7 @@ export async function GET(request: NextRequest) {
               // Pas de joueur réel - bot clique pour maintenir la bataille
               updates.last_click_username = botUsername
               updates.last_click_user_id = null
-              updates.end_time = now + 60000
+              updates.end_time = now + 59000 // 59s to stay in final phase
               action = `bot_click_final (${botUsername}) [battle: ${Math.round(battleProgress * 100)}%/${battleDurationMin}min]`
             }
           } else {
