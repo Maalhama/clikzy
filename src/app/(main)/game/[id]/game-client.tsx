@@ -603,6 +603,8 @@ export function GameClient({
                       ? 'bg-bg-secondary/50 text-white/30 cursor-not-allowed'
                       : isUrgent
                       ? `bg-danger text-white shadow-[0_0_30px_rgba(255,68,68,0.4)] hover:shadow-[0_0_40px_rgba(255,68,68,0.6)] active:scale-[0.98] ${clickAnimation ? 'scale-95' : ''}`
+                      : (game.item?.retail_value ?? 0) >= 1000
+                      ? `bg-gradient-to-r from-yellow-500 to-amber-600 text-white shadow-[0_0_25px_rgba(234,179,8,0.4)] hover:shadow-[0_0_35px_rgba(234,179,8,0.6)] active:scale-[0.98] ${clickAnimation ? 'scale-95' : ''}`
                       : `bg-gradient-to-r from-neon-purple to-neon-pink text-white shadow-[0_0_25px_rgba(155,92,255,0.4)] hover:shadow-[0_0_35px_rgba(155,92,255,0.6)] active:scale-[0.98] ${clickAnimation ? 'scale-95' : ''}`
                     }
                   `}
@@ -630,6 +632,13 @@ export function GameClient({
                         <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
                       </svg>
                       FONCE !
+                    </>
+                  ) : (game.item?.retail_value ?? 0) >= 1000 ? (
+                    <>
+                      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                      </svg>
+                      V.I.P - 1 crédit
                     </>
                   ) : (
                     <>
@@ -978,6 +987,8 @@ export function GameClient({
                       ? 'bg-bg-secondary/50 text-white/30 cursor-not-allowed'
                       : isUrgent
                       ? `bg-danger text-white shadow-[0_0_30px_rgba(255,68,68,0.4)] hover:shadow-[0_0_40px_rgba(255,68,68,0.6)] hover:scale-[1.01] active:scale-[0.98] ${clickAnimation ? 'scale-95' : ''}`
+                      : (game.item?.retail_value ?? 0) >= 1000
+                      ? `bg-gradient-to-r from-yellow-500 to-amber-600 text-white shadow-[0_0_25px_rgba(234,179,8,0.4)] hover:shadow-[0_0_35px_rgba(234,179,8,0.6)] hover:scale-[1.01] active:scale-[0.98] ${clickAnimation ? 'scale-95' : ''}`
                       : `bg-gradient-to-r from-neon-purple to-neon-pink text-white shadow-[0_0_25px_rgba(155,92,255,0.4)] hover:shadow-[0_0_35px_rgba(155,92,255,0.6)] hover:scale-[1.01] active:scale-[0.98] ${clickAnimation ? 'scale-95' : ''}`
                     }
                   `}
@@ -1005,6 +1016,13 @@ export function GameClient({
                         <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
                       </svg>
                       FONCE !
+                    </>
+                  ) : (game.item?.retail_value ?? 0) >= 1000 ? (
+                    <>
+                      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                      </svg>
+                      V.I.P - 1 crédit
                     </>
                   ) : (
                     <>

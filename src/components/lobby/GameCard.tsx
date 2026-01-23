@@ -826,11 +826,13 @@ export const GameCard = memo(function GameCard({ game, index = 0, isFavorite = f
               ${
                 isUrgent
                   ? 'bg-danger text-white group-hover:bg-danger/90 shadow-neon-danger'
+                  : (game.item?.retail_value ?? 0) >= 1000
+                  ? 'bg-gradient-to-r from-yellow-500 to-amber-600 text-white group-hover:opacity-90 shadow-[0_0_15px_rgba(234,179,8,0.4)]'
                   : 'bg-gradient-to-r from-neon-purple to-neon-pink text-white group-hover:opacity-90 shadow-neon-purple'
               }
             `}
           >
-            {isCritical ? 'CLIQUE !' : isUrgent ? 'FONCE' : 'JOUER'}
+            {isCritical ? 'CLIQUE !' : isUrgent ? 'FONCE' : (game.item?.retail_value ?? 0) >= 1000 ? 'V.I.P' : 'JOUER'}
           </div>
         )}
       </div>

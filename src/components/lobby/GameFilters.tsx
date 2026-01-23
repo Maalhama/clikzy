@@ -18,6 +18,7 @@ interface GameFiltersProps {
   soonCount?: number
   endedCount?: number
   favoritesCount?: number
+  premiumCount?: number
 }
 
 // SVG Icons pour les filtres
@@ -64,6 +65,7 @@ export const GameFilters = memo(function GameFilters({
   soonCount = 0,
   endedCount = 0,
   favoritesCount = 0,
+  premiumCount = 0,
 }: GameFiltersProps) {
   const [searchQuery, setSearchQuery] = useState('')
   const [isSearchExpanded, setIsSearchExpanded] = useState(false)
@@ -90,10 +92,12 @@ export const GameFilters = memo(function GameFilters({
               const showSoonBadge = option.value === 'soon' && soonCount > 0
               const showEndedBadge = option.value === 'ended' && endedCount > 0
               const showFavoritesBadge = option.value === 'favorites' && favoritesCount > 0
+              const showPremiumBadge = option.value === 'high_value' && premiumCount > 0
               const isUrgentFilter = option.value === 'urgent'
               const isSoonFilter = option.value === 'soon'
               const isEndedFilter = option.value === 'ended'
               const isFavoritesFilter = option.value === 'favorites'
+              const isPremiumFilter = option.value === 'high_value'
 
               return (
                 <button
@@ -112,6 +116,8 @@ export const GameFilters = memo(function GameFilters({
                           ? 'bg-success text-white border-2 border-success'
                           : isFavoritesFilter
                           ? 'bg-neon-pink text-white border-2 border-neon-pink'
+                          : isPremiumFilter
+                          ? 'bg-gradient-to-br from-yellow-500 to-amber-600 text-white border-2 border-yellow-500/50'
                           : 'bg-gradient-to-br from-neon-purple to-neon-pink text-white border-2 border-neon-purple/50'
                         : 'bg-bg-secondary/80 text-white/70 border border-white/10 active:scale-95'
                     }
@@ -127,6 +133,8 @@ export const GameFilters = memo(function GameFilters({
                             ? '0 0 15px rgba(34, 197, 94, 0.4)'
                             : isFavoritesFilter
                             ? '0 0 15px rgba(255, 79, 216, 0.4)'
+                            : isPremiumFilter
+                            ? '0 0 15px rgba(234, 179, 8, 0.4)'
                             : '0 0 15px rgba(155, 92, 255, 0.4)',
                         }
                       : undefined
@@ -152,6 +160,11 @@ export const GameFilters = memo(function GameFilters({
                   {showFavoritesBadge && (
                     <span className={`absolute -top-1 -right-1 px-1.5 py-0.5 text-[10px] font-bold rounded-full ${isActive ? 'bg-white/30' : 'bg-neon-pink text-white'}`}>
                       {favoritesCount}
+                    </span>
+                  )}
+                  {showPremiumBadge && (
+                    <span className={`absolute -top-1 -right-1 px-1.5 py-0.5 text-[10px] font-bold rounded-full ${isActive ? 'bg-white/30' : 'bg-gradient-to-r from-yellow-500 to-amber-500 text-white'}`}>
+                      {premiumCount}
                     </span>
                   )}
                 </button>
@@ -233,10 +246,12 @@ export const GameFilters = memo(function GameFilters({
               const showSoonBadge = option.value === 'soon' && soonCount > 0
               const showEndedBadge = option.value === 'ended' && endedCount > 0
               const showFavoritesBadge = option.value === 'favorites' && favoritesCount > 0
+              const showPremiumBadge = option.value === 'high_value' && premiumCount > 0
               const isUrgentFilter = option.value === 'urgent'
               const isSoonFilter = option.value === 'soon'
               const isEndedFilter = option.value === 'ended'
               const isFavoritesFilter = option.value === 'favorites'
+              const isPremiumFilter = option.value === 'high_value'
 
               return (
                 <button
@@ -255,6 +270,8 @@ export const GameFilters = memo(function GameFilters({
                           ? 'bg-success text-white border border-success'
                           : isFavoritesFilter
                           ? 'bg-neon-pink text-white border border-neon-pink'
+                          : isPremiumFilter
+                          ? 'bg-gradient-to-r from-yellow-500 to-amber-600 text-white border border-yellow-500/50'
                           : 'bg-gradient-to-r from-neon-purple to-neon-pink text-white border border-neon-purple/50'
                         : 'bg-bg-secondary/80 text-white/70 hover:text-white border border-white/10 hover:border-white/20'
                     }
@@ -268,6 +285,8 @@ export const GameFilters = memo(function GameFilters({
                       ? { boxShadow: '0 0 20px rgba(34, 197, 94, 0.4), 0 0 40px rgba(34, 197, 94, 0.2)' }
                       : isActive && isFavoritesFilter
                       ? { boxShadow: '0 0 20px rgba(255, 79, 216, 0.4), 0 0 40px rgba(255, 79, 216, 0.2)' }
+                      : isActive && isPremiumFilter
+                      ? { boxShadow: '0 0 20px rgba(234, 179, 8, 0.4), 0 0 40px rgba(234, 179, 8, 0.2), inset 0 1px 0 rgba(255,255,255,0.1)' }
                       : isActive
                       ? { boxShadow: '0 0 20px rgba(155, 92, 255, 0.4), 0 0 40px rgba(155, 92, 255, 0.2), inset 0 1px 0 rgba(255,255,255,0.1)' }
                       : undefined
@@ -293,6 +312,11 @@ export const GameFilters = memo(function GameFilters({
                   {showFavoritesBadge && (
                     <span className={`ml-1 px-1.5 py-0.5 text-xs font-bold rounded-full ${isActive ? 'bg-white/20' : 'bg-neon-pink text-white'}`}>
                       {favoritesCount}
+                    </span>
+                  )}
+                  {showPremiumBadge && (
+                    <span className={`ml-1 px-1.5 py-0.5 text-xs font-bold rounded-full ${isActive ? 'bg-white/20' : 'bg-gradient-to-r from-yellow-500 to-amber-500 text-white'}`}>
+                      {premiumCount}
                     </span>
                   )}
                 </button>

@@ -227,6 +227,7 @@ export function LobbyClient({
                 soonCount={stats.soonCount}
                 endedCount={stats.endedCount}
                 favoritesCount={stats.favoritesCount}
+                premiumCount={stats.highValueCount}
               />
             </Suspense>
           </div>
