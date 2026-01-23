@@ -53,8 +53,15 @@ const WinnerItem = memo(function WinnerItem({
           </span>
           <span className="text-success text-xs">a gagné</span>
         </div>
-        <div className="text-white/40 text-xs truncate">
-          {winner.itemName}
+        <div className="flex items-center gap-2">
+          <span className="text-white/40 text-xs truncate">
+            {winner.itemName}
+          </span>
+          {winner.itemValue && (
+            <span className="text-neon-purple text-xs font-bold">
+              {winner.itemValue}€
+            </span>
+          )}
         </div>
       </div>
 
