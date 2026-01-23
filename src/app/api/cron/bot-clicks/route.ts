@@ -145,19 +145,18 @@ export async function GET(request: NextRequest) {
   try {
     const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
-    // 3 crons configurés avec delays 0, 20, 40 pour un intervalle effectif de ~20s
+    // 3 crons avec delays 0, 10, 20 (timeout cron-job.org = 30s)
+    // Timeline par minute: :00, :10, :20, puis gap de 40s jusqu'à :00
     // Cron 1: /api/cron/bot-clicks (delay=0)
-    // Cron 2: /api/cron/bot-clicks?delay=20
-    // Cron 3: /api/cron/bot-clicks?delay=40
+    // Cron 2: /api/cron/bot-clicks?delay=10
+    // Cron 3: /api/cron/bot-clicks?delay=20
     const delayParam = request.nextUrl.searchParams.get('delay')
     const fixedDelay = delayParam ? parseInt(delayParam, 10) : 0
-    const validDelay = [0, 20, 40].includes(fixedDelay) ? fixedDelay : 0
+    const validDelay = [0, 10, 20].includes(fixedDelay) ? fixedDelay : 0
 
     if (validDelay > 0) {
-      console.log(`[CRON] Waiting ${validDelay}s (cron ${validDelay === 20 ? '2' : '3'} of 3)`)
+      console.log(`[CRON] Waiting ${validDelay}s`)
       await new Promise(resolve => setTimeout(resolve, validDelay * 1000))
-    } else {
-      console.log(`[CRON] No delay (cron 1 of 3)`)
     }
 
     const now = Date.now()
