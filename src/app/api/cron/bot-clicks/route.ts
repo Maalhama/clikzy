@@ -142,27 +142,39 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  // Support pour 3 crons décalés (timeout cron-job.org = 30s, donc max 25s)
-  // - Cron 1: pas de delay → 0-25s aléatoire
-  // - Cron 2: ?delay=10 → 10s + 0-15s = 10-25s
-  // - Cron 3: ?delay=20 → 20s + 0-5s = 20-25s
-  const delayParam = request.nextUrl.searchParams.get('delay')
-  const fixedDelay = delayParam ? parseInt(delayParam, 10) : 0
-  const validFixedDelay = fixedDelay > 0 && fixedDelay <= 20 ? fixedDelay : 0
-
-  // Délai aléatoire ajusté pour que total < 25s
-  const maxRandomDelay = Math.max(5, 25 - validFixedDelay)
-  const randomDelay = Math.floor(Math.random() * maxRandomDelay)
-
-  const totalDelay = validFixedDelay + randomDelay
-
-  if (totalDelay > 0) {
-    console.log(`[CRON] Waiting ${totalDelay}s (fixed: ${validFixedDelay}s + random: ${randomDelay}s)`)
-    await new Promise(resolve => setTimeout(resolve, totalDelay * 1000))
-  }
-
   try {
     const supabase = createClient(supabaseUrl, supabaseServiceKey)
+
+    // D'abord vérifier s'il y a des jeux en phase critique (< 45s)
+    // Si oui, on saute le délai pour ne pas manquer la bataille
+    const preCheckNow = Date.now()
+    const { data: criticalGames } = await supabase
+      .from('games')
+      .select('id, end_time')
+      .in('status', ['active', 'final_phase'])
+      .lt('end_time', preCheckNow + 45000) // Jeux avec < 45s restantes
+
+    const hasCriticalGames = criticalGames && criticalGames.length > 0
+
+    // Support pour 3 crons décalés (timeout cron-job.org = 30s, donc max 25s)
+    // SAUF si des jeux sont en phase critique
+    if (!hasCriticalGames) {
+      const delayParam = request.nextUrl.searchParams.get('delay')
+      const fixedDelay = delayParam ? parseInt(delayParam, 10) : 0
+      const validFixedDelay = fixedDelay > 0 && fixedDelay <= 20 ? fixedDelay : 0
+
+      const maxRandomDelay = Math.max(5, 25 - validFixedDelay)
+      const randomDelay = Math.floor(Math.random() * maxRandomDelay)
+      const totalDelay = validFixedDelay + randomDelay
+
+      if (totalDelay > 0) {
+        console.log(`[CRON] Waiting ${totalDelay}s (fixed: ${validFixedDelay}s + random: ${randomDelay}s)`)
+        await new Promise(resolve => setTimeout(resolve, totalDelay * 1000))
+      }
+    } else {
+      console.log(`[CRON] CRITICAL: ${criticalGames.length} game(s) in final phase - skipping delay!`)
+    }
+
     const now = Date.now()
 
     // Récupérer les jeux actifs
@@ -232,34 +244,35 @@ export async function GET(request: NextRequest) {
           // shouldBotClick retourne true si joueur réel présent (même après durée max)
           if (shouldBotClick(game.id, battleProgress, hasRealPlayer)) {
             // Tant que la bataille est en cours (< 100%), le bot DOIT cliquer pour maintenir le timer
-            // La question est: prend-on le lead ou laissons-nous le joueur réel?
+            // Priorité absolue: maintenir le timer au-dessus de 0
 
-            if (hasRealPlayer) {
-              // Un joueur réel est leader
-              if (timeLeft <= 15000) {
-                // SNIPE! Timer critique, on reprend le lead
-                updates.last_click_username = botUsername
-                updates.last_click_user_id = null
-                updates.end_time = now + 60000
-                action = `bot_snipe! (${botUsername}) stole from ${game.last_click_username} at ${Math.floor(timeLeft/1000)}s`
-              } else if (timeLeft <= 30000) {
-                // Timer bas mais pas critique - 50% chance de sniper pour créer du suspense
+            if (timeLeft <= 20000) {
+              // URGENCE: Timer critique (< 20s), TOUJOURS cliquer peu importe le leader
+              updates.last_click_username = botUsername
+              updates.last_click_user_id = null
+              updates.end_time = now + 60000
+              action = hasRealPlayer
+                ? `bot_emergency_click! (${botUsername}) saved at ${Math.floor(timeLeft/1000)}s [battle: ${Math.round(battleProgress * 100)}%/${battleDurationMin}min]`
+                : `bot_click_final (${botUsername}) at ${Math.floor(timeLeft/1000)}s [battle: ${Math.round(battleProgress * 100)}%/${battleDurationMin}min]`
+            } else if (hasRealPlayer) {
+              // Un joueur réel est leader et timer > 20s
+              if (timeLeft <= 35000) {
+                // Timer entre 20-35s - 50% chance de sniper pour créer du suspense
                 const snipeSeed = hashString(`${game.id}-snipe-${Math.floor(now / 10000)}`)
                 if (snipeSeed % 2 === 0) {
                   updates.last_click_username = botUsername
                   updates.last_click_user_id = null
                   updates.end_time = now + 60000
-                  action = `bot_early_snipe (${botUsername}) at ${Math.floor(timeLeft/1000)}s [battle: ${Math.round(battleProgress * 100)}%/${battleDurationMin}min]`
+                  action = `bot_snipe (${botUsername}) at ${Math.floor(timeLeft/1000)}s [battle: ${Math.round(battleProgress * 100)}%/${battleDurationMin}min]`
                 } else {
-                  // Laisser le timer descendre, créer du suspense
                   action = `real_player_leading (${game.last_click_username}) - ${Math.floor(timeLeft/1000)}s left, building suspense...`
                 }
               } else {
-                // Timer > 30s avec joueur réel - ne pas cliquer, laisser le timer descendre naturellement
+                // Timer > 35s avec joueur réel - laisser descendre naturellement
                 action = `real_player_leading (${game.last_click_username}) - ${Math.floor(timeLeft/1000)}s left, waiting...`
               }
             } else {
-              // Pas de joueur réel - bot clique normalement pour maintenir la bataille
+              // Pas de joueur réel - bot clique pour maintenir la bataille
               updates.last_click_username = botUsername
               updates.last_click_user_id = null
               updates.end_time = now + 60000

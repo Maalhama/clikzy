@@ -221,16 +221,17 @@ export function GameClient({
     return () => stopSounds()
   }, [isCritical, game.status, playHeartbeat, stopSounds])
 
-  // Show winner modal
+  // Show winner modal when game ends (either via status or timer reaching 0)
+  const gameEnded = game.status === 'ended' || isEnded
   useEffect(() => {
-    if (game.status === 'ended' && game.winner_id) {
+    if (gameEnded && !showWinnerModal) {
       const timer = setTimeout(() => {
         setShowWinnerModal(true)
         if (game.winner_id === userId) playWin()
       }, 500)
       return () => clearTimeout(timer)
     }
-  }, [game.status, game.winner_id, userId, playWin])
+  }, [gameEnded, showWinnerModal, game.winner_id, userId, playWin])
 
   // Haptic feedback
   const triggerHaptic = useCallback(() => {

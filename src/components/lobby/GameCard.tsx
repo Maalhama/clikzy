@@ -436,10 +436,13 @@ export const GameCard = memo(function GameCard({ game, index = 0, isFavorite = f
       {/* Won badge */}
       {isEnded && (
         <div className="absolute top-3 right-3 z-20 flex items-center gap-1.5">
-          {/* Ended duration badge */}
-          {endedDuration > 0 && (
-            <div className="px-2 py-1 rounded-full bg-white/10 text-white/60 text-[10px] font-medium backdrop-blur-sm">
-              il y a {formatDuration(endedDuration)}
+          {/* Game duration badge (how long the game lasted) */}
+          {game.start_time && game.end_time && (
+            <div className="px-2 py-1 rounded-full bg-white/10 text-white/60 text-[10px] font-medium backdrop-blur-sm flex items-center gap-1">
+              <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              {formatDuration(game.end_time - new Date(game.start_time).getTime())}
             </div>
           )}
           {/* Status badge */}
