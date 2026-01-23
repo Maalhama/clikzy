@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { ProfileClient } from './ProfileClient'
+import { getGameHistory, getGameHistoryStats } from '@/actions/gameHistory'
 import type { Profile, Winner, Item } from '@/types/database'
 
 type WinnerWithItem = Winner & {
@@ -17,7 +18,7 @@ export default async function ProfilePage() {
   }
 
   // Run all queries in parallel for faster loading
-  const [profileResult, winsResult, gamesPlayedResult] = await Promise.all([
+  const [profileResult, winsResult, gamesPlayedResult, gameHistory, historyStats] = await Promise.all([
     supabase
       .from('profiles')
       .select('*')
@@ -31,7 +32,9 @@ export default async function ProfilePage() {
     supabase
       .from('clicks')
       .select('game_id', { count: 'exact', head: true })
-      .eq('user_id', user.id)
+      .eq('user_id', user.id),
+    getGameHistory(20),
+    getGameHistoryStats()
   ])
 
   const profile = profileResult.data as Profile | null
@@ -54,6 +57,8 @@ export default async function ProfilePage() {
       wins={wins}
       gamesPlayed={gamesPlayed}
       totalValueWon={totalValueWon}
+      gameHistory={gameHistory}
+      historyStats={historyStats}
     />
   )
 }

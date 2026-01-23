@@ -21,6 +21,7 @@ export interface Database {
           total_clicks: number
           last_credits_reset: string
           has_purchased_credits: boolean
+          is_admin: boolean
           shipping_firstname: string | null
           shipping_lastname: string | null
           shipping_address: string | null
@@ -41,6 +42,7 @@ export interface Database {
           total_clicks?: number
           last_credits_reset?: string
           has_purchased_credits?: boolean
+          is_admin?: boolean
           shipping_firstname?: string | null
           shipping_lastname?: string | null
           shipping_address?: string | null
@@ -61,6 +63,7 @@ export interface Database {
           total_clicks?: number
           last_credits_reset?: string
           has_purchased_credits?: boolean
+          is_admin?: boolean
           shipping_firstname?: string | null
           shipping_lastname?: string | null
           shipping_address?: string | null

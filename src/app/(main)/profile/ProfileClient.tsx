@@ -6,14 +6,16 @@ import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import { updateUsername, uploadAvatar } from '@/actions/profile'
 import { CreditPacksModal } from '@/components/modals/CreditPacksModal'
+import { GameHistorySection } from '@/components/profile/GameHistorySection'
+import { NotificationSettings } from '@/components/profile/NotificationSettings'
 import {
   TrophyIcon,
-  CoinsIcon,
   GiftIcon,
   GamepadIcon,
   SparklesIcon,
 } from '@/components/ui/GamingIcons'
 import type { Profile, Winner, Item } from '@/types/database'
+import type { GameHistoryItem } from '@/actions/gameHistory'
 
 type WinnerWithItem = Winner & {
   item: Item
@@ -24,6 +26,13 @@ interface ProfileClientProps {
   wins: WinnerWithItem[]
   gamesPlayed: number
   totalValueWon: number
+  gameHistory: GameHistoryItem[]
+  historyStats: {
+    totalGames: number
+    totalClicks: number
+    wins: number
+    winRate: number
+  }
 }
 
 // SVG products mapping
@@ -100,7 +109,7 @@ function getPlayerLevel(wins: number, clicks: number, gamesPlayed: number): { le
   }
 }
 
-export function ProfileClient({ profile, wins, gamesPlayed, totalValueWon }: ProfileClientProps) {
+export function ProfileClient({ profile, wins, gamesPlayed, totalValueWon, gameHistory, historyStats }: ProfileClientProps) {
   const [isEditingUsername, setIsEditingUsername] = useState(false)
   const [newUsername, setNewUsername] = useState(profile.username || '')
   const [usernameError, setUsernameError] = useState<string | null>(null)
@@ -368,6 +377,16 @@ export function ProfileClient({ profile, wins, gamesPlayed, totalValueWon }: Pro
           </motion.div>
         )}
 
+        {/* Notification Settings */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.15 }}
+          className="mb-6"
+        >
+          <NotificationSettings />
+        </motion.div>
+
         {/* Wins Section */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -396,6 +415,9 @@ export function ProfileClient({ profile, wins, gamesPlayed, totalValueWon }: Pro
             <EmptyWinsState />
           )}
         </motion.div>
+
+        {/* Game History Section */}
+        <GameHistorySection history={gameHistory} stats={historyStats} />
 
         {/* Play CTA */}
         <motion.div
