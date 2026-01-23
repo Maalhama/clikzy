@@ -331,18 +331,8 @@ export function LandingClient({
           {/* Logo */}
           <Logo size="md" animated={true} href="/" />
 
-          {/* Navigation centrale - Desktop */}
-          <nav className="flex items-center gap-8">
-            <a href="#lots" className="nav-link-neon text-sm font-medium text-white/70 hover:text-white transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-neon-purple/50 rounded">
-              Lots
-            </a>
-            <a href="#how-it-works" className="nav-link-neon text-sm font-medium text-white/70 hover:text-white transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-neon-purple/50 rounded">
-              Comment ça marche
-            </a>
-            <a href="#winners" className="nav-link-neon text-sm font-medium text-white/70 hover:text-white transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-neon-purple/50 rounded">
-              Gagnants
-            </a>
-          </nav>
+          {/* Spacer pour centrer les CTAs */}
+          <div className="flex-1" />
 
           {/* Right section */}
           <div className="flex items-center gap-4">
@@ -427,7 +417,7 @@ export function LandingClient({
           <p className="hero-subtitle text-sm text-white/60 mb-4 max-w-[300px]">
             Le dernier clic remporte le lot. Rejoins des milliers de joueurs et tente de remporter ta récompense.
             <span className="block text-neon-blue font-semibold mt-1">10 clics gratuits chaque jour.</span>
-            <span className="block text-neon-purple text-xs mt-1">Nouveaux produits toutes les 3 heures</span>
+            <span className="block text-neon-purple text-xs mt-1">Nouveaux produits toutes les 3 heures.</span>
           </p>
 
           {/* Mini Prize Showcase - Mobile - Infinite Marquee (reduced for performance) */}
@@ -585,7 +575,7 @@ export function LandingClient({
             <p className="hero-subtitle text-lg text-white/70 max-w-lg mb-8">
               Le dernier clic remporte le lot. Rejoins des milliers de joueurs et tente de remporter ta récompense.
               <span className="block text-neon-blue font-semibold mt-2">10 clics gratuits chaque jour.</span>
-              <span className="block text-neon-purple text-sm mt-1">Nouveaux produits toutes les 3 heures</span>
+              <span className="block text-neon-purple text-sm mt-1">Nouveaux produits toutes les 3 heures.</span>
             </p>
 
             {/* CTA */}
@@ -1379,60 +1369,6 @@ export function LandingClient({
             </button>
           </div>
 
-          {/* Navigation Links */}
-          <nav className="px-3 py-3">
-            <a
-              href="#lots"
-              onClick={closeMenu}
-              className="flex items-center gap-3 px-3 py-3 rounded-xl text-white/80 hover:text-white hover:bg-neon-pink/10 transition-all group"
-            >
-              <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-neon-pink/10 border border-neon-pink/30 group-hover:border-neon-pink/50 transition-colors">
-                <svg className="w-4 h-4 text-neon-pink" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
-                </svg>
-              </div>
-              <div>
-                <span className="block text-sm font-semibold">Lots</span>
-                <span className="block text-[10px] text-white/40">Voir les lots disponibles</span>
-              </div>
-            </a>
-
-            <a
-              href="#how-it-works"
-              onClick={closeMenu}
-              className="flex items-center gap-3 px-3 py-3 rounded-xl text-white/80 hover:text-white hover:bg-neon-blue/10 transition-all group"
-            >
-              <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-neon-blue/10 border border-neon-blue/30 group-hover:border-neon-blue/50 transition-colors">
-                <svg className="w-4 h-4 text-neon-blue" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-              </div>
-              <div>
-                <span className="block text-sm font-semibold">Comment jouer</span>
-                <span className="block text-[10px] text-white/40">Les règles du jeu</span>
-              </div>
-            </a>
-
-            <a
-              href="#winners"
-              onClick={closeMenu}
-              className="flex items-center gap-3 px-3 py-3 rounded-xl text-white/80 hover:text-white hover:bg-success/10 transition-all group"
-            >
-              <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-success/10 border border-success/30 group-hover:border-success/50 transition-colors">
-                <svg className="w-4 h-4 text-success" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
-                </svg>
-              </div>
-              <div className="flex-1">
-                <span className="block text-sm font-semibold">Gagnants</span>
-                <span className="block text-[10px] text-white/40">Derniers lots remportés</span>
-              </div>
-              <span className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-success/20 text-success text-[9px] font-bold">
-                <span className="w-1.5 h-1.5 rounded-full bg-success animate-pulse" />
-                Live
-              </span>
-            </a>
-          </nav>
 
           {/* CTA Section */}
           <div className="px-4 pb-4">
