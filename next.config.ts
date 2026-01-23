@@ -1,4 +1,5 @@
 import type { NextConfig } from 'next'
+import { withSentryConfig } from '@sentry/nextjs'
 
 const nextConfig: NextConfig = {
   images: {
@@ -64,4 +65,15 @@ const nextConfig: NextConfig = {
   },
 }
 
-export default nextConfig
+export default withSentryConfig(nextConfig, {
+  // Supprime les logs de build Sentry
+  silent: true,
+
+  // Désactive le télémétrie Sentry
+  telemetry: false,
+
+  // Désactive l'upload des source maps (pas besoin pour le plan gratuit)
+  sourcemaps: {
+    disable: true,
+  },
+})
