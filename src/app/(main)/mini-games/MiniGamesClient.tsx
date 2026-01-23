@@ -33,6 +33,7 @@ interface PendingGame {
   creditsWon: number;
   segmentIndex?: number;
   slotIndex?: number;
+  finalCredits?: number; // For paid games: the final credit total after winnings
 }
 
 const GAME_CONFIG = {
@@ -69,7 +70,7 @@ const GAME_CONFIG = {
 };
 
 export default function MiniGamesClient({ initialEligibility }: MiniGamesClientProps) {
-  const { credits, refreshCredits } = useCredits();
+  const { credits, updateCredits, refreshCredits } = useCredits();
   const [eligibility, setEligibility] = useState(initialEligibility);
   const [activeGame, setActiveGame] = useState<MiniGameType | null>(null);
   const [pendingGame, setPendingGame] = useState<PendingGame | null>(null);
@@ -153,26 +154,32 @@ export default function MiniGamesClient({ initialEligibility }: MiniGamesClientP
     setResult(null);
     setPendingGame(null);
 
+    // Immediately show credit deduction for better UX
+    const creditsBeforePlay = credits;
+    updateCredits(creditsBeforePlay - PLAY_COST);
+
     try {
       const gameResult = await playMiniGamePaid(gameType);
 
       if (gameResult.success && gameResult.data) {
-        // Store the predetermined result
+        // Store the predetermined result + final credits for after animation
         setPendingGame({
           type: gameType,
           creditsWon: gameResult.data.creditsWon,
           segmentIndex: gameResult.data.segmentIndex,
           slotIndex: gameResult.data.slotIndex,
+          finalCredits: gameResult.data.newTotalCredits,
         });
-        // Refresh credits since we spent some
-        await refreshCredits();
       } else {
-        // Error - close modal
+        // Error - restore credits and close modal
+        updateCredits(creditsBeforePlay);
         setActiveGame(null);
         console.error('Game error:', gameResult.error);
       }
     } catch (error) {
       console.error("Error starting paid game:", error);
+      // Restore credits on error
+      updateCredits(creditsBeforePlay);
       setActiveGame(null);
     } finally {
       setIsLoading(false);
@@ -183,14 +190,19 @@ export default function MiniGamesClient({ initialEligibility }: MiniGamesClientP
   const handleGameComplete = async (creditsWon: number) => {
     setResult({
       creditsWon,
-      newTotalCredits: 0, // Will be refreshed
+      newTotalCredits: pendingGame?.finalCredits || 0,
     });
 
     if (creditsWon > 0) {
       triggerWinEffect();
     }
 
-    await refreshCredits();
+    // For paid games, use the stored final credits; for free games, refresh from server
+    if (pendingGame?.finalCredits !== undefined) {
+      updateCredits(pendingGame.finalCredits);
+    } else {
+      await refreshCredits();
+    }
   };
 
   const closeModal = () => {

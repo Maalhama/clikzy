@@ -119,59 +119,138 @@ export function PachinkoIcon({ className = '', animate = false }: IconProps) {
     <motion.div className={`relative ${className}`}>
       <svg viewBox="0 0 100 100" className="w-full h-full">
         <defs>
-          <linearGradient id="pachinkoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          {/* Frame gradient with metallic effect */}
+          <linearGradient id="pachinkoFrame" x1="0%" y1="0%" x2="100%" y2="100%">
             <stop offset="0%" stopColor="#3CCBFF" />
-            <stop offset="100%" stopColor="#1DA1D1" />
+            <stop offset="50%" stopColor="#1DA1D1" />
+            <stop offset="100%" stopColor="#3CCBFF" />
           </linearGradient>
-          <radialGradient id="ballGrad" cx="30%" cy="30%">
+          {/* Inner board dark gradient */}
+          <linearGradient id="pachinkoBoard" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stopColor="#0B0F1A" />
+            <stop offset="100%" stopColor="#141B2D" />
+          </linearGradient>
+          {/* Shiny metallic ball */}
+          <radialGradient id="ballGrad" cx="35%" cy="35%" r="60%">
             <stop offset="0%" stopColor="#FFFFFF" />
-            <stop offset="50%" stopColor="#3CCBFF" />
-            <stop offset="100%" stopColor="#0066FF" />
+            <stop offset="30%" stopColor="#E8E8E8" />
+            <stop offset="60%" stopColor="#B8B8B8" />
+            <stop offset="100%" stopColor="#808080" />
           </radialGradient>
-          <filter id="pachinkoGlow">
+          {/* Ball shine highlight */}
+          <radialGradient id="ballShine" cx="30%" cy="30%" r="30%">
+            <stop offset="0%" stopColor="#FFFFFF" stopOpacity="0.9" />
+            <stop offset="100%" stopColor="#FFFFFF" stopOpacity="0" />
+          </radialGradient>
+          {/* Peg gradients */}
+          <radialGradient id="pegGrad" cx="40%" cy="40%">
+            <stop offset="0%" stopColor="#FF4FD8" />
+            <stop offset="100%" stopColor="#9B5CFF" />
+          </radialGradient>
+          {/* Glow filters */}
+          <filter id="pachinkoGlow" x="-50%" y="-50%" width="200%" height="200%">
             <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
             <feMerge>
               <feMergeNode in="coloredBlur"/>
               <feMergeNode in="SourceGraphic"/>
             </feMerge>
           </filter>
+          <filter id="strongGlow" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+            <feMerge>
+              <feMergeNode in="coloredBlur"/>
+              <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+          </filter>
+          <filter id="ballShadow" x="-50%" y="-50%" width="200%" height="200%">
+            <feDropShadow dx="1" dy="2" stdDeviation="1" floodColor="#000" floodOpacity="0.4"/>
+          </filter>
         </defs>
 
-        {/* Board frame */}
-        <rect x="15" y="10" width="70" height="80" rx="8" fill="none" stroke="url(#pachinkoGrad)" strokeWidth="3" filter="url(#pachinkoGlow)" />
+        {/* Outer frame with 3D effect */}
+        <rect x="12" y="5" width="76" height="90" rx="10" fill="#1E2942" />
+        <rect x="14" y="7" width="72" height="86" rx="8" fill="url(#pachinkoBoard)" stroke="url(#pachinkoFrame)" strokeWidth="2" />
 
-        {/* Pegs - pyramid pattern */}
+        {/* Inner neon border accent */}
+        <rect x="18" y="11" width="64" height="78" rx="6" fill="none" stroke="#3CCBFF" strokeWidth="0.5" opacity="0.4" />
+
+        {/* Top launcher area */}
+        <rect x="70" y="14" width="8" height="20" rx="2" fill="#1E2942" stroke="#3CCBFF" strokeWidth="0.5" />
+        <circle cx="74" cy="18" r="2" fill="#3CCBFF" filter="url(#pachinkoGlow)" />
+
+        {/* Pegs - denser grid pattern */}
         {[
-          [50, 25],
-          [35, 40], [65, 40],
-          [25, 55], [50, 55], [75, 55],
-          [35, 70], [65, 70],
+          // Row 1
+          [35, 28], [50, 28], [65, 28],
+          // Row 2
+          [28, 38], [42, 38], [58, 38], [72, 38],
+          // Row 3
+          [35, 48], [50, 48], [65, 48],
+          // Row 4
+          [28, 58], [42, 58], [58, 58], [72, 58],
+          // Row 5
+          [35, 68], [50, 68], [65, 68],
         ].map(([cx, cy], i) => (
-          <circle key={i} cx={cx} cy={cy} r="4" fill="#9B5CFF" filter="url(#pachinkoGlow)" />
+          <g key={i}>
+            <circle cx={cx} cy={cy} r="3.5" fill="url(#pegGrad)" filter="url(#pachinkoGlow)" />
+            <circle cx={cx - 0.8} cy={cy - 0.8} r="1" fill="white" opacity="0.6" />
+          </g>
         ))}
 
-        {/* Ball */}
-        <motion.circle
-          cx="50"
-          cy="20"
-          r="6"
-          fill="url(#ballGrad)"
-          filter="url(#pachinkoGlow)"
+        {/* Prize slots at bottom */}
+        <g>
+          {/* Slot dividers */}
+          {[24, 38, 50, 62, 76].map((x, i) => (
+            <rect key={i} x={x} y="76" width="2" height="12" fill="#1E2942" />
+          ))}
+          {/* Slot backgrounds with values */}
+          {[
+            { x: 26, color: '#1E2942', glow: false },
+            { x: 40, color: '#9B5CFF', glow: true },
+            { x: 52, color: '#FFB800', glow: true },
+            { x: 64, color: '#9B5CFF', glow: true },
+            { x: 76, color: '#1E2942', glow: false },
+          ].map((slot, i) => (
+            <rect
+              key={i}
+              x={slot.x - 2}
+              y="78"
+              width="10"
+              height="8"
+              rx="1"
+              fill={slot.color}
+              filter={slot.glow ? 'url(#pachinkoGlow)' : undefined}
+              opacity={slot.glow ? 1 : 0.5}
+            />
+          ))}
+        </g>
+
+        {/* Animated ball */}
+        <motion.g
           animate={animate ? {
-            y: [0, 60, 0],
-            x: [0, 15, -10, 5, 0],
+            y: [0, 15, 25, 40, 55, 50],
+            x: [0, -8, 12, -5, 8, 2],
           } : {}}
           transition={animate ? {
-            duration: 3,
+            duration: 2.5,
             repeat: Infinity,
             ease: 'easeInOut',
+            times: [0, 0.2, 0.4, 0.6, 0.8, 1],
           } : {}}
-        />
+        >
+          {/* Ball shadow */}
+          <ellipse cx="50" cy="24" rx="4" ry="1.5" fill="#000" opacity="0.3" />
+          {/* Main ball */}
+          <circle cx="50" cy="20" r="5" fill="url(#ballGrad)" filter="url(#ballShadow)" />
+          {/* Ball shine */}
+          <circle cx="48" cy="18" r="2" fill="url(#ballShine)" />
+          {/* Ball edge highlight */}
+          <circle cx="50" cy="20" r="4.5" fill="none" stroke="#FFF" strokeWidth="0.3" opacity="0.5" />
+        </motion.g>
 
-        {/* Slots at bottom */}
-        {[-1, 0, 1].map((i) => (
-          <rect key={i} x={42 + i * 15} y="82" width="12" height="6" rx="1" fill={i === 0 ? '#FFB800' : '#1E2942'} />
-        ))}
+        {/* Decorative corner accents */}
+        <circle cx="20" cy="12" r="1.5" fill="#3CCBFF" opacity="0.6" />
+        <circle cx="80" cy="12" r="1.5" fill="#3CCBFF" opacity="0.6" />
       </svg>
     </motion.div>
   )
