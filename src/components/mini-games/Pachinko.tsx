@@ -45,6 +45,7 @@ export default function Pachinko({
   const [result, setResult] = useState<number | null>(null)
   const pegsRef = useRef<Peg[]>([])
   const ballRef = useRef<Ball | null>(null)
+  const dprRef = useRef<number>(1)
 
   // Generate pegs in pyramid pattern
   const generatePegs = useCallback(() => {
@@ -76,17 +77,46 @@ export default function Pachinko({
     return slotWidth * targetSlot + slotWidth / 2
   }, [targetSlot])
 
+  // Setup high DPI canvas
+  const setupCanvas = useCallback(() => {
+    const canvas = canvasRef.current
+    if (!canvas) return
+
+    const dpr = window.devicePixelRatio || 1
+    dprRef.current = dpr
+
+    // Set actual canvas size in memory (scaled for retina)
+    canvas.width = BOARD_WIDTH * dpr
+    canvas.height = BOARD_HEIGHT * dpr
+
+    // Set display size (CSS)
+    canvas.style.width = `${BOARD_WIDTH}px`
+    canvas.style.height = `${BOARD_HEIGHT}px`
+
+    // Scale context to match
+    const ctx = canvas.getContext('2d')
+    if (ctx) {
+      ctx.scale(dpr, dpr)
+    }
+  }, [])
+
   // Initialize
   useEffect(() => {
+    setupCanvas()
     pegsRef.current = generatePegs()
     drawBoard()
-  }, [generatePegs])
+  }, [generatePegs, setupCanvas])
 
   const drawBoard = useCallback(() => {
     const canvas = canvasRef.current
     if (!canvas) return
     const ctx = canvas.getContext('2d')
     if (!ctx) return
+
+    const dpr = dprRef.current
+
+    // Reset transform and reapply scale for high DPI
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
 
     // Background gradient
     const bgGradient = ctx.createLinearGradient(0, 0, 0, BOARD_HEIGHT)

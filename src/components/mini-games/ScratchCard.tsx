@@ -10,6 +10,9 @@ interface ScratchCardProps {
   disabled?: boolean
 }
 
+const CARD_WIDTH = 300
+const CARD_HEIGHT = 200
+
 export default function ScratchCard({
   onComplete,
   prizeAmount,
@@ -18,15 +21,32 @@ export default function ScratchCard({
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [isScratching, setIsScratching] = useState(false)
   const [isRevealed, setIsRevealed] = useState(false)
+  const dprRef = useRef<number>(1)
 
   const initCanvas = useCallback(() => {
     const canvas = canvasRef.current
     if (!canvas) return
+
+    // Setup high DPI canvas
+    const dpr = window.devicePixelRatio || 1
+    dprRef.current = dpr
+
+    // Set actual canvas size in memory (scaled for retina)
+    canvas.width = CARD_WIDTH * dpr
+    canvas.height = CARD_HEIGHT * dpr
+
+    // Set display size (CSS)
+    canvas.style.width = `${CARD_WIDTH}px`
+    canvas.style.height = `${CARD_HEIGHT}px`
+
     const ctx = canvas.getContext('2d', { willReadFrequently: true })
     if (!ctx) return
 
-    const width = canvas.width
-    const height = canvas.height
+    // Scale context to match
+    ctx.scale(dpr, dpr)
+
+    const width = CARD_WIDTH
+    const height = CARD_HEIGHT
 
     // Dark neon gradient background
     const gradient = ctx.createLinearGradient(0, 0, width, height)
@@ -164,6 +184,7 @@ export default function ScratchCard({
     if (!ctx) return
 
     const rect = canvas.getBoundingClientRect()
+    const dpr = dprRef.current
     let x, y
 
     if ('touches' in e) {
@@ -174,16 +195,22 @@ export default function ScratchCard({
       y = (e as React.MouseEvent).clientY - rect.top
     }
 
-    // Scale coordinates if canvas is sized differently
-    const scaleX = canvas.width / rect.width
-    const scaleY = canvas.height / rect.height
+    // Scale coordinates to match CSS display size (rect is CSS size, we draw in logical coordinates)
+    const scaleX = CARD_WIDTH / rect.width
+    const scaleY = CARD_HEIGHT / rect.height
     x *= scaleX
     y *= scaleY
 
+    // Save current transform and apply DPR scale for this operation
+    ctx.save()
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
+
     ctx.globalCompositeOperation = 'destination-out'
     ctx.beginPath()
-    ctx.arc(x, y, 25, 0, Math.PI * 2)
+    ctx.arc(x, y, 30, 0, Math.PI * 2) // Slightly larger scratch radius for better feel
     ctx.fill()
+
+    ctx.restore()
 
     const currentPercentage = getPercentage()
 
@@ -203,7 +230,7 @@ export default function ScratchCard({
     <div className="relative flex flex-col items-center p-4">
       <div
         className="relative select-none touch-none"
-        style={{ width: '300px', height: '200px' }}
+        style={{ width: `${CARD_WIDTH}px`, height: `${CARD_HEIGHT}px` }}
       >
         {/* Prize Layer */}
         <div
