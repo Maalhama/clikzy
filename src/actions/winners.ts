@@ -21,9 +21,13 @@ export interface LeaderboardData {
 
 /**
  * Recupere les derniers gagnants pour la landing page
+ * Garde les gagnants des dernières 24h minimum, indépendamment des rotations de jeux
  */
-export async function getRecentWinners(limit: number = 10): Promise<WinnerData[]> {
+export async function getRecentWinners(limit: number = 50): Promise<WinnerData[]> {
   const supabase = await createClient()
+
+  // Toujours montrer les gagnants des dernières 24h minimum
+  const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
 
   const { data: winners, error } = await supabase
     .from('winners')
@@ -42,6 +46,7 @@ export async function getRecentWinners(limit: number = 10): Promise<WinnerData[]
         image_url
       )
     `)
+    .gte('won_at', twentyFourHoursAgo)
     .order('won_at', { ascending: false })
     .limit(limit)
 
