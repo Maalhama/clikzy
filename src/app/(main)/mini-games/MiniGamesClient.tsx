@@ -8,7 +8,11 @@ import confetti from 'canvas-confetti';
 import { useCredits } from '@/contexts/CreditsContext';
 import { useCountdown } from '@/hooks/useCountdown';
 import { playMiniGame } from '@/actions/miniGames';
-import { MiniGameType, MiniGameEligibility } from '@/types/miniGames';
+import { MiniGameType, MiniGameEligibility, WHEEL_SEGMENTS, SCRATCH_VALUES, PACHINKO_SLOTS } from '@/types/miniGames';
+
+import WheelOfFortune from '@/components/mini-games/WheelOfFortune';
+import ScratchCard from '@/components/mini-games/ScratchCard';
+import Pachinko from '@/components/mini-games/Pachinko';
 
 interface MiniGamesClientProps {
   initialEligibility: MiniGameEligibility;
@@ -17,6 +21,13 @@ interface MiniGamesClientProps {
 interface GameResult {
   creditsWon: number;
   newTotalCredits: number;
+}
+
+interface PendingGame {
+  type: MiniGameType;
+  creditsWon: number;
+  segmentIndex?: number;
+  slotIndex?: number;
 }
 
 const GAME_CONFIG = {
@@ -56,8 +67,9 @@ export default function MiniGamesClient({ initialEligibility }: MiniGamesClientP
   const { refreshCredits } = useCredits();
   const [eligibility, setEligibility] = useState(initialEligibility);
   const [activeGame, setActiveGame] = useState<MiniGameType | null>(null);
-  const [isPlaying, setIsPlaying] = useState(false);
+  const [pendingGame, setPendingGame] = useState<PendingGame | null>(null);
   const [result, setResult] = useState<GameResult | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const triggerWinEffect = useCallback(() => {
     const duration = 3 * 1000;
@@ -76,51 +88,85 @@ export default function MiniGamesClient({ initialEligibility }: MiniGamesClientP
     }, 250);
   }, []);
 
-  const handlePlay = async (gameType: MiniGameType) => {
+  // Called when user clicks "Play" - fetches result from server first
+  const handleStartGame = async (gameType: MiniGameType) => {
+    setIsLoading(true);
     setActiveGame(gameType);
-    setIsPlaying(true);
     setResult(null);
+    setPendingGame(null);
 
     try {
       const gameResult = await playMiniGame(gameType);
 
-      setTimeout(async () => {
-        if (gameResult.success && gameResult.data) {
-          setResult({
-            creditsWon: gameResult.data.creditsWon,
-            newTotalCredits: gameResult.data.newTotalCredits,
-          });
+      if (gameResult.success && gameResult.data) {
+        // Store the predetermined result
+        setPendingGame({
+          type: gameType,
+          creditsWon: gameResult.data.creditsWon,
+          segmentIndex: gameResult.data.segmentIndex,
+          slotIndex: gameResult.data.slotIndex,
+        });
 
-          if (gameResult.data.creditsWon > 0) {
-            triggerWinEffect();
+        // Update eligibility
+        const tomorrow = new Date();
+        tomorrow.setUTCHours(0, 0, 0, 0);
+        tomorrow.setUTCDate(tomorrow.getUTCDate() + 1);
+
+        setEligibility(prev => ({
+          ...prev,
+          [gameType]: {
+            canPlay: false,
+            lastPlayedAt: new Date().toISOString(),
+            nextPlayAt: tomorrow.toISOString()
           }
-          await refreshCredits();
-
-          const tomorrow = new Date();
-          tomorrow.setUTCHours(0, 0, 0, 0);
-          tomorrow.setUTCDate(tomorrow.getUTCDate() + 1);
-
-          setEligibility(prev => ({
-            ...prev,
-            [gameType]: {
-              canPlay: false,
-              lastPlayedAt: new Date().toISOString(),
-              nextPlayAt: tomorrow.toISOString()
-            }
-          }));
-        }
-        setIsPlaying(false);
-      }, 2500);
+        }));
+      } else {
+        // Error - close modal
+        setActiveGame(null);
+        console.error('Game error:', gameResult.error);
+      }
     } catch (error) {
-      console.error("Error playing mini game:", error);
-      setIsPlaying(false);
+      console.error("Error starting game:", error);
       setActiveGame(null);
+    } finally {
+      setIsLoading(false);
     }
+  };
+
+  // Called when game animation completes
+  const handleGameComplete = async (creditsWon: number) => {
+    setResult({
+      creditsWon,
+      newTotalCredits: 0, // Will be refreshed
+    });
+
+    if (creditsWon > 0) {
+      triggerWinEffect();
+    }
+
+    await refreshCredits();
   };
 
   const closeModal = () => {
     setActiveGame(null);
     setResult(null);
+    setPendingGame(null);
+  };
+
+  // Get the target for the current game based on server result
+  const getGameTarget = () => {
+    if (!pendingGame) return 0;
+
+    switch (pendingGame.type) {
+      case 'wheel':
+        return pendingGame.segmentIndex ?? WHEEL_SEGMENTS.indexOf(pendingGame.creditsWon as typeof WHEEL_SEGMENTS[number]);
+      case 'scratch':
+        return pendingGame.creditsWon;
+      case 'pachinko':
+        return pendingGame.slotIndex ?? PACHINKO_SLOTS.indexOf(pendingGame.creditsWon as typeof PACHINKO_SLOTS[number]);
+      default:
+        return 0;
+    }
   };
 
   return (
@@ -170,7 +216,7 @@ export default function MiniGamesClient({ initialEligibility }: MiniGamesClientP
               key={key}
               config={GAME_CONFIG[key]}
               eligibility={eligibility[key]}
-              onPlay={() => handlePlay(key)}
+              onPlay={() => handleStartGame(key)}
               index={index}
             />
           ))}
@@ -180,87 +226,100 @@ export default function MiniGamesClient({ initialEligibility }: MiniGamesClientP
       {/* Game Modal */}
       <AnimatePresence>
         {activeGame && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 overflow-y-auto">
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               className="absolute inset-0 bg-black/90 backdrop-blur-md"
-              onClick={() => !isPlaying && closeModal()}
+              onClick={() => result && closeModal()}
             />
 
             <motion.div
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className="relative w-full max-w-2xl glass-dark p-8 rounded-2xl border border-[var(--bg-tertiary)] overflow-hidden"
+              className="relative w-full max-w-2xl glass-dark rounded-2xl border border-[var(--bg-tertiary)] overflow-hidden my-8"
             >
-              <div
-                className="absolute inset-0 opacity-10"
-                style={{
-                  backgroundImage: `radial-gradient(circle at 2px 2px, ${GAME_CONFIG[activeGame].color} 1px, transparent 0)`,
-                  backgroundSize: '24px 24px'
-                }}
-              />
+              {/* Close button - only when showing result */}
+              {result && (
+                <button
+                  onClick={closeModal}
+                  className="absolute top-4 right-4 z-50 text-[var(--text-secondary)] hover:text-white transition-colors"
+                >
+                  <X size={24} />
+                </button>
+              )}
 
-              {!result ? (
-                <div className="relative z-10 text-center py-12">
-                  <div className={`text-8xl mb-8 animate-pulse-slow ${GAME_CONFIG[activeGame].glowClass} inline-block rounded-full p-6`}>
+              {/* Loading state */}
+              {isLoading && (
+                <div className="p-12 text-center">
+                  <div className="text-6xl mb-4 animate-bounce">
                     {GAME_CONFIG[activeGame].icon}
                   </div>
-                  <h2 className={`text-4xl font-black mb-4 ${GAME_CONFIG[activeGame].textClass}`}>
+                  <p className="text-[var(--text-secondary)]">Chargement...</p>
+                </div>
+              )}
+
+              {/* Game Component */}
+              {!isLoading && pendingGame && !result && (
+                <div className="p-4">
+                  <h2 className={`text-2xl font-black text-center mb-4 ${GAME_CONFIG[activeGame].textClass}`}>
                     {GAME_CONFIG[activeGame].title}
                   </h2>
-                  <p className="text-[var(--text-secondary)] text-lg mb-8">
-                    Le jeu est en cours... Préparez-vous !
-                  </p>
 
-                  <div className="w-full bg-[var(--bg-primary)] h-3 rounded-full overflow-hidden border border-[var(--bg-tertiary)]">
-                    <motion.div
-                      initial={{ width: "0%" }}
-                      animate={{ width: "100%" }}
-                      transition={{ duration: 2.5, ease: "easeInOut" }}
-                      className={`h-full bg-gradient-to-r ${GAME_CONFIG[activeGame].gradient}`}
+                  {activeGame === 'wheel' && (
+                    <WheelOfFortune
+                      onComplete={handleGameComplete}
+                      targetSegment={getGameTarget()}
                     />
-                  </div>
+                  )}
+
+                  {activeGame === 'scratch' && (
+                    <ScratchCard
+                      onComplete={handleGameComplete}
+                      prizeAmount={pendingGame.creditsWon}
+                    />
+                  )}
+
+                  {activeGame === 'pachinko' && (
+                    <Pachinko
+                      onComplete={handleGameComplete}
+                      targetSlot={getGameTarget()}
+                    />
+                  )}
                 </div>
-              ) : (
-                <div className="relative z-10 text-center py-8">
+              )}
+
+              {/* Result */}
+              {result && (
+                <div className="relative z-10 text-center py-12 px-8">
                   <motion.div
                     initial={{ scale: 0 }}
                     animate={{ scale: 1, rotate: [0, 10, -10, 0] }}
-                    className={`w-24 h-24 ${result.creditsWon > 0 ? 'bg-[var(--success)]' : 'bg-[var(--warning)]'} rounded-full flex items-center justify-center mx-auto mb-6 ${result.creditsWon > 0 ? 'neon-glow-success' : ''}`}
+                    className={`w-24 h-24 ${result.creditsWon > 0 ? 'bg-[var(--success)]' : 'bg-[var(--bg-tertiary)]'} rounded-full flex items-center justify-center mx-auto mb-6 ${result.creditsWon > 0 ? 'neon-glow-success' : ''}`}
                   >
-                    <Trophy className="text-[var(--bg-primary)]" size={48} />
+                    <Trophy className={result.creditsWon > 0 ? 'text-[var(--bg-primary)]' : 'text-[var(--text-secondary)]'} size={48} />
                   </motion.div>
 
-                  <h2 className="text-5xl font-black text-white mb-2">
+                  <h2 className="text-4xl sm:text-5xl font-black text-white mb-2">
                     {result.creditsWon > 0 ? 'FÉLICITATIONS !' : 'PAS DE CHANCE !'}
                   </h2>
                   <p className="text-[var(--text-secondary)] text-xl mb-8">
                     {result.creditsWon > 0 ? 'Vous avez remporté' : 'Vous repartez avec'}
                   </p>
 
-                  <div className={`text-7xl font-black ${result.creditsWon > 0 ? 'gradient-text-blue' : 'text-[var(--text-secondary)]'} mb-8`}>
-                    {result.creditsWon} <span className="text-3xl">CRÉDITS</span>
+                  <div className={`text-6xl sm:text-7xl font-black ${result.creditsWon > 0 ? 'gradient-text-blue' : 'text-[var(--text-secondary)]'} mb-8`}>
+                    {result.creditsWon} <span className="text-2xl sm:text-3xl">CRÉDITS</span>
                   </div>
 
                   <button
                     onClick={closeModal}
-                    className="gaming-btn-large w-full"
+                    className="gaming-btn-large w-full max-w-xs mx-auto"
                   >
                     CONTINUER
                   </button>
                 </div>
-              )}
-
-              {!isPlaying && !result && (
-                <button
-                  onClick={closeModal}
-                  className="absolute top-4 right-4 text-[var(--text-secondary)] hover:text-white transition-colors"
-                >
-                  <X size={24} />
-                </button>
               )}
             </motion.div>
           </div>
