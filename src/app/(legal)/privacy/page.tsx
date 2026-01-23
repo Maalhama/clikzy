@@ -24,9 +24,11 @@ export default function PrivacyPage() {
 
       <section className="mb-8">
         <h2 className="text-xl font-bold text-neon-purple mb-4">2. Responsable du traitement</h2>
-        <p className="text-white/70">
-          Le responsable du traitement des données est CLIKZY, joignable à l'adresse : <a href="mailto:privacy@clikzy.fr" className="text-neon-purple hover:underline">privacy@clikzy.fr</a>
-        </p>
+        <div className="text-white/70 space-y-2">
+          <p><strong className="text-white">Responsable :</strong> Azizi Mehdi</p>
+          <p><strong className="text-white">Adresse :</strong> 32 boulevard Capdevila</p>
+          <p><strong className="text-white">Email :</strong> <a href="mailto:contact@clikzy.fr" className="text-neon-purple hover:underline">contact@clikzy.fr</a></p>
+        </div>
       </section>
 
       <section className="mb-8">

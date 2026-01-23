@@ -20,12 +20,9 @@ export default function LegalPage() {
         <div className="text-white/70 space-y-2">
           <p><strong className="text-white">Nom du site :</strong> CLIKZY</p>
           <p><strong className="text-white">URL :</strong> https://clikzy.fr</p>
-          <p><strong className="text-white">Éditeur :</strong> CLIKZY SAS</p>
-          <p><strong className="text-white">Siège social :</strong> [Adresse à compléter]</p>
-          <p><strong className="text-white">Capital social :</strong> [Montant à compléter] €</p>
-          <p><strong className="text-white">RCS :</strong> [Numéro à compléter]</p>
-          <p><strong className="text-white">SIRET :</strong> [Numéro à compléter]</p>
-          <p><strong className="text-white">TVA Intracommunautaire :</strong> [Numéro à compléter]</p>
+          <p><strong className="text-white">Éditeur :</strong> Azizi Mehdi (Auto-entrepreneur)</p>
+          <p><strong className="text-white">Adresse :</strong> 32 boulevard Capdevila</p>
+          <p><strong className="text-white">SIRET :</strong> 841 307 408</p>
           <p><strong className="text-white">Email :</strong> <a href="mailto:contact@clikzy.fr" className="text-neon-purple hover:underline">contact@clikzy.fr</a></p>
         </div>
       </section>
@@ -33,7 +30,7 @@ export default function LegalPage() {
       <section className="mb-8">
         <h2 className="text-xl font-bold text-neon-purple mb-4">2. Directeur de la publication</h2>
         <p className="text-white/70">
-          <strong className="text-white">Nom :</strong> [Nom du directeur de publication]
+          <strong className="text-white">Nom :</strong> Azizi Mehdi
         </p>
       </section>
 
