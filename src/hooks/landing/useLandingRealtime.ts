@@ -37,12 +37,21 @@ interface LandingRealtimeData {
 const MIN_PARTICIPANTS = 1487
 const MAX_PARTICIPANTS = 2382
 
+// Deterministic pseudo-random based on time (all users see same value at same moment)
+function getTimeBasedPlayerCount(): number {
+  // Use 30-second intervals as seed for consistency
+  const seed = Math.floor(Date.now() / 30000)
+  // Simple hash function to get pseudo-random from seed
+  const hash = ((seed * 9301 + 49297) % 233280) / 233280
+  return Math.floor(MIN_PARTICIPANTS + hash * (MAX_PARTICIPANTS - MIN_PARTICIPANTS))
+}
+
 export function useLandingRealtime(
   initialWinners: Winner[] = [],
   initialGame: FeaturedGame | null = null
 ): LandingRealtimeData {
-  // Initialize with fixed value to avoid hydration mismatch, then randomize on client
-  const [playerCount, setPlayerCount] = useState(MIN_PARTICIPANTS + 400) // Fixed initial value
+  // Initialize with deterministic value based on time (same for all users)
+  const [playerCount, setPlayerCount] = useState(() => getTimeBasedPlayerCount())
   const [recentWinners, setRecentWinners] = useState<Winner[]>(initialWinners)
   const [featuredGame, setFeaturedGame] = useState<FeaturedGame | null>(initialGame)
   const [isConnected, setIsConnected] = useState(false)
@@ -53,57 +62,28 @@ export function useLandingRealtime(
   const channelsRef = useRef<RealtimeChannel[]>([])
   const trendRef = useRef<number>(1)
 
-  // Set mounted state and initialize random value client-side only
+  // Set mounted state and sync with time-based value
   useEffect(() => {
     setIsMounted(true)
     setIsLoading(false)
-    // Set random initial value only on client
-    setPlayerCount(Math.floor(MIN_PARTICIPANTS + Math.random() * (MAX_PARTICIPANTS - MIN_PARTICIPANTS)))
-    trendRef.current = Math.random() > 0.5 ? 1 : -1
+    // Sync with current time-based value
+    setPlayerCount(getTimeBasedPlayerCount())
+    trendRef.current = Date.now() % 2 === 0 ? 1 : -1
   }, [])
 
-  // Realistic participant counter that fluctuates (only after mount)
+  // Participant counter synced with time-based value (all users see same count)
   useEffect(() => {
     if (!isMounted) return
 
-    const updateCount = () => {
-      setPlayerCount(prev => {
-        // Change trend direction occasionally (10% chance)
-        if (Math.random() < 0.1) {
-          trendRef.current *= -1
-        }
-
-        // Also reverse trend if we're near boundaries
-        if (prev <= MIN_PARTICIPANTS + 50) trendRef.current = 1
-        if (prev >= MAX_PARTICIPANTS - 50) trendRef.current = -1
-
-        // Calculate change (1-12 in trend direction, occasionally opposite)
-        let change = Math.floor(1 + Math.random() * 12) * trendRef.current
-
-        // 20% chance to go opposite direction for natural feel
-        if (Math.random() < 0.2) {
-          change = -change
-        }
-
-        // Apply change and clamp to range
-        const newCount = Math.max(MIN_PARTICIPANTS, Math.min(MAX_PARTICIPANTS, prev + change))
-        return newCount
-      })
+    const syncWithTime = () => {
+      setPlayerCount(getTimeBasedPlayerCount())
     }
 
-    // Update every 2-5 seconds randomly
-    const scheduleNextUpdate = () => {
-      const delay = 2000 + Math.random() * 3000
-      return setTimeout(() => {
-        updateCount()
-        timeoutId = scheduleNextUpdate()
-      }, delay)
-    }
-
-    let timeoutId = scheduleNextUpdate()
+    // Sync every 30 seconds (when the time-based value changes)
+    const interval = setInterval(syncWithTime, 30000)
     setIsConnected(true)
 
-    return () => clearTimeout(timeoutId)
+    return () => clearInterval(interval)
   }, [isMounted])
 
   useEffect(() => {
