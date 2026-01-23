@@ -238,24 +238,39 @@ export async function GET(request: NextRequest) {
           // Phase finale - vérifier si les bots doivent encore cliquer
           // shouldBotClick retourne true si joueur réel présent (même après durée max)
           if (shouldBotClick(game.id, battleProgress, hasRealPlayer)) {
-            // SNIPE: Si un joueur réel est leader et timer < 15s, le bot reprend
-            // Sinon, le bot clique normalement
-            const shouldSnipe = hasRealPlayer && timeLeft <= 15000
-            const shouldNormalClick = !hasRealPlayer
+            // Tant que la bataille est en cours (< 100%), le bot DOIT cliquer pour maintenir le timer
+            // La question est: prend-on le lead ou laissons-nous le joueur réel?
 
-            if (shouldSnipe || shouldNormalClick) {
-              updates.last_click_username = botUsername
-              updates.last_click_user_id = null // Effacer le joueur réel
-              updates.end_time = now + 60000
-
-              if (shouldSnipe) {
+            if (hasRealPlayer) {
+              // Un joueur réel est leader
+              if (timeLeft <= 15000) {
+                // SNIPE! Timer critique, on reprend le lead
+                updates.last_click_username = botUsername
+                updates.last_click_user_id = null
+                updates.end_time = now + 60000
                 action = `bot_snipe! (${botUsername}) stole from ${game.last_click_username} at ${Math.floor(timeLeft/1000)}s`
+              } else if (timeLeft <= 30000) {
+                // Timer bas mais pas critique - 50% chance de sniper pour créer du suspense
+                const snipeSeed = hashString(`${game.id}-snipe-${Math.floor(now / 10000)}`)
+                if (snipeSeed % 2 === 0) {
+                  updates.last_click_username = botUsername
+                  updates.last_click_user_id = null
+                  updates.end_time = now + 60000
+                  action = `bot_early_snipe (${botUsername}) at ${Math.floor(timeLeft/1000)}s [battle: ${Math.round(battleProgress * 100)}%/${battleDurationMin}min]`
+                } else {
+                  // Laisser le timer descendre, créer du suspense
+                  action = `real_player_leading (${game.last_click_username}) - ${Math.floor(timeLeft/1000)}s left, building suspense...`
+                }
               } else {
-                action = `bot_click_final (${botUsername}) [battle: ${Math.round(battleProgress * 100)}%/${battleDurationMin}min]`
+                // Timer > 30s avec joueur réel - ne pas cliquer, laisser le timer descendre naturellement
+                action = `real_player_leading (${game.last_click_username}) - ${Math.floor(timeLeft/1000)}s left, waiting...`
               }
             } else {
-              // Joueur réel leader, timer > 15s - laisser croire qu'il va gagner
-              action = `real_player_leading (${game.last_click_username}) - ${Math.floor(timeLeft/1000)}s left, waiting to snipe...`
+              // Pas de joueur réel - bot clique normalement pour maintenir la bataille
+              updates.last_click_username = botUsername
+              updates.last_click_user_id = null
+              updates.end_time = now + 60000
+              action = `bot_click_final (${botUsername}) [battle: ${Math.round(battleProgress * 100)}%/${battleDurationMin}min]`
             }
           } else {
             // Bataille terminée ET pas de joueur réel - laisser timer descendre

@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useMemo, useState, useEffect } from 'react'
+import { useCallback, useMemo, useState, useEffect, useRef } from 'react'
 import { useSearchParams, useRouter, usePathname } from 'next/navigation'
 import type { GameWithItem } from '@/types/database'
 import type { GameWithFinalPhaseTracking } from '@/hooks/lobby/useLobbyRealtime'
@@ -52,8 +52,20 @@ export function useLobbyFilters(games: GameWithFinalPhaseTracking[], options: Us
   const pathname = usePathname()
   const [currentPage, setCurrentPage] = useState(1)
 
+  // Stable order: keep track of game positions to prevent jumping
+  // Once a game is assigned a position, it keeps that position until filter/sort changes
+  const stableOrderRef = useRef<Map<string, number>>(new Map())
+  const lastSortKeyRef = useRef<string>('')
+
   const currentFilter = (searchParams.get('filter') as FilterType) || 'all'
   const currentSort = (searchParams.get('sort') as SortType) || 'ending_soon'
+
+  // Reset stable order when filter or sort changes
+  const sortKey = `${currentFilter}-${currentSort}-${searchQuery}`
+  if (sortKey !== lastSortKeyRef.current) {
+    stableOrderRef.current.clear()
+    lastSortKeyRef.current = sortKey
+  }
 
   // Reset page when search query changes
   useEffect(() => {
@@ -242,6 +254,32 @@ export function useLobbyFilters(games: GameWithFinalPhaseTracking[], options: Us
         })
         break
     }
+
+    // STABLE ORDERING: Once games are sorted, assign stable positions
+    // This prevents cards from jumping when realtime updates arrive
+    const stableOrder = stableOrderRef.current
+
+    // Assign positions to new games (games not yet in stableOrder)
+    filtered.forEach((game, index) => {
+      if (!stableOrder.has(game.id)) {
+        stableOrder.set(game.id, index)
+      }
+    })
+
+    // Remove games that are no longer in filtered list
+    const currentIds = new Set(filtered.map(g => g.id))
+    for (const id of stableOrder.keys()) {
+      if (!currentIds.has(id)) {
+        stableOrder.delete(id)
+      }
+    }
+
+    // Final sort by stable position (games keep their original position)
+    filtered.sort((a, b) => {
+      const aPos = stableOrder.get(a.id) ?? 999
+      const bPos = stableOrder.get(b.id) ?? 999
+      return aPos - bPos
+    })
 
     return filtered
   }, [games, currentFilter, currentSort, searchQuery, favorites])
