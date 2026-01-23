@@ -13,8 +13,8 @@ interface PachinkoProps {
 const SLOTS = [0, 1, 2, 5, 10, 5, 2, 1, 0]
 const BOARD_WIDTH = 320
 const BOARD_HEIGHT = 400
-const BALL_RADIUS = 12
-const PEG_RADIUS = 7
+const BALL_RADIUS = 8
+const PEG_RADIUS = 6
 const GRAVITY = 0.15 // Ralenti pour une descente plus douce
 const BOUNCE = 0.65
 const FRICTION = 0.995
@@ -238,13 +238,13 @@ export default function Pachinko({
 
       // Ball trail/glow
       ctx.beginPath()
-      ctx.arc(ball.x, ball.y, BALL_RADIUS + 8, 0, Math.PI * 2)
-      ctx.fillStyle = 'rgba(60, 203, 255, 0.2)'
+      ctx.arc(ball.x, ball.y, BALL_RADIUS + 6, 0, Math.PI * 2)
+      ctx.fillStyle = 'rgba(60, 203, 255, 0.25)'
       ctx.fill()
 
       // Main ball with gradient
       const gradient = ctx.createRadialGradient(
-        ball.x - 4, ball.y - 4, 0,
+        ball.x - 2, ball.y - 2, 0,
         ball.x, ball.y, BALL_RADIUS
       )
       gradient.addColorStop(0, '#FFFFFF')
@@ -256,14 +256,14 @@ export default function Pachinko({
       ctx.arc(ball.x, ball.y, BALL_RADIUS, 0, Math.PI * 2)
       ctx.fillStyle = gradient
       ctx.shadowColor = '#3CCBFF'
-      ctx.shadowBlur = 25
+      ctx.shadowBlur = 20
       ctx.fill()
       ctx.shadowBlur = 0
 
       // Ball highlight
       ctx.beginPath()
-      ctx.arc(ball.x - 4, ball.y - 4, 4, 0, Math.PI * 2)
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.8)'
+      ctx.arc(ball.x - 2, ball.y - 2, 2.5, 0, Math.PI * 2)
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.9)'
       ctx.fill()
     }
   }, [])
