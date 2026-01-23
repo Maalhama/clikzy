@@ -246,10 +246,10 @@ export async function GET(request: NextRequest) {
             // Tant que la bataille est en cours (< 100%), le bot DOIT cliquer pour maintenir le timer
             // Priorité absolue: maintenir le timer au-dessus de 0
 
-            // Pour le suspense: seuil aléatoire entre 30-50s basé sur gameId
-            // Doit être > intervalle cron (60s) soustrait du reset (90s) = 30s minimum
-            const clickThresholdSeed = hashString(`${game.id}-threshold-${Math.floor(now / 60000)}`)
-            const clickThreshold = 30000 + (clickThresholdSeed % 20000) // 30s à 50s
+            // Pour le suspense: seuil FIXE par jeu entre 35-50s
+            // IMPORTANT: ne pas utiliser le timestamp sinon le seuil change à chaque minute!
+            const clickThresholdSeed = hashString(`${game.id}-threshold-fixed`)
+            const clickThreshold = 35000 + (clickThresholdSeed % 15000) // 35s à 50s
 
             if (timeLeft <= clickThreshold) {
               // Timer sous le seuil - bot clique pour maintenir la bataille
