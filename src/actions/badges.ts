@@ -162,20 +162,11 @@ export async function checkAndAwardBadges(): Promise<BadgeCheckResult> {
       if (!error) {
         newBadges.push(badge)
         totalCreditsEarned += badge.credits_reward
-
-        // Award credits if any
-        if (badge.credits_reward > 0) {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          await (supabase as any)
-            .from('profiles')
-            .update({ credits: profile.total_clicks + badge.credits_reward }) // This is wrong, should use increment
-            .eq('id', user.id)
-        }
       }
     }
   }
 
-  // Award credits properly using RPC or direct update
+  // Award all credits at once
   if (totalCreditsEarned > 0) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data: currentProfile } = await (supabase as any)

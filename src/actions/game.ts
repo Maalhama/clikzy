@@ -2,6 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { GAME_CONSTANTS } from '@/lib/constants'
+import { checkAndAwardBadges } from '@/actions/badges'
 import type { Game, Click, Item, Profile } from '@/types/database'
 
 type GameWithItem = Game & {
@@ -148,6 +149,9 @@ export async function clickGame(gameId: string): Promise<ActionResult<{ newEndTi
       total_clicks: (profile.total_clicks ?? 0) + 1,
     })
     .eq('id', user.id)
+
+  // 5. Check for new badges (non-blocking)
+  checkAndAwardBadges().catch(console.error)
 
   return { success: true, data: { newEndTime } }
 }

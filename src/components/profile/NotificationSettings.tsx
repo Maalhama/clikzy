@@ -90,15 +90,14 @@ export function NotificationSettings() {
         <button
           onClick={handleToggle}
           disabled={isLoading}
-          className={`relative w-14 h-8 rounded-full transition-colors ${
+          className={`relative w-14 h-8 rounded-full transition-all duration-200 ${
             isSubscribed ? 'bg-neon-purple' : 'bg-white/20'
-          } ${isLoading ? 'opacity-50' : ''}`}
+          } ${isLoading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
         >
-          <motion.div
-            layout
-            className="absolute top-1 w-6 h-6 rounded-full bg-white shadow-md"
-            style={{ left: isSubscribed ? 'calc(100% - 28px)' : '4px' }}
-            transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+          <div
+            className={`absolute top-1 w-6 h-6 rounded-full bg-white shadow-md transition-all duration-200 ${
+              isSubscribed ? 'left-[calc(100%-28px)]' : 'left-1'
+            }`}
           />
         </button>
       </div>
