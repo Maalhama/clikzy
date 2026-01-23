@@ -7,7 +7,7 @@
     "dev:mobile": "next dev -H 0.0.0.0",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "eslint src",
     "type-check": "tsc --noEmit",
     "seed:items": "tsx scripts/seed-items.ts"
   },
