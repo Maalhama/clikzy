@@ -162,10 +162,10 @@ export function ProfileClient({ profile, wins, gamesPlayed, totalValueWon }: Pro
       <AnimatePresence>
         {successMessage && (
           <motion.div
-            initial={{ opacity: 0, y: -50, scale: 0.9 }}
+            initial={{ opacity: 0, y: 20, scale: 0.9 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -50, scale: 0.9 }}
-            className="fixed top-20 left-1/2 -translate-x-1/2 z-50 px-5 py-2.5 rounded-xl bg-success text-white font-semibold shadow-lg shadow-success/30 flex items-center gap-2 text-sm"
+            exit={{ opacity: 0, y: 20, scale: 0.9 }}
+            className="fixed bottom-24 left-1/2 -translate-x-1/2 z-50 px-5 py-3 rounded-xl bg-gradient-to-r from-neon-purple to-neon-pink text-white font-semibold shadow-lg shadow-neon-purple/30 flex items-center gap-2 text-sm"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
@@ -176,29 +176,7 @@ export function ProfileClient({ profile, wins, gamesPlayed, totalValueWon }: Pro
       </AnimatePresence>
 
       {/* Main content */}
-      <main className="relative z-10 max-w-4xl mx-auto px-4 py-4">
-        {/* Top bar with back button and buy credits */}
-        <div className="flex items-center justify-between mb-4">
-          <Link
-            href="/lobby"
-            className="flex items-center gap-1.5 text-white/50 hover:text-white text-sm transition-colors"
-          >
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-            </svg>
-            <span>Lobby</span>
-          </Link>
-
-          {/* Buy credits button */}
-          <button
-            onClick={() => setShowCreditModal(true)}
-            className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gradient-to-r from-neon-purple/20 to-neon-pink/20 border border-neon-purple/30 hover:border-neon-pink/50 transition-all group"
-          >
-            <CoinsIcon className="w-4 h-4 text-neon-purple" />
-            <span className="text-sm font-semibold text-white">{profile.credits || 0}</span>
-            <span className="text-neon-pink text-xs font-medium group-hover:underline">+ Acheter</span>
-          </button>
-        </div>
+      <main className="relative z-10 max-w-4xl mx-auto px-4 py-6">
         {/* Profile Card */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -339,6 +317,36 @@ export function ProfileClient({ profile, wins, gamesPlayed, totalValueWon }: Pro
             <StatItem value={`${winRate}%`} label="Win rate" color="text-warning" />
           </div>
         </motion.div>
+
+        {/* Buy Credits Card */}
+        <motion.button
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          onClick={() => setShowCreditModal(true)}
+          className="w-full rounded-2xl bg-gradient-to-r from-neon-purple/10 via-neon-pink/10 to-neon-purple/10 border border-neon-purple/30 hover:border-neon-pink/50 p-4 mb-6 flex items-center justify-between group transition-all hover:shadow-lg hover:shadow-neon-purple/10"
+        >
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-neon-purple to-neon-pink flex items-center justify-center shadow-lg shadow-neon-purple/30">
+              <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+            </div>
+            <div className="text-left">
+              <div className="text-white font-bold">Mes crédits</div>
+              <div className="flex items-center gap-2">
+                <span className="text-2xl font-black text-neon-purple">{profile.credits || 0}</span>
+                <span className="text-white/40 text-sm">disponibles</span>
+              </div>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-neon-purple to-neon-pink text-white font-bold text-sm group-hover:scale-105 transition-transform">
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+            </svg>
+            Recharger
+          </div>
+        </motion.button>
 
         {/* Total Value Won */}
         {totalValueWon > 0 && (
