@@ -80,7 +80,26 @@ export function Header({ profile }: HeaderProps) {
           {/* Logo */}
           <Logo size="md" animated={true} href="/" />
 
-          
+          {/* Navigation Links */}
+          <nav className="flex items-center gap-6">
+            <Link
+              href="/lobby"
+              className="text-white/60 hover:text-white transition-colors font-medium"
+            >
+              Lobby
+            </Link>
+            <Link
+              href="/mini-games"
+              className="flex items-center gap-2 text-white/60 hover:text-neon-purple transition-colors font-medium group"
+            >
+              <span>🎰</span>
+              <span>Mini-Jeux</span>
+              <span className="px-1.5 py-0.5 text-[10px] font-bold bg-neon-purple/20 text-neon-purple rounded uppercase">
+                Gratuit
+              </span>
+            </Link>
+          </nav>
+
           {/* Right section */}
           <div className="flex items-center gap-4">
             {profile && (
@@ -199,6 +218,29 @@ export function Header({ profile }: HeaderProps) {
                 </div>
               </Link>
             )}
+
+            {/* Navigation Links */}
+            <div className="px-4 py-2 space-y-1">
+              <Link
+                href="/lobby"
+                onClick={closeMenu}
+                className="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-white/5 transition-colors"
+              >
+                <span className="text-xl">🏠</span>
+                <span className="font-medium text-white/80">Lobby</span>
+              </Link>
+              <Link
+                href="/mini-games"
+                onClick={closeMenu}
+                className="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-neon-purple/10 transition-colors border border-transparent hover:border-neon-purple/30"
+              >
+                <span className="text-xl">🎰</span>
+                <span className="font-medium text-white/80">Mini-Jeux</span>
+                <span className="px-2 py-0.5 text-[10px] font-bold bg-neon-purple/20 text-neon-purple rounded uppercase">
+                  Gratuit
+                </span>
+              </Link>
+            </div>
 
             {/* Sign out */}
             <div className="px-4 pt-4 pb-4">

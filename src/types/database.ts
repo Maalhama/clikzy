@@ -94,6 +94,7 @@ export interface Database {
           name: string
           description: string | null
           image_url: string
+          model_3d_url: string | null
           retail_value: number | null
           is_active: boolean
           created_at: string
@@ -103,6 +104,7 @@ export interface Database {
           name: string
           description?: string | null
           image_url: string
+          model_3d_url?: string | null
           retail_value?: number | null
           is_active?: boolean
           created_at?: string
@@ -112,6 +114,7 @@ export interface Database {
           name?: string
           description?: string | null
           image_url?: string
+          model_3d_url?: string | null
           retail_value?: number | null
           is_active?: boolean
           created_at?: string
@@ -255,6 +258,29 @@ export interface Database {
           delivered_at?: string | null
         }
       }
+      mini_game_plays: {
+        Row: {
+          id: string
+          user_id: string
+          game_type: 'wheel' | 'scratch' | 'pachinko'
+          credits_won: number
+          played_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          game_type: 'wheel' | 'scratch' | 'pachinko'
+          credits_won?: number
+          played_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          game_type?: 'wheel' | 'scratch' | 'pachinko'
+          credits_won?: number
+          played_at?: string
+        }
+      }
     }
     Views: {
       [_ in never]: never
@@ -272,6 +298,20 @@ export interface Database {
           game_id_param: string
         }
         Returns: number
+      }
+      add_mini_game_credits: {
+        Args: {
+          p_user_id: string
+          p_amount: number
+        }
+        Returns: number
+      }
+      can_play_mini_game: {
+        Args: {
+          p_user_id: string
+          p_game_type: string
+        }
+        Returns: boolean
       }
     }
     Enums: {
