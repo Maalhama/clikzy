@@ -442,7 +442,7 @@ export const GameCard = memo(function GameCard({ game, index = 0, isFavorite = f
               <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
-              {formatDuration(game.end_time - new Date(game.start_time).getTime())}
+              {formatDuration((game.ended_at ? new Date(game.ended_at).getTime() : game.end_time) - new Date(game.start_time).getTime())}
             </div>
           )}
           {/* Status badge */}
