@@ -32,25 +32,41 @@ const CRON_SECRET = process.env.CRON_SECRET
 // (Réplique de src/lib/bots/usernameGenerator.ts)
 // ============================================
 
-const ALL_FIRST_NAMES = [
-  // Français
-  'Lucas', 'Hugo', 'Theo', 'Nathan', 'Mathis', 'Enzo', 'Louis', 'Gabriel',
-  'Thomas', 'Antoine', 'Maxime', 'Alexandre', 'Emma', 'Léa', 'Chloé', 'Manon',
-  'Camille', 'Sarah', 'Julie', 'Marie', 'Laura', 'Clara', 'Jade', 'Zoé',
-  // Ibériques
-  'Pablo', 'Diego', 'Carlos', 'Miguel', 'María', 'Carmen', 'Ana', 'Lucía',
-  // Maghrébins
-  'Mohamed', 'Ahmed', 'Youssef', 'Karim', 'Mehdi', 'Amine', 'Fatima', 'Amina',
-  'Yasmine', 'Nadia', 'Samira', 'Nour', 'Lina', 'Sara', 'Rayan', 'Adam',
-  // Africains
-  'Mamadou', 'Moussa', 'Ibrahima', 'Ousmane', 'Fatou', 'Aminata', 'Awa',
-]
-
-const SUFFIXES = [
-  '', '59', '62', '75', '69', '13', '33', '93', '94', '77', '78',
-  '95', '96', '97', '98', '99', '00', '01', '02', '03', '04',
-  '_off', '_real', '_fr', '_gaming', 'music', 'pro', 'x', 'zz',
-  '2k', '123', '007',
+// Pseudos réalistes inspirés des réseaux sociaux (Instagram, TikTok, gaming)
+const REALISTIC_USERNAMES = [
+  // Style simple (prénom + chiffres)
+  'emma.music', 'lucas_music', 'theo.music', 'lemusic_a', 'hugo.music',
+  'lena_music', 'maxime_music', 'clara.music', 'tom_music', 'julie_music',
+  // Style année de naissance
+  'emma2004', 'lucas2003', 'theo2005', 'hugo99', 'lea2002', 'nathan01',
+  'chloe2004', 'enzo2003', 'manon2001', 'jade2005', 'louis2000', 'sarah03',
+  // Style gamer/pseudo court
+  'emm4', 'lcs_', 'th3o', 'hug0', 'l3a_', 'nath_', 'enz0_', 'mxm',
+  'clra', 'jde_', 'srh_', 'lna_', 'ryn_', 'adm_', 'tom_', 'julz',
+  // Style underscore
+  '_emma', '_lucas', '_theo', '_hugo', '_lea', '_nathan', '_enzo',
+  'emma_', 'lucas_', 'theo_', 'hugo_', 'lea_', 'nathan_', 'enzo_',
+  // Style point
+  'em.ma', 'lu.cas', 'the.o', 'hu.go', 'le.a', 'na.than', 'en.zo',
+  // Prénoms maghrébins réalistes
+  'ryanbzh', 'adam_dz', 'yasmine.fr', 'nour_75', 'lina.93', 'sara_92',
+  'mehdi_77', 'amine.94', 'karim_95', 'youssef.dz', 'nadia_31', 'amina.ma',
+  // Prénoms africains réalistes
+  'moussa_sn', 'ibra_221', 'mamadou.sn', 'fatou_', 'awa.221', 'ousmane_',
+  // Style lettres doublées
+  'emmaa', 'lucass', 'theoo', 'hugoo', 'leaa', 'nathann', 'enzoo',
+  // Style chiffre au milieu
+  'em4a', 'luc4s', 'the0', 'hug0o', 'le4', 'n4than', 'enz0o',
+  // Style x devant
+  'xemma', 'xlucas', 'xtheo', 'xhugo', 'xlea', 'xnathan', 'xenzo',
+  // Mix réaliste varié
+  'ju.music', 'music.mxm', 'music_tom', 'clara.music', 'jade_vibes',
+  'chloe.music', 'sarah_music', 'laura_music', 'marie.music', 'zoey_',
+  // Pseudos courts populaires
+  'lcs', 'thm', 'hgo', 'ntn', 'enz', 'mxm', 'clr', 'jde', 'srh', 'lna',
+  // Style TikTok/Insta
+  'music.emma', 'music.lucas', 'music.theo', 'vibes.hugo', 'music.lea',
+  'real.nathan', 'just.enzo', 'its.maxime', 'hey.clara', 'the.jade',
 ]
 
 function hashString(str: string): number {
@@ -65,20 +81,7 @@ function hashString(str: string): number {
 
 function generateDeterministicUsername(seed: string): string {
   const hash = hashString(seed)
-  const firstName = ALL_FIRST_NAMES[hash % ALL_FIRST_NAMES.length]
-  const suffixIndex = Math.floor(hash / ALL_FIRST_NAMES.length) % SUFFIXES.length
-  const suffix = SUFFIXES[suffixIndex]
-
-  const patterns = [
-    (fn: string, sfx: string) => fn.toLowerCase() + sfx,
-    (fn: string, sfx: string) => fn + sfx,
-    (fn: string, sfx: string) => fn.toLowerCase() + (sfx.startsWith('_') ? sfx : '_' + sfx),
-    (fn: string, sfx: string) => fn.toLowerCase() + sfx.replace(/_/g, ''),
-  ]
-
-  const patternIndex = Math.floor(hash / (ALL_FIRST_NAMES.length * SUFFIXES.length)) % patterns.length
-  const result = patterns[patternIndex](firstName, suffix)
-  return result.replace(/__+/g, '_').replace(/_$/, '')
+  return REALISTIC_USERNAMES[hash % REALISTIC_USERNAMES.length]
 }
 
 interface GameData {
