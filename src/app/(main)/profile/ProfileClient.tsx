@@ -7,7 +7,6 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { updateUsername, uploadAvatar } from '@/actions/profile'
 import { CreditPacksModal } from '@/components/modals/CreditPacksModal'
 import { GameHistorySection } from '@/components/profile/GameHistorySection'
-import { NotificationSettings } from '@/components/profile/NotificationSettings'
 import { ReferralSection } from '@/components/profile/ReferralSection'
 import { BadgesSection } from '@/components/profile/BadgesSection'
 import type { Badge } from '@/actions/badges'
@@ -396,26 +395,6 @@ export function ProfileClient({ profile, wins, gamesPlayed, totalValueWon, gameH
           </motion.div>
         )}
 
-        {/* Notification Settings */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.15 }}
-          className="mb-6"
-        >
-          <NotificationSettings />
-        </motion.div>
-
-        {/* Referral Section */}
-        <div className="mb-6">
-          <ReferralSection
-            referralCode={referralStats.referralCode}
-            referralCount={referralStats.referralCount}
-            creditsEarned={referralStats.creditsEarned}
-            hasReferrer={!!referralStats.referredBy}
-          />
-        </div>
-
         {/* Wins Section */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -445,11 +424,21 @@ export function ProfileClient({ profile, wins, gamesPlayed, totalValueWon, gameH
           )}
         </motion.div>
 
-        {/* Game History Section */}
-        <GameHistorySection history={gameHistory} stats={historyStats} />
-
         {/* Badges Section */}
         <BadgesSection badges={badges} stats={badgeStats} />
+
+        {/* Referral Section */}
+        <div className="mt-8 mb-6">
+          <ReferralSection
+            referralCode={referralStats.referralCode}
+            referralCount={referralStats.referralCount}
+            creditsEarned={referralStats.creditsEarned}
+            hasReferrer={!!referralStats.referredBy}
+          />
+        </div>
+
+        {/* Game History Section */}
+        <GameHistorySection history={gameHistory} stats={historyStats} />
 
         {/* Play CTA */}
         <motion.div
