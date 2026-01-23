@@ -24,8 +24,8 @@ export async function GET(request: NextRequest) {
     const todayMidnight = new Date()
     todayMidnight.setUTCHours(0, 0, 0, 0)
 
-    // Find free users whose credits haven't been reset today
-    const { data: usersToReset, error: fetchError } = await supabase
+    // Find all free users who haven't been processed today
+    const { data: freeUsers, error: fetchError } = await supabase
       .from('profiles')
       .select('id, username, credits, last_credits_reset')
       .eq('has_purchased_credits', false)
@@ -36,34 +36,58 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Failed to fetch profiles' }, { status: 500 })
     }
 
-    if (!usersToReset || usersToReset.length === 0) {
+    if (!freeUsers || freeUsers.length === 0) {
       return NextResponse.json({
-        message: 'No users need credits reset',
+        message: 'No users need processing',
         resetCount: 0,
+        skippedCount: 0,
       })
     }
 
-    // Reset credits for all eligible users
-    const userIds = usersToReset.map(u => u.id)
+    // Separate users: those who need credits vs those who already have enough
+    const usersNeedingCredits = freeUsers.filter(u => u.credits < DAILY_FREE_CREDITS)
+    const usersWithEnoughCredits = freeUsers.filter(u => u.credits >= DAILY_FREE_CREDITS)
 
-    const { error: updateError } = await supabase
-      .from('profiles')
-      .update({
-        credits: DAILY_FREE_CREDITS,
-        last_credits_reset: new Date().toISOString(),
-      })
-      .in('id', userIds)
+    const now = new Date().toISOString()
 
-    if (updateError) {
-      console.error('Error resetting credits:', updateError)
-      return NextResponse.json({ error: 'Failed to reset credits' }, { status: 500 })
+    // Reset credits for users with < 10 credits
+    if (usersNeedingCredits.length > 0) {
+      const { error: resetError } = await supabase
+        .from('profiles')
+        .update({
+          credits: DAILY_FREE_CREDITS,
+          last_credits_reset: now,
+        })
+        .in('id', usersNeedingCredits.map(u => u.id))
+
+      if (resetError) {
+        console.error('Error resetting credits:', resetError)
+        return NextResponse.json({ error: 'Failed to reset credits' }, { status: 500 })
+      }
     }
 
-    console.log(`Reset credits for ${usersToReset.length} free users`)
+    // Just update last_credits_reset for users who already have >= 10 credits
+    // (they keep their credits earned from mini-games)
+    if (usersWithEnoughCredits.length > 0) {
+      const { error: markError } = await supabase
+        .from('profiles')
+        .update({
+          last_credits_reset: now,
+        })
+        .in('id', usersWithEnoughCredits.map(u => u.id))
+
+      if (markError) {
+        console.error('Error marking users:', markError)
+        // Non-critical, continue
+      }
+    }
+
+    console.log(`Reset credits for ${usersNeedingCredits.length} users, skipped ${usersWithEnoughCredits.length} users with enough credits`)
 
     return NextResponse.json({
-      message: `Reset credits for ${usersToReset.length} users`,
-      resetCount: usersToReset.length,
+      message: `Processed ${freeUsers.length} free users`,
+      resetCount: usersNeedingCredits.length,
+      skippedCount: usersWithEnoughCredits.length,
       creditsGiven: DAILY_FREE_CREDITS,
     })
   } catch (error) {
