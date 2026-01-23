@@ -84,15 +84,31 @@ export function Header({ profile }: HeaderProps) {
           <nav className="flex items-center gap-6">
             <Link
               href="/lobby"
-              className="text-white/60 hover:text-white transition-colors font-medium"
+              className="flex items-center gap-2 text-white/60 hover:text-neon-blue transition-colors font-medium group"
             >
-              Lobby
+              {/* Trophy/Crown icon for Lobby */}
+              <svg className="w-5 h-5 text-neon-blue/70 group-hover:text-neon-blue transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5C7 4 6 9 6 9Z" />
+                <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5C17 4 18 9 18 9Z" />
+                <path d="M4 22h16" />
+                <path d="M10 22V18.75a1.75 1.75 0 0 1 1.75-1.75h.5A1.75 1.75 0 0 1 14 18.75V22" />
+                <path d="M6 9a6 6 0 1 0 12 0H6Z" />
+              </svg>
+              <span>Lobby</span>
             </Link>
             <Link
               href="/mini-games"
               className="flex items-center gap-2 text-white/60 hover:text-neon-purple transition-colors font-medium group"
             >
-              <span>🎰</span>
+              {/* Dice icon for Mini-Jeux */}
+              <svg className="w-5 h-5 text-neon-purple/70 group-hover:text-neon-purple transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                <rect x="2" y="2" width="20" height="20" rx="3" />
+                <circle cx="8" cy="8" r="1.5" fill="currentColor" />
+                <circle cx="16" cy="8" r="1.5" fill="currentColor" />
+                <circle cx="8" cy="16" r="1.5" fill="currentColor" />
+                <circle cx="16" cy="16" r="1.5" fill="currentColor" />
+                <circle cx="12" cy="12" r="1.5" fill="currentColor" />
+              </svg>
               <span>Mini-Jeux</span>
               <span className="px-1.5 py-0.5 text-[10px] font-bold bg-neon-purple/20 text-neon-purple rounded uppercase">
                 Gratuit
@@ -224,19 +240,38 @@ export function Header({ profile }: HeaderProps) {
               <Link
                 href="/lobby"
                 onClick={closeMenu}
-                className="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-white/5 transition-colors"
+                className="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-neon-blue/10 transition-colors border border-transparent hover:border-neon-blue/30 group"
               >
-                <span className="text-xl">🏠</span>
-                <span className="font-medium text-white/80">Lobby</span>
+                {/* Trophy/Crown icon for Lobby */}
+                <div className="w-8 h-8 rounded-lg bg-neon-blue/10 border border-neon-blue/30 flex items-center justify-center group-hover:bg-neon-blue/20 transition-colors">
+                  <svg className="w-4 h-4 text-neon-blue" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5C7 4 6 9 6 9Z" />
+                    <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5C17 4 18 9 18 9Z" />
+                    <path d="M4 22h16" />
+                    <path d="M10 22V18.75a1.75 1.75 0 0 1 1.75-1.75h.5A1.75 1.75 0 0 1 14 18.75V22" />
+                    <path d="M6 9a6 6 0 1 0 12 0H6Z" />
+                  </svg>
+                </div>
+                <span className="font-medium text-white/80 group-hover:text-neon-blue transition-colors">Lobby</span>
               </Link>
               <Link
                 href="/mini-games"
                 onClick={closeMenu}
-                className="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-neon-purple/10 transition-colors border border-transparent hover:border-neon-purple/30"
+                className="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-neon-purple/10 transition-colors border border-transparent hover:border-neon-purple/30 group"
               >
-                <span className="text-xl">🎰</span>
-                <span className="font-medium text-white/80">Mini-Jeux</span>
-                <span className="px-2 py-0.5 text-[10px] font-bold bg-neon-purple/20 text-neon-purple rounded uppercase">
+                {/* Dice icon for Mini-Jeux */}
+                <div className="w-8 h-8 rounded-lg bg-neon-purple/10 border border-neon-purple/30 flex items-center justify-center group-hover:bg-neon-purple/20 transition-colors">
+                  <svg className="w-4 h-4 text-neon-purple" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="2" y="2" width="20" height="20" rx="3" />
+                    <circle cx="8" cy="8" r="1.5" fill="currentColor" />
+                    <circle cx="16" cy="8" r="1.5" fill="currentColor" />
+                    <circle cx="8" cy="16" r="1.5" fill="currentColor" />
+                    <circle cx="16" cy="16" r="1.5" fill="currentColor" />
+                    <circle cx="12" cy="12" r="1.5" fill="currentColor" />
+                  </svg>
+                </div>
+                <span className="font-medium text-white/80 group-hover:text-neon-purple transition-colors">Mini-Jeux</span>
+                <span className="px-2 py-0.5 text-[10px] font-bold bg-neon-purple/20 text-neon-purple rounded uppercase ml-auto">
                   Gratuit
                 </span>
               </Link>
