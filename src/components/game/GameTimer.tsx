@@ -162,7 +162,7 @@ export const GameTimer = memo(function GameTimer({
             exit={{ opacity: 0, height: 0 }}
             className="text-center text-sm text-neon-pink"
           >
-            Chaque clic remet le timer a 1 minute !
+            Chaque clic remet le timer à 1min30 !
           </motion.p>
         )}
       </AnimatePresence>

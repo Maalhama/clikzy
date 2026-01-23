@@ -469,7 +469,7 @@ export function GameClient({
                       <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
                       </svg>
-                      Chaque clic remet le timer à 1 minute !
+                      Chaque clic remet le timer à 1min30 !
                     </p>
                   )}
                 </div>
@@ -844,7 +844,7 @@ export function GameClient({
                       <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
                       </svg>
-                      Chaque clic remet le timer à 1 minute !
+                      Chaque clic remet le timer à 1min30 !
                     </p>
                   )}
                 </div>

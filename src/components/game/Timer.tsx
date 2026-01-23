@@ -36,7 +36,7 @@ export function Timer({ timeLeft, isUrgent, status }: TimerProps) {
       </div>
       {isUrgent && status !== 'ended' && (
         <div className="mt-3 text-sm text-danger animate-pulse">
-          Chaque clic remet le timer à 1 minute !
+          Chaque clic remet le timer à 1min30 !
         </div>
       )}
     </div>

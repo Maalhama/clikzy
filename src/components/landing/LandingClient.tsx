@@ -747,7 +747,7 @@ export function LandingClient({
               {[
                 { num: '1', title: 'CHOISIS', desc: 'Parcours les lots disponibles : smartphones, consoles, accessoires... Choisis celui qui te fait envie.', Icon: TargetIcon, hex: '#9B5CFF' },
                 { num: '2', title: 'CLIQUE', desc: 'Chaque clic utilise 1 crédit. Tu reçois 10 crédits gratuits chaque jour, sans aucun paiement.', Icon: CursorClickIcon, hex: '#3CCBFF' },
-                { num: '3', title: 'LE TIMER', desc: 'Quand le timer passe sous 1 minute, chaque clic le relance à 1 minute. Le jeu continue tant que la communauté joue.', Icon: TrophyIcon, hex: '#00FF88' },
+                { num: '3', title: 'LE TIMER', desc: 'Quand le timer passe sous 2 minutes, chaque clic le relance à 1min30. Le jeu continue tant que la communauté joue.', Icon: TrophyIcon, hex: '#00FF88' },
                 { num: '4', title: 'GAGNE', desc: 'Quand le timer atteint zéro, le dernier joueur à avoir cliqué remporte le lot. Simple.', Icon: GiftIcon, hex: '#FF4FD8' },
               ].map((step, i) => (
                 <div key={i} className="step-card group relative">

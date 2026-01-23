@@ -20,7 +20,7 @@ const FAQ_ITEMS: FAQItem[] = [
   },
   {
     question: "Comment fonctionne le jeu ?",
-    answer: "C'est simple : choisis un lot, clique pour participer. Chaque clic relance le timer quand il passe sous 1 minute. Quand le timer atteint zéro, le dernier joueur à avoir cliqué remporte le lot.",
+    answer: "C'est simple : choisis un lot, clique pour participer. Chaque clic relance le timer quand il passe sous 2 minutes. Quand le timer atteint zéro, le dernier joueur à avoir cliqué remporte le lot.",
   },
   {
     question: "Est-ce un jeu de hasard ?",

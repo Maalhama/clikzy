@@ -115,14 +115,14 @@ export function useLobbyBotSimulation({
     // Générer username déterministe
     const username = generateDeterministicUsername(`${game.id}-${roundedTime}-bot`)
 
-    // Reset timer SEULEMENT si timeLeft < 60s (pas juste le status)
-    const shouldResetTimer = timeLeft <= 60000
+    // Reset timer SEULEMENT si timeLeft < 120s (phase finale)
+    const shouldResetTimer = timeLeft <= 120000
 
     // Mettre à jour le jeu
     onGameUpdateRef.current(game.id, {
       total_clicks: (game.total_clicks || 0) + 1,
       last_click_username: username,
-      end_time: shouldResetTimer ? now + 60000 : game.end_time,
+      end_time: shouldResetTimer ? now + 90000 : game.end_time,
     })
 
     // Mettre à jour le temps du dernier clic
@@ -152,7 +152,7 @@ export function useLobbyBotSimulation({
         const timeLeft = game.end_time - now
         if (timeLeft <= 0) return
 
-        const isInFinalPhase = game.status === 'final_phase' || timeLeft <= 60000
+        const isInFinalPhase = game.status === 'final_phase' || timeLeft <= 120000
         const hasRealPlayer = !!game.last_click_user_id
 
         // Vérifier si la bataille est terminée
@@ -173,7 +173,7 @@ export function useLobbyBotSimulation({
             total_clicks: (game.total_clicks || 0) + 1,
             last_click_username: username,
             last_click_user_id: null, // Bot reprend
-            end_time: now + 60000,
+            end_time: now + 90000,
           })
           lastClickTimesRef.current.set(game.id, now)
           console.log(`[LOBBY BOT] SNIPE! ${username} stole from real player`)
@@ -189,7 +189,7 @@ export function useLobbyBotSimulation({
             total_clicks: (game.total_clicks || 0) + 1,
             last_click_username: username,
             last_click_user_id: null,
-            end_time: now + 60000,
+            end_time: now + 90000,
           })
           lastClickTimesRef.current.set(game.id, now)
           console.log(`[LOBBY BOT] ENDGAME SNIPE! ${username}`)
