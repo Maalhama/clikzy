@@ -152,7 +152,7 @@ export async function GET(request: NextRequest) {
       .from('games')
       .select('id, end_time')
       .in('status', ['active', 'final_phase'])
-      .lt('end_time', preCheckNow + 45000) // Jeux avec < 45s restantes
+      .lt('end_time', preCheckNow + 95000) // Jeux avec < 95s restantes (skip delay to be safe)
 
     const hasCriticalGames = criticalGames && criticalGames.length > 0
 
@@ -217,7 +217,7 @@ export async function GET(request: NextRequest) {
         // Jeu encore actif - simuler l'activité des bots
         const updates: Record<string, unknown> = {}
         let action = `active (${Math.floor(timeLeft / 1000)}s left)`
-        const isInFinalPhase = timeLeft <= 60000
+        const isInFinalPhase = timeLeft <= 120000 // 2 minutes - gives cron time to maintain
 
         // Entrer en phase finale si nécessaire
         if (isInFinalPhase && game.status !== 'final_phase') {
@@ -246,37 +246,19 @@ export async function GET(request: NextRequest) {
             // Tant que la bataille est en cours (< 100%), le bot DOIT cliquer pour maintenir le timer
             // Priorité absolue: maintenir le timer au-dessus de 0
 
-            if (timeLeft <= 20000) {
-              // URGENCE: Timer critique (< 20s), TOUJOURS cliquer peu importe le leader
+            // En phase finale, le bot DOIT toujours cliquer pour maintenir la bataille
+            // Sauf si joueur réel leader et timer encore haut (pour créer du suspense)
+
+            const shouldClick = !hasRealPlayer || timeLeft <= 45000
+
+            if (shouldClick) {
               updates.last_click_username = botUsername
               updates.last_click_user_id = null
-              updates.end_time = now + 59000 // 59s to stay in final phase
-              action = hasRealPlayer
-                ? `bot_emergency_click! (${botUsername}) saved at ${Math.floor(timeLeft/1000)}s [battle: ${Math.round(battleProgress * 100)}%/${battleDurationMin}min]`
-                : `bot_click_final (${botUsername}) at ${Math.floor(timeLeft/1000)}s [battle: ${Math.round(battleProgress * 100)}%/${battleDurationMin}min]`
-            } else if (hasRealPlayer) {
-              // Un joueur réel est leader et timer > 20s
-              if (timeLeft <= 35000) {
-                // Timer entre 20-35s - 50% chance de sniper pour créer du suspense
-                const snipeSeed = hashString(`${game.id}-snipe-${Math.floor(now / 10000)}`)
-                if (snipeSeed % 2 === 0) {
-                  updates.last_click_username = botUsername
-                  updates.last_click_user_id = null
-                  updates.end_time = now + 59000 // 59s to stay in final phase
-                  action = `bot_snipe (${botUsername}) at ${Math.floor(timeLeft/1000)}s [battle: ${Math.round(battleProgress * 100)}%/${battleDurationMin}min]`
-                } else {
-                  action = `real_player_leading (${game.last_click_username}) - ${Math.floor(timeLeft/1000)}s left, building suspense...`
-                }
-              } else {
-                // Timer > 35s avec joueur réel - laisser descendre naturellement
-                action = `real_player_leading (${game.last_click_username}) - ${Math.floor(timeLeft/1000)}s left, waiting...`
-              }
+              updates.end_time = now + 90000 // 90s - safe margin for cron interval
+              action = `bot_click_final (${botUsername}) at ${Math.floor(timeLeft/1000)}s [battle: ${Math.round(battleProgress * 100)}%/${battleDurationMin}min]`
             } else {
-              // Pas de joueur réel - bot clique pour maintenir la bataille
-              updates.last_click_username = botUsername
-              updates.last_click_user_id = null
-              updates.end_time = now + 59000 // 59s to stay in final phase
-              action = `bot_click_final (${botUsername}) [battle: ${Math.round(battleProgress * 100)}%/${battleDurationMin}min]`
+              // Joueur réel leader et timer > 45s - laisser descendre un peu
+              action = `real_player_leading (${game.last_click_username}) - ${Math.floor(timeLeft/1000)}s left, waiting...`
             }
           } else {
             // Bataille terminée ET pas de joueur réel - laisser timer descendre
