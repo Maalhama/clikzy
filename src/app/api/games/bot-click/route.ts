@@ -19,13 +19,29 @@ export async function POST(request: NextRequest) {
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
-    // Mettre à jour le leader du jeu
+    // Vérifier si le jeu est en phase finale pour étendre le timer
+    const { data: game } = await supabase
+      .from('games')
+      .select('status, end_time')
+      .eq('id', gameId)
+      .single()
+
+    const now = Date.now()
+    const isInFinalPhase = game?.status === 'final_phase' || (game?.end_time && game.end_time - now <= 60000)
+
+    // Mettre à jour le leader du jeu et étendre le timer si en phase finale
+    const updateData: Record<string, unknown> = {
+      last_click_username: username,
+      last_click_user_id: null, // Bot, pas un vrai joueur
+    }
+
+    if (isInFinalPhase) {
+      updateData.end_time = now + 60000 // Étendre le timer à 60s
+    }
+
     const { error } = await supabase
       .from('games')
-      .update({
-        last_click_username: username,
-        last_click_user_id: null, // Bot, pas un vrai joueur
-      })
+      .update(updateData)
       .eq('id', gameId)
       .in('status', ['active', 'final_phase'])
 

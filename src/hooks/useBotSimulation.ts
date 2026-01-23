@@ -93,21 +93,17 @@ function getBattleProgress(gameId: string, battleStartTime: string | null): numb
 }
 
 function shouldBotClickInBattle(gameId: string, battleProgress: number, hasRealPlayer: boolean): boolean {
-  // Si un joueur réel est encore actif, continuer la bataille même après la durée max
-  if (battleProgress >= 1) {
-    // Bataille "terminée" mais joueur réel présent = continuer à se battre
-    return hasRealPlayer
+  // Tant que la bataille n'est pas terminée (< 100%), les bots DOIVENT cliquer
+  // pour maintenir le timer et faire durer la bataille 30min à 1h59min
+
+  if (battleProgress < 1) {
+    // Bataille en cours - toujours cliquer pour maintenir le timer
+    return true
   }
-  if (battleProgress < 0.9) return true
 
-  // 90-100%: probabilité linéaire décroissante (sauf si joueur réel)
-  if (hasRealPlayer) return true // Toujours cliquer si joueur réel présent
-
-  const remainingProgress = (1 - battleProgress) / 0.1
-  const seed = getDeterministicSeed(gameId, Math.floor(Date.now() / 5000))
-  const random = (seed % 100) / 100
-
-  return random < remainingProgress
+  // Bataille terminée (>= 100%)
+  // Continuer seulement si un joueur réel est présent
+  return hasRealPlayer
 }
 
 export function useBotSimulation({
