@@ -186,10 +186,11 @@ export async function resetPassword(email: string): Promise<AuthResult> {
   }
 
   const supabase = await createClient()
-  const origin = (await headers()).get('origin') || process.env.NEXT_PUBLIC_SITE_URL
+  // Toujours utiliser NEXT_PUBLIC_SITE_URL pour éviter les redirections vers localhost
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://clikzy.vercel.app'
 
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: `${origin}/reset-password`,
+    redirectTo: `${siteUrl}/reset-password`,
   })
 
   if (error) {
