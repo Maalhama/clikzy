@@ -50,12 +50,13 @@ export async function getMiniGameEligibility(): Promise<ActionResult<MiniGameEli
   const todayMidnight = getTodayMidnight()
   const tomorrowMidnight = getTomorrowMidnight()
 
-  // Get today's plays for all game types
+  // Get today's FREE plays for all game types (ignore paid plays)
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { data: plays, error } = await (supabase as any)
     .from('mini_game_plays')
     .select('game_type, played_at')
     .eq('user_id', user.id)
+    .eq('is_free_play', true)
     .gte('played_at', todayMidnight.toISOString())
     .order('played_at', { ascending: false })
 
@@ -158,7 +159,7 @@ export async function playMiniGame(gameType: MiniGameType): Promise<ActionResult
       creditsWon = 0
   }
 
-  // Insert play record
+  // Insert play record (free play)
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { error: insertError } = await (supabase as any)
     .from('mini_game_plays')
@@ -166,6 +167,7 @@ export async function playMiniGame(gameType: MiniGameType): Promise<ActionResult
       user_id: user.id,
       game_type: gameType,
       credits_won: creditsWon,
+      is_free_play: true,
     })
 
   if (insertError) {
@@ -276,7 +278,7 @@ export async function playMiniGamePaid(gameType: MiniGameType): Promise<ActionRe
       creditsWon = 0
   }
 
-  // Insert play record (for history tracking)
+  // Insert play record (paid play - for history tracking)
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   await (supabase as any)
     .from('mini_game_plays')
@@ -284,6 +286,7 @@ export async function playMiniGamePaid(gameType: MiniGameType): Promise<ActionRe
       user_id: user.id,
       game_type: gameType,
       credits_won: creditsWon,
+      is_free_play: false,
     })
 
   // Add winnings to user profile

@@ -6,6 +6,7 @@ export interface MiniGamePlay {
   game_type: MiniGameType
   credits_won: number
   played_at: string
+  is_free_play: boolean
 }
 
 export interface MiniGameEligibility {
