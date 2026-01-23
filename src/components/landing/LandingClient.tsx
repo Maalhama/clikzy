@@ -1218,10 +1218,10 @@ export function LandingClient({
 
         {/* Links - Horizontal compact */}
         <div className="flex flex-wrap gap-x-4 gap-y-2 mb-4 text-xs">
-          <a href="#" className="text-white/40">CGU</a>
-          <a href="#" className="text-white/40">Confidentialité</a>
-          <a href="#" className="text-white/40">Mentions légales</a>
-          <a href="mailto:contact@clikzy.fr" className="text-white/40">Contact</a>
+          <Link href="/terms" className="text-white/40 hover:text-white">CGU</Link>
+          <Link href="/privacy" className="text-white/40 hover:text-white">Confidentialité</Link>
+          <Link href="/legal" className="text-white/40 hover:text-white">Mentions légales</Link>
+          <Link href="/support" className="text-white/40 hover:text-white">Contact</Link>
         </div>
 
         {/* Copyright */}
@@ -1279,10 +1279,10 @@ export function LandingClient({
             <div>
               <h4 className="text-white font-bold mb-5 text-sm uppercase tracking-wider">Légal</h4>
               <ul className="space-y-3">
-                <li><a href="#" className="text-white/50 hover:text-neon-blue transition-colors text-sm">Conditions générales</a></li>
-                <li><a href="#" className="text-white/50 hover:text-neon-blue transition-colors text-sm">Politique de confidentialité</a></li>
-                <li><a href="#" className="text-white/50 hover:text-neon-blue transition-colors text-sm">Mentions légales</a></li>
-                <li><a href="#" className="text-white/50 hover:text-neon-blue transition-colors text-sm">Règlement des jeux</a></li>
+                <li><Link href="/terms" className="text-white/50 hover:text-neon-blue transition-colors text-sm">Conditions générales</Link></li>
+                <li><Link href="/privacy" className="text-white/50 hover:text-neon-blue transition-colors text-sm">Politique de confidentialité</Link></li>
+                <li><Link href="/legal" className="text-white/50 hover:text-neon-blue transition-colors text-sm">Mentions légales</Link></li>
+                <li><Link href="/cgv" className="text-white/50 hover:text-neon-blue transition-colors text-sm">CGV</Link></li>
               </ul>
             </div>
 
