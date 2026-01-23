@@ -63,8 +63,8 @@ export const GameTimer = memo(function GameTimer({
 
   const config = getStatusConfig()
 
-  // Progress percentage for the bar
-  const maxTime = 60000 // 60 seconds max display
+  // Progress percentage for the bar (1min30 = 90s)
+  const maxTime = 90000 // 90 seconds max display
   const progress = Math.min(timeLeft / maxTime, 1)
 
   return (
