@@ -5,14 +5,12 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import { updateUsername, uploadAvatar } from '@/actions/profile'
-import { Logo } from '@/components/ui/Logo'
+import { CreditPacksModal } from '@/components/modals/CreditPacksModal'
 import {
   TrophyIcon,
-  CursorClickIcon,
   CoinsIcon,
   GiftIcon,
   GamepadIcon,
-  FireIcon,
   SparklesIcon,
 } from '@/components/ui/GamingIcons'
 import type { Profile, Winner, Item } from '@/types/database'
@@ -112,6 +110,7 @@ export function ProfileClient({ profile, wins, gamesPlayed, totalValueWon }: Pro
   const [avatarError, setAvatarError] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
+  const [showCreditModal, setShowCreditModal] = useState(false)
 
   const playerLevel = getPlayerLevel(wins.length, profile.total_clicks || 0, gamesPlayed)
   const winRate = gamesPlayed > 0 ? ((wins.length / gamesPlayed) * 100).toFixed(1) : '0'
@@ -176,31 +175,30 @@ export function ProfileClient({ profile, wins, gamesPlayed, totalValueWon }: Pro
         )}
       </AnimatePresence>
 
-      {/* Header */}
-      <header className="sticky top-0 z-40 border-b border-white/10 bg-bg-primary/80 backdrop-blur-xl">
-        <div className="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
+      {/* Main content */}
+      <main className="relative z-10 max-w-4xl mx-auto px-4 py-4">
+        {/* Top bar with back button and buy credits */}
+        <div className="flex items-center justify-between mb-4">
           <Link
             href="/lobby"
-            className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-sm text-white/70 hover:text-white hover:border-neon-purple/50 transition-all"
+            className="flex items-center gap-1.5 text-white/50 hover:text-white text-sm transition-colors"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
             </svg>
-            <span className="hidden sm:inline">Retour au lobby</span>
+            <span>Lobby</span>
           </Link>
 
-          <Logo size="sm" animated={false} href="/" />
-
-          {/* Credits badge */}
-          <div className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-neon-purple/10 border border-neon-purple/30">
+          {/* Buy credits button */}
+          <button
+            onClick={() => setShowCreditModal(true)}
+            className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gradient-to-r from-neon-purple/20 to-neon-pink/20 border border-neon-purple/30 hover:border-neon-pink/50 transition-all group"
+          >
             <CoinsIcon className="w-4 h-4 text-neon-purple" />
-            <span className="font-bold text-neon-purple">{profile.credits || 0}</span>
-          </div>
+            <span className="text-sm font-semibold text-white">{profile.credits || 0}</span>
+            <span className="text-neon-pink text-xs font-medium group-hover:underline">+ Acheter</span>
+          </button>
         </div>
-      </header>
-
-      {/* Main content */}
-      <main className="relative z-10 max-w-4xl mx-auto px-4 py-6">
         {/* Profile Card */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -414,6 +412,12 @@ export function ProfileClient({ profile, wins, gamesPlayed, totalValueWon }: Pro
             : '-'}
         </p>
       </main>
+
+      {/* Credit Packs Modal */}
+      <CreditPacksModal
+        isOpen={showCreditModal}
+        onClose={() => setShowCreditModal(false)}
+      />
     </div>
   )
 }
