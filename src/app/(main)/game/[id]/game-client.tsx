@@ -12,6 +12,7 @@ import { clickGame } from '@/actions/game'
 import { GAME_CONSTANTS } from '@/lib/constants'
 import { formatTime } from '@/lib/utils/timer'
 import { generateDeterministicUsername } from '@/lib/bots/usernameGenerator'
+import { CreditPacksModal } from '@/components/modals/CreditPacksModal'
 import type { Game, Item } from '@/types/database'
 
 // Generate UUID with fallback for browsers that don't support crypto.randomUUID
@@ -175,6 +176,7 @@ export function GameClient({
   const [isPending, startTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
   const [showWinnerModal, setShowWinnerModal] = useState(false)
+  const [showCreditModal, setShowCreditModal] = useState(false)
   const [clickAnimation, setClickAnimation] = useState(false)
   const [creditsAnimation, setCreditsAnimation] = useState(false)
 
@@ -570,6 +572,19 @@ export function GameClient({
                 </button>
               )}
 
+              {/* Buy credits button when no credits */}
+              {game.status !== 'ended' && !hasCredits && (
+                <button
+                  onClick={() => setShowCreditModal(true)}
+                  className="w-full py-3 mt-3 rounded-xl bg-gradient-to-r from-neon-purple to-neon-pink text-white font-bold flex items-center justify-center gap-2 hover:shadow-[0_0_25px_rgba(155,92,255,0.4)] transition-all"
+                >
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  Acheter des crédits
+                </button>
+              )}
+
               {error && (
                 <div className="mt-4 text-center text-danger bg-danger/10 border border-danger/30 px-4 py-3 rounded-xl text-sm flex items-center justify-center gap-2">
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -936,6 +951,19 @@ export function GameClient({
                 </button>
               )}
 
+              {/* Buy credits button when no credits - Desktop */}
+              {game.status !== 'ended' && !hasCredits && (
+                <button
+                  onClick={() => setShowCreditModal(true)}
+                  className="w-full py-3 rounded-xl bg-gradient-to-r from-neon-purple to-neon-pink text-white font-bold flex items-center justify-center gap-2 hover:shadow-[0_0_25px_rgba(155,92,255,0.4)] hover:scale-[1.01] transition-all"
+                >
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  Acheter des crédits
+                </button>
+              )}
+
               {error && (
                 <div className="text-center text-danger bg-danger/10 border border-danger/30 px-3 py-2 rounded-lg text-sm flex items-center justify-center gap-2">
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -1067,6 +1095,12 @@ export function GameClient({
           </div>
         </div>
       )}
+
+      {/* Credit Packs Modal */}
+      <CreditPacksModal
+        isOpen={showCreditModal}
+        onClose={() => setShowCreditModal(false)}
+      />
     </div>
   )
 }

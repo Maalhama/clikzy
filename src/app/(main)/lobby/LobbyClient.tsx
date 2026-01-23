@@ -1,7 +1,7 @@
 'use client'
 
 import { Suspense, useMemo, useEffect, useState, useCallback, useRef } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import {
   LobbyHeader,
   GameFilters,
@@ -17,6 +17,7 @@ import { useLobbyRealtime } from '@/hooks/lobby/useLobbyRealtime'
 import { useLobbyBotSimulation } from '@/hooks/lobby/useLobbyBotSimulation'
 import { useFavorites } from '@/hooks/useFavorites'
 import { usePullToRefresh } from '@/hooks/usePullToRefresh'
+import { useCreditsOptional } from '@/contexts/CreditsContext'
 import type { GameWithItem } from '@/types/database'
 
 interface LobbyClientProps {
@@ -34,12 +35,38 @@ export function LobbyClient({
 }: LobbyClientProps) {
   // Search state
   const [searchQuery, setSearchQuery] = useState('')
+  const [paymentSuccess, setPaymentSuccess] = useState<{ show: boolean; credits: number }>({ show: false, credits: 0 })
 
   // Favorites
   const { favorites, isFavorite, toggleFavorite } = useFavorites()
 
+  // Credits context for refresh
+  const creditsContext = useCreditsOptional()
+
   // Router for refresh
   const router = useRouter()
+  const searchParams = useSearchParams()
+
+  // Handle payment success from URL params
+  useEffect(() => {
+    const payment = searchParams.get('payment')
+    const creditsParam = searchParams.get('credits')
+
+    if (payment === 'success' && creditsParam) {
+      const purchasedCredits = parseInt(creditsParam, 10)
+      if (purchasedCredits > 0) {
+        setPaymentSuccess({ show: true, credits: purchasedCredits })
+        // Refresh credits from database
+        creditsContext?.refreshCredits()
+        // Clean URL params
+        router.replace('/lobby', { scroll: false })
+        // Auto-hide after 5 seconds
+        setTimeout(() => {
+          setPaymentSuccess({ show: false, credits: 0 })
+        }, 5000)
+      }
+    }
+  }, [searchParams, router, creditsContext])
 
   // Pull to refresh handler
   const handleRefresh = useCallback(async () => {
@@ -130,6 +157,31 @@ export function LobbyClient({
 
   return (
     <>
+      {/* Payment success toast */}
+      {paymentSuccess.show && (
+        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 animate-in slide-in-from-top-4 fade-in duration-300">
+          <div className="flex items-center gap-3 px-5 py-3 rounded-xl bg-success/90 backdrop-blur-sm text-white shadow-lg shadow-success/20">
+            <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+            <div>
+              <div className="font-bold">Paiement réussi !</div>
+              <div className="text-sm text-white/80">+{paymentSuccess.credits} crédits ajoutés</div>
+            </div>
+            <button
+              onClick={() => setPaymentSuccess({ show: false, credits: 0 })}
+              className="ml-2 p-1 rounded-full hover:bg-white/20 transition-colors"
+            >
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Floating urgent timer */}
       <FloatingTimer
         enabled={true}
