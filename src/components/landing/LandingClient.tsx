@@ -160,7 +160,6 @@ export function LandingClient({
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [menuClosing, setMenuClosing] = useState(false)
   const [isMounted, setIsMounted] = useState(false)
-  const [isMobile, setIsMobile] = useState(false)
   const [isNavigating, setIsNavigating] = useState(false)
 
   async function handleSignOut() {
@@ -175,10 +174,9 @@ export function LandingClient({
     router.push(href)
   }
 
-  // Pour le portal - attendre le montage côté client + detect mobile + prefetch auth pages
+  // Pour le portal - attendre le montage côté client + prefetch auth pages
   useEffect(() => {
     setIsMounted(true)
-    setIsMobile(window.innerWidth < 768)
 
     // Prefetch auth pages for faster navigation
     if (!isLoggedIn) {

@@ -54,10 +54,6 @@ function getEndedGamesStartTime(): number {
   // Calculate the start time of the current rotation in UTC
   const rotationStart = new Date(now)
 
-  // Get Paris offset
-  const utcDate = new Date(now.toLocaleString('en-US', { timeZone: 'UTC' }))
-  const parisDate = new Date(now.toLocaleString('en-US', { timeZone: 'Europe/Paris' }))
-  const parisOffset = parisDate.getTime() - utcDate.getTime()
 
   // Set to current rotation hour in Paris, then convert to UTC
   rotationStart.setHours(now.getHours() - parisHour + currentRotationHour, 0, 0, 0)

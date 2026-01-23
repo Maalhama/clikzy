@@ -3,6 +3,7 @@
 import { useEffect, useState, memo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
+import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 
 interface GameWinnerModalProps {
@@ -147,11 +148,13 @@ export const GameWinnerModal = memo(function GameWinnerModal({
                       transition={{ delay: 0.4 }}
                       className="bg-bg-tertiary/50 rounded-2xl p-6 mb-6 border border-white/10"
                     >
-                      <div className="w-24 h-24 mx-auto mb-4 rounded-xl bg-bg-secondary flex items-center justify-center overflow-hidden">
-                        <img
+                      <div className="relative w-24 h-24 mx-auto mb-4 rounded-xl bg-bg-secondary flex items-center justify-center overflow-hidden">
+                        <Image
                           src={itemImage}
                           alt={itemName}
-                          className="max-w-[90%] max-h-[90%] object-contain"
+                          fill
+                          className="object-contain p-2"
+                          sizes="96px"
                         />
                       </div>
                       <p className="text-xl font-bold text-white mb-1">

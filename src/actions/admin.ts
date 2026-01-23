@@ -31,7 +31,7 @@ export async function getAdminStats(): Promise<AdminStats | null> {
 
   const supabase = await createClient()
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  /* eslint-disable @typescript-eslint/no-explicit-any */
   const [usersResult, gamesResult, itemsResult, activeGamesResult, winsResult] = await Promise.all([
     (supabase as any).from('profiles').select('*', { count: 'exact', head: true }),
     (supabase as any).from('games').select('*', { count: 'exact', head: true }),
@@ -39,6 +39,7 @@ export async function getAdminStats(): Promise<AdminStats | null> {
     (supabase as any).from('games').select('*', { count: 'exact', head: true }).in('status', ['waiting', 'active', 'final_phase']),
     (supabase as any).from('winners').select('*', { count: 'exact', head: true }),
   ])
+  /* eslint-enable @typescript-eslint/no-explicit-any */
 
   // Get total clicks from all profiles
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

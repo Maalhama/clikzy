@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import type { Item } from '@/types/database'
 
 type ItemDisplayProps = {
@@ -14,10 +15,12 @@ export function ItemDisplay({ item, className = '' }: ItemDisplayProps) {
       <div className="relative group">
         <div className="absolute inset-0 bg-gradient-to-r from-neon-purple via-neon-blue to-neon-pink opacity-50 blur-xl group-hover:opacity-75 transition-opacity" />
         <div className="relative aspect-video bg-bg-tertiary flex items-center justify-center p-8 border border-bg-tertiary rounded-xl">
-          <img
+          <Image
             src={item.image_url}
             alt={item.name}
-            className="max-w-full max-h-full object-contain drop-shadow-2xl transition-transform group-hover:scale-105"
+            fill
+            className="object-contain drop-shadow-2xl transition-transform group-hover:scale-105 p-8"
+            sizes="(max-width: 768px) 100vw, 50vw"
           />
         </div>
       </div>

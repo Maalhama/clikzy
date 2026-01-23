@@ -2,7 +2,7 @@
 
 import { useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
-import { RoundedBox, Text, MeshTransmissionMaterial } from '@react-three/drei'
+import { RoundedBox, MeshTransmissionMaterial } from '@react-three/drei'
 import * as THREE from 'three'
 
 interface ProductFallback3DProps {

@@ -22,9 +22,6 @@ const FAKE_PRODUCTS = [
   'DJI Mini 4 Pro',
 ]
 
-// Threshold for showing timer to logged-in users (10 minutes)
-const LOGGED_IN_THRESHOLD = 10 * 60 * 1000 // 10 minutes in ms
-
 interface FloatingTimerProps {
   isLoggedIn?: boolean
   gameId?: string

@@ -52,7 +52,7 @@ export function getNextRotationTime(): Date {
   }
 
   // Si pas de rotation plus tard aujourd'hui, prendre la première de demain
-  let isNextDay = nextRotationHour === undefined
+  const isNextDay = nextRotationHour === undefined
   if (isNextDay) {
     nextRotationHour = ROTATION_HOURS[0]
   }

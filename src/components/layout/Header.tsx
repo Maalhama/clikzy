@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { usePathname, useRouter } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import { createPortal } from 'react-dom'
 import { signOut } from '@/actions/auth'
 import { Logo } from '@/components/ui/Logo'
@@ -15,16 +15,9 @@ interface HeaderProps {
 
 export function Header({ profile }: HeaderProps) {
   const router = useRouter()
-  const pathname = usePathname()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [menuClosing, setMenuClosing] = useState(false)
-  const [isMounted, setIsMounted] = useState(false)
   const { credits } = useCredits()
-
-  // Mount check for portal
-  useState(() => {
-    setIsMounted(true)
-  })
 
   const closeMenu = () => {
     if (menuClosing) return
@@ -40,8 +33,6 @@ export function Header({ profile }: HeaderProps) {
     await signOut()
     router.push('/login')
   }
-
-  const isActive = (path: string) => pathname === path
 
   return (
     <>

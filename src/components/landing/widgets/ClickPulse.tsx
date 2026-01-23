@@ -29,7 +29,7 @@ export function ClickPulse({
     setIsMobile(window.innerWidth < 768)
   }, [])
 
-  const getIntervalRange = () => {
+  const getIntervalRange = useCallback(() => {
     switch (intensity) {
       case 'low':
         return { min: 2000, max: 5000 }
@@ -38,7 +38,7 @@ export function ClickPulse({
       case 'high':
         return { min: 300, max: 1000 }
     }
-  }
+  }, [intensity])
 
   const addPulse = useCallback(() => {
     const colors: PulsePoint['color'][] = ['purple', 'blue', 'pink']
@@ -77,7 +77,7 @@ export function ClickPulse({
     const timeout = scheduleNext()
 
     return () => clearTimeout(timeout)
-  }, [enabled, intensity, addPulse, isMobile])
+  }, [enabled, addPulse, isMobile, getIntervalRange])
 
   const getColorStyles = (color: PulsePoint['color']) => {
     switch (color) {

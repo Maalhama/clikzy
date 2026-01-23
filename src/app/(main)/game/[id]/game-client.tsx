@@ -224,44 +224,15 @@ type GameClientProps = {
 
 export function GameClient({
   initialGame,
-  initialCredits,
+  initialCredits: _initialCredits,
   username,
   userId,
-  recentClicks: initialClicks,
+  recentClicks: _initialClicks,
 }: GameClientProps) {
   // useGame now provides recentClicks from DB (synced with lobby)
-  const { game, recentClicks: dbClicks, isConnected, optimisticUpdate, addClick, removeClick } = useGame(initialGame)
+  const { game, isConnected, optimisticUpdate, addClick, removeClick } = useGame(initialGame)
   const { credits, decrementCredits } = useCredits()
 
-  // Merge initial clicks with DB clicks, prioritizing DB
-  // If no clicks exist, generate fake initial history for visual feedback
-  const recentClicks = useMemo(() => {
-    const dbIds = new Set(dbClicks.map(c => c.id))
-    const uniqueInitial = initialClicks.filter(c => !dbIds.has(c.id))
-    // Convert dbClicks to the expected format
-    const formattedDbClicks = dbClicks.map(c => ({
-      id: c.id,
-      username: c.username,
-      clickedAt: c.clickedAt,
-    }))
-    const mergedClicks = [...formattedDbClicks, ...uniqueInitial]
-
-    // If no clicks yet, generate 3 fake initial clicks for visual history
-    if (mergedClicks.length === 0) {
-      const now = Date.now()
-      return [0, 1, 2].map((i) => {
-        const seed = `${initialGame.id}-initial-${i}`
-        const clickTime = now - (i * 30000 + Math.floor(Math.random() * 10000)) // 30s apart
-        return {
-          id: `initial-${seed}`,
-          username: generateDeterministicUsername(seed),
-          clickedAt: new Date(clickTime).toISOString(),
-        }
-      })
-    }
-
-    return mergedClicks.slice(0, 10)
-  }, [dbClicks, initialClicks, initialGame.id])
   const [isPending, startTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
   const [showWinnerModal, setShowWinnerModal] = useState(false)
@@ -1183,59 +1154,6 @@ export function GameClient({
         isOpen={showCreditModal}
         onClose={() => setShowCreditModal(false)}
       />
-    </div>
-  )
-}
-
-// Live Click Item Component
-function LiveClickItem({ click, isNew }: { click: RecentClick; isNew: boolean }) {
-  const [timeAgo, setTimeAgo] = useState(0)
-
-  useEffect(() => {
-    const updateTime = () => {
-      setTimeAgo(Math.floor((Date.now() - new Date(click.clickedAt).getTime()) / 1000))
-    }
-    updateTime()
-    const interval = setInterval(updateTime, 1000)
-    return () => clearInterval(interval)
-  }, [click.clickedAt])
-
-  const timeDisplay = timeAgo < 5 ? 'maintenant' : `il y a ${timeAgo}s`
-
-  return (
-    <div
-      className={`
-        flex items-center gap-3 px-3 py-2 rounded-lg
-        transition-all duration-300
-        ${isNew ? 'bg-neon-purple/20 animate-pulse' : 'bg-bg-secondary/30'}
-      `}
-    >
-      {/* Avatar */}
-      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-neon-purple to-neon-pink flex items-center justify-center flex-shrink-0">
-        <span className="text-white text-xs font-bold">
-          {click.username.charAt(0).toUpperCase()}
-        </span>
-      </div>
-
-      {/* Content */}
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2">
-          <span className="font-medium text-white text-sm truncate">
-            {click.username}
-          </span>
-          <span className="text-neon-purple text-xs flex items-center gap-1">
-            <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122" />
-            </svg>
-            a cliqué
-          </span>
-        </div>
-      </div>
-
-      {/* Time */}
-      <div className="text-white/30 text-[10px] whitespace-nowrap" suppressHydrationWarning>
-        {timeDisplay}
-      </div>
     </div>
   )
 }

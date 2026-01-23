@@ -104,7 +104,7 @@ export function ProductShowcase3D({
   className = '',
 }: ProductShowcase3DProps) {
   const [currentIndex, setCurrentIndex] = useState(0)
-  const [modelError, setModelError] = useState<Record<string, boolean>>({})
+  const [modelError] = useState<Record<string, boolean>>({})
 
   const currentProduct = products[currentIndex]
 

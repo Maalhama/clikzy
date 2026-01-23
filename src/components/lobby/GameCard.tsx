@@ -220,7 +220,6 @@ export const GameCard = memo(function GameCard({ game, index = 0, isFavorite = f
     game.end_time ? calculateTimeLeft(game.end_time) : 0
   )
   const [prevClicks, setPrevClicks] = useState(game.total_clicks)
-  const [isClickAnimating, setIsClickAnimating] = useState(false)
   const cardRef = useRef<HTMLAnchorElement>(null)
 
   const isStatusEnded = game.status === 'ended'
@@ -247,15 +246,12 @@ export const GameCard = memo(function GameCard({ game, index = 0, isFavorite = f
 
     animationId = requestAnimationFrame(updateTimer)
     return () => cancelAnimationFrame(animationId)
-  }, [game.end_time, isEnded])
+  }, [game.end_time, isStatusEnded])
 
-  // Click count animation
+  // Click count sync
   useEffect(() => {
     if (game.total_clicks > prevClicks) {
-      setIsClickAnimating(true)
-      const timer = setTimeout(() => setIsClickAnimating(false), 300)
       setPrevClicks(game.total_clicks)
-      return () => clearTimeout(timer)
     }
   }, [game.total_clicks, prevClicks])
 

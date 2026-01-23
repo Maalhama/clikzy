@@ -2,7 +2,6 @@
 
 import { useCallback, useMemo, useState, useEffect, useRef } from 'react'
 import { useSearchParams, useRouter, usePathname } from 'next/navigation'
-import type { GameWithItem } from '@/types/database'
 import type { GameWithFinalPhaseTracking } from '@/hooks/lobby/useLobbyRealtime'
 import { calculateTimeLeft } from '@/lib/utils/timer'
 import { FINAL_PHASE_THRESHOLD } from '@/lib/utils/constants'
