@@ -182,14 +182,18 @@ export function Header({ profile }: HeaderProps) {
               </button>
             </div>
 
-            {/* User info */}
+            {/* User info - clickable to profile */}
             {profile && (
-              <div className="px-4 py-4 border-b border-white/10">
+              <Link
+                href="/profile"
+                onClick={closeMenu}
+                className="block px-4 py-4 border-b border-white/10 hover:bg-white/5 transition-colors"
+              >
                 <div className="flex items-center gap-3">
                   <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-neon-purple to-neon-pink flex items-center justify-center font-bold text-white text-lg">
                     {profile.username.charAt(0).toUpperCase()}
                   </div>
-                  <div>
+                  <div className="flex-1">
                     <div className="font-bold text-white">{profile.username}</div>
                     <div className="flex items-center gap-1 text-neon-purple text-sm">
                       <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -198,8 +202,11 @@ export function Header({ profile }: HeaderProps) {
                       <span className="font-bold">{credits} crédits</span>
                     </div>
                   </div>
+                  <svg className="w-5 h-5 text-white/40" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                  </svg>
                 </div>
-              </div>
+              </Link>
             )}
 
             
