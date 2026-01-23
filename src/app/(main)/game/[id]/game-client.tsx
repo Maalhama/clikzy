@@ -520,14 +520,25 @@ export function GameClient({
                 </div>
               </div>
 
-              {/* Click button */}
-              {game.status !== 'ended' && (
+              {/* Click button - shows "Buy credits" when no credits */}
+              {game.status !== 'ended' && !hasCredits && (
+                <button
+                  onClick={() => setShowCreditModal(true)}
+                  className="w-full py-4 rounded-xl font-bold text-lg transition-all flex items-center justify-center gap-2 bg-gradient-to-r from-neon-purple to-neon-pink text-white shadow-[0_0_25px_rgba(155,92,255,0.4)] hover:shadow-[0_0_35px_rgba(155,92,255,0.6)] active:scale-[0.98]"
+                >
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  Acheter des crédits
+                </button>
+              )}
+              {game.status !== 'ended' && hasCredits && (
                 <button
                   onClick={handleClick}
-                  disabled={!canClick || isPending || !hasCredits}
+                  disabled={!canClick || isPending}
                   className={`
                     w-full py-4 rounded-xl font-bold text-lg transition-all flex items-center justify-center gap-2
-                    ${!canClick || !hasCredits
+                    ${!canClick
                       ? 'bg-bg-secondary/50 text-white/30 cursor-not-allowed'
                       : isUrgent
                       ? `bg-danger text-white shadow-[0_0_30px_rgba(255,68,68,0.4)] hover:shadow-[0_0_40px_rgba(255,68,68,0.6)] active:scale-[0.98] ${clickAnimation ? 'scale-95' : ''}`
@@ -543,8 +554,6 @@ export function GameClient({
                       </svg>
                       Enregistrement...
                     </>
-                  ) : !hasCredits ? (
-                    'Crédits insuffisants'
                   ) : game.status === 'waiting' ? (
                     'En attente...'
                   ) : isCritical ? (
@@ -569,19 +578,6 @@ export function GameClient({
                       CLIQUER - 1 crédit
                     </>
                   )}
-                </button>
-              )}
-
-              {/* Buy credits button when no credits */}
-              {game.status !== 'ended' && !hasCredits && (
-                <button
-                  onClick={() => setShowCreditModal(true)}
-                  className="w-full py-3 mt-3 rounded-xl bg-gradient-to-r from-neon-purple to-neon-pink text-white font-bold flex items-center justify-center gap-2 hover:shadow-[0_0_25px_rgba(155,92,255,0.4)] transition-all"
-                >
-                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  Acheter des crédits
                 </button>
               )}
 
@@ -900,13 +896,24 @@ export function GameClient({
               </div>
 
               {/* Click Button */}
-              {game.status !== 'ended' && (
+              {game.status !== 'ended' && !hasCredits && (
+                <button
+                  onClick={() => setShowCreditModal(true)}
+                  className="w-full py-4 rounded-xl font-bold text-lg transition-all flex items-center justify-center gap-2 bg-gradient-to-r from-neon-purple to-neon-pink text-white shadow-[0_0_25px_rgba(155,92,255,0.4)] hover:shadow-[0_0_35px_rgba(155,92,255,0.6)] hover:scale-[1.01] active:scale-[0.98]"
+                >
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  Acheter des crédits
+                </button>
+              )}
+              {game.status !== 'ended' && hasCredits && (
                 <button
                   onClick={handleClick}
-                  disabled={!canClick || isPending || !hasCredits}
+                  disabled={!canClick || isPending}
                   className={`
                     w-full py-4 rounded-xl font-bold text-lg transition-all flex items-center justify-center gap-2
-                    ${!canClick || !hasCredits
+                    ${!canClick
                       ? 'bg-bg-secondary/50 text-white/30 cursor-not-allowed'
                       : isUrgent
                       ? `bg-danger text-white shadow-[0_0_30px_rgba(255,68,68,0.4)] hover:shadow-[0_0_40px_rgba(255,68,68,0.6)] hover:scale-[1.01] active:scale-[0.98] ${clickAnimation ? 'scale-95' : ''}`
@@ -922,8 +929,6 @@ export function GameClient({
                       </svg>
                       Enregistrement...
                     </>
-                  ) : !hasCredits ? (
-                    'Crédits insuffisants'
                   ) : game.status === 'waiting' ? (
                     'En attente...'
                   ) : isCritical ? (
@@ -948,19 +953,6 @@ export function GameClient({
                       CLIQUER - 1 crédit
                     </>
                   )}
-                </button>
-              )}
-
-              {/* Buy credits button when no credits - Desktop */}
-              {game.status !== 'ended' && !hasCredits && (
-                <button
-                  onClick={() => setShowCreditModal(true)}
-                  className="w-full py-3 rounded-xl bg-gradient-to-r from-neon-purple to-neon-pink text-white font-bold flex items-center justify-center gap-2 hover:shadow-[0_0_25px_rgba(155,92,255,0.4)] hover:scale-[1.01] transition-all"
-                >
-                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  Acheter des crédits
                 </button>
               )}
 
