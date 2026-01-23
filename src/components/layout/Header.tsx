@@ -209,9 +209,8 @@ export function Header({ profile }: HeaderProps) {
               </Link>
             )}
 
-            
             {/* Sign out */}
-            <div className="px-4 pb-4">
+            <div className="px-4 pt-4 pb-4">
               <button
                 onClick={handleSignOut}
                 className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-danger/10 border border-danger/30 text-danger hover:bg-danger/20 transition-colors"
