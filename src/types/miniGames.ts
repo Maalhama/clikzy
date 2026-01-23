@@ -31,14 +31,14 @@ export interface MiniGameResult {
   newTotalCredits: number
 }
 
-// Wheel segments configuration
-export const WHEEL_SEGMENTS = [0, 1, 2, 3, 5, 2, 1, 10] as const
+// Wheel segments configuration (8 segments, moyenne: 2.25 crédits)
+export const WHEEL_SEGMENTS = [0, 0, 1, 1, 2, 3, 3, 10] as const
 
-// Scratch card possible values (weighted)
-export const SCRATCH_VALUES = [1, 1, 1, 2, 2, 2, 3, 3, 5, 10] as const
+// Scratch card possible values weighted (10 valeurs, moyenne: 2.2 crédits)
+export const SCRATCH_VALUES = [0, 0, 1, 1, 1, 2, 2, 3, 3, 10] as const
 
-// Pachinko slots configuration
-export const PACHINKO_SLOTS = [0, 1, 2, 5, 10, 5, 2, 1, 0] as const
+// Pachinko slots configuration (9 slots, moyenne: 2.0 crédits)
+export const PACHINKO_SLOTS = [0, 0, 1, 3, 10, 3, 1, 0, 0] as const
 
 // Game info for display
 export interface MiniGameInfo {

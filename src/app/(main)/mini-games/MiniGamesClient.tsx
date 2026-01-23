@@ -2,19 +2,22 @@
 
 import React, { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Trophy, Clock, Zap, ChevronRight, X, Sparkles } from 'lucide-react';
+import { Trophy, Clock, Zap, ChevronRight, X, Sparkles, Coins } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
 import { WheelIcon, ScratchIcon, PachinkoIcon, CreditIcon } from '@/components/mini-games/GameIcons';
+import { CreditPacksModal } from '@/components/modals/CreditPacksModal';
 
 import { useCredits } from '@/contexts/CreditsContext';
 import { useCountdown } from '@/hooks/useCountdown';
-import { playMiniGame } from '@/actions/miniGames';
+import { playMiniGame, playMiniGamePaid } from '@/actions/miniGames';
 import { MiniGameType, MiniGameEligibility, WHEEL_SEGMENTS, SCRATCH_VALUES, PACHINKO_SLOTS } from '@/types/miniGames';
 
 import WheelOfFortune from '@/components/mini-games/WheelOfFortune';
 import ScratchCard from '@/components/mini-games/ScratchCard';
 import Pachinko from '@/components/mini-games/Pachinko';
+
+const PLAY_COST = 3; // Coût en crédits pour une partie payante
 
 interface MiniGamesClientProps {
   initialEligibility: MiniGameEligibility;
@@ -66,12 +69,15 @@ const GAME_CONFIG = {
 };
 
 export default function MiniGamesClient({ initialEligibility }: MiniGamesClientProps) {
-  const { refreshCredits } = useCredits();
+  const { credits, refreshCredits } = useCredits();
   const [eligibility, setEligibility] = useState(initialEligibility);
   const [activeGame, setActiveGame] = useState<MiniGameType | null>(null);
   const [pendingGame, setPendingGame] = useState<PendingGame | null>(null);
   const [result, setResult] = useState<GameResult | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [showCreditModal, setShowCreditModal] = useState(false);
+
+  const hasEnoughCredits = credits >= PLAY_COST;
 
   const triggerWinEffect = useCallback(() => {
     const duration = 3 * 1000;
@@ -90,7 +96,7 @@ export default function MiniGamesClient({ initialEligibility }: MiniGamesClientP
     }, 250);
   }, []);
 
-  // Called when user clicks "Play" - fetches result from server first
+  // Called when user clicks "Play Free" - fetches result from server first
   const handleStartGame = async (gameType: MiniGameType) => {
     setIsLoading(true);
     setActiveGame(gameType);
@@ -129,6 +135,44 @@ export default function MiniGamesClient({ initialEligibility }: MiniGamesClientP
       }
     } catch (error) {
       console.error("Error starting game:", error);
+      setActiveGame(null);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Called when user clicks "Play with credits" - paid play
+  const handleStartPaidGame = async (gameType: MiniGameType) => {
+    if (!hasEnoughCredits) {
+      setShowCreditModal(true);
+      return;
+    }
+
+    setIsLoading(true);
+    setActiveGame(gameType);
+    setResult(null);
+    setPendingGame(null);
+
+    try {
+      const gameResult = await playMiniGamePaid(gameType);
+
+      if (gameResult.success && gameResult.data) {
+        // Store the predetermined result
+        setPendingGame({
+          type: gameType,
+          creditsWon: gameResult.data.creditsWon,
+          segmentIndex: gameResult.data.segmentIndex,
+          slotIndex: gameResult.data.slotIndex,
+        });
+        // Refresh credits since we spent some
+        await refreshCredits();
+      } else {
+        // Error - close modal
+        setActiveGame(null);
+        console.error('Game error:', gameResult.error);
+      }
+    } catch (error) {
+      console.error("Error starting paid game:", error);
       setActiveGame(null);
     } finally {
       setIsLoading(false);
@@ -218,12 +262,21 @@ export default function MiniGamesClient({ initialEligibility }: MiniGamesClientP
               key={key}
               config={GAME_CONFIG[key]}
               eligibility={eligibility[key]}
-              onPlay={() => handleStartGame(key)}
+              onPlayFree={() => handleStartGame(key)}
+              onPlayPaid={() => handleStartPaidGame(key)}
+              hasEnoughCredits={hasEnoughCredits}
+              onBuyCredits={() => setShowCreditModal(true)}
               index={index}
             />
           ))}
         </div>
       </div>
+
+      {/* Credit Packs Modal */}
+      <CreditPacksModal
+        isOpen={showCreditModal}
+        onClose={() => setShowCreditModal(false)}
+      />
 
       {/* Game Modal */}
       <AnimatePresence>
@@ -458,15 +511,18 @@ interface GameCardProps {
     gradient: string;
   };
   eligibility: { canPlay: boolean; nextPlayAt: string | null };
-  onPlay: () => void;
+  onPlayFree: () => void;
+  onPlayPaid: () => void;
+  hasEnoughCredits: boolean;
+  onBuyCredits: () => void;
   index: number;
 }
 
-function GameCard({ config, eligibility, onPlay, index }: GameCardProps) {
+function GameCard({ config, eligibility, onPlayFree, onPlayPaid, hasEnoughCredits, onBuyCredits, index }: GameCardProps) {
   const { canPlay, nextPlayAt } = eligibility;
   const countdown = useCountdown(nextPlayAt);
 
-  const isAvailable = canPlay || countdown.isExpired;
+  const isFreeAvailable = canPlay || countdown.isExpired;
 
   return (
     <motion.div
@@ -477,17 +533,16 @@ function GameCard({ config, eligibility, onPlay, index }: GameCardProps) {
       whileHover={{ y: -10 }}
       className="group relative glass rounded-2xl p-8 border border-[var(--bg-tertiary)] flex flex-col items-center text-center transition-all duration-300 hover:border-[var(--neon-purple)]/50 overflow-hidden"
     >
-      {/* Decorative Corner Badge */}
-      <div className="absolute -top-1 -right-1">
-        {/* Glow effect */}
-        <div className={`absolute inset-0 bg-gradient-to-br ${config.gradient} blur-xl opacity-40`} />
-        {/* Ribbon badge */}
-        <div className={`relative bg-gradient-to-br ${config.gradient} text-white text-[9px] font-black uppercase tracking-wider px-6 py-1.5 transform rotate-45 translate-x-4 translate-y-3 shadow-lg`}>
-          <span className="drop-shadow-[0_1px_1px_rgba(0,0,0,0.5)]">Gratuit</span>
+      {/* Decorative Corner Badge - Shows "Gratuit" only if free play available */}
+      {isFreeAvailable && (
+        <div className="absolute -top-1 -right-1">
+          <div className={`absolute inset-0 bg-gradient-to-br ${config.gradient} blur-xl opacity-40`} />
+          <div className={`relative bg-gradient-to-br ${config.gradient} text-white text-[9px] font-black uppercase tracking-wider px-6 py-1.5 transform rotate-45 translate-x-4 translate-y-3 shadow-lg`}>
+            <span className="drop-shadow-[0_1px_1px_rgba(0,0,0,0.5)]">Gratuit</span>
+          </div>
+          <div className={`absolute top-0 right-0 w-12 h-12 bg-gradient-to-br ${config.gradient} opacity-20 rounded-bl-2xl`} />
         </div>
-        {/* Corner accent */}
-        <div className={`absolute top-0 right-0 w-12 h-12 bg-gradient-to-br ${config.gradient} opacity-20 rounded-bl-2xl`} />
-      </div>
+      )}
 
       {/* Max Reward Badge */}
       <div className="absolute top-4 left-4 flex items-center gap-1.5 px-3 py-1.5 bg-black/60 rounded-full border border-[#FFB800]/30 backdrop-blur-sm">
@@ -495,39 +550,63 @@ function GameCard({ config, eligibility, onPlay, index }: GameCardProps) {
         <span className="text-[10px] font-bold text-[#FFB800] uppercase tracking-tighter">Max: 10</span>
       </div>
 
-      <div className={`w-24 h-24 my-8 transition-transform duration-500 group-hover:scale-110 ${isAvailable ? '' : 'opacity-40 grayscale'}`}>
-        <config.IconComponent className="w-full h-full" animate={isAvailable} />
+      <div className={`w-24 h-24 my-8 transition-transform duration-500 group-hover:scale-110`}>
+        <config.IconComponent className="w-full h-full" animate={true} />
       </div>
 
-      <h3 className={`text-2xl font-black mb-3 ${isAvailable ? config.textClass : 'text-[var(--text-secondary)]'}`}>
+      <h3 className={`text-2xl font-black mb-3 ${config.textClass}`}>
         {config.title}
       </h3>
 
-      <p className="text-[var(--text-secondary)] text-sm leading-relaxed mb-8 flex-grow">
+      <p className="text-[var(--text-secondary)] text-sm leading-relaxed mb-6 flex-grow">
         {config.description}
       </p>
 
-      {isAvailable ? (
-        <button
-          onClick={onPlay}
-          className="gaming-btn w-full py-3 px-6 group/btn relative flex items-center justify-center gap-2"
-        >
-          <span>JOUER MAINTENANT</span>
-          <ChevronRight size={18} className="transition-transform group-hover/btn:translate-x-1" />
-        </button>
-      ) : (
-        <div className="w-full space-y-3">
+      {/* Buttons */}
+      <div className="w-full space-y-3">
+        {isFreeAvailable ? (
+          // Free play available
+          <button
+            onClick={onPlayFree}
+            className="gaming-btn w-full py-3 px-6 group/btn relative flex items-center justify-center gap-2"
+          >
+            <span>JOUER GRATUITEMENT</span>
+            <ChevronRight size={18} className="transition-transform group-hover/btn:translate-x-1" />
+          </button>
+        ) : (
+          // Free play used - show countdown
           <div className="flex items-center justify-center gap-3 py-3 px-4 bg-[var(--bg-primary)]/50 rounded-lg border border-white/5 text-[var(--text-secondary)]">
             <Clock size={16} />
-            <span className="font-mono font-bold tracking-widest text-lg">
-              {countdown.formatted}
-            </span>
+            <div className="flex flex-col items-start">
+              <span className="text-[10px] uppercase tracking-wider opacity-60">Prochain gratuit</span>
+              <span className="font-mono font-bold tracking-widest">
+                {countdown.formatted}
+              </span>
+            </div>
           </div>
-          <p className="text-[10px] text-[var(--text-secondary)] uppercase tracking-widest font-bold">
-            Prochain essai disponible
-          </p>
-        </div>
-      )}
+        )}
+
+        {/* Paid play button - always visible */}
+        {hasEnoughCredits ? (
+          <button
+            onClick={onPlayPaid}
+            className="w-full py-2.5 px-6 rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2 bg-[var(--bg-tertiary)] border border-white/10 text-white hover:bg-[var(--bg-secondary)] hover:border-[var(--neon-purple)]/50"
+          >
+            <Coins size={16} className="text-[#FFB800]" />
+            <span>Rejouer pour {PLAY_COST} crédits</span>
+          </button>
+        ) : (
+          <button
+            onClick={onBuyCredits}
+            className="w-full py-2.5 px-6 rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2 bg-gradient-to-r from-[#9B5CFF]/20 to-[#FF4FD8]/20 border border-[#9B5CFF]/30 text-[#9B5CFF] hover:from-[#9B5CFF]/30 hover:to-[#FF4FD8]/30"
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span>Acheter des crédits</span>
+          </button>
+        )}
+      </div>
 
       {/* Interactive hover lines */}
       <div className={`absolute bottom-0 left-0 h-1 bg-gradient-to-r ${config.gradient} transition-all duration-500 w-0 group-hover:w-full`} />

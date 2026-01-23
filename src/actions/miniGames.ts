@@ -211,6 +211,104 @@ export async function playMiniGame(gameType: MiniGameType): Promise<ActionResult
   }
 }
 
+const PLAY_COST = 3 // Coût en crédits pour une partie payante
+
+/**
+ * Play a mini-game with credits (paid play, no daily limit)
+ */
+export async function playMiniGamePaid(gameType: MiniGameType): Promise<ActionResult<MiniGameResult & { segmentIndex?: number; slotIndex?: number }>> {
+  const supabase = await createClient()
+
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) {
+    return { success: false, error: 'Non authentifié' }
+  }
+
+  // Check if user has enough credits
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: profile, error: profileError } = await (supabase as any)
+    .from('profiles')
+    .select('credits')
+    .eq('id', user.id)
+    .single()
+
+  if (profileError || !profile) {
+    return { success: false, error: 'Erreur lors de la récupération du profil' }
+  }
+
+  if (profile.credits < PLAY_COST) {
+    return { success: false, error: `Crédits insuffisants. Il vous faut ${PLAY_COST} crédits pour jouer.` }
+  }
+
+  // Deduct credits first
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { error: deductError } = await (supabase as any)
+    .from('profiles')
+    .update({ credits: profile.credits - PLAY_COST })
+    .eq('id', user.id)
+
+  if (deductError) {
+    return { success: false, error: 'Erreur lors du débit des crédits' }
+  }
+
+  // Calculate result based on game type
+  let creditsWon: number
+  let segmentIndex: number | undefined
+  let slotIndex: number | undefined
+
+  switch (gameType) {
+    case 'wheel': {
+      segmentIndex = Math.floor(Math.random() * WHEEL_SEGMENTS.length)
+      creditsWon = WHEEL_SEGMENTS[segmentIndex]
+      break
+    }
+    case 'scratch': {
+      const valueIndex = Math.floor(Math.random() * SCRATCH_VALUES.length)
+      creditsWon = SCRATCH_VALUES[valueIndex]
+      break
+    }
+    case 'pachinko': {
+      slotIndex = Math.floor(Math.random() * PACHINKO_SLOTS.length)
+      creditsWon = PACHINKO_SLOTS[slotIndex]
+      break
+    }
+    default:
+      creditsWon = 0
+  }
+
+  // Insert play record (for history tracking)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  await (supabase as any)
+    .from('mini_game_plays')
+    .insert({
+      user_id: user.id,
+      game_type: gameType,
+      credits_won: creditsWon,
+    })
+
+  // Add winnings to user profile
+  let newTotalCredits = profile.credits - PLAY_COST
+  if (creditsWon > 0) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: rpcData } = await (supabase as any)
+      .rpc('add_mini_game_credits', {
+        p_user_id: user.id,
+        p_amount: creditsWon,
+      })
+    newTotalCredits = rpcData || newTotalCredits + creditsWon
+  }
+
+  return {
+    success: true,
+    data: {
+      creditsWon,
+      newTotalCredits,
+      segmentIndex,
+      slotIndex,
+    },
+  }
+}
+
 /**
  * Get user's mini-game history
  */

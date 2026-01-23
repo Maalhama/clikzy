@@ -10,7 +10,7 @@ interface PachinkoProps {
   disabled?: boolean
 }
 
-const SLOTS = [0, 1, 2, 5, 10, 5, 2, 1, 0]
+const SLOTS = [0, 0, 1, 3, 10, 3, 1, 0, 0]
 const BOARD_WIDTH = 320
 const BOARD_HEIGHT = 400
 const BALL_RADIUS = 8
