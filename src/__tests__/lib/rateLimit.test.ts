@@ -1,0 +1,102 @@
+import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { checkRateLimit, rateLimiters } from '@/lib/rateLimit'
+
+describe('Rate Limiter', () => {
+  beforeEach(() => {
+    // Reset time mocking between tests
+    vi.useRealTimers()
+  })
+
+  describe('checkRateLimit', () => {
+    it('should allow first request', () => {
+      const result = checkRateLimit('test-ip-1', 5, 60000)
+
+      expect(result.success).toBe(true)
+      expect(result.remaining).toBe(4)
+    })
+
+    it('should decrement remaining count', () => {
+      const identifier = 'test-ip-2'
+
+      checkRateLimit(identifier, 5, 60000)
+      const result = checkRateLimit(identifier, 5, 60000)
+
+      expect(result.success).toBe(true)
+      expect(result.remaining).toBe(3)
+    })
+
+    it('should block when limit exceeded', () => {
+      const identifier = 'test-ip-3'
+
+      // Make 5 requests (limit)
+      for (let i = 0; i < 5; i++) {
+        checkRateLimit(identifier, 5, 60000)
+      }
+
+      // 6th request should be blocked
+      const result = checkRateLimit(identifier, 5, 60000)
+
+      expect(result.success).toBe(false)
+      expect(result.remaining).toBe(0)
+    })
+
+    it('should reset after window expires', () => {
+      vi.useFakeTimers()
+      const identifier = 'test-ip-4'
+
+      // Make requests up to limit
+      for (let i = 0; i < 5; i++) {
+        checkRateLimit(identifier, 5, 60000)
+      }
+
+      // Advance time past window
+      vi.advanceTimersByTime(61000)
+
+      // Should be allowed again
+      const result = checkRateLimit(identifier, 5, 60000)
+
+      expect(result.success).toBe(true)
+      expect(result.remaining).toBe(4)
+    })
+  })
+
+  describe('rateLimiters presets', () => {
+    it('api limiter allows 60 requests per minute', () => {
+      const identifier = 'api-test-ip'
+
+      // Make 60 requests
+      for (let i = 0; i < 60; i++) {
+        const result = rateLimiters.api(identifier)
+        expect(result.success).toBe(true)
+      }
+
+      // 61st should fail
+      const result = rateLimiters.api(identifier)
+      expect(result.success).toBe(false)
+    })
+
+    it('payment limiter allows 10 requests per minute', () => {
+      const identifier = 'payment-test-ip'
+
+      // Make 10 requests
+      for (let i = 0; i < 10; i++) {
+        const result = rateLimiters.payment(identifier)
+        expect(result.success).toBe(true)
+      }
+
+      // 11th should fail
+      const result = rateLimiters.payment(identifier)
+      expect(result.success).toBe(false)
+    })
+
+    it('cron limiter allows 1 request per 30 seconds', () => {
+      const identifier = 'cron-test-ip'
+
+      const result1 = rateLimiters.cron(identifier)
+      expect(result1.success).toBe(true)
+
+      const result2 = rateLimiters.cron(identifier)
+      expect(result2.success).toBe(false)
+    })
+  })
+})
