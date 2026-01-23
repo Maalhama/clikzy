@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { Header } from '@/components/layout/Header'
 import { BackgroundEffects } from '@/components/ui/BackgroundEffects'
 import { ClientProviders } from '@/components/providers/ClientProviders'
+import { InstallBanner } from '@/components/pwa/InstallBanner'
 import type { Profile } from '@/types/database'
 
 export default async function MainLayout({
@@ -53,6 +54,9 @@ export default async function MainLayout({
         <main className="flex-1 relative z-10">
           {children}
         </main>
+
+        {/* PWA Install Banner */}
+        <InstallBanner />
       </div>
     </ClientProviders>
   )

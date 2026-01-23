@@ -2,10 +2,10 @@
   "name": "CLIKZY - Le dernier clic gagne",
   "short_name": "CLIKZY",
   "description": "Jeu gratuit en temps réel : le dernier à cliquer remporte le lot.",
-  "start_url": "/",
+  "start_url": "/lobby",
   "display": "standalone",
-  "background_color": "#0B0F1A",
-  "theme_color": "#9B5CFF",
+  "background_color": "#0a0a0f",
+  "theme_color": "#a855f7",
   "orientation": "portrait-primary",
   "categories": ["games", "entertainment"],
   "icons": [

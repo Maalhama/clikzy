@@ -22,6 +22,10 @@ export interface Database {
           last_credits_reset: string
           has_purchased_credits: boolean
           is_admin: boolean
+          referral_code: string | null
+          referred_by: string | null
+          referral_count: number
+          referral_credits_earned: number
           shipping_firstname: string | null
           shipping_lastname: string | null
           shipping_address: string | null
@@ -43,6 +47,10 @@ export interface Database {
           last_credits_reset?: string
           has_purchased_credits?: boolean
           is_admin?: boolean
+          referral_code?: string | null
+          referred_by?: string | null
+          referral_count?: number
+          referral_credits_earned?: number
           shipping_firstname?: string | null
           shipping_lastname?: string | null
           shipping_address?: string | null
@@ -64,6 +72,10 @@ export interface Database {
           last_credits_reset?: string
           has_purchased_credits?: boolean
           is_admin?: boolean
+          referral_code?: string | null
+          referred_by?: string | null
+          referral_count?: number
+          referral_credits_earned?: number
           shipping_firstname?: string | null
           shipping_lastname?: string | null
           shipping_address?: string | null

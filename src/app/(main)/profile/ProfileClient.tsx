@@ -8,6 +8,7 @@ import { updateUsername, uploadAvatar } from '@/actions/profile'
 import { CreditPacksModal } from '@/components/modals/CreditPacksModal'
 import { GameHistorySection } from '@/components/profile/GameHistorySection'
 import { NotificationSettings } from '@/components/profile/NotificationSettings'
+import { ReferralSection } from '@/components/profile/ReferralSection'
 import {
   TrophyIcon,
   GiftIcon,
@@ -32,6 +33,12 @@ interface ProfileClientProps {
     totalClicks: number
     wins: number
     winRate: number
+  }
+  referralStats: {
+    referralCode: string | null
+    referralCount: number
+    creditsEarned: number
+    referredBy: string | null
   }
 }
 
@@ -109,7 +116,7 @@ function getPlayerLevel(wins: number, clicks: number, gamesPlayed: number): { le
   }
 }
 
-export function ProfileClient({ profile, wins, gamesPlayed, totalValueWon, gameHistory, historyStats }: ProfileClientProps) {
+export function ProfileClient({ profile, wins, gamesPlayed, totalValueWon, gameHistory, historyStats, referralStats }: ProfileClientProps) {
   const [isEditingUsername, setIsEditingUsername] = useState(false)
   const [newUsername, setNewUsername] = useState(profile.username || '')
   const [usernameError, setUsernameError] = useState<string | null>(null)
@@ -386,6 +393,16 @@ export function ProfileClient({ profile, wins, gamesPlayed, totalValueWon, gameH
         >
           <NotificationSettings />
         </motion.div>
+
+        {/* Referral Section */}
+        <div className="mb-6">
+          <ReferralSection
+            referralCode={referralStats.referralCode}
+            referralCount={referralStats.referralCount}
+            creditsEarned={referralStats.creditsEarned}
+            hasReferrer={!!referralStats.referredBy}
+          />
+        </div>
 
         {/* Wins Section */}
         <motion.div
