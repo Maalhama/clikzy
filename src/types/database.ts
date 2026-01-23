@@ -21,6 +21,14 @@ export interface Database {
           total_clicks: number
           last_credits_reset: string
           has_purchased_credits: boolean
+          shipping_firstname: string | null
+          shipping_lastname: string | null
+          shipping_address: string | null
+          shipping_address2: string | null
+          shipping_postal_code: string | null
+          shipping_city: string | null
+          shipping_country: string | null
+          shipping_phone: string | null
           created_at: string
           updated_at: string
         }
@@ -33,6 +41,14 @@ export interface Database {
           total_clicks?: number
           last_credits_reset?: string
           has_purchased_credits?: boolean
+          shipping_firstname?: string | null
+          shipping_lastname?: string | null
+          shipping_address?: string | null
+          shipping_address2?: string | null
+          shipping_postal_code?: string | null
+          shipping_city?: string | null
+          shipping_country?: string | null
+          shipping_phone?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -45,6 +61,14 @@ export interface Database {
           total_clicks?: number
           last_credits_reset?: string
           has_purchased_credits?: boolean
+          shipping_firstname?: string | null
+          shipping_lastname?: string | null
+          shipping_address?: string | null
+          shipping_address2?: string | null
+          shipping_postal_code?: string | null
+          shipping_city?: string | null
+          shipping_country?: string | null
+          shipping_phone?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -178,6 +202,10 @@ export interface Database {
           total_clicks_in_game: number | null
           is_bot: boolean
           won_at: string
+          shipping_status: 'pending' | 'address_needed' | 'processing' | 'shipped' | 'delivered'
+          tracking_number: string | null
+          shipped_at: string | null
+          delivered_at: string | null
         }
         Insert: {
           id?: string
@@ -190,6 +218,10 @@ export interface Database {
           total_clicks_in_game?: number | null
           is_bot?: boolean
           won_at?: string
+          shipping_status?: 'pending' | 'address_needed' | 'processing' | 'shipped' | 'delivered'
+          tracking_number?: string | null
+          shipped_at?: string | null
+          delivered_at?: string | null
         }
         Update: {
           id?: string
@@ -202,6 +234,10 @@ export interface Database {
           total_clicks_in_game?: number | null
           is_bot?: boolean
           won_at?: string
+          shipping_status?: 'pending' | 'address_needed' | 'processing' | 'shipped' | 'delivered'
+          tracking_number?: string | null
+          shipped_at?: string | null
+          delivered_at?: string | null
         }
       }
     }
