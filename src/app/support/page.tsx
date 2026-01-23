@@ -375,7 +375,7 @@ export default function SupportPage() {
       <footer className="relative z-10 border-t border-white/10 mt-12">
         <div className="max-w-6xl mx-auto px-6 py-8 flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="text-sm text-white/40">
-            © 2024 CLIKZY. Tous droits réservés.
+            © 2026 CLIKZY. Tous droits réservés.
           </div>
           <div className="flex items-center gap-6 text-sm text-white/40">
             <Link href="/" className="hover:text-white transition-colors">Accueil</Link>
