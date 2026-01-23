@@ -70,7 +70,7 @@ export function Header({ profile }: HeaderProps) {
 
           {/* Logo - Center */}
           <div className="absolute left-1/2 -translate-x-1/2">
-            <Logo size="md" animated={false} href="/lobby" />
+            <Logo size="md" animated={true} href="/" />
           </div>
 
           {/* Credits badge - Right */}
@@ -87,7 +87,7 @@ export function Header({ profile }: HeaderProps) {
         {/* Desktop Header */}
         <div className="hidden md:flex relative max-w-7xl mx-auto px-6 py-4 items-center justify-between">
           {/* Logo */}
-          <Logo size="md" animated={false} href="/lobby" />
+          <Logo size="md" animated={true} href="/" />
 
           {/* Navigation */}
           <nav className="flex items-center gap-8">
