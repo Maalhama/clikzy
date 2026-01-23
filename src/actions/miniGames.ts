@@ -226,11 +226,11 @@ export async function playMiniGamePaid(gameType: MiniGameType): Promise<ActionRe
     return { success: false, error: 'Non authentifié' }
   }
 
-  // Check if user has enough credits
+  // Check if user has enough total credits (daily + earned)
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { data: profile, error: profileError } = await (supabase as any)
     .from('profiles')
-    .select('credits')
+    .select('credits, earned_credits')
     .eq('id', user.id)
     .single()
 
@@ -238,18 +238,20 @@ export async function playMiniGamePaid(gameType: MiniGameType): Promise<ActionRe
     return { success: false, error: 'Erreur lors de la récupération du profil' }
   }
 
-  if (profile.credits < PLAY_COST) {
+  const totalCredits = profile.credits + profile.earned_credits
+  if (totalCredits < PLAY_COST) {
     return { success: false, error: `Crédits insuffisants. Il vous faut ${PLAY_COST} crédits pour jouer.` }
   }
 
-  // Deduct credits first
+  // Deduct credits (use daily credits first, then earned credits)
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { error: deductError } = await (supabase as any)
-    .from('profiles')
-    .update({ credits: profile.credits - PLAY_COST })
-    .eq('id', user.id)
+  const { data: newTotal, error: deductError } = await (supabase as any)
+    .rpc('deduct_credits', {
+      p_user_id: user.id,
+      p_amount: PLAY_COST,
+    })
 
-  if (deductError) {
+  if (deductError || newTotal === -1) {
     return { success: false, error: 'Erreur lors du débit des crédits' }
   }
 
@@ -289,8 +291,8 @@ export async function playMiniGamePaid(gameType: MiniGameType): Promise<ActionRe
       is_free_play: false,
     })
 
-  // Add winnings to user profile
-  let newTotalCredits = profile.credits - PLAY_COST
+  // Add winnings to earned_credits (permanent)
+  let newTotalCredits = newTotal as number
   if (creditsWon > 0) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data: rpcData } = await (supabase as any)

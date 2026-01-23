@@ -17,6 +17,7 @@ export interface Database {
           username: string
           avatar_url: string | null
           credits: number
+          earned_credits: number
           total_wins: number
           total_clicks: number
           last_credits_reset: string
@@ -42,6 +43,7 @@ export interface Database {
           username: string
           avatar_url?: string | null
           credits?: number
+          earned_credits?: number
           total_wins?: number
           total_clicks?: number
           last_credits_reset?: string
@@ -67,6 +69,7 @@ export interface Database {
           username?: string
           avatar_url?: string | null
           credits?: number
+          earned_credits?: number
           total_wins?: number
           total_clicks?: number
           last_credits_reset?: string

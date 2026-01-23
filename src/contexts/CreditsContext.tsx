@@ -35,12 +35,15 @@ export function CreditsProvider({ children, initialCredits, userId }: CreditsPro
     const supabase = createClient()
     const { data } = await supabase
       .from('profiles')
-      .select('credits')
+      .select('credits, earned_credits')
       .eq('id', userId)
       .single()
 
     if (data) {
-      setCredits((data as { credits: number }).credits)
+      // Total credits = daily credits + earned credits (from mini-games)
+      const totalCredits = (data as { credits: number; earned_credits: number }).credits +
+                          (data as { credits: number; earned_credits: number }).earned_credits
+      setCredits(totalCredits)
     }
   }, [userId])
 
@@ -61,8 +64,11 @@ export function CreditsProvider({ children, initialCredits, userId }: CreditsPro
           filter: `id=eq.${userId}`,
         },
         (payload) => {
-          if (payload.new && typeof payload.new.credits === 'number') {
-            setCredits(payload.new.credits)
+          if (payload.new) {
+            // Total credits = daily credits + earned credits
+            const daily = typeof payload.new.credits === 'number' ? payload.new.credits : 0
+            const earned = typeof payload.new.earned_credits === 'number' ? payload.new.earned_credits : 0
+            setCredits(daily + earned)
           }
         }
       )
