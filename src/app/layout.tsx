@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import { Inter, JetBrains_Mono } from 'next/font/google'
 import { SkipLink } from '@/components/ui/SkipLink'
+import { CookieConsent } from '@/components/common/CookieConsent'
 import './globals.css'
 
 const inter = Inter({
@@ -93,6 +94,7 @@ export default function RootLayout({
       <body className="font-sans antialiased bg-bg-primary text-text-primary min-h-screen">
         <SkipLink />
         {children}
+        <CookieConsent />
       </body>
     </html>
   )

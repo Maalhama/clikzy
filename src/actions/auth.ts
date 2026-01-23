@@ -3,6 +3,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
+import { sendWelcomeEmail } from '@/lib/email/resend'
 
 export type AuthResult = {
   success: boolean
@@ -137,6 +138,11 @@ export async function signUp(formData: FormData): Promise<AuthResult> {
 
     return { success: false, error: error.message }
   }
+
+  // Send welcome email (non-blocking, don't fail signup if email fails)
+  sendWelcomeEmail(email, username).catch((err) => {
+    console.error('Failed to send welcome email:', err)
+  })
 
   return { success: true }
 }
