@@ -616,7 +616,7 @@ export function LandingClient({
                   </span>
                 </button>
                 <a
-                  href="#how-it-works"
+                  href="#how-it-works-desktop"
                   className="px-8 py-4 border-2 border-white/20 text-white font-bold hover:border-neon-blue/50 hover:text-neon-blue transition-all text-center focus:outline-none focus:ring-2 focus:ring-neon-blue/50"
                 >
                   COMMENT ÇA MARCHE
@@ -723,7 +723,7 @@ export function LandingClient({
       </section>
 
       {/* === DESKTOP HOW IT WORKS === */}
-      <section className="hidden md:block how-section relative py-20 overflow-hidden">
+      <section id="how-it-works-desktop" className="hidden md:block how-section relative py-20 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-neon-purple/5 to-transparent" />
 
         <div className="relative max-w-7xl mx-auto px-6">
@@ -1269,7 +1269,7 @@ export function LandingClient({
               <h4 className="text-white font-bold mb-5 text-sm uppercase tracking-wider">Navigation</h4>
               <ul className="space-y-3">
                 <li><Link href="/lobby" className="text-white/50 hover:text-neon-purple transition-colors text-sm">Voir les lots</Link></li>
-                <li><a href="#how-it-works" className="text-white/50 hover:text-neon-purple transition-colors text-sm">Comment ça marche</a></li>
+                <li><a href="#how-it-works-desktop" className="text-white/50 hover:text-neon-purple transition-colors text-sm">Comment ça marche</a></li>
                 <li><a href="#winners" className="text-white/50 hover:text-neon-purple transition-colors text-sm">Derniers gagnants</a></li>
                 <li><Link href="/register" className="text-white/50 hover:text-neon-purple transition-colors text-sm">Créer un compte</Link></li>
               </ul>
