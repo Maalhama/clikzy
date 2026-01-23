@@ -9,6 +9,8 @@ import { CreditPacksModal } from '@/components/modals/CreditPacksModal'
 import { GameHistorySection } from '@/components/profile/GameHistorySection'
 import { NotificationSettings } from '@/components/profile/NotificationSettings'
 import { ReferralSection } from '@/components/profile/ReferralSection'
+import { BadgesSection } from '@/components/profile/BadgesSection'
+import type { Badge } from '@/actions/badges'
 import {
   TrophyIcon,
   GiftIcon,
@@ -39,6 +41,16 @@ interface ProfileClientProps {
     referralCount: number
     creditsEarned: number
     referredBy: string | null
+  }
+  badges: {
+    badge: Badge
+    earned: boolean
+    earnedAt: string | null
+  }[]
+  badgeStats: {
+    total: number
+    earned: number
+    byRarity: { rarity: string; total: number; earned: number }[]
   }
 }
 
@@ -116,7 +128,7 @@ function getPlayerLevel(wins: number, clicks: number, gamesPlayed: number): { le
   }
 }
 
-export function ProfileClient({ profile, wins, gamesPlayed, totalValueWon, gameHistory, historyStats, referralStats }: ProfileClientProps) {
+export function ProfileClient({ profile, wins, gamesPlayed, totalValueWon, gameHistory, historyStats, referralStats, badges, badgeStats }: ProfileClientProps) {
   const [isEditingUsername, setIsEditingUsername] = useState(false)
   const [newUsername, setNewUsername] = useState(profile.username || '')
   const [usernameError, setUsernameError] = useState<string | null>(null)
@@ -435,6 +447,9 @@ export function ProfileClient({ profile, wins, gamesPlayed, totalValueWon, gameH
 
         {/* Game History Section */}
         <GameHistorySection history={gameHistory} stats={historyStats} />
+
+        {/* Badges Section */}
+        <BadgesSection badges={badges} stats={badgeStats} />
 
         {/* Play CTA */}
         <motion.div
