@@ -89,30 +89,7 @@ export function Header({ profile }: HeaderProps) {
           {/* Logo */}
           <Logo size="md" animated={true} href="/" />
 
-          {/* Navigation */}
-          <nav className="flex items-center gap-8">
-            <Link
-              href="/lobby"
-              className={`nav-link-neon text-sm font-medium transition-all duration-300 ${
-                isActive('/lobby')
-                  ? 'text-neon-purple'
-                  : 'text-white/70 hover:text-white'
-              }`}
-            >
-              Lobby
-            </Link>
-            <Link
-              href="/profile"
-              className={`nav-link-neon text-sm font-medium transition-all duration-300 ${
-                isActive('/profile')
-                  ? 'text-neon-purple'
-                  : 'text-white/70 hover:text-white'
-              }`}
-            >
-              Profil
-            </Link>
-          </nav>
-
+          
           {/* Right section */}
           <div className="flex items-center gap-4">
             {profile && (
@@ -225,58 +202,7 @@ export function Header({ profile }: HeaderProps) {
               </div>
             )}
 
-            {/* Navigation */}
-            <nav className="px-3 py-3">
-              <Link
-                href="/lobby"
-                onClick={closeMenu}
-                className={`flex items-center gap-3 px-3 py-3 rounded-xl transition-all ${
-                  isActive('/lobby')
-                    ? 'bg-neon-purple/20 text-white'
-                    : 'text-white/80 hover:bg-neon-purple/10'
-                }`}
-              >
-                <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${
-                  isActive('/lobby')
-                    ? 'bg-neon-purple/30 border-neon-purple/50'
-                    : 'bg-neon-purple/10 border-neon-purple/30'
-                } border transition-colors`}>
-                  <svg className="w-5 h-5 text-neon-purple" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                </div>
-                <div>
-                  <span className="block text-sm font-semibold">Lobby</span>
-                  <span className="block text-[10px] text-white/40">Voir les parties</span>
-                </div>
-              </Link>
-
-              <Link
-                href="/profile"
-                onClick={closeMenu}
-                className={`flex items-center gap-3 px-3 py-3 rounded-xl transition-all ${
-                  isActive('/profile')
-                    ? 'bg-neon-pink/20 text-white'
-                    : 'text-white/80 hover:bg-neon-pink/10'
-                }`}
-              >
-                <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${
-                  isActive('/profile')
-                    ? 'bg-neon-pink/30 border-neon-pink/50'
-                    : 'bg-neon-pink/10 border-neon-pink/30'
-                } border transition-colors`}>
-                  <svg className="w-5 h-5 text-neon-pink" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                  </svg>
-                </div>
-                <div>
-                  <span className="block text-sm font-semibold">Profil</span>
-                  <span className="block text-[10px] text-white/40">Mon compte</span>
-                </div>
-              </Link>
-            </nav>
-
+            
             {/* Sign out */}
             <div className="px-4 pb-4">
               <button
