@@ -231,17 +231,20 @@ export async function GET(request: NextRequest) {
             // Tant que la bataille est en cours (< 100%), le bot DOIT cliquer pour maintenir le timer
             // Priorité absolue: maintenir le timer au-dessus de 0
 
-            // Avec 3 crons (intervalle ~20s), on peut cliquer à 25s pour max suspense
-            // Le timer descendra de 90s → ~25s avant chaque clic
-            if (timeLeft <= 25000) {
-              // Timer bas - bot clique pour sauver
+            // Seuil aléatoire FIXE par jeu entre 20-40s pour désynchroniser les clics
+            // Avec 3 crons (intervalle ~20s), 20s minimum est safe (90s - 20s*3 = 30s marge)
+            const clickThresholdSeed = hashString(`${game.id}-click-threshold`)
+            const clickThreshold = 20000 + (clickThresholdSeed % 20000) // 20s à 40s par jeu
+
+            if (timeLeft <= clickThreshold) {
+              // Timer sous le seuil de ce jeu - bot clique
               updates.last_click_username = botUsername
               updates.last_click_user_id = null
               updates.end_time = now + 90000 // Reset à 90s
-              action = `bot_click_final (${botUsername}) SAVED at ${Math.floor(timeLeft/1000)}s! [battle: ${Math.round(battleProgress * 100)}%/${battleDurationMin}min]`
+              action = `bot_click_final (${botUsername}) SAVED at ${Math.floor(timeLeft/1000)}s! (threshold: ${Math.floor(clickThreshold/1000)}s) [battle: ${Math.round(battleProgress * 100)}%/${battleDurationMin}min]`
             } else {
-              // Timer > 25s - laisser descendre pour le suspense (90s → 25s = 65s de tension!)
-              action = `waiting - ${Math.floor(timeLeft/1000)}s left [battle: ${Math.round(battleProgress * 100)}%/${battleDurationMin}min]`
+              // Timer > seuil - laisser descendre
+              action = `waiting (threshold: ${Math.floor(clickThreshold/1000)}s) - ${Math.floor(timeLeft/1000)}s left [battle: ${Math.round(battleProgress * 100)}%/${battleDurationMin}min]`
             }
           } else {
             // Bataille terminée ET pas de joueur réel - laisser timer descendre
