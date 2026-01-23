@@ -21,6 +21,129 @@ interface PrizeCarouselProps {
   className?: string
 }
 
+// Mapping of product names to SVG files
+const PRODUCT_SVG_MAP: Record<string, string> = {
+  // Apple
+  'iphone': '/products/iphone-15-pro.svg',
+  'iphone 15': '/products/iphone-15-pro.svg',
+  'iphone 15 pro': '/products/iphone-15-pro.svg',
+  'iphone 16': '/products/iphone-15-pro.svg',
+  'iphone 16 pro': '/products/iphone-15-pro.svg',
+  'macbook': '/products/macbook-pro.svg',
+  'macbook pro': '/products/macbook-pro.svg',
+  'macbook air': '/products/macbook-pro.svg',
+  'ipad': '/products/ipad-pro.svg',
+  'ipad pro': '/products/ipad-pro.svg',
+  'ipad air': '/products/ipad-pro.svg',
+  'airpods': '/products/airpods-pro.svg',
+  'airpods pro': '/products/airpods-pro.svg',
+  'airpods max': '/products/airpods-max.svg',
+  'apple watch': '/products/apple-watch.svg',
+  'imac': '/products/imac.svg',
+  // Gaming
+  'playstation': '/products/ps5.svg',
+  'playstation 5': '/products/ps5.svg',
+  'ps5': '/products/ps5.svg',
+  'ps5 slim': '/products/ps5.svg',
+  'manette ps5': '/products/ps5-controller.svg',
+  'xbox': '/products/xbox-series-x.svg',
+  'xbox series x': '/products/xbox-series-x.svg',
+  'xbox series s': '/products/xbox-series-x.svg',
+  'nintendo': '/products/nintendo-switch.svg',
+  'nintendo switch': '/products/nintendo-switch.svg',
+  'switch': '/products/nintendo-switch.svg',
+  'steam deck': '/products/steam-deck.svg',
+  'meta quest': '/products/meta-quest.svg',
+  'quest 3': '/products/meta-quest.svg',
+  'oculus': '/products/meta-quest.svg',
+  // Gaming accessories
+  'gaming laptop': '/products/gaming-laptop.svg',
+  'pc portable gamer': '/products/gaming-laptop.svg',
+  'gaming chair': '/products/gaming-chair.svg',
+  'chaise gamer': '/products/gaming-chair.svg',
+  'gaming monitor': '/products/gaming-monitor.svg',
+  'écran gamer': '/products/gaming-monitor.svg',
+  'gaming keyboard': '/products/gaming-keyboard.svg',
+  'clavier gamer': '/products/gaming-keyboard.svg',
+  'gaming mouse': '/products/gaming-mouse.svg',
+  'souris gamer': '/products/gaming-mouse.svg',
+  // Samsung
+  'samsung galaxy': '/products/samsung-galaxy.svg',
+  'galaxy s24': '/products/samsung-galaxy.svg',
+  'galaxy s23': '/products/samsung-galaxy.svg',
+  'samsung tv': '/products/samsung-tv.svg',
+  // Audio
+  'sony wh': '/products/sony-headphones.svg',
+  'sony headphones': '/products/sony-headphones.svg',
+  'casque sony': '/products/sony-headphones.svg',
+  'bose': '/products/bose-speaker.svg',
+  'jbl': '/products/jbl-speaker.svg',
+  'sonos': '/products/sonos-speaker.svg',
+  'soundbar': '/products/soundbar.svg',
+  'barre de son': '/products/soundbar.svg',
+  // TV
+  'lg tv': '/products/lg-tv.svg',
+  'tv lg': '/products/lg-tv.svg',
+  'tv samsung': '/products/samsung-tv.svg',
+  // Cameras
+  'gopro': '/products/gopro-hero.svg',
+  'canon': '/products/canon-camera.svg',
+  'sony camera': '/products/sony-camera.svg',
+  'appareil photo': '/products/sony-camera.svg',
+  // Drones & mobility
+  'dji': '/products/dji-drone.svg',
+  'drone': '/products/dji-drone.svg',
+  'trottinette': '/products/electric-scooter.svg',
+  'scooter': '/products/electric-scooter.svg',
+  'vélo électrique': '/products/electric-bike.svg',
+  'vélo': '/products/electric-bike.svg',
+  'moto': '/products/electric-moto.svg',
+  'vespa': '/products/vespa.svg',
+  'tesla': '/products/tesla-model.svg',
+  // Watches
+  'garmin': '/products/garmin-watch.svg',
+  'rolex': '/products/rolex-watch.svg',
+  'montre': '/products/apple-watch.svg',
+  // Home
+  'dyson': '/products/dyson-vacuum.svg',
+  'aspirateur': '/products/dyson-vacuum.svg',
+  'dyson airwrap': '/products/dyson-airwrap.svg',
+  'thermomix': '/products/thermomix.svg',
+  // Fashion
+  'louis vuitton': '/products/louis-vuitton-bag.svg',
+  'sac': '/products/louis-vuitton-bag.svg',
+  'nike': '/products/nike-jordan.svg',
+  'jordan': '/products/nike-jordan.svg',
+  'ray-ban': '/products/rayban-smart.svg',
+  'rayban': '/products/rayban-smart.svg',
+  'lunettes': '/products/rayban-smart.svg',
+  // Other
+  'google pixel': '/products/google-pixel.svg',
+  'pixel': '/products/google-pixel.svg',
+  'carte cadeau': '/products/gift-card.svg',
+  'gift card': '/products/gift-card.svg',
+}
+
+// Get SVG path from product name
+function getProductSvg(name: string): string {
+  const normalizedName = name.toLowerCase().trim()
+
+  // Direct match
+  if (PRODUCT_SVG_MAP[normalizedName]) {
+    return PRODUCT_SVG_MAP[normalizedName]
+  }
+
+  // Partial match
+  for (const [key, value] of Object.entries(PRODUCT_SVG_MAP)) {
+    if (normalizedName.includes(key) || key.includes(normalizedName)) {
+      return value
+    }
+  }
+
+  // Default fallback
+  return '/products/gift-card.svg'
+}
+
 const MOCK_PRIZES: Prize[] = [
   {
     id: '1',
@@ -167,7 +290,7 @@ export function PrizeCarousel({
                   </div>
                 ) : (
                   <Image
-                    src={currentPrize.image_url}
+                    src={getProductSvg(currentPrize.name)}
                     alt={currentPrize.name}
                     fill
                     className="object-contain p-4 transition-transform duration-500 group-hover/image:scale-105"
