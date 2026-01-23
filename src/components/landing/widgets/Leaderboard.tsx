@@ -65,6 +65,28 @@ function getBotWinnersLeaderboard(period: string): LeaderboardEntry[] {
   }))
 }
 
+// Filter winners by period
+function filterWinnersByPeriod(winners: RealWinner[], period: string): RealWinner[] {
+  const now = new Date()
+  let startDate: Date
+
+  switch (period) {
+    case 'today':
+      startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+      break
+    case 'week':
+      startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
+      break
+    case 'month':
+      startDate = new Date(now.getFullYear(), now.getMonth(), 1)
+      break
+    default:
+      return winners // 'all' - no filter
+  }
+
+  return winners.filter(w => new Date(w.won_at) >= startDate)
+}
+
 // Convert real winners to leaderboard format (for when real DB data exists)
 function convertRealWinnersToLeaderboard(winners: RealWinner[]): LeaderboardEntry[] {
   // Agreger par utilisateur
@@ -108,13 +130,16 @@ export function Leaderboard({
   const [selectedPeriod, setSelectedPeriod] = useState<'today' | 'week' | 'month' | 'all'>(initialPeriod)
   const isMobile = useIsMobile()
 
-  // Convert real winners to leaderboard format if available
+  // Convert real winners to leaderboard format if available (filtered by period)
   const realLeaderboard = useMemo(() => {
     if (realWinners && realWinners.length > 0) {
-      return convertRealWinnersToLeaderboard(realWinners)
+      const filteredWinners = filterWinnersByPeriod(realWinners, selectedPeriod)
+      if (filteredWinners.length > 0) {
+        return convertRealWinnersToLeaderboard(filteredWinners)
+      }
     }
     return null
-  }, [realWinners])
+  }, [realWinners, selectedPeriod])
 
   // Get bot winners data for the selected period
   const botWinnersData = useMemo(() => getBotWinnersLeaderboard(selectedPeriod), [selectedPeriod])
