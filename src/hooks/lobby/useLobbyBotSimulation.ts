@@ -116,7 +116,7 @@ export function useLobbyBotSimulation({
     const username = generateDeterministicUsername(`${game.id}-${roundedTime}-bot`)
 
     // Reset timer SEULEMENT si timeLeft < 120s (phase finale)
-    const shouldResetTimer = timeLeft <= 120000
+    const shouldResetTimer = timeLeft <= 90000
 
     // Mettre à jour le jeu
     onGameUpdateRef.current(game.id, {
@@ -152,7 +152,7 @@ export function useLobbyBotSimulation({
         const timeLeft = game.end_time - now
         if (timeLeft <= 0) return
 
-        const isInFinalPhase = game.status === 'final_phase' || timeLeft <= 120000
+        const isInFinalPhase = game.status === 'final_phase' || timeLeft <= 90000
         const hasRealPlayer = !!game.last_click_user_id
 
         // Vérifier si la bataille est terminée

@@ -1,6 +1,6 @@
 // Timer constants
 export const INITIAL_DURATION = 24 * 60 * 60 * 1000 // 24 hours in ms
-export const FINAL_PHASE_THRESHOLD = 120 * 1000 // 2 minutes - matches cron logic
+export const FINAL_PHASE_THRESHOLD = 90 * 1000 // 1min30 - matches timer reset
 export const FINAL_PHASE_RESET = 90 * 1000 // Reset to 90s - safe margin for cron
 export const CLICK_COOLDOWN = 1000 // 1 second between clicks
 

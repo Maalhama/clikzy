@@ -157,7 +157,7 @@ export function useBotSimulation({
 
       const timeSinceLastClick = now - lastClickTimeRef.current
       const personality = personalityRef.current
-      const isInFinalPhase = currentStatus === 'final_phase' || timeLeft <= 120000
+      const isInFinalPhase = currentStatus === 'final_phase' || timeLeft <= 90000
       const hasRealPlayer = !!lastClickUserIdRef.current
 
       // Vérifier si la bataille est terminée (phase finale seulement)
@@ -240,7 +240,7 @@ export function useBotSimulation({
       if (isInFinalPhase) {
         // Phase finale : attendre 25-50s pour laisser le timer descendre bas
         minDelay = 25000 + (getDeterministicSeed(gameId, Math.floor(now / 5000)) % 25000)
-        shouldResetTimer = timeLeft <= 120000
+        shouldResetTimer = timeLeft <= 90000
       } else if (timeLeft <= 15 * 60 * 1000) {
         minDelay = 40000 + (getDeterministicSeed(gameId, Math.floor(now / 10000)) % 40000)
       } else if (timeLeft <= 30 * 60 * 1000) {

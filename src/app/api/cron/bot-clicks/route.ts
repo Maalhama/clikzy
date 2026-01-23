@@ -217,7 +217,7 @@ export async function GET(request: NextRequest) {
         // Jeu encore actif - simuler l'activité des bots
         const updates: Record<string, unknown> = {}
         let action = `active (${Math.floor(timeLeft / 1000)}s left)`
-        const isInFinalPhase = timeLeft <= 120000 // 2 minutes - gives cron time to maintain
+        const isInFinalPhase = timeLeft <= 90000 // 2 minutes - gives cron time to maintain
 
         // Entrer en phase finale si nécessaire
         if (isInFinalPhase && game.status !== 'final_phase') {

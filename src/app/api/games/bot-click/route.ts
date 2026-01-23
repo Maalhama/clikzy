@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
       .single()
 
     const now = Date.now()
-    const isInFinalPhase = game?.status === 'final_phase' || (game?.end_time && game.end_time - now <= 120000)
+    const isInFinalPhase = game?.status === 'final_phase' || (game?.end_time && game.end_time - now <= 90000)
 
     // Mettre à jour le leader du jeu et étendre le timer si en phase finale
     const updateData: Record<string, unknown> = {
