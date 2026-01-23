@@ -232,87 +232,81 @@ export function Guarantees({ className = '' }: GuaranteesProps) {
           </div>
 
           {/* Delivery Proofs + Trustpilot */}
-          <div className="grid lg:grid-cols-3 gap-8">
-            {/* Delivery Proofs */}
-            <div className="lg:col-span-2">
-              <h3 className="text-2xl font-black mb-6">
-                PREUVES DE <span className="text-success">LIVRAISON</span>
-              </h3>
-              <div className="grid grid-cols-4 gap-4">
-                {DELIVERY_PROOFS.map((proof, index) => (
-                  <div
-                    key={proof.id}
-                    className={`
-                      group relative rounded-xl overflow-hidden bg-bg-secondary/50 border border-white/10
-                      hover:border-success/50 transition-all duration-500
-                      ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}
-                    `}
-                    style={{ transitionDelay: `${(index + 4) * 100}ms` }}
-                  >
-                    <div className="aspect-square relative">
-                      {imageErrors[proof.id] ? (
-                        <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-neon-purple/20 to-neon-pink/20 p-4">
-                          <svg className="w-10 h-10 text-success mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                          </svg>
-                          <span className="text-xs text-white/50 text-center">Photo à venir</span>
-                        </div>
-                      ) : (
-                        <Image
-                          src={proof.image}
-                          alt={`Livraison ${proof.item}`}
-                          fill
-                          className="object-cover group-hover:scale-105 transition-transform duration-500"
-                          sizes="200px"
-                          onError={() => handleImageError(proof.id)}
-                        />
-                      )}
-                      <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/90 to-transparent">
-                        <div className="text-sm font-bold text-white">{proof.username}</div>
-                        <div className="text-xs text-success">{proof.item}</div>
+          <div>
+            <h3 className="text-2xl font-black mb-6">
+              PREUVES DE <span className="text-success">LIVRAISON</span>
+            </h3>
+            <div className="grid grid-cols-5 gap-4">
+              {/* Delivery Proofs */}
+              {DELIVERY_PROOFS.map((proof, index) => (
+                <div
+                  key={proof.id}
+                  className={`
+                    group relative rounded-xl overflow-hidden bg-bg-secondary/50 border border-white/10
+                    hover:border-success/50 transition-all duration-500
+                    ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}
+                  `}
+                  style={{ transitionDelay: `${(index + 4) * 100}ms` }}
+                >
+                  <div className="aspect-square relative">
+                    {imageErrors[proof.id] ? (
+                      <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-neon-purple/20 to-neon-pink/20 p-4">
+                        <svg className="w-10 h-10 text-success mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                        </svg>
+                        <span className="text-xs text-white/50 text-center">Photo à venir</span>
                       </div>
+                    ) : (
+                      <Image
+                        src={proof.image}
+                        alt={`Livraison ${proof.item}`}
+                        fill
+                        className="object-cover group-hover:scale-105 transition-transform duration-500"
+                        sizes="200px"
+                        onError={() => handleImageError(proof.id)}
+                      />
+                    )}
+                    <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/90 to-transparent">
+                      <div className="text-sm font-bold text-white">{proof.username}</div>
+                      <div className="text-xs text-success">{proof.item}</div>
                     </div>
                   </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Trustpilot */}
-            <div
-              className={`
-                p-6 rounded-xl bg-bg-secondary/50 border border-[#00B67A]/30 h-fit
-                transition-all duration-500
-                ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}
-              `}
-              style={{ transitionDelay: '800ms' }}
-            >
-              <div className="flex items-center gap-2 mb-4">
-                {/* Trustpilot Star Icon */}
-                <svg className="w-7 h-7" viewBox="0 0 24 24" fill="none">
-                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" fill="#00B67A"/>
-                </svg>
-                <span className="font-black text-xl text-[#00B67A]">Trustpilot</span>
-              </div>
-
-              <div className="flex items-center gap-1 mb-3">
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <svg key={star} className="w-6 h-6 text-[#00B67A]" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
-                  </svg>
-                ))}
-              </div>
-
-              <div className="text-white/70 mb-4">
-                <span className="font-black text-2xl text-white">4.8</span>
-                <span className="text-sm">/5 basé sur </span>
-                <span className="font-bold text-white">127 avis</span>
-              </div>
-
-              <div className="space-y-2">
-                <div className="text-xs text-white/50 italic">
-                  "Livraison rapide, produit conforme. Je recommande !"
                 </div>
-                <div className="text-xs text-white/70">— {DELIVERY_PROOFS[0]?.username || 'Joueur'}</div>
+              ))}
+
+              {/* Trustpilot - Same row as photos */}
+              <div
+                className={`
+                  p-4 rounded-xl bg-bg-secondary/50 border border-[#00B67A]/30
+                  transition-all duration-500 flex flex-col justify-center
+                  ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}
+                `}
+                style={{ transitionDelay: '800ms' }}
+              >
+                <div className="flex items-center gap-2 mb-3">
+                  <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none">
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" fill="#00B67A"/>
+                  </svg>
+                  <span className="font-black text-lg text-[#00B67A]">Trustpilot</span>
+                </div>
+
+                <div className="flex items-center gap-0.5 mb-2">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <svg key={star} className="w-5 h-5 text-[#00B67A]" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+                    </svg>
+                  ))}
+                </div>
+
+                <div className="text-white/70 mb-3">
+                  <span className="font-black text-xl text-white">4.8</span>
+                  <span className="text-xs">/5</span>
+                  <div className="text-xs">127 avis</div>
+                </div>
+
+                <div className="text-[10px] text-white/50 italic leading-tight">
+                  "Livraison rapide !"
+                </div>
               </div>
             </div>
           </div>
