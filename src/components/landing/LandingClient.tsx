@@ -68,11 +68,20 @@ interface FeaturedItem {
   description?: string
 }
 
+interface Prize {
+  id: string
+  name: string
+  image_url: string
+  value: number
+  status: 'available' | 'ending_soon' | 'ended'
+}
+
 interface LandingClientProps {
   isLoggedIn: boolean
   initialWinners: Winner[]
   initialFeaturedGame: FeaturedGame | null
   featuredItem: FeaturedItem | null
+  prizes?: Prize[]
   stats: {
     totalWinningsValue: number
     totalGames: number
@@ -143,6 +152,7 @@ export function LandingClient({
   initialWinners,
   initialFeaturedGame,
   featuredItem,
+  prizes,
   stats,
 }: LandingClientProps) {
   const mainRef = useRef<HTMLElement>(null)
@@ -519,12 +529,12 @@ export function LandingClient({
 
           {/* Stats - Horizontal compact */}
           <div className="hero-stats flex justify-between gap-2">
-            <div className="flex-1 py-3 px-2 rounded-lg bg-bg-secondary/60 border border-neon-blue/20 text-center">
-              <div className="text-lg font-black text-neon-blue">{stats.totalWinningsValue.toLocaleString()}€</div>
+            <div className="flex-1 py-3 px-2 rounded-lg bg-bg-secondary/60 border border-neon-purple/20 text-center">
+              <div className="text-lg font-black text-neon-purple">{stats.totalWinningsValue.toLocaleString()}€</div>
               <div className="text-[9px] text-white/40 uppercase">Récompenses</div>
             </div>
-            <div className="flex-1 py-3 px-2 rounded-lg bg-bg-secondary/60 border border-neon-purple/20 text-center">
-              <div className="text-lg font-black text-neon-purple">{stats.totalGames}+</div>
+            <div className="flex-1 py-3 px-2 rounded-lg bg-bg-secondary/60 border border-neon-pink/20 text-center">
+              <div className="text-lg font-black text-neon-pink">{stats.totalGames}+</div>
               <div className="text-[9px] text-white/40 uppercase">Lots</div>
             </div>
             <div className="flex-1 py-3 px-2 rounded-lg bg-bg-secondary/60 border border-neon-pink/20 text-center">
@@ -620,16 +630,16 @@ export function LandingClient({
 
             {/* Stats */}
             <div className="hero-stats grid grid-cols-3 gap-6">
-              <div className="stat-box p-4 rounded-xl bg-bg-secondary/40 border border-neon-blue/20">
-                <div className="text-3xl font-black text-neon-blue">{stats.totalWinningsValue.toLocaleString()}€</div>
+              <div className="stat-box p-4 rounded-xl bg-bg-secondary/40 border border-neon-purple/20">
+                <div className="text-3xl font-black text-neon-purple">{stats.totalWinningsValue.toLocaleString()}€</div>
                 <div className="text-xs text-white/40 uppercase tracking-wider">Récompenses</div>
               </div>
-              <div className="stat-box p-4 rounded-xl bg-bg-secondary/40 border border-neon-purple/20">
-                <div className="text-3xl font-black text-neon-purple">{stats.totalGames}+</div>
+              <div className="stat-box p-4 rounded-xl bg-bg-secondary/40 border border-neon-pink/20">
+                <div className="text-3xl font-black text-neon-pink">{stats.totalGames}+</div>
                 <div className="text-xs text-white/40 uppercase tracking-wider">Lots distribués</div>
               </div>
-              <div className="stat-box p-4 rounded-xl bg-bg-secondary/40 border border-neon-pink/20">
-                <div className="text-3xl font-black text-neon-pink">10</div>
+              <div className="stat-box p-4 rounded-xl bg-bg-secondary/40 border border-neon-purple/20">
+                <div className="text-3xl font-black text-neon-purple">10</div>
                 <div className="text-xs text-white/40 uppercase tracking-wider">Clics gratuits/jour</div>
               </div>
             </div>
@@ -807,7 +817,7 @@ export function LandingClient({
           </div>
 
           {/* Carousel */}
-          <PrizeCarousel />
+          {prizes && prizes.length > 0 ? <PrizeCarousel prizes={prizes} /> : <PrizeCarousel />}
         </div>
       </section>
 
@@ -829,7 +839,7 @@ export function LandingClient({
             </h2>
             <p className="text-white/60 text-lg">Produits premium quotidiens</p>
           </div>
-          <PrizeCarousel />
+          {prizes && prizes.length > 0 ? <PrizeCarousel prizes={prizes} /> : <PrizeCarousel />}
         </div>
       </section>
 

@@ -29,6 +29,14 @@ interface FeaturedItem {
   description?: string
 }
 
+interface Prize {
+  id: string
+  name: string
+  image_url: string
+  value: number
+  status: 'available' | 'ending_soon' | 'ended'
+}
+
 async function getLandingData() {
   const supabase = await createClient()
   const now = Date.now()
@@ -40,6 +48,7 @@ async function getLandingData() {
     statsResult,
     winningsResult,
     fallbackItemResult,
+    activeGamesResult,
   ] = await Promise.all([
     // Fetch recent winners from last 24h (including bots)
     supabase
@@ -77,6 +86,15 @@ async function getLandingData() {
       .order('retail_value', { ascending: false })
       .limit(1)
       .single(),
+
+    // Fetch active games with items for prizes carousel
+    supabase
+      .from('games')
+      .select('id, end_time, status, item:items(id, name, image_url, retail_value)')
+      .in('status', ['active', 'final_phase'])
+      .gt('end_time', now)
+      .order('end_time', { ascending: true })
+      .limit(6),
   ])
 
   const typedWinners = winnersResult.data as Pick<DbWinner, 'id' | 'item_name' | 'item_value' | 'won_at' | 'user_id' | 'username' | 'is_bot'>[] | null
@@ -165,10 +183,33 @@ async function getLandingData() {
     0
   )
 
+  // Process active games for prizes carousel
+  const activeGames = activeGamesResult.data as Array<{
+    id: string
+    end_time: number
+    status: string
+    item: { id: string; name: string; image_url: string; retail_value: number } | null
+  }> | null
+
+  const prizes: Prize[] = (activeGames || [])
+    .filter(g => g.item)
+    .map(g => {
+      const timeLeft = g.end_time - now
+      const isEndingSoon = timeLeft <= 120000 // 2 minutes
+      return {
+        id: g.id,
+        name: g.item!.name,
+        image_url: g.item!.image_url,
+        value: g.item!.retail_value || 0,
+        status: isEndingSoon ? 'ending_soon' as const : 'available' as const,
+      }
+    })
+
   return {
     winners,
     featuredGame,
     featuredItem,
+    prizes,
     stats: {
       totalWinningsValue: totalWinningsValue || 15000,
       totalGames: statsResult.count || 50,
@@ -180,7 +221,7 @@ export default async function LandingPage() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
-  const { winners, featuredGame, featuredItem, stats } = await getLandingData()
+  const { winners, featuredGame, featuredItem, prizes, stats } = await getLandingData()
 
   return (
     <LandingClient
@@ -188,6 +229,7 @@ export default async function LandingPage() {
       initialWinners={winners}
       initialFeaturedGame={featuredGame}
       featuredItem={featuredItem}
+      prizes={prizes}
       stats={stats}
     />
   )
