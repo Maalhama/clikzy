@@ -246,18 +246,29 @@ export async function GET(request: NextRequest) {
             // Tant que la bataille est en cours (< 100%), le bot DOIT cliquer pour maintenir le timer
             // Priorité absolue: maintenir le timer au-dessus de 0
 
-            // Pour le suspense: attendre que le timer soit BAS avant de cliquer
-            // Le bot clique seulement quand timer < 25s pour créer de la tension
+            // Pour le suspense: seuil aléatoire entre 8-25s basé sur gameId
+            const clickThresholdSeed = hashString(`${game.id}-threshold-${Math.floor(now / 60000)}`)
+            const clickThreshold = 8000 + (clickThresholdSeed % 17000) // 8s à 25s
 
-            if (timeLeft <= 25000) {
+            // Probabilité de clic: 70% (pour varier les moments)
+            const clickProbSeed = hashString(`${game.id}-prob-${Math.floor(now / 30000)}`)
+            const shouldClickNow = (clickProbSeed % 100) < 70
+
+            if (timeLeft <= clickThreshold && shouldClickNow) {
               // Timer critique - bot clique pour sauver la bataille
               updates.last_click_username = botUsername
               updates.last_click_user_id = null
               updates.end_time = now + 90000 // Reset à 90s
               action = `bot_click_final (${botUsername}) SAVED at ${Math.floor(timeLeft/1000)}s! [battle: ${Math.round(battleProgress * 100)}%/${battleDurationMin}min]`
+            } else if (timeLeft <= 5000) {
+              // URGENCE ABSOLUE: < 5s, toujours cliquer!
+              updates.last_click_username = botUsername
+              updates.last_click_user_id = null
+              updates.end_time = now + 90000
+              action = `bot_EMERGENCY (${botUsername}) at ${Math.floor(timeLeft/1000)}s! [battle: ${Math.round(battleProgress * 100)}%/${battleDurationMin}min]`
             } else {
-              // Timer > 25s - laisser descendre pour le suspense
-              action = `waiting_for_suspense - ${Math.floor(timeLeft/1000)}s left [battle: ${Math.round(battleProgress * 100)}%/${battleDurationMin}min]`
+              // Attendre pour le suspense
+              action = `waiting (threshold: ${Math.floor(clickThreshold/1000)}s) - ${Math.floor(timeLeft/1000)}s left [battle: ${Math.round(battleProgress * 100)}%/${battleDurationMin}min]`
             }
           } else {
             // Bataille terminée ET pas de joueur réel - laisser timer descendre
