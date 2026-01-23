@@ -2,32 +2,31 @@
 
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-
-const CONSENT_KEY = 'cookie-consent'
+import { useCookieConsent } from '@/hooks/useCookieConsent'
 
 export function CookieConsent() {
   const [showBanner, setShowBanner] = useState(false)
+  const { hasConsented, accept, refuse } = useCookieConsent()
 
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const consent = localStorage.getItem(CONSENT_KEY)
-      if (!consent) {
-        // Delay showing the banner for better UX
-        const timer = setTimeout(() => {
-          setShowBanner(true)
-        }, 2000)
-        return () => clearTimeout(timer)
-      }
+    if (!hasConsented) {
+      // Delay showing the banner for better UX
+      const timer = setTimeout(() => {
+        setShowBanner(true)
+      }, 2000)
+      return () => clearTimeout(timer)
+    } else {
+      setShowBanner(false)
     }
-  }, [])
+  }, [hasConsented])
 
   function handleAccept() {
-    localStorage.setItem(CONSENT_KEY, 'accepted')
+    accept()
     setShowBanner(false)
   }
 
   function handleRefuse() {
-    localStorage.setItem(CONSENT_KEY, 'refused')
+    refuse()
     setShowBanner(false)
   }
 
@@ -38,7 +37,7 @@ export function CookieConsent() {
           initial={{ opacity: 0, y: 100 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 100 }}
-          className="fixed bottom-4 left-4 right-4 z-50 md:left-auto md:right-4 md:max-w-md"
+          className="fixed bottom-4 left-4 right-4 z-[60] md:left-auto md:right-4 md:max-w-md"
         >
           <div className="p-4 rounded-2xl bg-bg-secondary/95 border border-white/10 shadow-xl shadow-black/50 backdrop-blur-sm">
             <div className="flex items-start gap-3">

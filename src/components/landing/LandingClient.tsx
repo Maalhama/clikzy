@@ -8,6 +8,7 @@ import { useRouter } from 'next/navigation'
 import { useGSAP } from '@gsap/react'
 import { gsap } from '@/lib/gsap/gsapConfig'
 import { useLandingRealtime } from '@/hooks/landing/useLandingRealtime'
+import { useCookieConsent } from '@/hooks/useCookieConsent'
 import { signOut } from '@/actions/auth'
 
 // Widgets
@@ -161,6 +162,7 @@ export function LandingClient({
   const [menuClosing, setMenuClosing] = useState(false)
   const [isMounted, setIsMounted] = useState(false)
   const [isNavigating, setIsNavigating] = useState(false)
+  const { hasConsented } = useCookieConsent()
 
   async function handleSignOut() {
     await signOut()
@@ -284,15 +286,19 @@ export function LandingClient({
         <BackgroundEffects />
       </div>
 
-      {/* FLOATING WIDGETS */}
-      <LiveActivityToast enabled={true} maxVisible={3} realWinners={initialWinners} />
-      <FloatingTimer
-        enabled={true}
-        isLoggedIn={isLoggedIn}
-        gameId={initialFeaturedGame?.id}
-        initialEndTime={initialFeaturedGame?.end_time}
-        itemName={featuredItem?.name}
-      />
+      {/* FLOATING WIDGETS - Only show after cookie consent */}
+      {hasConsented && (
+        <>
+          <LiveActivityToast enabled={true} maxVisible={3} realWinners={initialWinners} />
+          <FloatingTimer
+            enabled={true}
+            isLoggedIn={isLoggedIn}
+            gameId={initialFeaturedGame?.id}
+            initialEndTime={initialFeaturedGame?.end_time}
+            itemName={featuredItem?.name}
+          />
+        </>
+      )}
 
       {/* Header */}
       <header className="fixed top-0 left-0 right-0 z-50 group/header">
