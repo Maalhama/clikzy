@@ -5,14 +5,14 @@ test.describe('Authentication', () => {
     await page.goto('/login')
 
     await expect(page).toHaveTitle(/CLEEKZY/)
-    await expect(page.getByRole('heading', { name: /connexion/i })).toBeVisible()
+    await expect(page.getByRole('heading', { name: /se connecter/i })).toBeVisible()
   })
 
   test('should display register page', async ({ page }) => {
     await page.goto('/register')
 
     await expect(page).toHaveTitle(/CLEEKZY/)
-    await expect(page.getByRole('heading', { name: /inscription|créer/i })).toBeVisible()
+    await expect(page.getByRole('heading', { name: /s'inscrire|créer/i })).toBeVisible()
   })
 
   test('should show validation error for invalid email', async ({ page }) => {

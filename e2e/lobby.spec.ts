@@ -14,7 +14,7 @@ test.describe('Lobby Page', () => {
     await page.goto('/lobby')
 
     // Should have login page elements after redirect
-    await expect(page.getByRole('heading', { name: /connexion/i })).toBeVisible()
+    await expect(page.getByRole('heading', { name: /se connecter/i })).toBeVisible()
   })
 })
 
