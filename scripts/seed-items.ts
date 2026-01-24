@@ -606,7 +606,7 @@ const PRODUCTS: Product[] = [
     category: 'watch'
   },
   {
-    name: 'Garmin Venu Sq 3',
+    name: 'Garmin Venu Sq 2',
     description: 'Montre GPS fitness avec écran AMOLED',
     image_url: 'https://images.unsplash.com/photo-1508685096489-7aacd43bd3b1?w=800&q=90&fit=crop',
     retail_value: 199,

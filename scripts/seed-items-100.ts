@@ -71,7 +71,7 @@ const productsUnder200: Product[] = [
   { name: 'Samsung Galaxy Watch FE', description: 'Montre connectée Wear OS abordable', retail_value: 199, category: 'wearable', target: 'mixte' },
   { name: 'Whoop 5.0', description: 'Bracelet performance sans écran nouvelle génération', retail_value: 199, category: 'wearable', target: 'homme', imageSlug: 'whoop-5-0' },
   { name: 'Apple Watch SE 2', description: 'Montre connectée Apple essentielle', retail_value: 199, category: 'wearable', target: 'mixte', imageSlug: 'apple-watch-se-2' },
-  { name: 'Garmin Venu Sq 3', description: 'Montre fitness GPS écran AMOLED', retail_value: 199, category: 'wearable', target: 'mixte' },
+  { name: 'Garmin Venu Sq 2', description: 'Montre fitness GPS écran AMOLED', retail_value: 199, category: 'wearable', target: 'mixte' },
 
   // AUDIO & GAMING (8)
   { name: 'Manette PS5 DualSense', description: 'Manette officielle PlayStation 5 avec retour haptique', retail_value: 69, category: 'gaming', target: 'mixte', imageSlug: 'manette-ps5-dualsense' },
@@ -86,7 +86,7 @@ const productsUnder200: Product[] = [
   // MAISON CONNECTÉE (8)
   { name: 'Amazon Echo Show 10', description: 'Écran connecté Alexa avec rotation auto', retail_value: 199, category: 'maison', target: 'mixte' },
   { name: 'Google Nest Hub Max', description: 'Écran connecté Google Assistant 10 pouces', retail_value: 199, category: 'maison', target: 'mixte' },
-  { name: 'Philips Hue Starter Kit', description: 'Kit 3 ampoules couleur + pont + interrupteur', retail_value: 149, category: 'maison', target: 'mixte', imageSlug: 'philips-hue-starter-kit' },
+  { name: 'Insta360 Go 3S', description: 'Mini caméra action 4K étanche avec boîtier écran', retail_value: 149, category: 'photo', target: 'mixte', imageSlug: 'philips-hue-starter-kit' },
   { name: 'Ring Video Doorbell 4', description: 'Sonnette vidéo connectée HD avec radar', retail_value: 199, category: 'maison', target: 'mixte' },
   { name: 'Eufy Security SoloCam E40', description: 'Caméra surveillance 2K sans fil solaire', retail_value: 129, category: 'maison', target: 'mixte', imageSlug: 'eufy-security-solo-cam-e40' },
   { name: 'Nanoleaf Shapes Hexagons', description: 'Panneaux lumineux modulaires RGB', retail_value: 199, category: 'maison', target: 'mixte', imageSlug: 'nanoleaf-shapes-hexagons' },
@@ -100,7 +100,7 @@ const productsUnder200: Product[] = [
   { name: 'MagSafe Battery Pack', description: 'Batterie magnétique Apple iPhone 15W', retail_value: 109, category: 'accessoire', target: 'mixte' },
   { name: 'Belkin BoostCharge Pro 3-en-1', description: 'Station de charge MagSafe Apple Watch AirPods', retail_value: 149, category: 'accessoire', target: 'mixte' },
   { name: 'Kindle Paperwhite Signature', description: 'Liseuse 6.8" 32Go charge sans fil', retail_value: 189, category: 'accessoire', target: 'mixte' },
-  { name: 'Kobo Libra Colour', description: 'Liseuse couleur E Ink Kaleido 7 pouces', retail_value: 199, category: 'accessoire', target: 'mixte' },
+  { name: 'Ray-Ban Meta Smart Glasses', description: 'Lunettes connectées caméra 12MP et audio intégré', retail_value: 329, category: 'accessoire', target: 'mixte', imageSlug: 'kobo-libra-colour' },
   { name: 'Logitech G915 TKL', description: 'Clavier gaming mécanique sans fil RGB', retail_value: 199, category: 'accessoire', target: 'mixte' },
 ]
 
@@ -174,7 +174,7 @@ const productsOver200: Product[] = [
   // MOBILITÉ (3)
   { name: 'Xiaomi Electric Scooter 5 Pro', description: 'Trottinette 25km/h autonomie 60km', retail_value: 649, category: 'mobilite', target: 'mixte', imageSlug: 'xiaomi-electric-scooter-5-pro' },
   { name: 'Segway Ninebot Max G3', description: 'Trottinette premium longue autonomie 65km', retail_value: 899, category: 'mobilite', target: 'mixte', imageSlug: 'segway-ninebot-max-g3' },
-  { name: 'Cowboy 5', description: 'Vélo électrique connecté design belge', retail_value: 2990, category: 'mobilite', target: 'mixte', imageSlug: 'cowboy-5' },
+  { name: 'Ledger Nano X', description: 'Wallet crypto hardware Bluetooth sécurisé', retail_value: 149, category: 'accessoire', target: 'mixte', imageSlug: 'cowboy-5' },
 ]
 
 const allProducts = [...productsUnder200, ...productsOver200]
