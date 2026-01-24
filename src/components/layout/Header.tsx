@@ -115,6 +115,18 @@ export function Header({ profile }: HeaderProps) {
                 Gratuit
               </span>
             </Link>
+            <Link
+              href="/shop"
+              className="flex items-center gap-2 text-white/60 hover:text-neon-pink transition-colors font-medium group"
+            >
+              {/* Shopping bag icon */}
+              <svg className="w-5 h-5 text-neon-pink/70 group-hover:text-neon-pink transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+                <line x1="3" y1="6" x2="21" y2="6" />
+                <path d="M16 10a4 4 0 0 1-8 0" />
+              </svg>
+              <span>Boutique</span>
+            </Link>
           </nav>
 
           {/* Right section */}
@@ -299,6 +311,21 @@ export function Header({ profile }: HeaderProps) {
                 <span className="px-2 py-0.5 text-[10px] font-bold bg-neon-purple/20 text-neon-purple rounded uppercase ml-auto">
                   Gratuit
                 </span>
+              </Link>
+              <Link
+                href="/shop"
+                onClick={closeMenu}
+                className="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-neon-pink/10 transition-colors border border-transparent hover:border-neon-pink/30 group"
+              >
+                {/* Shopping bag icon */}
+                <div className="w-8 h-8 rounded-lg bg-neon-pink/10 border border-neon-pink/30 flex items-center justify-center group-hover:bg-neon-pink/20 transition-colors">
+                  <svg className="w-4 h-4 text-neon-pink" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+                    <line x1="3" y1="6" x2="21" y2="6" />
+                    <path d="M16 10a4 4 0 0 1-8 0" />
+                  </svg>
+                </div>
+                <span className="font-medium text-white/80 group-hover:text-neon-pink transition-colors">Boutique</span>
               </Link>
             </div>
 
