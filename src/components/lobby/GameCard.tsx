@@ -49,8 +49,8 @@ export const GameCard = memo(function GameCard({ game, index = 0, isFavorite = f
 
   // Images avec fallback
   const { primary: neonImage, fallback: fallbackImage } = useMemo(
-    () => getProductImageWithFallback(game.item.name, game.item.id),
-    [game.item.name, game.item.id]
+    () => getProductImageWithFallback(game.item.name, game.item.image_url),
+    [game.item.name, game.item.image_url]
   )
   const currentImage = imgError ? fallbackImage : neonImage
 
