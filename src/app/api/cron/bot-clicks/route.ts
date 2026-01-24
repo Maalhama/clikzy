@@ -370,8 +370,9 @@ async function endGame(
   itemName: string
 ): Promise<boolean> {
   const winnerId = game.last_click_user_id || null
-  const winnerUsername = game.last_click_username || 'Bot'
   const isBot = !winnerId
+  // Si pas de username, générer un pseudo de bot cohérent
+  const winnerUsername = game.last_click_username || generateDeterministicUsername(`${game.id}-winner`)
 
   // Update avec protection contre les race conditions
   const { data: updateResult } = await supabase
