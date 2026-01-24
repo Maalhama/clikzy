@@ -12,7 +12,7 @@ import { clickGame } from '@/actions/game'
 import { GAME_CONSTANTS } from '@/lib/constants'
 import { formatTime } from '@/lib/utils/timer'
 import { generateDeterministicUsername } from '@/lib/bots/usernameGenerator'
-import { getProductSvg } from '@/lib/utils/productImages'
+import { getProductImageWithFallback } from '@/lib/utils/productImages'
 import { CreditPacksModal } from '@/components/modals/CreditPacksModal'
 import { trackGameClick, trackGameWin } from '@/lib/analytics'
 import type { Game, Item } from '@/types/database'
@@ -195,7 +195,10 @@ export function GameClient({
     }
   }, [game.status, isCritical, isUrgent])
 
-  const productImage = getProductSvg(game.item.name, game.item.id)
+  const { primary: productImage } = useMemo(
+    () => getProductImageWithFallback(game.item.name, game.item.image_url),
+    [game.item.name, game.item.image_url]
+  )
 
   return (
     <div className="min-h-screen pb-20 lg:pb-8">
