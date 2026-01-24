@@ -113,8 +113,12 @@ export function CreditPacksModal({ isOpen, onClose }: CreditPacksModalProps) {
                         </span>
                       )}
                     </div>
-                    <div className="text-white/40 text-xs">
-                      {(pack.price / pack.credits * 100).toFixed(1)} cent / crédit
+                    <div className="text-xs">
+                      {pack.bonus > 0 ? (
+                        <span className="text-success font-medium">+{pack.bonus}% de valeur</span>
+                      ) : (
+                        <span className="text-white/40">Pack de base</span>
+                      )}
                     </div>
                   </div>
 

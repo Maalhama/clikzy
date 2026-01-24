@@ -16,30 +16,34 @@ export function getStripe(): Promise<Stripe | null> {
 }
 
 // Credit pack definitions
+// Bonus calculated vs base price (Boost pack): 4.99€/50 = 0.0998€/credit
 export const CREDIT_PACKS = [
   {
     id: 'starter',
-    name: 'Starter',
+    name: 'Boost',
     credits: 50,
     price: 4.99,
     priceId: process.env.STRIPE_PRICE_STARTER || '',
     popular: false,
+    bonus: 0, // Base price
   },
   {
     id: 'popular',
-    name: 'Popular',
+    name: 'Turbo',
     credits: 150,
     price: 9.99,
     priceId: process.env.STRIPE_PRICE_POPULAR || '',
     popular: true,
+    bonus: 33, // 33% more value vs Boost
   },
   {
     id: 'premium',
-    name: 'Premium',
+    name: 'Ultra',
     credits: 500,
     price: 24.99,
     priceId: process.env.STRIPE_PRICE_PREMIUM || '',
     popular: false,
+    bonus: 50, // 50% more value vs Boost
   },
 ] as const
 

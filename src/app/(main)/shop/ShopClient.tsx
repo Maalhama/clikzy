@@ -114,9 +114,13 @@ export function ShopClient({ currentCredits }: ShopClientProps) {
                   {/* Pack name */}
                   <h3 className="text-xl font-bold text-white mb-1">{pack.name}</h3>
 
-                  {/* Price per credit */}
-                  <div className="text-white/40 text-sm mb-6">
-                    {(pack.price / pack.credits * 100).toFixed(1)} centimes / crédit
+                  {/* Bonus percentage */}
+                  <div className="text-sm mb-6">
+                    {pack.bonus > 0 ? (
+                      <span className="text-success font-semibold">+{pack.bonus}% de valeur</span>
+                    ) : (
+                      <span className="text-white/40">Pack de base</span>
+                    )}
                   </div>
 
                   {/* Price */}
