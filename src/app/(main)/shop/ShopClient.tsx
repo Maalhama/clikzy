@@ -32,10 +32,10 @@ export function ShopClient({ currentCredits }: ShopClientProps) {
       {/* Header */}
       <div className="relative py-8 md:py-12 px-4 md:px-6">
         <div className="max-w-4xl mx-auto text-center">
-          {/* Back link */}
+          {/* Back link - desktop only */}
           <Link
             href="/lobby"
-            className="inline-flex items-center gap-2 text-white/50 hover:text-white transition-colors mb-6"
+            className="hidden sm:inline-flex items-center gap-2 text-white/50 hover:text-white transition-colors mb-6"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
