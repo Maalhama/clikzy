@@ -57,7 +57,7 @@ export async function GET(request: NextRequest) {
       })
     }
 
-    const now = new Date().toISOString()
+    const resetTimestamp = new Date().toISOString()
 
     // Reset daily credits to 10 for all free users
     // Note: earned_credits (from mini-games) are NOT touched - they persist forever
@@ -65,7 +65,7 @@ export async function GET(request: NextRequest) {
       .from('profiles')
       .update({
         credits: DAILY_FREE_CREDITS, // Reset daily credits to 10
-        last_credits_reset: now,
+        last_credits_reset: resetTimestamp,
       })
       .in('id', freeUsers.map(u => u.id))
 
