@@ -19,6 +19,32 @@ import Pachinko from '@/components/mini-games/Pachinko';
 
 const PLAY_COST = 3; // Coût en crédits pour une partie payante
 
+// Get tomorrow midnight in French timezone (Europe/Paris)
+function getTomorrowMidnightFrench(): Date {
+  const now = new Date();
+  // Create a formatter for French timezone
+  const formatter = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Europe/Paris',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  });
+  // Get today's date in French timezone
+  const frenchDateStr = formatter.format(now);
+  // Parse it and add one day for tomorrow
+  const [year, month, day] = frenchDateStr.split('-').map(Number);
+  // Create tomorrow midnight in French timezone
+  const tomorrowFrench = new Date(Date.UTC(year, month - 1, day + 1, 0, 0, 0));
+  // Adjust for French timezone offset (CET = UTC+1, CEST = UTC+2)
+  // We need to subtract the offset to get the correct UTC time
+  const offsetHours = now.toLocaleString('en-US', { timeZone: 'Europe/Paris', hour: '2-digit', hour12: false }) !==
+                      now.toLocaleString('en-US', { timeZone: 'UTC', hour: '2-digit', hour12: false }) ?
+                      (parseInt(now.toLocaleString('en-US', { timeZone: 'Europe/Paris', hour: '2-digit', hour12: false })) -
+                       parseInt(now.toLocaleString('en-US', { timeZone: 'UTC', hour: '2-digit', hour12: false })) + 24) % 24 : 0;
+  tomorrowFrench.setUTCHours(-offsetHours);
+  return tomorrowFrench;
+}
+
 interface MiniGamesClientProps {
   initialEligibility: MiniGameEligibility;
 }
@@ -116,17 +142,15 @@ export default function MiniGamesClient({ initialEligibility }: MiniGamesClientP
           slotIndex: gameResult.data.slotIndex,
         });
 
-        // Update eligibility
-        const tomorrow = new Date();
-        tomorrow.setUTCHours(0, 0, 0, 0);
-        tomorrow.setUTCDate(tomorrow.getUTCDate() + 1);
+        // Update eligibility - next play at midnight French time
+        const tomorrowMidnight = getTomorrowMidnightFrench();
 
         setEligibility(prev => ({
           ...prev,
           [gameType]: {
             canPlay: false,
             lastPlayedAt: new Date().toISOString(),
-            nextPlayAt: tomorrow.toISOString()
+            nextPlayAt: tomorrowMidnight.toISOString()
           }
         }));
       } else {
@@ -263,7 +287,7 @@ export default function MiniGamesClient({ initialEligibility }: MiniGamesClientP
             className="text-[var(--text-secondary)] text-lg md:text-xl max-w-2xl mx-auto"
           >
             Jouez à nos 3 jeux exclusifs chaque jour pour gagner des crédits gratuits.
-            Réinitialisation toutes les 24 heures.
+            Réinitialisation à minuit.
           </motion.p>
         </div>
 

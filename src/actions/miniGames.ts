@@ -18,21 +18,32 @@ type ActionResult<T = void> = {
 }
 
 /**
- * Get midnight of today in UTC
+ * Get midnight of today in French timezone (Europe/Paris)
  */
-function getTodayMidnight(): Date {
+function getTodayMidnightFrench(): Date {
+  // Get current time in French timezone
   const now = new Date()
-  const midnight = new Date(now)
-  midnight.setUTCHours(0, 0, 0, 0)
-  return midnight
+  const frenchTime = new Date(now.toLocaleString('en-US', { timeZone: 'Europe/Paris' }))
+
+  // Set to midnight
+  frenchTime.setHours(0, 0, 0, 0)
+
+  // Convert back to UTC for database comparison
+  const frenchMidnightStr = frenchTime.toLocaleString('en-US', { timeZone: 'Europe/Paris' })
+  const frenchMidnight = new Date(frenchMidnightStr)
+
+  // Calculate the offset and return UTC equivalent
+  const offsetMs = now.getTime() - new Date(now.toLocaleString('en-US', { timeZone: 'Europe/Paris' })).getTime()
+
+  return new Date(frenchTime.getTime() + offsetMs)
 }
 
 /**
- * Get midnight of tomorrow in UTC
+ * Get midnight of tomorrow in French timezone (Europe/Paris)
  */
-function getTomorrowMidnight(): Date {
-  const midnight = getTodayMidnight()
-  midnight.setUTCDate(midnight.getUTCDate() + 1)
+function getTomorrowMidnightFrench(): Date {
+  const midnight = getTodayMidnightFrench()
+  midnight.setDate(midnight.getDate() + 1)
   return midnight
 }
 
@@ -47,8 +58,8 @@ export async function getMiniGameEligibility(): Promise<ActionResult<MiniGameEli
     return { success: false, error: 'Non authentifié' }
   }
 
-  const todayMidnight = getTodayMidnight()
-  const tomorrowMidnight = getTomorrowMidnight()
+  const todayMidnight = getTodayMidnightFrench()
+  const tomorrowMidnight = getTomorrowMidnightFrench()
 
   // Get today's FREE plays for all game types (ignore paid plays)
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
