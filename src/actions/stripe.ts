@@ -100,6 +100,7 @@ export async function createCheckoutSession(
     return { success: true, data: { url: session.url } }
   } catch (error) {
     console.error('Checkout session error:', error)
-    return { success: false, error: 'Erreur de connexion au serveur de paiement' }
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+    return { success: false, error: `Erreur Stripe: ${errorMessage}` }
   }
 }
