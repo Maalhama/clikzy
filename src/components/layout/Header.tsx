@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { createPortal } from 'react-dom'
 import { signOut } from '@/actions/auth'
@@ -134,9 +135,21 @@ export function Header({ profile }: HeaderProps) {
                   href="/profile"
                   className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-white/5 transition-colors group"
                 >
-                  <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-neon-purple to-neon-pink flex items-center justify-center font-bold text-white group-hover:scale-105 transition-transform">
-                    {profile.username.charAt(0).toUpperCase()}
-                  </div>
+                  {profile.avatar_url ? (
+                    <div className="w-9 h-9 rounded-lg overflow-hidden group-hover:scale-105 transition-transform ring-2 ring-neon-purple/50">
+                      <Image
+                        src={profile.avatar_url}
+                        alt={profile.username}
+                        width={36}
+                        height={36}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  ) : (
+                    <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-neon-purple to-neon-pink flex items-center justify-center font-bold text-white group-hover:scale-105 transition-transform">
+                      {profile.username.charAt(0).toUpperCase()}
+                    </div>
+                  )}
                   <span className="font-medium text-white/80 group-hover:text-white transition-colors">
                     {profile.username}
                   </span>
@@ -216,9 +229,21 @@ export function Header({ profile }: HeaderProps) {
                 className="block px-4 py-4 border-b border-white/10 hover:bg-white/5 transition-colors"
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-neon-purple to-neon-pink flex items-center justify-center font-bold text-white text-lg">
-                    {profile.username.charAt(0).toUpperCase()}
-                  </div>
+                  {profile.avatar_url ? (
+                    <div className="w-12 h-12 rounded-xl overflow-hidden ring-2 ring-neon-purple/50">
+                      <Image
+                        src={profile.avatar_url}
+                        alt={profile.username}
+                        width={48}
+                        height={48}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  ) : (
+                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-neon-purple to-neon-pink flex items-center justify-center font-bold text-white text-lg">
+                      {profile.username.charAt(0).toUpperCase()}
+                    </div>
+                  )}
                   <div className="flex-1">
                     <div className="font-bold text-white">{profile.username}</div>
                     <div className="flex items-center gap-1 text-neon-purple text-sm">
