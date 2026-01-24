@@ -3,7 +3,7 @@ import { createClient, SupabaseClient } from '@supabase/supabase-js'
 
 /**
  * ============================================
- * CRON DE GESTION DES JEUX - Clikzy v11.0
+ * CRON DE GESTION DES JEUX - Clikzy v12.0
  * ============================================
  *
  * Ce cron gère:
@@ -13,14 +13,12 @@ import { createClient, SupabaseClient } from '@supabase/supabase-js'
  * - La création des records de gagnants
  *
  * Système de bataille:
- * - 0-90% de la durée: bots cliquent normalement
- * - 90-100%: probabilité de clic décroissante
- * - >100%: bots arrêtent, timer descend à 0
+ * - Phase normale: bots cliquent pour simuler l'activité
+ * - Phase finale: bots maintiennent le timer jusqu'à fin de bataille
+ * - Bataille terminée sans joueur réel: timer descend à 0
  *
- * Fréquence: 3 crons par minute sur cron-job.org (timeout 30s)
- * - Cron 1: /api/cron/bot-clicks (0-25s aléatoire)
- * - Cron 2: /api/cron/bot-clicks?delay=10 (10s + 0-15s = 10-25s)
- * - Cron 3: /api/cron/bot-clicks?delay=20 (20s + 0-5s = 20-25s)
+ * Fréquence: 1 cron par minute sur cron-job.org
+ * URL: /api/cron/bot-clicks
  */
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
@@ -202,21 +200,6 @@ export async function GET(request: NextRequest) {
 
   try {
     const supabase = createClient(supabaseUrl, supabaseServiceKey)
-
-    // 3 crons avec delays 0, 10, 20 (timeout cron-job.org = 30s)
-    // Timeline par minute: :00, :10, :20, puis gap de 40s jusqu'à :00
-    // Cron 1: /api/cron/bot-clicks (delay=0)
-    // Cron 2: /api/cron/bot-clicks?delay=10
-    // Cron 3: /api/cron/bot-clicks?delay=20
-    const delayParam = request.nextUrl.searchParams.get('delay')
-    const fixedDelay = delayParam ? parseInt(delayParam, 10) : 0
-    const validDelay = [0, 10, 20].includes(fixedDelay) ? fixedDelay : 0
-
-    if (validDelay > 0) {
-      console.log(`[CRON] Waiting ${validDelay}s`)
-      await new Promise(resolve => setTimeout(resolve, validDelay * 1000))
-    }
-
     const now = Date.now()
 
     // Récupérer les jeux actifs
@@ -259,7 +242,7 @@ export async function GET(request: NextRequest) {
         // Jeu encore actif - simuler l'activité des bots
         const updates: Record<string, unknown> = {}
         let action = `active (${Math.floor(timeLeft / 1000)}s left)`
-        const isInFinalPhase = timeLeft <= 90000 // 2 minutes - gives cron time to maintain
+        const isInFinalPhase = timeLeft <= 90000 // 90s - gives 1 cron cycle to maintain
 
         // Entrer en phase finale si nécessaire
         if (isInFinalPhase && game.status !== 'final_phase') {
@@ -288,10 +271,10 @@ export async function GET(request: NextRequest) {
             // Tant que la bataille est en cours (< 100%), le bot DOIT cliquer pour maintenir le timer
             // Priorité absolue: maintenir le timer au-dessus de 0
 
-            // Seuil aléatoire FIXE par jeu entre 45-65s pour désynchroniser les clics
-            // Gap max entre crons = 40s (:20 à :00), donc seuil minimum = 45s pour garantir survie
+            // Seuil aléatoire FIXE par jeu entre 65-85s pour désynchroniser les clics
+            // Gap entre crons = 60s, donc seuil minimum = 65s pour garantir survie du timer
             const clickThresholdSeed = hashString(`${game.id}-click-threshold`)
-            const clickThreshold = 45000 + (clickThresholdSeed % 20000) // 45s à 65s par jeu
+            const clickThreshold = 65000 + (clickThresholdSeed % 20000) // 65s à 85s par jeu
 
             if (timeLeft <= clickThreshold) {
               // Timer sous le seuil de ce jeu - bot clique
