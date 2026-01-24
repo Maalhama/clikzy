@@ -3,22 +3,21 @@
 import { useRef, useState, useEffect } from 'react'
 import Image from 'next/image'
 import { GiftIcon } from '@/components/ui/GamingIcons'
-import { getProductSvg } from '@/lib/utils/productImages'
-
 interface Prize {
   id: string
   name: string
   value: number
   color: 'purple' | 'blue' | 'pink'
+  image_url: string
 }
 
 const PRIZES: Prize[] = [
-  { id: '1', name: 'iPhone 17 Pro Max', value: 1479, color: 'purple' },
-  { id: '2', name: 'PlayStation 5 Pro', value: 799, color: 'blue' },
-  { id: '3', name: 'MacBook Pro M5', value: 4499, color: 'pink' },
-  { id: '4', name: 'AirPods Pro 3', value: 299, color: 'purple' },
-  { id: '5', name: 'Apple Watch Ultra 3', value: 999, color: 'blue' },
-  { id: '6', name: 'iPad Pro M4', value: 1499, color: 'pink' },
+  { id: '1', name: 'iPhone 17 Pro Max', value: 1479, color: 'purple', image_url: '/products/iphone-17-pro-max-neon.png' },
+  { id: '2', name: 'PlayStation 5 Pro', value: 799, color: 'blue', image_url: '/products/playstation-5-pro-neon.png' },
+  { id: '3', name: 'MacBook Pro 16" M5 Max', value: 3199, color: 'pink', image_url: '/products/macbook-pro-16-m5-max-neon.png' },
+  { id: '4', name: 'AirPods Pro 3', value: 279, color: 'purple', image_url: '/products/airpods-pro-3-neon.png' },
+  { id: '5', name: 'Apple Watch Ultra 3', value: 899, color: 'blue', image_url: '/products/apple-watch-ultra-3-neon.png' },
+  { id: '6', name: 'iPad Pro 13" M4', value: 1469, color: 'pink', image_url: '/products/ipad-pro-13-m4-neon.png' },
 ]
 
 const getColorStyles = (color: Prize['color']) => {
@@ -158,7 +157,7 @@ export function FloatingPrizes() {
                       style={{ background: `linear-gradient(135deg, ${colors.hex}10, transparent)` }}
                     >
                       <Image
-                        src={getProductSvg(prize.name)}
+                        src={prize.image_url}
                         alt={prize.name}
                         fill
                         className="object-contain p-2 transition-transform duration-300 group-hover:scale-110"
