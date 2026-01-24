@@ -80,7 +80,7 @@ export function ReferralSection({ referralCode, referralCount, creditsEarned, ha
     if (navigator.share) {
       try {
         await navigator.share({
-          title: 'Rejoins CLIKZY !',
+          title: 'Rejoins CLEEKZY !',
           text: 'Gagne des produits incroyables gratuitement ! Utilise mon code de parrainage.',
           url: referralLink,
         })

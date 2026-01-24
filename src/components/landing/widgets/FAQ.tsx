@@ -25,7 +25,7 @@ const FAQ_ITEMS: FAQItem[] = [
   },
   {
     question: "Est-ce un jeu de hasard ?",
-    answer: "Non. CLIKZY est un jeu d'adresse et de timing. Il n'y a pas de tirage au sort ni d'algorithme aléatoire. Le gagnant est toujours le dernier à avoir cliqué avant la fin du timer. Tout est transparent.",
+    answer: "Non. CLEEKZY est un jeu d'adresse et de timing. Il n'y a pas de tirage au sort ni d'algorithme aléatoire. Le gagnant est toujours le dernier à avoir cliqué avant la fin du timer. Tout est transparent.",
   },
   {
     question: "Comment sont livrés les lots ?",
@@ -37,7 +37,7 @@ const FAQ_ITEMS: FAQItem[] = [
   },
   {
     question: "Comment contacter le support ?",
-    answer: "Notre équipe est disponible 24h/24 par chat en direct sur le site ou par email à support@clikzy.fr. Temps de réponse moyen : moins de 2 heures.",
+    answer: "Notre équipe est disponible 24h/24 par chat en direct sur le site ou par email à support@cleekzy.com. Temps de réponse moyen : moins de 2 heures.",
   },
 ]
 

@@ -193,7 +193,7 @@ export async function resetPassword(email: string): Promise<AuthResult> {
 
   const supabase = await createClient()
   // Toujours utiliser NEXT_PUBLIC_SITE_URL pour éviter les redirections vers localhost
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://clikzy.vercel.app'
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://cleekzy.com'
 
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
     redirectTo: `${siteUrl}/reset-password`,

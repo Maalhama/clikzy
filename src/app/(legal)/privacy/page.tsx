@@ -1,8 +1,8 @@
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Politique de Confidentialité - CLIKZY',
-  description: 'Politique de confidentialité et protection des données personnelles de CLIKZY',
+  title: 'Politique de Confidentialité - CLEEKZY',
+  description: 'Politique de confidentialité et protection des données personnelles de CLEEKZY',
 }
 
 export default function PrivacyPage() {
@@ -18,7 +18,7 @@ export default function PrivacyPage() {
       <section className="mb-8">
         <h2 className="text-xl font-bold text-neon-purple mb-4">1. Introduction</h2>
         <p className="text-white/70 mb-4">
-          CLIKZY s'engage à protéger la vie privée de ses utilisateurs. Cette politique de confidentialité explique comment nous collectons, utilisons et protégeons vos données personnelles conformément au Règlement Général sur la Protection des Données (RGPD).
+          CLEEKZY s'engage à protéger la vie privée de ses utilisateurs. Cette politique de confidentialité explique comment nous collectons, utilisons et protégeons vos données personnelles conformément au Règlement Général sur la Protection des Données (RGPD).
         </p>
       </section>
 
@@ -27,7 +27,7 @@ export default function PrivacyPage() {
         <div className="text-white/70 space-y-2">
           <p><strong className="text-white">Responsable :</strong> Azizi Mehdi</p>
           <p><strong className="text-white">Adresse :</strong> 32 boulevard Capdevila</p>
-          <p><strong className="text-white">Email :</strong> <a href="mailto:contact@clikzy.fr" className="text-neon-purple hover:underline">contact@clikzy.fr</a></p>
+          <p><strong className="text-white">Email :</strong> <a href="mailto:contact@cleekzy.com" className="text-neon-purple hover:underline">contact@cleekzy.com</a></p>
         </div>
       </section>
 
@@ -117,7 +117,7 @@ export default function PrivacyPage() {
           <li><strong className="text-white">Droit à la limitation :</strong> limiter le traitement de vos données</li>
         </ul>
         <p className="text-white/70">
-          Pour exercer ces droits, contactez-nous à : <a href="mailto:privacy@clikzy.fr" className="text-neon-purple hover:underline">privacy@clikzy.fr</a>
+          Pour exercer ces droits, contactez-nous à : <a href="mailto:privacy@cleekzy.com" className="text-neon-purple hover:underline">privacy@cleekzy.com</a>
         </p>
       </section>
 
@@ -152,7 +152,7 @@ export default function PrivacyPage() {
       <section>
         <h2 className="text-xl font-bold text-neon-purple mb-4">12. Contact et réclamation</h2>
         <p className="text-white/70 mb-4">
-          Pour toute question : <a href="mailto:privacy@clikzy.fr" className="text-neon-purple hover:underline">privacy@clikzy.fr</a>
+          Pour toute question : <a href="mailto:privacy@cleekzy.com" className="text-neon-purple hover:underline">privacy@cleekzy.com</a>
         </p>
         <p className="text-white/70">
           Vous pouvez également adresser une réclamation à la CNIL : <a href="https://www.cnil.fr" target="_blank" rel="noopener noreferrer" className="text-neon-purple hover:underline">www.cnil.fr</a>

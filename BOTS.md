@@ -1,4 +1,4 @@
-# 🤖 Documentation Système de Bots - Clikzy v5.0
+# 🤖 Documentation Système de Bots - Cleekzy v5.0
 
 ## 📋 Vue d'ensemble
 
@@ -149,7 +149,7 @@ Ce facteur multiplie les probabilités de clic.
 
 ### Cron (Backend)
 - **Fréquence**: Toutes les 60 secondes (cron-job.org)
-- **URL**: `https://clikzy.vercel.app/api/cron/bot-clicks`
+- **URL**: `https://cleekzy.vercel.app/api/cron/bot-clicks`
 - **Auth**: `Authorization: Bearer ${CRON_SECRET}`
 
 ### Probabilités par Phase

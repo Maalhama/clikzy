@@ -1,4 +1,4 @@
-# Guidelines de Développement - Clikzy
+# Guidelines de Développement - Cleekzy
 
 ## Principes fondamentaux
 

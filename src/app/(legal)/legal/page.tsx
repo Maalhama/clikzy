@@ -1,8 +1,8 @@
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Mentions Légales - CLIKZY',
-  description: 'Mentions légales du site CLIKZY',
+  title: 'Mentions Légales - CLEEKZY',
+  description: 'Mentions légales du site CLEEKZY',
 }
 
 export default function LegalPage() {
@@ -18,12 +18,12 @@ export default function LegalPage() {
       <section className="mb-8">
         <h2 className="text-xl font-bold text-neon-purple mb-4">1. Éditeur du site</h2>
         <div className="text-white/70 space-y-2">
-          <p><strong className="text-white">Nom du site :</strong> CLIKZY</p>
-          <p><strong className="text-white">URL :</strong> https://clikzy.fr</p>
+          <p><strong className="text-white">Nom du site :</strong> CLEEKZY</p>
+          <p><strong className="text-white">URL :</strong> https://cleekzy.com</p>
           <p><strong className="text-white">Éditeur :</strong> Azizi Mehdi (Auto-entrepreneur)</p>
           <p><strong className="text-white">Adresse :</strong> 32 boulevard Capdevila</p>
           <p><strong className="text-white">SIRET :</strong> 841 307 408</p>
-          <p><strong className="text-white">Email :</strong> <a href="mailto:contact@clikzy.fr" className="text-neon-purple hover:underline">contact@clikzy.fr</a></p>
+          <p><strong className="text-white">Email :</strong> <a href="mailto:contact@cleekzy.com" className="text-neon-purple hover:underline">contact@cleekzy.com</a></p>
         </div>
       </section>
 
@@ -54,27 +54,27 @@ export default function LegalPage() {
       <section className="mb-8">
         <h2 className="text-xl font-bold text-neon-purple mb-4">5. Propriété intellectuelle</h2>
         <p className="text-white/70 mb-4">
-          L'ensemble du contenu du site CLIKZY (textes, images, vidéos, logos, icônes, sons, logiciels, etc.) est protégé par le droit d'auteur et le droit des marques.
+          L'ensemble du contenu du site CLEEKZY (textes, images, vidéos, logos, icônes, sons, logiciels, etc.) est protégé par le droit d'auteur et le droit des marques.
         </p>
         <p className="text-white/70">
-          Toute reproduction, représentation, modification, publication, adaptation de tout ou partie des éléments du site, quel que soit le moyen ou le procédé utilisé, est interdite sans autorisation écrite préalable de CLIKZY.
+          Toute reproduction, représentation, modification, publication, adaptation de tout ou partie des éléments du site, quel que soit le moyen ou le procédé utilisé, est interdite sans autorisation écrite préalable de CLEEKZY.
         </p>
       </section>
 
       <section className="mb-8">
         <h2 className="text-xl font-bold text-neon-purple mb-4">6. Limitation de responsabilité</h2>
         <p className="text-white/70 mb-4">
-          CLIKZY s'efforce de fournir des informations aussi précises que possible. Toutefois, CLIKZY ne pourra être tenu responsable des omissions, inexactitudes et carences dans la mise à jour, qu'elles soient de son fait ou du fait des tiers partenaires qui lui fournissent ces informations.
+          CLEEKZY s'efforce de fournir des informations aussi précises que possible. Toutefois, CLEEKZY ne pourra être tenu responsable des omissions, inexactitudes et carences dans la mise à jour, qu'elles soient de son fait ou du fait des tiers partenaires qui lui fournissent ces informations.
         </p>
         <p className="text-white/70">
-          CLIKZY ne saurait être tenu pour responsable des dommages directs et indirects causés au matériel de l'utilisateur lors de l'accès au site.
+          CLEEKZY ne saurait être tenu pour responsable des dommages directs et indirects causés au matériel de l'utilisateur lors de l'accès au site.
         </p>
       </section>
 
       <section className="mb-8">
         <h2 className="text-xl font-bold text-neon-purple mb-4">7. Liens hypertextes</h2>
         <p className="text-white/70">
-          Le site CLIKZY peut contenir des liens vers d'autres sites. CLIKZY n'exerce aucun contrôle sur ces sites et décline toute responsabilité quant à leur contenu.
+          Le site CLEEKZY peut contenir des liens vers d'autres sites. CLEEKZY n'exerce aucun contrôle sur ces sites et décline toute responsabilité quant à leur contenu.
         </p>
       </section>
 
@@ -88,7 +88,7 @@ export default function LegalPage() {
       <section>
         <h2 className="text-xl font-bold text-neon-purple mb-4">9. Contact</h2>
         <p className="text-white/70">
-          Pour toute question concernant ces mentions légales, contactez-nous à : <a href="mailto:contact@clikzy.fr" className="text-neon-purple hover:underline">contact@clikzy.fr</a>
+          Pour toute question concernant ces mentions légales, contactez-nous à : <a href="mailto:contact@cleekzy.com" className="text-neon-purple hover:underline">contact@cleekzy.com</a>
         </p>
       </section>
     </article>

@@ -3,7 +3,7 @@ import { createClient, SupabaseClient } from '@supabase/supabase-js'
 
 /**
  * ============================================
- * CRON UNIFIÉ DE GESTION DES JEUX - Clikzy v13.0
+ * CRON UNIFIÉ DE GESTION DES JEUX - Cleekzy v13.0
  * ============================================
  *
  * Ce cron gère TOUT le cycle de vie des jeux:

@@ -6,7 +6,7 @@ import type { GameClick } from './useGame'
 
 /**
  * ============================================
- * SIMULATION FRONTEND DES BOTS CLIKZY v6
+ * SIMULATION FRONTEND DES BOTS CLEEKZY v6
  * ============================================
  *
  * Synchronise les clics de bots avec la DB via API

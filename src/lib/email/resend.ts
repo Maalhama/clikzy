@@ -16,7 +16,7 @@ function getResend(): Resend {
   return resendInstance
 }
 
-const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || 'CLIKZY <noreply@clikzy.fr>'
+const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || 'CLEEKZY <noreply@cleekzy.com>'
 
 export interface EmailResult {
   success: boolean
@@ -36,7 +36,7 @@ export async function sendWelcomeEmail(
     await resend.emails.send({
       from: FROM_EMAIL,
       to,
-      subject: `Bienvenue sur CLIKZY, ${username} ! 🎮`,
+      subject: `Bienvenue sur CLEEKZY, ${username} ! 🎮`,
       html: `
 <!DOCTYPE html>
 <html>
@@ -60,7 +60,7 @@ export async function sendWelcomeEmail(
         Bienvenue ${username} !
       </h2>
       <p style="color: rgba(255, 255, 255, 0.7); font-size: 16px; margin: 0 0 24px 0;">
-        Ton compte CLIKZY est prêt
+        Ton compte CLEEKZY est prêt
       </p>
 
       <!-- Bonus credits -->
@@ -97,7 +97,7 @@ export async function sendWelcomeEmail(
 
     <!-- CTA Button -->
     <div style="text-align: center; margin-top: 32px;">
-      <a href="https://clikzy.fr/lobby" style="display: inline-block; background: linear-gradient(90deg, #9B5CFF, #FF4FD8); color: #ffffff; text-decoration: none; font-weight: 700; padding: 16px 32px; border-radius: 12px; font-size: 16px;">
+      <a href="https://cleekzy.com/lobby" style="display: inline-block; background: linear-gradient(90deg, #9B5CFF, #FF4FD8); color: #ffffff; text-decoration: none; font-weight: 700; padding: 16px 32px; border-radius: 12px; font-size: 16px;">
         Commencer à jouer
       </a>
     </div>
@@ -105,9 +105,9 @@ export async function sendWelcomeEmail(
     <!-- Footer -->
     <div style="text-align: center; margin-top: 48px; padding-top: 24px; border-top: 1px solid rgba(255, 255, 255, 0.1);">
       <p style="color: rgba(255, 255, 255, 0.4); font-size: 12px; margin: 0;">
-        © 2026 CLIKZY - Le dernier clic gagne<br>
-        <a href="https://clikzy.fr/legal" style="color: rgba(255, 255, 255, 0.4);">Mentions légales</a> •
-        <a href="https://clikzy.fr/privacy" style="color: rgba(255, 255, 255, 0.4);">Confidentialité</a>
+        © 2026 CLEEKZY - Le dernier clic gagne<br>
+        <a href="https://cleekzy.com/legal" style="color: rgba(255, 255, 255, 0.4);">Mentions légales</a> •
+        <a href="https://cleekzy.com/privacy" style="color: rgba(255, 255, 255, 0.4);">Confidentialité</a>
       </p>
     </div>
   </div>
@@ -138,7 +138,7 @@ export async function sendWinnerEmail(
     await resend.emails.send({
       from: FROM_EMAIL,
       to,
-      subject: `🎉 Félicitations ${username} ! Tu as gagné sur CLIKZY`,
+      subject: `🎉 Félicitations ${username} ! Tu as gagné sur CLEEKZY`,
       html: `
 <!DOCTYPE html>
 <html>
@@ -182,7 +182,7 @@ export async function sendWinnerEmail(
 
     <!-- CTA Button -->
     <div style="text-align: center; margin-top: 32px;">
-      <a href="https://clikzy.fr/profile" style="display: inline-block; background: linear-gradient(90deg, #9B5CFF, #FF4FD8); color: #ffffff; text-decoration: none; font-weight: 700; padding: 16px 32px; border-radius: 12px; font-size: 16px;">
+      <a href="https://cleekzy.com/profile" style="display: inline-block; background: linear-gradient(90deg, #9B5CFF, #FF4FD8); color: #ffffff; text-decoration: none; font-weight: 700; padding: 16px 32px; border-radius: 12px; font-size: 16px;">
         Voir mon profil
       </a>
     </div>
@@ -190,9 +190,9 @@ export async function sendWinnerEmail(
     <!-- Footer -->
     <div style="text-align: center; margin-top: 48px; padding-top: 24px; border-top: 1px solid rgba(255, 255, 255, 0.1);">
       <p style="color: rgba(255, 255, 255, 0.4); font-size: 12px; margin: 0;">
-        © 2026 CLIKZY - Le dernier clic gagne<br>
-        <a href="https://clikzy.fr/legal" style="color: rgba(255, 255, 255, 0.4);">Mentions légales</a> •
-        <a href="https://clikzy.fr/privacy" style="color: rgba(255, 255, 255, 0.4);">Confidentialité</a>
+        © 2026 CLEEKZY - Le dernier clic gagne<br>
+        <a href="https://cleekzy.com/legal" style="color: rgba(255, 255, 255, 0.4);">Mentions légales</a> •
+        <a href="https://cleekzy.com/privacy" style="color: rgba(255, 255, 255, 0.4);">Confidentialité</a>
       </p>
     </div>
   </div>
@@ -270,7 +270,7 @@ export async function sendPurchaseEmail(
 
     <!-- CTA -->
     <div style="text-align: center; margin-top: 32px;">
-      <a href="https://clikzy.fr/lobby" style="display: inline-block; background: linear-gradient(90deg, #9B5CFF, #FF4FD8); color: #ffffff; text-decoration: none; font-weight: 700; padding: 16px 32px; border-radius: 12px; font-size: 16px;">
+      <a href="https://cleekzy.com/lobby" style="display: inline-block; background: linear-gradient(90deg, #9B5CFF, #FF4FD8); color: #ffffff; text-decoration: none; font-weight: 700; padding: 16px 32px; border-radius: 12px; font-size: 16px;">
         Jouer maintenant
       </a>
     </div>
@@ -278,9 +278,9 @@ export async function sendPurchaseEmail(
     <!-- Footer -->
     <div style="text-align: center; margin-top: 48px; padding-top: 24px; border-top: 1px solid rgba(255, 255, 255, 0.1);">
       <p style="color: rgba(255, 255, 255, 0.4); font-size: 12px; margin: 0;">
-        © 2026 CLIKZY - Le dernier clic gagne<br>
-        <a href="https://clikzy.fr/legal" style="color: rgba(255, 255, 255, 0.4);">Mentions légales</a> •
-        <a href="https://clikzy.fr/privacy" style="color: rgba(255, 255, 255, 0.4);">Confidentialité</a>
+        © 2026 CLEEKZY - Le dernier clic gagne<br>
+        <a href="https://cleekzy.com/legal" style="color: rgba(255, 255, 255, 0.4);">Mentions légales</a> •
+        <a href="https://cleekzy.com/privacy" style="color: rgba(255, 255, 255, 0.4);">Confidentialité</a>
       </p>
     </div>
   </div>
@@ -358,9 +358,9 @@ export async function sendShippingEmail(
     <!-- Footer -->
     <div style="text-align: center; margin-top: 48px; padding-top: 24px; border-top: 1px solid rgba(255, 255, 255, 0.1);">
       <p style="color: rgba(255, 255, 255, 0.4); font-size: 12px; margin: 0;">
-        © 2026 CLIKZY - Le dernier clic gagne<br>
-        <a href="https://clikzy.fr/legal" style="color: rgba(255, 255, 255, 0.4);">Mentions légales</a> •
-        <a href="https://clikzy.fr/privacy" style="color: rgba(255, 255, 255, 0.4);">Confidentialité</a>
+        © 2026 CLEEKZY - Le dernier clic gagne<br>
+        <a href="https://cleekzy.com/legal" style="color: rgba(255, 255, 255, 0.4);">Mentions légales</a> •
+        <a href="https://cleekzy.com/privacy" style="color: rgba(255, 255, 255, 0.4);">Confidentialité</a>
       </p>
     </div>
   </div>

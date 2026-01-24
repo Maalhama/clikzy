@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useEffect } from 'react'
 
-const STORAGE_KEY = 'clikzy_favorites'
+const STORAGE_KEY = 'cleekzy_favorites'
 
 interface UseFavoritesReturn {
   favorites: string[]

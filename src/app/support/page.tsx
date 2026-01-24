@@ -23,8 +23,8 @@ const CONTACT_METHODS: ContactMethod[] = [
     ),
     title: 'Email',
     description: 'Réponse sous 2h en moyenne',
-    action: 'support@clikzy.fr',
-    href: 'mailto:support@clikzy.fr',
+    action: 'support@cleekzy.com',
+    href: 'mailto:support@cleekzy.com',
     color: '#9B5CFF',
   },
   {
@@ -64,7 +64,7 @@ const FAQ_QUICK = [
   },
   {
     question: "Comment supprimer mon compte ?",
-    answer: "Envoie-nous un email à support@clikzy.fr avec l'objet 'Suppression de compte' et nous traiterons ta demande sous 48h.",
+    answer: "Envoie-nous un email à support@cleekzy.com avec l'objet 'Suppression de compte' et nous traiterons ta demande sous 48h.",
   },
 ]
 
@@ -95,7 +95,7 @@ export default function SupportPage() {
     await new Promise(resolve => setTimeout(resolve, 1500))
 
     // For now, open mailto
-    const mailtoUrl = `mailto:support@clikzy.fr?subject=${encodeURIComponent(formData.subject)}&body=${encodeURIComponent(
+    const mailtoUrl = `mailto:support@cleekzy.com?subject=${encodeURIComponent(formData.subject)}&body=${encodeURIComponent(
       `Nom: ${formData.name}\nEmail: ${formData.email}\n\n${formData.message}`
     )}`
     window.location.href = mailtoUrl
@@ -375,7 +375,7 @@ export default function SupportPage() {
       <footer className="relative z-10 border-t border-white/10 mt-12">
         <div className="max-w-6xl mx-auto px-6 py-8 flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="text-sm text-white/40">
-            © 2026 CLIKZY. Tous droits réservés.
+            © 2026 CLEEKZY. Tous droits réservés.
           </div>
           <div className="flex items-center gap-6 text-sm text-white/40">
             <Link href="/" className="hover:text-white transition-colors">Accueil</Link>

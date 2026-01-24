@@ -1230,7 +1230,7 @@ export function LandingClient({
 
         {/* Copyright */}
         <div className="flex items-center justify-between text-[10px] text-white/30">
-          <span>© 2026 CLIKZY</span>
+          <span>© 2026 CLEEKZY</span>
           <span className="flex items-center gap-1">
             <svg className="w-3 h-3 text-neon-purple" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122" />
@@ -1294,7 +1294,7 @@ export function LandingClient({
             <div>
               <h4 className="text-white font-bold mb-5 text-sm uppercase tracking-wider">Contact</h4>
               <ul className="space-y-3 mb-6">
-                <li><a href="mailto:contact@clikzy.fr" className="text-white/50 hover:text-neon-pink transition-colors text-sm">contact@clikzy.fr</a></li>
+                <li><a href="mailto:contact@cleekzy.com" className="text-white/50 hover:text-neon-pink transition-colors text-sm">contact@cleekzy.com</a></li>
                 <li><span className="text-white/50 text-sm">Support 24h/24 - 7j/7</span></li>
               </ul>
               <div className="flex gap-2">
@@ -1313,7 +1313,7 @@ export function LandingClient({
 
         <div className="border-t border-white/5">
           <div className="max-w-7xl mx-auto px-6 py-6 flex items-center justify-between">
-            <p className="text-white/30 text-sm">© 2026 CLIKZY. Tous droits réservés.</p>
+            <p className="text-white/30 text-sm">© 2026 CLEEKZY. Tous droits réservés.</p>
             <p className="text-white/20 text-xs flex items-center gap-1">
               <svg className="w-3 h-3 text-neon-purple" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122" />

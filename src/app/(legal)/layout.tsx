@@ -38,7 +38,7 @@ export default function LegalLayout({
             <Link href="/cgv" className="hover:text-white transition-colors">CGV</Link>
           </div>
           <p className="text-center text-white/30 text-xs mt-4">
-            © 2026 CLIKZY. Tous droits réservés.
+            © 2026 CLEEKZY. Tous droits réservés.
           </p>
         </div>
       </footer>

@@ -2,7 +2,7 @@ import { getMiniGameEligibility } from '@/actions/miniGames'
 import MiniGamesClient from './MiniGamesClient'
 
 export const metadata = {
-  title: 'Mini-Jeux | Clikzy',
+  title: 'Mini-Jeux | Cleekzy',
   description: 'Jouez à nos mini-jeux quotidiens et gagnez des crédits gratuits !',
 }
 

@@ -40,7 +40,7 @@ export function AdminDashboard({ stats, users, games, items, winners }: AdminDas
         <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="text-2xl font-bold text-white">Dashboard Admin</h1>
-            <p className="text-white/50 text-sm">Gestion de la plateforme CLIKZY</p>
+            <p className="text-white/50 text-sm">Gestion de la plateforme CLEEKZY</p>
           </div>
         </div>
 

@@ -64,7 +64,7 @@ export async function POST(request: NextRequest) {
           price_data: {
             currency: 'eur',
             product_data: {
-              name: `${pack.credits} Crédits Clikzy`,
+              name: `${pack.credits} Crédits Cleekzy`,
               description: `Pack ${pack.name} - ${pack.credits} crédits pour jouer`,
             },
             unit_amount: Math.round(pack.price * 100), // Stripe uses cents

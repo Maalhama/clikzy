@@ -32,14 +32,14 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   title: {
-    default: 'CLIKZY - Le dernier clic gagne',
-    template: '%s | CLIKZY',
+    default: 'CLEEKZY - Le dernier clic gagne',
+    template: '%s | CLEEKZY',
   },
   description: 'Jeu gratuit en temps réel : le dernier à cliquer remporte le lot. 10 clics gratuits chaque jour. iPhone, PS5, MacBook et plus à gagner.',
   keywords: ['jeu gratuit', 'gagner des lots', 'concours', 'temps réel', 'clic', 'gaming', 'iPhone', 'PS5', 'lots gratuits'],
-  authors: [{ name: 'CLIKZY' }],
-  creator: 'CLIKZY',
-  publisher: 'CLIKZY',
+  authors: [{ name: 'CLEEKZY' }],
+  creator: 'CLEEKZY',
+  publisher: 'CLEEKZY',
   robots: {
     index: true,
     follow: true,
@@ -54,25 +54,25 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     locale: 'fr_FR',
-    url: 'https://clikzy.fr',
-    siteName: 'CLIKZY',
-    title: 'CLIKZY - Le dernier clic gagne',
+    url: 'https://cleekzy.com',
+    siteName: 'CLEEKZY',
+    title: 'CLEEKZY - Le dernier clic gagne',
     description: 'Jeu gratuit en temps réel : le dernier à cliquer remporte le lot. 10 clics gratuits chaque jour. iPhone, PS5, MacBook et plus à gagner.',
     images: [
       {
         url: '/og-image.png',
         width: 1200,
         height: 630,
-        alt: 'CLIKZY - Le dernier clic gagne des lots premium',
+        alt: 'CLEEKZY - Le dernier clic gagne des lots premium',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'CLIKZY - Le dernier clic gagne',
+    title: 'CLEEKZY - Le dernier clic gagne',
     description: 'Jeu gratuit en temps réel : le dernier à cliquer remporte le lot. 10 clics gratuits chaque jour.',
     images: ['/og-image.png'],
-    creator: '@clikzy_fr',
+    creator: '@cleekzy_fr',
   },
   icons: {
     icon: [

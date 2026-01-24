@@ -61,7 +61,7 @@ export function InstallBanner() {
                 </svg>
               </div>
               <div className="flex-1 min-w-0">
-                <h3 className="text-white font-bold text-sm">Installe CLIKZY</h3>
+                <h3 className="text-white font-bold text-sm">Installe CLEEKZY</h3>
                 <p className="text-white/50 text-xs mt-0.5">
                   Accès rapide depuis ton écran d&apos;accueil
                 </p>

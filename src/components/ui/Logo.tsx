@@ -29,12 +29,12 @@ export function Logo({ size = 'md', animated = true, href = '/' }: LogoProps) {
       <span className={`${sizeClasses[size]} font-black tracking-tighter relative`}>
         {/* Glow layer */}
         <span className="absolute inset-0 blur-sm opacity-70">
-          <span className="text-neon-purple">CLIK</span>
+          <span className="text-neon-purple">CLEEK</span>
           <span className="text-neon-pink">ZY</span>
         </span>
         {/* Main text */}
         <span className="relative">
-          <span className="text-neon-purple neon-text">CLIK</span>
+          <span className="text-neon-purple neon-text">CLEEK</span>
           <span className="text-neon-pink neon-text-pink">ZY</span>
         </span>
       </span>

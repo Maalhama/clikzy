@@ -4,14 +4,14 @@ test.describe('Landing Page', () => {
   test('should load landing page', async ({ page }) => {
     await page.goto('/')
 
-    await expect(page).toHaveTitle(/CLIKZY/)
+    await expect(page).toHaveTitle(/CLEEKZY/)
   })
 
-  test('should display CLIKZY branding', async ({ page }) => {
+  test('should display CLEEKZY branding', async ({ page }) => {
     await page.goto('/')
 
     // Check for logo/brand name
-    await expect(page.locator('text=CLIKZY').first()).toBeVisible()
+    await expect(page.locator('text=CLEEKZY').first()).toBeVisible()
   })
 
   test('should have call-to-action buttons', async ({ page }) => {
@@ -36,8 +36,8 @@ test.describe('Landing Page', () => {
     await page.setViewportSize({ width: 375, height: 667 })
     await page.goto('/')
 
-    await expect(page).toHaveTitle(/CLIKZY/)
+    await expect(page).toHaveTitle(/CLEEKZY/)
     // Page should still be functional
-    await expect(page.locator('text=CLIKZY').first()).toBeVisible()
+    await expect(page.locator('text=CLEEKZY').first()).toBeVisible()
   })
 })

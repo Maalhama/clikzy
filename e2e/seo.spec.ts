@@ -5,7 +5,7 @@ test.describe('SEO', () => {
     await page.goto('/')
 
     // Title
-    await expect(page).toHaveTitle(/CLIKZY/)
+    await expect(page).toHaveTitle(/CLEEKZY/)
 
     // Meta description
     const metaDescription = page.locator('meta[name="description"]')
@@ -101,6 +101,6 @@ test.describe('SEO', () => {
 
     const content = await page.content()
     expect(content).toContain('urlset')
-    expect(content).toContain('clikzy.fr')
+    expect(content).toContain('cleekzy.com')
   })
 })

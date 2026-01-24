@@ -1,8 +1,8 @@
-# Feature: CLIKZY - Plateforme d'enchères temps réel
+# Feature: CLEEKZY - Plateforme d'enchères temps réel
 
 ## Vue d'ensemble
 
-CLIKZY est une plateforme web de jeu d'enchères interactif en temps réel. Le principe : le dernier utilisateur à cliquer sur un objet AVANT la fin du timer gagne l'objet.
+CLEEKZY est une plateforme web de jeu d'enchères interactif en temps réel. Le principe : le dernier utilisateur à cliquer sur un objet AVANT la fin du timer gagne l'objet.
 
 ### Règles du jeu
 - Timer initial : **24 heures**

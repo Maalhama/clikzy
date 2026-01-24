@@ -4,14 +4,14 @@ test.describe('Authentication', () => {
   test('should display login page', async ({ page }) => {
     await page.goto('/login')
 
-    await expect(page).toHaveTitle(/CLIKZY/)
+    await expect(page).toHaveTitle(/CLEEKZY/)
     await expect(page.getByRole('heading', { name: /connexion/i })).toBeVisible()
   })
 
   test('should display register page', async ({ page }) => {
     await page.goto('/register')
 
-    await expect(page).toHaveTitle(/CLIKZY/)
+    await expect(page).toHaveTitle(/CLEEKZY/)
     await expect(page.getByRole('heading', { name: /inscription|créer/i })).toBeVisible()
   })
 

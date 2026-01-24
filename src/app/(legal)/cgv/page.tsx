@@ -1,8 +1,8 @@
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Conditions Générales de Vente - CLIKZY',
-  description: 'Conditions générales de vente pour l\'achat de crédits sur CLIKZY',
+  title: 'Conditions Générales de Vente - CLEEKZY',
+  description: 'Conditions générales de vente pour l\'achat de crédits sur CLEEKZY',
 }
 
 export default function CGVPage() {
@@ -18,14 +18,14 @@ export default function CGVPage() {
       <section className="mb-8">
         <h2 className="text-xl font-bold text-neon-purple mb-4">1. Objet</h2>
         <p className="text-white/70">
-          Les présentes Conditions Générales de Vente (CGV) régissent l'achat de crédits sur la plateforme CLIKZY. Tout achat implique l'acceptation sans réserve des présentes CGV.
+          Les présentes Conditions Générales de Vente (CGV) régissent l'achat de crédits sur la plateforme CLEEKZY. Tout achat implique l'acceptation sans réserve des présentes CGV.
         </p>
       </section>
 
       <section className="mb-8">
         <h2 className="text-xl font-bold text-neon-purple mb-4">2. Produits</h2>
         <p className="text-white/70 mb-4">
-          CLIKZY propose à la vente des packs de crédits permettant de participer aux jeux sur la plateforme :
+          CLEEKZY propose à la vente des packs de crédits permettant de participer aux jeux sur la plateforme :
         </p>
         <ul className="text-white/70 list-disc pl-6">
           <li><strong className="text-white">Pack Starter :</strong> 50 crédits</li>
@@ -33,14 +33,14 @@ export default function CGVPage() {
           <li><strong className="text-white">Pack Premium :</strong> 500 crédits</li>
         </ul>
         <p className="text-white/70 mt-4">
-          Les crédits sont des biens numériques utilisables uniquement sur la plateforme CLIKZY.
+          Les crédits sont des biens numériques utilisables uniquement sur la plateforme CLEEKZY.
         </p>
       </section>
 
       <section className="mb-8">
         <h2 className="text-xl font-bold text-neon-purple mb-4">3. Prix</h2>
         <p className="text-white/70 mb-4">
-          Les prix sont indiqués en euros (€) TTC. CLIKZY se réserve le droit de modifier ses prix à tout moment. Les prix applicables sont ceux en vigueur au moment de la validation de la commande.
+          Les prix sont indiqués en euros (€) TTC. CLEEKZY se réserve le droit de modifier ses prix à tout moment. Les prix applicables sont ceux en vigueur au moment de la validation de la commande.
         </p>
       </section>
 
@@ -50,7 +50,7 @@ export default function CGVPage() {
           Pour passer commande, l'utilisateur doit :
         </p>
         <ol className="text-white/70 list-decimal pl-6 mb-4">
-          <li>Être connecté à son compte CLIKZY</li>
+          <li>Être connecté à son compte CLEEKZY</li>
           <li>Sélectionner un pack de crédits</li>
           <li>Procéder au paiement via Stripe</li>
         </ol>
@@ -72,7 +72,7 @@ export default function CGVPage() {
           <li>Google Pay</li>
         </ul>
         <p className="text-white/70 mt-4">
-          Les transactions sont sécurisées par chiffrement SSL. CLIKZY ne stocke aucune donnée bancaire.
+          Les transactions sont sécurisées par chiffrement SSL. CLEEKZY ne stocke aucune donnée bancaire.
         </p>
       </section>
 
@@ -114,7 +114,7 @@ export default function CGVPage() {
       <section className="mb-8">
         <h2 className="text-xl font-bold text-neon-purple mb-4">9. Responsabilité</h2>
         <p className="text-white/70 mb-4">
-          CLIKZY ne pourra être tenu responsable :
+          CLEEKZY ne pourra être tenu responsable :
         </p>
         <ul className="text-white/70 list-disc pl-6">
           <li>Des retards de livraison imputables au transporteur</li>
@@ -129,8 +129,8 @@ export default function CGVPage() {
           Pour toute question relative à une commande :
         </p>
         <ul className="text-white/70 list-disc pl-6">
-          <li><strong className="text-white">Email :</strong> <a href="mailto:support@clikzy.fr" className="text-neon-purple hover:underline">support@clikzy.fr</a></li>
-          <li><strong className="text-white">Page support :</strong> <a href="/support" className="text-neon-purple hover:underline">clikzy.fr/support</a></li>
+          <li><strong className="text-white">Email :</strong> <a href="mailto:support@cleekzy.com" className="text-neon-purple hover:underline">support@cleekzy.com</a></li>
+          <li><strong className="text-white">Page support :</strong> <a href="/support" className="text-neon-purple hover:underline">cleekzy.com/support</a></li>
         </ul>
         <p className="text-white/70 mt-4">
           Délai de réponse : sous 24 heures ouvrées.

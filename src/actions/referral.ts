@@ -150,6 +150,6 @@ export async function getReferralLink(): Promise<string | null> {
     return null
   }
 
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://clikzy.fr'
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://cleekzy.com'
   return `${baseUrl}/register?ref=${profile.referral_code}`
 }

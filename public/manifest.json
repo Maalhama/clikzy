@@ -1,6 +1,6 @@
 {
-  "name": "CLIKZY - Le dernier clic gagne",
-  "short_name": "CLIKZY",
+  "name": "CLEEKZY - Le dernier clic gagne",
+  "short_name": "CLEEKZY",
   "description": "Jeu gratuit en temps réel : le dernier à cliquer remporte le lot.",
   "start_url": "/lobby",
   "display": "standalone",
