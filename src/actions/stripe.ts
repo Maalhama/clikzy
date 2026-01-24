@@ -10,20 +10,18 @@ type ActionResult<T = void> = {
   error?: string
 }
 
-// Lazy init Stripe
-let stripe: Stripe | null = null
+// Create Stripe instance per request (no caching for serverless)
 function getStripeInstance(): Stripe | null {
-  if (!stripe) {
-    const secretKey = process.env.STRIPE_SECRET_KEY
-    if (!secretKey) {
-      console.error('STRIPE_SECRET_KEY is not configured')
-      return null
-    }
-    stripe = new Stripe(secretKey, {
-      apiVersion: '2025-12-15.clover',
-    })
+  const secretKey = process.env.STRIPE_SECRET_KEY
+  if (!secretKey) {
+    console.error('STRIPE_SECRET_KEY is not configured')
+    return null
   }
-  return stripe
+  return new Stripe(secretKey, {
+    apiVersion: '2025-12-15.clover',
+    timeout: 30000, // 30 seconds timeout
+    maxNetworkRetries: 3,
+  })
 }
 
 /**
