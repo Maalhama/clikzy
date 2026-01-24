@@ -10,9 +10,15 @@ test.describe('Landing Page', () => {
   test('should display branding elements', async ({ page }) => {
     await page.goto('/')
 
-    // Check for logo/brand - either text or logo component
-    const brandElement = page.locator('text=CLEEK').first().or(page.locator('[class*="logo"]').first())
-    await expect(brandElement).toBeVisible()
+    // Wait for page to be fully loaded
+    await page.waitForLoadState('networkidle')
+
+    // Check for logo link - the Logo component is a link to "/"
+    const logoLink = page.locator('a[href="/"]').first()
+    await expect(logoLink).toBeVisible()
+
+    // Verify the CLEEKZY text is present in the page
+    await expect(page.locator('body')).toContainText('CLEEK')
   })
 
   test('should have call-to-action buttons', async ({ page }) => {
