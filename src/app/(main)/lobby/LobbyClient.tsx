@@ -10,6 +10,7 @@ import {
   Pagination,
   PullToRefreshIndicator,
 } from '@/components/lobby'
+import { PaymentSuccessModal } from '@/components/lobby/PaymentSuccessModal'
 import type { WinnerData } from '@/actions/winners'
 import { FloatingTimer } from '@/components/landing/widgets/FloatingTimer'
 import { useLobbyFilters } from '@/hooks/lobby/useLobbyFilters'
@@ -60,10 +61,6 @@ export function LobbyClient({
         creditsContext?.refreshCredits()
         // Clean URL params
         router.replace('/lobby', { scroll: false })
-        // Auto-hide after 5 seconds
-        setTimeout(() => {
-          setPaymentSuccess({ show: false, credits: 0 })
-        }, 5000)
       }
     }
   }, [searchParams, router, creditsContext])
@@ -157,29 +154,12 @@ export function LobbyClient({
 
   return (
     <>
-      {/* Payment success toast */}
+      {/* Payment success modal */}
       {paymentSuccess.show && (
-        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 animate-in slide-in-from-top-4 fade-in duration-300">
-          <div className="flex items-center gap-3 px-5 py-3 rounded-xl bg-success/90 backdrop-blur-sm text-white shadow-lg shadow-success/20">
-            <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
-              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-              </svg>
-            </div>
-            <div>
-              <div className="font-bold">Paiement réussi !</div>
-              <div className="text-sm text-white/80">+{paymentSuccess.credits} crédits ajoutés</div>
-            </div>
-            <button
-              onClick={() => setPaymentSuccess({ show: false, credits: 0 })}
-              className="ml-2 p-1 rounded-full hover:bg-white/20 transition-colors"
-            >
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-          </div>
-        </div>
+        <PaymentSuccessModal
+          credits={paymentSuccess.credits}
+          onClose={() => setPaymentSuccess({ show: false, credits: 0 })}
+        />
       )}
 
       {/* Floating urgent timer */}
