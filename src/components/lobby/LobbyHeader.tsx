@@ -40,10 +40,10 @@ export const LobbyHeader = memo(function LobbyHeader({
             </div>
             <div>
               <div className="font-bold text-success text-sm">
-                +10 credits offerts !
+                +10 crédits offerts !
               </div>
               <div className="text-xs text-white/50">
-                Tes credits quotidiens sont recharges
+                Tes crédits quotidiens sont rechargés
               </div>
             </div>
           </div>

@@ -281,7 +281,7 @@ export function LobbyClient({
                               : 'bg-bg-secondary text-white border border-white/10'
                           }`}
                         >
-                          Precedent
+                          Précédent
                         </button>
                         <button
                           onClick={nextPage}
