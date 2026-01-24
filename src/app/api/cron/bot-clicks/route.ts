@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient, SupabaseClient } from '@supabase/supabase-js'
+import { sendWinnerEmail } from '@/lib/email'
 
 /**
  * ============================================
@@ -392,13 +393,15 @@ async function endGame(
 
   // Créer le record du gagnant
   let finalUsername = winnerUsername
+  let winnerEmail: string | null = null
   if (winnerId) {
     const { data: profile } = await supabase
       .from('profiles')
-      .select('username')
+      .select('username, email')
       .eq('id', winnerId)
       .single()
     finalUsername = profile?.username || winnerUsername
+    winnerEmail = profile?.email || null
   }
 
   // Récupérer la valeur de l'item
@@ -434,6 +437,14 @@ async function endGame(
           .from('profiles')
           .update({ total_wins: (profile.total_wins ?? 0) + 1 })
           .eq('id', winnerId)
+      }
+
+      // Envoyer l'email de victoire (non-bloquant)
+      if (winnerEmail) {
+        sendWinnerEmail(winnerEmail, finalUsername, itemName, itemValue).catch((err) => {
+          console.error('[CRON] Failed to send winner email:', err)
+        })
+        console.log(`[CRON] Winner email queued for ${winnerEmail}`)
       }
     }
   }

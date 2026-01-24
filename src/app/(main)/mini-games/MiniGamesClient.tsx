@@ -16,6 +16,7 @@ import { MiniGameType, MiniGameEligibility, WHEEL_SEGMENTS, SCRATCH_VALUES, PACH
 import WheelOfFortune from '@/components/mini-games/WheelOfFortune';
 import ScratchCard from '@/components/mini-games/ScratchCard';
 import Pachinko from '@/components/mini-games/Pachinko';
+import { trackMiniGame } from '@/lib/analytics';
 
 const PLAY_COST = 3; // Coût en crédits pour une partie payante
 
@@ -216,6 +217,11 @@ export default function MiniGamesClient({ initialEligibility }: MiniGamesClientP
       creditsWon,
       newTotalCredits: pendingGame?.finalCredits || 0,
     });
+
+    // Track mini-game play in analytics
+    if (pendingGame?.type) {
+      trackMiniGame(pendingGame.type, creditsWon);
+    }
 
     if (creditsWon > 0) {
       triggerWinEffect();

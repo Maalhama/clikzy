@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import { signInWithPassword, signInWithOAuth } from '@/actions/auth'
 import { Button } from '@/components/ui/button'
 import { Logo } from '@/components/ui/Logo'
+import { trackLogin } from '@/lib/analytics'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -36,6 +37,7 @@ export default function LoginPage() {
     const result = await signInWithPassword(data)
 
     if (result.success) {
+      trackLogin('email')
       router.push('/lobby')
     } else {
       setError(result.error || 'Une erreur est survenue')
@@ -50,6 +52,7 @@ export default function LoginPage() {
     const result = await signInWithOAuth(provider)
 
     if (result.success && result.url) {
+      trackLogin(provider)
       window.location.href = result.url
     } else {
       setError(result.error || 'Une erreur est survenue')

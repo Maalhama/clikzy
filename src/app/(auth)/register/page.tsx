@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { signUp, signInWithOAuth } from '@/actions/auth'
 import { Button } from '@/components/ui/button'
 import { Logo } from '@/components/ui/Logo'
+import { trackSignup } from '@/lib/analytics'
 
 function getPasswordStrength(password: string): { score: number; label: string; color: string } {
   let score = 0
@@ -52,6 +53,7 @@ export default function RegisterPage() {
     const result = await signUp(data)
 
     if (result.success) {
+      trackSignup('email')
       setSuccess(true)
     } else {
       setError(result.error || 'Une erreur est survenue')
@@ -67,6 +69,7 @@ export default function RegisterPage() {
     const result = await signInWithOAuth(provider)
 
     if (result.success && result.url) {
+      trackSignup(provider)
       window.location.href = result.url
     } else {
       setError(result.error || 'Une erreur est survenue')

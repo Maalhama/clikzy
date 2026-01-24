@@ -14,6 +14,7 @@ import { formatTime } from '@/lib/utils/timer'
 import { generateDeterministicUsername } from '@/lib/bots/usernameGenerator'
 import { getProductSvg } from '@/lib/utils/productImages'
 import { CreditPacksModal } from '@/components/modals/CreditPacksModal'
+import { trackGameClick, trackGameWin } from '@/lib/analytics'
 import type { Game, Item } from '@/types/database'
 
 // Generate UUID with fallback for browsers that don't support crypto.randomUUID
@@ -111,11 +112,14 @@ export function GameClient({
     if (gameEnded && !showWinnerModal) {
       const timer = setTimeout(() => {
         setShowWinnerModal(true)
-        if (game.winner_id === userId) playWin()
+        if (game.winner_id === userId) {
+          playWin()
+          trackGameWin(game.id, game.item.name, game.item.retail_value ?? 0)
+        }
       }, 500)
       return () => clearTimeout(timer)
     }
-  }, [gameEnded, showWinnerModal, game.winner_id, userId, playWin])
+  }, [gameEnded, showWinnerModal, game.winner_id, userId, playWin, game.id, game.item.name, game.item])
 
   // Haptic feedback
   const triggerHaptic = useCallback(() => {
@@ -130,6 +134,7 @@ export function GameClient({
     setError(null)
     playClick()
     triggerHaptic()
+    trackGameClick(game.id, game.item.name)
     setClickAnimation(true)
     setCreditsAnimation(true)
     setTimeout(() => setClickAnimation(false), 150)

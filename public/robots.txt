@@ -1,11 +1,11 @@
-# Robots.txt for CLIKZY
-# https://clikzy.fr
+# Robots.txt for CLEEKZY
+# https://cleekzy.com
 
 User-agent: *
 Allow: /
 
 # Sitemaps
-Sitemap: https://clikzy.fr/sitemap.xml
+Sitemap: https://cleekzy.com/sitemap.xml
 
 # Disallow admin and API routes
 Disallow: /api/

@@ -3,7 +3,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
-import { sendWelcomeEmail } from '@/lib/email/resend'
+import { sendWelcomeEmail } from '@/lib/email'
 
 export type AuthResult = {
   success: boolean

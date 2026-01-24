@@ -58,31 +58,40 @@ export const metadata: Metadata = {
     siteName: 'CLEEKZY',
     title: 'CLEEKZY - Le dernier clic gagne',
     description: 'Jeu gratuit en temps réel : le dernier à cliquer remporte le lot. 10 clics gratuits chaque jour. iPhone, PS5, MacBook et plus à gagner.',
-    images: [
-      {
-        url: '/og-image.png',
-        width: 1200,
-        height: 630,
-        alt: 'CLEEKZY - Le dernier clic gagne des lots premium',
-      },
-    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'CLEEKZY - Le dernier clic gagne',
     description: 'Jeu gratuit en temps réel : le dernier à cliquer remporte le lot. 10 clics gratuits chaque jour.',
-    images: ['/og-image.png'],
     creator: '@cleekzy_fr',
-  },
-  icons: {
-    icon: [
-      { url: '/favicon.ico', sizes: 'any' },
-      { url: '/icon.svg', type: 'image/svg+xml' },
-    ],
-    apple: '/apple-touch-icon.png',
   },
   manifest: '/manifest.json',
   category: 'gaming',
+}
+
+// JSON-LD Structured Data
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'WebApplication',
+  name: 'CLEEKZY',
+  description: 'Jeu gratuit en temps réel : le dernier à cliquer remporte le lot. 10 clics gratuits chaque jour.',
+  url: 'https://cleekzy.com',
+  applicationCategory: 'Game',
+  operatingSystem: 'Web',
+  offers: {
+    '@type': 'Offer',
+    price: '0',
+    priceCurrency: 'EUR',
+  },
+  author: {
+    '@type': 'Organization',
+    name: 'CLEEKZY',
+    url: 'https://cleekzy.com',
+  },
+  potentialAction: {
+    '@type': 'PlayAction',
+    target: 'https://cleekzy.com/lobby',
+  },
 }
 
 export default function RootLayout({
@@ -92,6 +101,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="fr" className={`${inter.variable} ${jetbrainsMono.variable}`}>
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+      </head>
       <body className="font-sans antialiased bg-bg-primary text-text-primary min-h-screen">
         <SkipLink />
         {children}
