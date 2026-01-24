@@ -6,7 +6,7 @@ import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import { GiftIcon } from '@/components/ui/GamingIcons'
 import { useIsMobile } from '@/hooks/useIsMobile'
-import { getProductSvg } from '@/lib/utils/productImages'
+import { getNeonImagePath } from '@/lib/utils/productImages'
 
 interface Prize {
   id: string
@@ -26,42 +26,42 @@ const MOCK_PRIZES: Prize[] = [
   {
     id: '1',
     name: 'iPhone 17 Pro Max',
-    image_url: '/products/iphone-15-pro.svg',
+    image_url: '/products/iphone-17-pro-max-neon.png',
     value: 1479,
     status: 'ending_soon'
   },
   {
     id: '2',
     name: 'PlayStation 5 Pro',
-    image_url: '/products/ps5.svg',
+    image_url: '/products/playstation-5-pro-neon.png',
     value: 799,
     status: 'available'
   },
   {
     id: '3',
-    name: 'MacBook Pro M5 Max',
-    image_url: '/products/macbook-pro.svg',
+    name: 'MacBook Pro 16" M5 Max',
+    image_url: '/products/macbook-pro-16-m5-max-neon.png',
     value: 4499,
     status: 'available'
   },
   {
     id: '4',
     name: 'AirPods Pro 3',
-    image_url: '/products/airpods-pro.svg',
+    image_url: '/products/airpods-pro-3-neon.png',
     value: 299,
     status: 'available'
   },
   {
     id: '5',
     name: 'Apple Watch Ultra 3',
-    image_url: '/products/apple-watch.svg',
+    image_url: '/products/apple-watch-ultra-3-neon.png',
     value: 999,
     status: 'ending_soon'
   },
   {
     id: '6',
-    name: 'iPad Pro M4',
-    image_url: '/products/ipad-pro.svg',
+    name: 'iPad Pro 13" M4',
+    image_url: '/products/ipad-pro-13-m4-neon.png',
     value: 1499,
     status: 'available'
   },
@@ -168,7 +168,7 @@ export function PrizeCarousel({
                   </div>
                 ) : (
                   <Image
-                    src={getProductSvg(currentPrize.name)}
+                    src={currentPrize.image_url || getNeonImagePath(currentPrize.name)}
                     alt={currentPrize.name}
                     fill
                     className="object-contain p-4 transition-transform duration-500 group-hover/image:scale-105"
