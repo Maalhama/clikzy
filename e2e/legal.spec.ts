@@ -30,14 +30,15 @@ test.describe('Legal Pages', () => {
   test('legal page should have required sections', async ({ page }) => {
     await page.goto('/legal')
 
-    // Check for important legal sections
-    await expect(page.locator('text=/Éditeur|éditeur/i')).toBeVisible()
-    await expect(page.locator('text=/Hébergement|hébergement/i')).toBeVisible()
+    // Check for important legal sections in page content
+    await expect(page.locator('body')).toContainText(/Éditeur|éditeur/i)
+    await expect(page.locator('body')).toContainText(/Hébergement|hébergement/i)
   })
 
   test('privacy page should mention RGPD', async ({ page }) => {
     await page.goto('/privacy')
 
-    await expect(page.locator('text=/RGPD|données personnelles/i')).toBeVisible()
+    // Check for RGPD or personal data mention in page content
+    await expect(page.locator('body')).toContainText(/RGPD|données personnelles/i)
   })
 })

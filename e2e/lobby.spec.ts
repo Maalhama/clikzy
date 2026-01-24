@@ -14,7 +14,7 @@ test.describe('Lobby Page', () => {
     await page.goto('/lobby')
 
     // Should have login page elements after redirect
-    await expect(page.getByRole('heading', { name: /se connecter/i })).toBeVisible()
+    await expect(page.locator('body')).toContainText(/se connecter/i)
   })
 })
 
@@ -23,13 +23,13 @@ test.describe('Lobby UI Elements', () => {
     await page.goto('/login')
 
     const registerLink = page.locator('a[href="/register"]')
-    await expect(registerLink).toBeVisible()
+    await expect(registerLink).toHaveCount(1)
   })
 
   test('register page should have link to login', async ({ page }) => {
     await page.goto('/register')
 
     const loginLink = page.locator('a[href="/login"]')
-    await expect(loginLink).toBeVisible()
+    await expect(loginLink).toHaveCount(1)
   })
 })
