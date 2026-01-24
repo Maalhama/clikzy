@@ -192,7 +192,7 @@ Header requis : `Authorization: Bearer [CRON_SECRET]`
 
 ## TODO - À faire
 
-- [ ] **Resend** : Créer un compte sur resend.com quand le nom de domaine sera acheté, puis ajouter `RESEND_API_KEY` dans `.env.local`
+- [x] **Resend** : Configuré avec le domaine cleekzy.com
 
 ## Notes
 
