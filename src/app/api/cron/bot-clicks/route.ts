@@ -3,14 +3,14 @@ import { createClient, SupabaseClient } from '@supabase/supabase-js'
 
 /**
  * ============================================
- * CRON DE GESTION DES JEUX - Clikzy v12.0
+ * CRON UNIFIÉ DE GESTION DES JEUX - Clikzy v13.0
  * ============================================
  *
- * Ce cron gère:
- * - La mise à jour des leaders (last_click_username) pour simuler l'activité
- * - Le système de bataille en phase finale (30min à 1h59min)
- * - La fin des jeux (timer = 0)
- * - La création des records de gagnants
+ * Ce cron gère TOUT le cycle de vie des jeux:
+ * 1. Activation des jeux en attente (waiting → active)
+ * 2. Simulation de l'activité des bots (mise à jour des leaders)
+ * 3. Système de bataille en phase finale (30min à 1h59min)
+ * 4. Fin des jeux (timer = 0) et création des records de gagnants
  *
  * Système de bataille:
  * - Phase normale: bots cliquent pour simuler l'activité
@@ -201,7 +201,34 @@ export async function GET(request: NextRequest) {
   try {
     const supabase = createClient(supabaseUrl, supabaseServiceKey)
     const now = Date.now()
+    const nowISO = new Date().toISOString()
 
+    // ============================================
+    // ÉTAPE 1: Activer les jeux en attente
+    // ============================================
+    const { data: gamesToActivate } = await supabase
+      .from('games')
+      .select('id, item:items(name)')
+      .eq('status', 'waiting')
+      .lte('start_time', nowISO)
+
+    let activatedCount = 0
+    if (gamesToActivate && gamesToActivate.length > 0) {
+      const gameIds = gamesToActivate.map(g => g.id)
+      const { error: activateError } = await supabase
+        .from('games')
+        .update({ status: 'active' })
+        .in('id', gameIds)
+
+      if (!activateError) {
+        activatedCount = gamesToActivate.length
+        console.log(`[CRON] Activated ${activatedCount} games`)
+      }
+    }
+
+    // ============================================
+    // ÉTAPE 2: Gérer les jeux actifs
+    // ============================================
     // Récupérer les jeux actifs
     const { data: activeGames, error: fetchError } = await supabase
       .from('games')
@@ -218,7 +245,11 @@ export async function GET(request: NextRequest) {
     }
 
     if (!activeGames || activeGames.length === 0) {
-      return NextResponse.json({ message: 'No active games', processed: 0 })
+      return NextResponse.json({
+        message: activatedCount > 0 ? `Activated ${activatedCount} games, no active games to process` : 'No active games',
+        activated: activatedCount,
+        processed: 0
+      })
     }
 
     console.log(`[CRON] Checking ${activeGames.length} games`)
@@ -316,7 +347,8 @@ export async function GET(request: NextRequest) {
     const endedCount = results.filter(r => r.action === 'ended').length
 
     return NextResponse.json({
-      message: `Checked ${results.length} games, ${endedCount} ended`,
+      message: `Activated ${activatedCount}, checked ${results.length} games, ${endedCount} ended`,
+      activated: activatedCount,
       processed: results.length,
       ended: endedCount,
       games: results
