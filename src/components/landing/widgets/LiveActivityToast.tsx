@@ -38,22 +38,22 @@ function formatRelativeTime(dateString: string): string {
 
 // Bot winners for toast notifications - diverse usernames (2026 edition)
 const BOT_WINNERS = [
-  { username: 'Sami_paris', item: 'MacBook Pro M5', value: 4499, image: '/products/macbook-pro.svg' },
-  { username: 'EvaMusic', item: 'iPhone 17 Pro', value: 1229, image: '/products/iphone-15-pro.svg' },
-  { username: 'Ibra_sn', item: 'PlayStation 5 Pro', value: 799, image: '/products/ps5.svg' },
-  { username: 'MarineL', item: 'Sony WH-1000XM6', value: 399, image: '/products/sony-headphones.svg' },
-  { username: 'Bilal_69', item: 'AirPods Pro 3', value: 299, image: '/products/airpods-pro.svg' },
-  { username: 'ChloeGames', item: 'iPad Pro M4', value: 1499, image: '/products/ipad-pro.svg' },
-  { username: 'Amadou_ml', item: 'Apple Watch Ultra 3', value: 999, image: '/products/apple-watch.svg' },
-  { username: 'Sarah_lh', item: 'Samsung Galaxy S26 Ultra', value: 1399, image: '/products/samsung-galaxy.svg' },
-  { username: 'Enzo_tls', item: 'MacBook Air M4', value: 1599, image: '/products/macbook-pro.svg' },
-  { username: 'Khadija_ma', item: 'Nintendo Switch 2', value: 449, image: '/products/nintendo-switch.svg' },
-  { username: 'Lucas_44', item: 'AirPods Max 2', value: 549, image: '/products/airpods-max.svg' },
-  { username: 'Jade_bzh', item: 'Xbox Series X 2TB', value: 599, image: '/products/xbox-series-x.svg' },
-  { username: 'MohamedK', item: 'Steam Deck OLED 1TB', value: 679, image: '/products/steam-deck.svg' },
-  { username: 'Lea_rns', item: 'Meta Quest 4', value: 599, image: '/products/meta-quest.svg' },
-  { username: 'Adama_ci', item: 'DJI Mini 5 Pro', value: 999, image: '/products/dji-drone.svg' },
-  { username: 'MathisPlay', item: 'GoPro Hero 14', value: 499, image: '/products/gopro-hero.svg' },
+  { username: 'Sami_paris', item: 'MacBook Pro M5', value: 4499, image: '/products/macbook-pro-16-m5-max-neon.png' },
+  { username: 'EvaMusic', item: 'iPhone 17 Pro', value: 1229, image: '/products/iphone-17-pro-neon.png' },
+  { username: 'Ibra_sn', item: 'PlayStation 5 Pro', value: 799, image: '/products/playstation-5-pro-neon.png' },
+  { username: 'MarineL', item: 'Sony WF-1000XM5', value: 399, image: '/products/sony-wf-1000xm5-neon.png' },
+  { username: 'Bilal_69', item: 'AirPods Pro 3', value: 299, image: '/products/airpods-pro-3-neon.png' },
+  { username: 'ChloeGames', item: 'iPad Pro M4', value: 1499, image: '/products/ipad-pro-13-m4-neon.png' },
+  { username: 'Amadou_ml', item: 'Apple Watch Ultra 3', value: 999, image: '/products/apple-watch-ultra-3-neon.png' },
+  { username: 'Sarah_lh', item: 'Samsung Galaxy S26 Ultra', value: 1399, image: '/products/samsung-galaxy-s26-ultra-neon.png' },
+  { username: 'Enzo_tls', item: 'MacBook Air M4', value: 1599, image: '/products/macbook-air-15-m4-neon.png' },
+  { username: 'Khadija_ma', item: 'Nintendo Switch Pro Controller', value: 449, image: '/products/nintendo-switch-pro-controller-neon.png' },
+  { username: 'Lucas_44', item: 'Beats Studio Buds', value: 549, image: '/products/beats-studio-buds-neon.png' },
+  { username: 'Jade_bzh', item: 'Manette Xbox Core', value: 599, image: '/products/manette-xbox-core-neon.png' },
+  { username: 'MohamedK', item: 'Steam Deck OLED 1TB', value: 679, image: '/products/steam-deck-oled-1tb-neon.png' },
+  { username: 'Lea_rns', item: 'Meta Quest 4', value: 599, image: '/products/meta-quest-4-neon.png' },
+  { username: 'Adama_ci', item: 'DJI Avata 3', value: 999, image: '/products/dji-avata-3-neon.png' },
+  { username: 'MathisPlay', item: 'GoPro Hero 14 Black', value: 499, image: '/products/gopro-hero-14-black-neon.png' },
 ]
 
 const TOAST_DURATION = 6000 // 6 seconds
@@ -95,61 +95,77 @@ export function LiveActivityToast({ enabled = true, maxVisible = 3, realWinners 
   const realWinnersRef = useRef(realWinners)
   realWinnersRef.current = realWinners
 
-  // Map item names to local SVG images
+  // Map item names to local neon PNG images
   const getItemImage = (itemName: string): string => {
     const name = itemName.toLowerCase()
     // Smartphones
-    if (name.includes('iphone')) return '/products/iphone-15-pro.svg'
-    if (name.includes('samsung') && name.includes('galaxy')) return '/products/samsung-galaxy.svg'
-    if (name.includes('pixel')) return '/products/google-pixel.svg'
+    if (name.includes('iphone 17 pro max')) return '/products/iphone-17-pro-max-neon.png'
+    if (name.includes('iphone')) return '/products/iphone-17-pro-neon.png'
+    if (name.includes('samsung') && name.includes('s26')) return '/products/samsung-galaxy-s26-ultra-neon.png'
+    if (name.includes('samsung') && name.includes('fold')) return '/products/samsung-galaxy-z-fold-6-neon.png'
+    if (name.includes('pixel')) return '/products/google-pixel-10-pro-neon.png'
     // Gaming
-    if (name.includes('ps5') || name.includes('playstation')) return '/products/ps5.svg'
-    if (name.includes('xbox')) return '/products/xbox-series-x.svg'
-    if (name.includes('switch') || name.includes('nintendo')) return '/products/nintendo-switch.svg'
-    if (name.includes('steam deck')) return '/products/steam-deck.svg'
-    if (name.includes('quest') || name.includes('meta')) return '/products/meta-quest.svg'
-    if (name.includes('dualsense') || name.includes('manette')) return '/products/ps5-controller.svg'
+    if (name.includes('ps5 pro') || name.includes('playstation 5 pro')) return '/products/playstation-5-pro-neon.png'
+    if (name.includes('ps5') || name.includes('playstation')) return '/products/playstation-5-slim-neon.png'
+    if (name.includes('xbox') || name.includes('manette xbox')) return '/products/manette-xbox-core-neon.png'
+    if (name.includes('switch')) return '/products/nintendo-switch-pro-controller-neon.png'
+    if (name.includes('steam deck')) return '/products/steam-deck-oled-1tb-neon.png'
+    if (name.includes('quest') || name.includes('meta')) return '/products/meta-quest-4-neon.png'
+    if (name.includes('dualsense edge')) return '/products/manette-ps5-dualsense-edge-neon.png'
+    if (name.includes('dualsense') || name.includes('manette ps5')) return '/products/manette-ps5-dualsense-neon.png'
+    if (name.includes('rog ally')) return '/products/asus-rog-ally-x-neon.png'
+    if (name.includes('rog strix')) return '/products/asus-rog-strix-g18-neon.png'
     // Computers
-    if (name.includes('macbook')) return '/products/macbook-pro.svg'
-    if (name.includes('ipad')) return '/products/ipad-pro.svg'
-    if (name.includes('imac')) return '/products/imac.svg'
-    if (name.includes('rog') || name.includes('gaming') && name.includes('laptop')) return '/products/gaming-laptop.svg'
+    if (name.includes('macbook pro 16') || name.includes('m5 max')) return '/products/macbook-pro-16-m5-max-neon.png'
+    if (name.includes('macbook pro 14') || name.includes('m5 pro')) return '/products/macbook-pro-14-m5-pro-neon.png'
+    if (name.includes('macbook air')) return '/products/macbook-air-15-m4-neon.png'
+    if (name.includes('macbook')) return '/products/macbook-pro-16-m5-max-neon.png'
+    if (name.includes('ipad')) return '/products/ipad-pro-13-m4-neon.png'
+    if (name.includes('imac')) return '/products/imac-24-m4-neon.png'
     // Audio
-    if (name.includes('airpods max')) return '/products/airpods-max.svg'
-    if (name.includes('airpods')) return '/products/airpods-pro.svg'
-    if (name.includes('sony') && (name.includes('wh') || name.includes('casque') || name.includes('headphone'))) return '/products/sony-headphones.svg'
-    if (name.includes('bose')) return '/products/bose-speaker.svg'
-    if (name.includes('sonos')) return '/products/sonos-speaker.svg'
-    if (name.includes('marshall') || name.includes('jbl')) return '/products/jbl-speaker.svg'
-    if (name.includes('soundbar') || name.includes('arc')) return '/products/soundbar.svg'
+    if (name.includes('airpods pro')) return '/products/airpods-pro-3-neon.png'
+    if (name.includes('beats')) return '/products/beats-studio-buds-neon.png'
+    if (name.includes('sony wf')) return '/products/sony-wf-1000xm5-neon.png'
+    if (name.includes('bose')) return '/products/bose-soundlink-flex-neon.png'
+    if (name.includes('sonos arc')) return '/products/sonos-arc-ultra-neon.png'
+    if (name.includes('sonos era')) return '/products/sonos-era-500-neon.png'
+    if (name.includes('sonos roam')) return '/products/sonos-roam-2-neon.png'
+    if (name.includes('sonos')) return '/products/sonos-arc-ultra-neon.png'
+    if (name.includes('marshall stanmore')) return '/products/marshall-stanmore-iv-neon.png'
+    if (name.includes('marshall')) return '/products/marshall-emberton-iii-neon.png'
+    if (name.includes('jbl flip')) return '/products/jbl-flip-7-neon.png'
+    if (name.includes('jbl tune')) return '/products/jbl-tune-770nc-neon.png'
+    if (name.includes('jbl')) return '/products/jbl-flip-7-neon.png'
+    if (name.includes('ultimate ears') || name.includes('ue boom')) return '/products/ultimate-ears-boom-4-neon.png'
+    if (name.includes('razer blackshark')) return '/products/razer-blackshark-v2-pro-neon.png'
+    if (name.includes('steelseries')) return '/products/steelseries-arctis-nova-7-neon.png'
+    if (name.includes('galaxy buds')) return '/products/samsung-galaxy-buds-3-neon.png'
     // Watches
-    if (name.includes('apple watch') || name.includes('watch ultra')) return '/products/apple-watch.svg'
-    if (name.includes('garmin') || name.includes('fenix')) return '/products/garmin-watch.svg'
-    if (name.includes('rolex')) return '/products/rolex-watch.svg'
+    if (name.includes('apple watch ultra')) return '/products/apple-watch-ultra-3-neon.png'
+    if (name.includes('galaxy watch')) return '/products/samsung-galaxy-watch-8-classic-neon.png'
+    if (name.includes('garmin fenix')) return '/products/garmin-fenix-8-pro-neon.png'
+    if (name.includes('garmin venu')) return '/products/garmin-venu-sq-2-neon.png'
+    if (name.includes('garmin')) return '/products/garmin-fenix-8-pro-neon.png'
+    if (name.includes('fitbit')) return '/products/fitbit-sense-3-neon.png'
+    if (name.includes('huawei watch')) return '/products/huawei-watch-fit-4-neon.png'
+    if (name.includes('whoop')) return '/products/whoop-5-0-neon.png'
+    if (name.includes('xiaomi') && name.includes('band')) return '/products/xiaomi-smart-band-9-pro-neon.png'
     // Photo/Video
-    if (name.includes('gopro')) return '/products/gopro-hero.svg'
-    if (name.includes('dji') || name.includes('drone') || name.includes('mavic')) return '/products/dji-drone.svg'
-    if (name.includes('canon')) return '/products/canon-camera.svg'
-    if (name.includes('sony') && name.includes('alpha')) return '/products/sony-camera.svg'
+    if (name.includes('gopro')) return '/products/gopro-hero-14-black-neon.png'
+    if (name.includes('dji avata')) return '/products/dji-avata-3-neon.png'
+    if (name.includes('dji mavic') || name.includes('mavic')) return '/products/dji-mavic-4-pro-neon.png'
+    if (name.includes('dji osmo')) return '/products/dji-osmo-pocket-4-neon.png'
+    if (name.includes('dji') || name.includes('drone')) return '/products/dji-avata-3-neon.png'
+    if (name.includes('canon')) return '/products/canon-eos-r8-neon.png'
+    if (name.includes('sony alpha')) return '/products/sony-alpha-7-v-neon.png'
     // TV
-    if (name.includes('lg') && name.includes('oled')) return '/products/lg-tv.svg'
-    if (name.includes('samsung') && (name.includes('tv') || name.includes('qled'))) return '/products/samsung-tv.svg'
-    // Mobility
-    if (name.includes('trottinette') || name.includes('scooter') && !name.includes('vespa')) return '/products/electric-scooter.svg'
-    if (name.includes('velo') || name.includes('bike') || name.includes('vanmoof') || name.includes('cowboy')) return '/products/electric-bike.svg'
-    if (name.includes('vespa')) return '/products/vespa.svg'
-    if (name.includes('moto') || name.includes('zero sr')) return '/products/electric-moto.svg'
-    // Home
-    if (name.includes('dyson') && name.includes('airwrap')) return '/products/dyson-airwrap.svg'
-    if (name.includes('dyson')) return '/products/dyson-vacuum.svg'
-    if (name.includes('thermomix')) return '/products/thermomix.svg'
-    // Accessories
-    if (name.includes('chaise') || name.includes('gaming chair') || name.includes('secretlab')) return '/products/gaming-chair.svg'
-    if (name.includes('rayban')) return '/products/rayban-smart.svg'
-    if (name.includes('louis vuitton') || name.includes('sac')) return '/products/louis-vuitton-bag.svg'
-    if (name.includes('jordan') || name.includes('nike')) return '/products/nike-jordan.svg'
+    if (name.includes('lg') && name.includes('oled')) return '/products/lg-oled-g4-65-neon.png'
+    if (name.includes('samsung') && (name.includes('tv') || name.includes('qn'))) return '/products/samsung-qn95d-55-neon.png'
+    if (name.includes('sony bravia')) return '/products/sony-bravia-9-55-neon.png'
+    // Kindle
+    if (name.includes('kindle')) return '/products/kindle-paperwhite-signature-neon.png'
     // Fallback
-    return '/products/gift-card.svg'
+    return '/products/airpods-4-neon.png'
   }
 
   // Show winners every 60 seconds - stable useEffect with no changing dependencies

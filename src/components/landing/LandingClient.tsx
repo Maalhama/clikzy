@@ -448,10 +448,10 @@ export function LandingClient({
             >
               {/* First set - reduced to 4 items for mobile performance */}
               {[
-                { name: 'iPhone 17 Pro', value: 1479, color: '#9B5CFF', image: '/products/iphone-15-pro.svg' },
-                { name: 'PlayStation 5 Pro', value: 799, color: '#3CCBFF', image: '/products/ps5.svg' },
-                { name: 'MacBook Pro M5', value: 4499, color: '#FF4FD8', image: '/products/macbook-pro.svg' },
-                { name: 'AirPods Pro 3', value: 299, color: '#00FF88', image: '/products/airpods-pro.svg' },
+                { name: 'iPhone 17 Pro', value: 1479, color: '#9B5CFF', image: '/products/iphone-17-pro-neon.png' },
+                { name: 'PlayStation 5 Pro', value: 799, color: '#3CCBFF', image: '/products/playstation-5-pro-neon.png' },
+                { name: 'MacBook Pro M5', value: 4499, color: '#FF4FD8', image: '/products/macbook-pro-16-m5-max-neon.png' },
+                { name: 'AirPods Pro 3', value: 299, color: '#00FF88', image: '/products/airpods-pro-3-neon.png' },
               ].map((prize, i) => (
                 <div
                   key={`a-${i}`}
@@ -477,10 +477,10 @@ export function LandingClient({
               ))}
               {/* Duplicate set for seamless loop */}
               {[
-                { name: 'iPhone 17 Pro', value: 1479, color: '#9B5CFF', image: '/products/iphone-15-pro.svg' },
-                { name: 'PlayStation 5 Pro', value: 799, color: '#3CCBFF', image: '/products/ps5.svg' },
-                { name: 'MacBook Pro M5', value: 4499, color: '#FF4FD8', image: '/products/macbook-pro.svg' },
-                { name: 'AirPods Pro 3', value: 299, color: '#00FF88', image: '/products/airpods-pro.svg' },
+                { name: 'iPhone 17 Pro', value: 1479, color: '#9B5CFF', image: '/products/iphone-17-pro-neon.png' },
+                { name: 'PlayStation 5 Pro', value: 799, color: '#3CCBFF', image: '/products/playstation-5-pro-neon.png' },
+                { name: 'MacBook Pro M5', value: 4499, color: '#FF4FD8', image: '/products/macbook-pro-16-m5-max-neon.png' },
+                { name: 'AirPods Pro 3', value: 299, color: '#00FF88', image: '/products/airpods-pro-3-neon.png' },
               ].map((prize, i) => (
                 <div
                   key={`b-${i}`}

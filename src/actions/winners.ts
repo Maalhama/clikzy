@@ -74,7 +74,7 @@ export async function getRecentWinners(limit: number = 50): Promise<WinnerData[]
     username: w.username || w.profiles?.username || 'Joueur anonyme',
     itemName: w.item_name,
     itemValue: w.item_value ? Number(w.item_value) : null,
-    itemImage: w.items?.image_url || '/products/default.svg',
+    itemImage: w.items?.image_url || '/products/airpods-4-neon.png',
     wonAt: w.won_at,
     totalClicksInGame: w.total_clicks_in_game,
   }))

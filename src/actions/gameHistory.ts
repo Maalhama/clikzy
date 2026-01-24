@@ -96,7 +96,7 @@ export async function getGameHistory(limit: number = 20): Promise<GameHistoryIte
       gameId: game.id,
       itemName: game.items?.name || 'Lot inconnu',
       itemValue: game.items?.retail_value || null,
-      itemImage: game.items?.image_url || '/products/default.svg',
+      itemImage: game.items?.image_url || '/products/airpods-4-neon.png',
       clickCount: clickData?.count || 0,
       playedAt: clickData?.lastClickAt || game.ended_at || new Date().toISOString(),
       won: game.winner_id === user.id,
