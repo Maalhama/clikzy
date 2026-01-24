@@ -1,12 +1,29 @@
 'use server'
 
+import Stripe from 'stripe'
 import { createClient } from '@/lib/supabase/server'
-import type { CreditPackId } from '@/lib/stripe/config'
+import { CREDIT_PACKS, type CreditPackId } from '@/lib/stripe/config'
 
 type ActionResult<T = void> = {
   success: boolean
   data?: T
   error?: string
+}
+
+// Lazy init Stripe
+let stripe: Stripe | null = null
+function getStripeInstance(): Stripe | null {
+  if (!stripe) {
+    const secretKey = process.env.STRIPE_SECRET_KEY
+    if (!secretKey) {
+      console.error('STRIPE_SECRET_KEY is not configured')
+      return null
+    }
+    stripe = new Stripe(secretKey, {
+      apiVersion: '2025-12-18.acacia',
+    })
+  }
+  return stripe
 }
 
 /**
@@ -26,24 +43,61 @@ export async function createCheckoutSession(
     return { success: false, error: 'Non authentifié' }
   }
 
-  try {
-    // Call our API route to create the session
-    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
-    const response = await fetch(`${baseUrl}/api/stripe/checkout`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ packId }),
-    })
+  // Find the pack
+  const pack = CREDIT_PACKS.find((p) => p.id === packId)
+  if (!pack) {
+    return { success: false, error: 'Pack invalide' }
+  }
 
-    if (!response.ok) {
-      const error = await response.json()
-      return { success: false, error: error.error || 'Erreur lors de la création de la session' }
+  try {
+    const stripeInstance = getStripeInstance()
+    if (!stripeInstance) {
+      return { success: false, error: 'Service de paiement non configuré' }
     }
 
-    const data = await response.json()
-    return { success: true, data: { url: data.url } }
+    // Get user profile for username
+    const { data: profileData } = await supabase
+      .from('profiles')
+      .select('username')
+      .eq('id', user.id)
+      .single()
+
+    const profile = profileData as { username: string } | null
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
+
+    // Create Stripe Checkout session directly
+    const session = await stripeInstance.checkout.sessions.create({
+      payment_method_types: ['card'],
+      line_items: [
+        {
+          price_data: {
+            currency: 'eur',
+            product_data: {
+              name: `${pack.credits} Crédits Cleekzy`,
+              description: `Pack ${pack.name} - ${pack.credits} crédits pour jouer`,
+            },
+            unit_amount: Math.round(pack.price * 100), // Stripe uses cents
+          },
+          quantity: 1,
+        },
+      ],
+      mode: 'payment',
+      success_url: `${baseUrl}/lobby?payment=success&credits=${pack.credits}`,
+      cancel_url: `${baseUrl}/lobby?payment=cancelled`,
+      customer_email: user.email,
+      metadata: {
+        userId: user.id,
+        packId: pack.id,
+        credits: pack.credits.toString(),
+        username: profile?.username || 'unknown',
+      },
+    })
+
+    if (!session.url) {
+      return { success: false, error: 'Erreur lors de la création de la session' }
+    }
+
+    return { success: true, data: { url: session.url } }
   } catch (error) {
     console.error('Checkout session error:', error)
     return { success: false, error: 'Erreur de connexion au serveur de paiement' }
