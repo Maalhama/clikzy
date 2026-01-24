@@ -20,9 +20,23 @@ export async function GET(request: NextRequest) {
   try {
     const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
-    // Get today's midnight in UTC
-    const todayMidnight = new Date()
-    todayMidnight.setUTCHours(0, 0, 0, 0)
+    // Get today's midnight in Paris timezone
+    const now = new Date()
+    const parisFormatter = new Intl.DateTimeFormat('fr-FR', {
+      timeZone: 'Europe/Paris',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    })
+    const [day, month, year] = parisFormatter.format(now).split('/')
+    // Create a date at midnight Paris time (expressed in UTC)
+    const todayMidnightParis = new Date(`${year}-${month}-${day}T00:00:00+01:00`) // Winter time
+    // Adjust for summer time if needed
+    const parisOffset = now.toLocaleString('en-US', { timeZone: 'Europe/Paris', timeZoneName: 'shortOffset' })
+    const isSummerTime = parisOffset.includes('+02')
+    const todayMidnight = isSummerTime
+      ? new Date(`${year}-${month}-${day}T00:00:00+02:00`)
+      : todayMidnightParis
 
     // Find all free users who haven't been reset today
     const { data: freeUsers, error: fetchError } = await supabase
