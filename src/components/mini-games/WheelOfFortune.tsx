@@ -2,7 +2,7 @@
 
 import React, { useState, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Trophy, Zap } from 'lucide-react'
+import { Trophy, Zap, Sparkles, Info } from 'lucide-react'
 
 interface WheelOfFortuneProps {
   onComplete: (creditsWon: number) => void
@@ -22,6 +22,15 @@ const SEGMENTS = [
   { value: 10, color: '#FFB800', text: '#0B0F1A', borderColor: '#FFD700', isSpecial: true },
 ]
 
+// Calculate unique values for payout display
+const UNIQUE_PAYOUTS = [
+  { value: 0, chance: '25%', color: 'text-white/40' },
+  { value: 1, chance: '25%', color: 'text-[#9B5CFF]' },
+  { value: 2, chance: '12.5%', color: 'text-[#3CCBFF]' },
+  { value: 3, chance: '25%', color: 'text-[#FF4FD8]' },
+  { value: 10, chance: '12.5%', color: 'text-[#FFB800]', special: true },
+]
+
 export default function WheelOfFortune({
   onComplete,
   targetSegment,
@@ -30,6 +39,7 @@ export default function WheelOfFortune({
   const [isSpinning, setIsSpinning] = useState(false)
   const [rotation, setRotation] = useState(0)
   const [hasFinished, setHasFinished] = useState(false)
+  const [showWinCelebration, setShowWinCelebration] = useState(false)
   const wheelRef = useRef<HTMLDivElement>(null)
 
   const spinWheel = () => {
@@ -37,6 +47,7 @@ export default function WheelOfFortune({
 
     setIsSpinning(true)
     setHasFinished(false)
+    setShowWinCelebration(false)
 
     const segmentAngle = 360 / SEGMENTS.length
     const extraRotations = (5 + Math.floor(Math.random() * 3)) * 360
@@ -48,16 +59,77 @@ export default function WheelOfFortune({
     setTimeout(() => {
       setIsSpinning(false)
       setHasFinished(true)
+      if (SEGMENTS[targetSegment].value > 0) {
+        setShowWinCelebration(true)
+      }
       onComplete(SEGMENTS[targetSegment].value)
     }, 5000)
   }
+
+  const isWin = hasFinished && SEGMENTS[targetSegment].value > 0
+  const isJackpot = hasFinished && SEGMENTS[targetSegment].isSpecial
 
   return (
     <div className="relative flex flex-col items-center justify-center p-2 sm:p-4 select-none">
       {/* Glow Atmosphere */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-[#9B5CFF] opacity-10 blur-[120px] rounded-full" />
+        <motion.div
+          animate={showWinCelebration ? { scale: [1, 1.5, 1], opacity: [0.1, 0.3, 0.1] } : { opacity: 0.1 }}
+          transition={{ duration: 1, repeat: showWinCelebration ? 3 : 0 }}
+          className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] ${isJackpot ? 'bg-[#FFB800]' : 'bg-[#9B5CFF]'} blur-[120px] rounded-full`}
+        />
       </div>
+
+      {/* Win Celebration Particles */}
+      <AnimatePresence>
+        {showWinCelebration && (
+          <>
+            {[...Array(16)].map((_, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 1, scale: 0, x: 0, y: 0 }}
+                animate={{
+                  opacity: [1, 1, 0],
+                  scale: [0, 1, 0.5],
+                  x: Math.cos((i / 16) * Math.PI * 2) * 180,
+                  y: Math.sin((i / 16) * Math.PI * 2) * 180,
+                }}
+                transition={{ duration: 1.5, delay: i * 0.05 }}
+                className="absolute top-1/2 left-1/2 pointer-events-none z-50"
+              >
+                <Sparkles size={16} className={isJackpot ? 'text-[#FFB800]' : i % 2 === 0 ? 'text-[#9B5CFF]' : 'text-[#00FF88]'} />
+              </motion.div>
+            ))}
+          </>
+        )}
+      </AnimatePresence>
+
+      {/* Payout Table - Mobile optimized */}
+      {!isSpinning && !hasFinished && (
+        <div className="mb-3 w-full max-w-[280px] sm:max-w-xs">
+          <div className="flex flex-wrap justify-center gap-1.5 sm:gap-2">
+            {UNIQUE_PAYOUTS.map((payout, i) => (
+              <motion.div
+                key={i}
+                whileHover={{ scale: 1.05 }}
+                className={`flex items-center gap-1 px-2 py-1 rounded-lg text-xs sm:text-sm ${
+                  payout.special
+                    ? 'bg-[#FFB800]/20 border border-[#FFB800]/50'
+                    : 'bg-white/5 border border-white/10'
+                }`}
+              >
+                <span className={`font-black ${payout.color}`}>{payout.value}</span>
+                <span className="text-white/40 text-[10px]">{payout.chance}</span>
+                {payout.special && <Zap size={10} className="text-[#FFB800]" />}
+              </motion.div>
+            ))}
+          </div>
+          <div className="flex items-center justify-center gap-1 text-white/30 text-[10px] mt-2">
+            <Info size={10} />
+            <span>Appuyez sur SPIN pour lancer</span>
+          </div>
+        </div>
+      )}
 
       {/* The Pointer */}
       <div className="relative z-20 mb-[-20px]">
@@ -219,21 +291,38 @@ export default function WheelOfFortune({
       </div>
 
       {/* Result */}
-      <div className="h-16 mt-4 flex items-center justify-center">
+      <div className="h-20 mt-4 flex items-center justify-center">
         <AnimatePresence mode="wait">
           {hasFinished && (
             <motion.div
-              initial={{ opacity: 0, y: 10, scale: 0.9 }}
+              initial={{ opacity: 0, y: 20, scale: 0.8 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.9 }}
-              className="flex items-center gap-3 px-6 py-3 rounded-full bg-[#141B2D] border border-white/10 shadow-lg"
+              exit={{ opacity: 0, scale: 0.8 }}
+              className={`flex items-center gap-3 sm:gap-4 px-4 sm:px-8 py-3 sm:py-4 rounded-2xl border shadow-lg ${
+                isJackpot
+                  ? 'bg-gradient-to-r from-[#FFB800]/30 to-[#FF8C00]/20 border-[#FFB800]/60 shadow-[0_0_40px_rgba(255,184,0,0.4)]'
+                  : isWin
+                    ? 'bg-gradient-to-r from-[#9B5CFF]/20 to-[#00FF88]/20 border-[#9B5CFF]/40 shadow-[0_0_30px_rgba(155,92,255,0.3)]'
+                    : 'bg-[#141B2D] border-white/10'
+              }`}
             >
-              <Trophy className={`w-6 h-6 ${SEGMENTS[targetSegment].isSpecial ? 'text-[#FFB800]' : 'text-[#9B5CFF]'}`} />
+              <motion.div
+                animate={isJackpot ? { rotate: [0, -15, 15, 0], scale: [1, 1.3, 1] } : isWin ? { scale: [1, 1.1, 1] } : {}}
+                transition={{ duration: 0.5, repeat: isJackpot || isWin ? 2 : 0 }}
+              >
+                <Trophy className={`w-7 h-7 sm:w-8 sm:h-8 ${isJackpot ? 'text-[#FFB800]' : isWin ? 'text-[#9B5CFF]' : 'text-white/40'}`} />
+              </motion.div>
               <div className="flex flex-col">
-                <span className="text-white/60 text-[10px] uppercase font-bold tracking-widest">Gagné</span>
-                <span className={`text-xl font-black ${SEGMENTS[targetSegment].isSpecial ? 'text-[#FFB800]' : 'text-white'}`}>
-                  {SEGMENTS[targetSegment].value} CRÉDITS
+                <span className="text-white/60 text-[10px] uppercase font-bold tracking-widest">
+                  {isJackpot ? '🎉 JACKPOT !' : isWin ? 'Gagné !' : 'Perdu'}
                 </span>
+                <motion.span
+                  animate={isJackpot ? { scale: [1, 1.1, 1] } : {}}
+                  transition={{ duration: 0.3, repeat: isJackpot ? 3 : 0 }}
+                  className={`text-xl sm:text-2xl font-black ${isJackpot ? 'text-[#FFB800]' : isWin ? 'text-white' : 'text-white/50'}`}
+                >
+                  {isWin ? '+' : ''}{SEGMENTS[targetSegment].value} CRÉDITS
+                </motion.span>
               </div>
             </motion.div>
           )}

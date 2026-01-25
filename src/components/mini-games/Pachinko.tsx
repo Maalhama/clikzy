@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Trophy } from 'lucide-react'
+import { Trophy, Sparkles, Info } from 'lucide-react'
 
 interface PachinkoProps {
   onComplete: (creditsWon: number) => void
@@ -11,8 +11,9 @@ interface PachinkoProps {
 }
 
 const SLOTS = [0, 0, 1, 3, 10, 3, 1, 0, 0]
-const BOARD_WIDTH = 320
-const BOARD_HEIGHT = 400
+// Responsive board dimensions
+const BOARD_WIDTH = 300
+const BOARD_HEIGHT = 380
 const BALL_RADIUS = 8
 const PEG_RADIUS = 6
 const GRAVITY = 0.15 // Ralenti pour une descente plus douce
@@ -432,12 +433,71 @@ export default function Pachinko({
     }
   }, [])
 
+  const isWin = hasFinished && result !== null && result > 0
+  const isJackpot = hasFinished && result === 10
+
   return (
-    <div className="relative flex flex-col items-center p-4">
+    <div className="relative flex flex-col items-center p-2 sm:p-4">
       {/* Glow effect */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-[#9B5CFF] opacity-10 blur-[100px] rounded-full" />
+        <motion.div
+          animate={isJackpot ? { scale: [1, 1.5, 1], opacity: [0.1, 0.3, 0.1] } : { opacity: 0.1 }}
+          transition={{ duration: 1, repeat: isJackpot ? 3 : 0 }}
+          className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] ${isJackpot ? 'bg-[#FFB800]' : 'bg-[#9B5CFF]'} blur-[100px] rounded-full`}
+        />
       </div>
+
+      {/* Win Celebration */}
+      <AnimatePresence>
+        {isWin && (
+          <>
+            {[...Array(12)].map((_, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 1, scale: 0, x: 0, y: 0 }}
+                animate={{
+                  opacity: [1, 1, 0],
+                  scale: [0, 1, 0.5],
+                  x: Math.cos((i / 12) * Math.PI * 2) * 150,
+                  y: Math.sin((i / 12) * Math.PI * 2) * 150,
+                }}
+                transition={{ duration: 1.5, delay: i * 0.05 }}
+                className="absolute top-1/2 left-1/2 pointer-events-none z-50"
+              >
+                <Sparkles size={14} className={isJackpot ? 'text-[#FFB800]' : i % 2 === 0 ? 'text-[#9B5CFF]' : 'text-[#00FF88]'} />
+              </motion.div>
+            ))}
+          </>
+        )}
+      </AnimatePresence>
+
+      {/* Payout info - Mobile friendly */}
+      {!isDropping && !hasFinished && (
+        <div className="mb-3 w-full max-w-[300px]">
+          <div className="flex justify-center gap-1 text-[10px] sm:text-xs">
+            <div className="bg-white/5 rounded px-2 py-1 text-center">
+              <span className="text-white/40">0</span>
+              <span className="text-white/20 mx-1">×2</span>
+            </div>
+            <div className="bg-[#9B5CFF]/20 rounded px-2 py-1 text-center border border-[#9B5CFF]/30">
+              <span className="text-[#9B5CFF] font-bold">1</span>
+              <span className="text-white/20 mx-1">×2</span>
+            </div>
+            <div className="bg-[#FF4FD8]/20 rounded px-2 py-1 text-center border border-[#FF4FD8]/30">
+              <span className="text-[#FF4FD8] font-bold">3</span>
+              <span className="text-white/20 mx-1">×2</span>
+            </div>
+            <div className="bg-[#FFB800]/20 rounded px-2 py-1 text-center border border-[#FFB800]/50">
+              <span className="text-[#FFB800] font-bold">10</span>
+              <span className="text-[#FFB800]/60 ml-1">⚡</span>
+            </div>
+          </div>
+          <div className="flex items-center justify-center gap-1 text-white/30 text-[10px] mt-2">
+            <Info size={10} />
+            <span>La bille tombe vers le centre</span>
+          </div>
+        </div>
+      )}
 
       {/* Game board */}
       <div className="relative">
@@ -448,25 +508,36 @@ export default function Pachinko({
           ref={canvasRef}
           width={BOARD_WIDTH}
           height={BOARD_HEIGHT}
-          className="rounded-lg border border-[#1E2942]"
+          className="rounded-lg border border-[#1E2942] max-w-full"
+          style={{ maxWidth: '100%', height: 'auto' }}
         />
 
-        {/* Drop button */}
+        {/* Drop button - More prominent */}
         <div className="absolute top-2 left-1/2 -translate-x-1/2">
-          <button
+          <motion.button
             onClick={dropBall}
             disabled={isDropping || disabled}
+            whileHover={!isDropping && !disabled ? { scale: 1.05 } : {}}
+            whileTap={!isDropping && !disabled ? { scale: 0.95 } : {}}
             className={`
-              px-6 py-2 rounded-full font-bold text-sm uppercase tracking-wider
-              transition-all duration-300
+              relative px-6 sm:px-8 py-2 sm:py-2.5 rounded-full font-bold text-sm uppercase tracking-wider
+              transition-all duration-300 overflow-hidden
               ${isDropping || disabled
                 ? 'bg-[#1E2942] text-[#8B9BB4] cursor-not-allowed'
-                : 'bg-gradient-to-r from-[#9B5CFF] to-[#FF4FD8] text-white hover:shadow-[0_0_20px_rgba(155,92,255,0.5)] active:scale-95'
+                : 'bg-gradient-to-r from-[#9B5CFF] to-[#FF4FD8] text-white shadow-[0_0_20px_rgba(155,92,255,0.4)]'
               }
             `}
           >
-            {isDropping ? 'En cours...' : 'Lancer'}
-          </button>
+            {/* Shine */}
+            {!isDropping && !disabled && (
+              <motion.div
+                animate={{ x: [-100, 100] }}
+                transition={{ duration: 1.5, repeat: Infinity, repeatDelay: 1 }}
+                className="absolute inset-y-0 w-12 bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-12"
+              />
+            )}
+            <span className="relative z-10">{isDropping ? '🔵 ...' : '🔵 Lancer'}</span>
+          </motion.button>
         </div>
       </div>
 
@@ -475,19 +546,34 @@ export default function Pachinko({
         <AnimatePresence mode="wait">
           {hasFinished && result !== null && (
             <motion.div
-              initial={{ opacity: 0, y: 10, scale: 0.9 }}
+              initial={{ opacity: 0, y: 20, scale: 0.8 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.9 }}
-              className="flex items-center gap-3 px-6 py-3 rounded-full bg-[#141B2D] border border-white/10 shadow-lg"
+              exit={{ opacity: 0, scale: 0.8 }}
+              className={`flex items-center gap-3 px-5 sm:px-8 py-3 sm:py-4 rounded-2xl border shadow-lg ${
+                isJackpot
+                  ? 'bg-gradient-to-r from-[#FFB800]/30 to-[#FF8C00]/20 border-[#FFB800]/60 shadow-[0_0_40px_rgba(255,184,0,0.4)]'
+                  : isWin
+                    ? 'bg-gradient-to-r from-[#9B5CFF]/20 to-[#00FF88]/20 border-[#9B5CFF]/40'
+                    : 'bg-[#141B2D] border-white/10'
+              }`}
             >
-              <Trophy className={`w-6 h-6 ${result === 10 ? 'text-[#FFB800]' : result > 0 ? 'text-[#9B5CFF]' : 'text-[#8B9BB4]'}`} />
+              <motion.div
+                animate={isJackpot ? { rotate: [0, -15, 15, 0], scale: [1, 1.3, 1] } : isWin ? { scale: [1, 1.1, 1] } : {}}
+                transition={{ duration: 0.5, repeat: isJackpot || isWin ? 2 : 0 }}
+              >
+                <Trophy className={`w-6 h-6 sm:w-7 sm:h-7 ${isJackpot ? 'text-[#FFB800]' : isWin ? 'text-[#9B5CFF]' : 'text-[#8B9BB4]'}`} />
+              </motion.div>
               <div className="flex flex-col">
                 <span className="text-white/60 text-[10px] uppercase font-bold tracking-widest">
-                  {result > 0 ? 'Gagné' : 'Perdu'}
+                  {isJackpot ? '🎉 JACKPOT !' : isWin ? 'Gagné !' : 'Perdu'}
                 </span>
-                <span className={`text-xl font-black ${result === 10 ? 'text-[#FFB800]' : result > 0 ? 'text-white' : 'text-[#8B9BB4]'}`}>
-                  {result} CRÉDITS
-                </span>
+                <motion.span
+                  animate={isJackpot ? { scale: [1, 1.1, 1] } : {}}
+                  transition={{ duration: 0.3, repeat: isJackpot ? 3 : 0 }}
+                  className={`text-lg sm:text-xl font-black ${isJackpot ? 'text-[#FFB800]' : isWin ? 'text-white' : 'text-[#8B9BB4]'}`}
+                >
+                  {isWin ? '+' : ''}{result} CRÉDITS
+                </motion.span>
               </div>
             </motion.div>
           )}

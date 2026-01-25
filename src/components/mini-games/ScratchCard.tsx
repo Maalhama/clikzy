@@ -10,8 +10,9 @@ interface ScratchCardProps {
   disabled?: boolean
 }
 
-const CARD_WIDTH = 300
-const CARD_HEIGHT = 200
+// Responsive card dimensions
+const CARD_WIDTH = 280
+const CARD_HEIGHT = 180
 
 export default function ScratchCard({
   onComplete,
@@ -225,10 +226,24 @@ export default function ScratchCard({
     }, 800)
   }
 
+  const isWin = isRevealed && prizeAmount > 0
+  const isJackpot = isRevealed && prizeAmount >= 10
+
   return (
-    <div className="relative flex flex-col items-center p-4">
+    <div className="relative flex flex-col items-center p-2 sm:p-4">
+      {/* Payout info before scratching */}
+      {!isRevealed && !isScratching && (
+        <div className="mb-3 text-center">
+          <div className="flex justify-center gap-2 text-[10px] sm:text-xs">
+            <span className="px-2 py-1 bg-white/5 rounded text-white/50">0-3</span>
+            <span className="px-2 py-1 bg-[#9B5CFF]/20 rounded text-[#9B5CFF] border border-[#9B5CFF]/30">1-2</span>
+            <span className="px-2 py-1 bg-[#FFB800]/20 rounded text-[#FFB800] border border-[#FFB800]/50 font-bold">10 ⚡</span>
+          </div>
+        </div>
+      )}
+
       <div
-        className="relative select-none touch-none"
+        className="relative select-none touch-none max-w-full"
         style={{ width: `${CARD_WIDTH}px`, height: `${CARD_HEIGHT}px` }}
       >
         {/* Prize Layer */}
@@ -387,9 +402,36 @@ export default function ScratchCard({
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mt-4 text-center text-xs tracking-widest text-white/30 uppercase font-medium"
+          className="mt-4 text-center"
         >
-          Grattez pour révéler votre récompense
+          <motion.p
+            animate={{ opacity: [0.3, 0.7, 0.3] }}
+            transition={{ duration: 2, repeat: Infinity }}
+            className="text-xs tracking-widest text-white/50 uppercase font-medium flex items-center justify-center gap-2"
+          >
+            <span>👆</span>
+            <span>Grattez avec le doigt</span>
+            <span>👆</span>
+          </motion.p>
+        </motion.div>
+      )}
+
+      {/* Result after reveal */}
+      {isRevealed && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className={`mt-4 px-6 py-3 rounded-xl ${
+            isJackpot
+              ? 'bg-[#FFB800]/20 border border-[#FFB800]/50'
+              : isWin
+                ? 'bg-[#00FF88]/20 border border-[#00FF88]/50'
+                : 'bg-white/5 border border-white/10'
+          }`}
+        >
+          <p className={`text-center font-bold ${isJackpot ? 'text-[#FFB800]' : isWin ? 'text-[#00FF88]' : 'text-white/50'}`}>
+            {isJackpot ? '🎉 JACKPOT !' : isWin ? '✨ Bien joué !' : 'Pas de chance...'}
+          </p>
         </motion.div>
       )}
     </div>
