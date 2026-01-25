@@ -58,17 +58,15 @@ const BRAND_LOGOS: BrandIcon[] = [
 
 function BrandLogo({ brand }: { brand: BrandIcon }) {
   return (
-    <div className="w-28 md:w-36 h-12 flex items-center justify-center">
-      <svg
-        viewBox="0 0 24 24"
-        className="h-8 md:h-10 w-auto max-w-full"
-        fill={`#${brand.hex}`}
-        role="img"
-        aria-label={brand.title}
-      >
-        <path d={brand.path} />
-      </svg>
-    </div>
+    <svg
+      viewBox="0 0 24 24"
+      className="h-7 md:h-9 w-7 md:w-9"
+      fill={`#${brand.hex}`}
+      role="img"
+      aria-label={brand.title}
+    >
+      <path d={brand.path} />
+    </svg>
   )
 }
 
@@ -83,11 +81,11 @@ export function BrandMarquee() {
         }}
       >
         {/* Premier groupe - animation continue */}
-        <div className="flex items-center gap-4 md:gap-6 animate-marquee-infinite">
+        <div className="flex items-center gap-10 md:gap-14 animate-marquee-infinite">
           {BRAND_LOGOS.map((brand, index) => (
             <div
               key={`brand-1-${index}`}
-              className="flex-shrink-0 opacity-50 hover:opacity-90 transition-opacity duration-300"
+              className="flex-shrink-0 opacity-60 hover:opacity-100 transition-opacity duration-300"
             >
               <BrandLogo brand={brand} />
             </div>
@@ -95,11 +93,11 @@ export function BrandMarquee() {
         </div>
 
         {/* Deuxième groupe - dupliqué pour scroll infini seamless */}
-        <div className="flex items-center gap-4 md:gap-6 animate-marquee-infinite" aria-hidden="true">
+        <div className="flex items-center gap-10 md:gap-14 animate-marquee-infinite" aria-hidden="true">
           {BRAND_LOGOS.map((brand, index) => (
             <div
               key={`brand-2-${index}`}
-              className="flex-shrink-0 opacity-50 hover:opacity-90 transition-opacity duration-300"
+              className="flex-shrink-0 opacity-60 hover:opacity-100 transition-opacity duration-300"
             >
               <BrandLogo brand={brand} />
             </div>
