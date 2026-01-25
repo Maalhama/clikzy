@@ -15,7 +15,9 @@ import { formatTime } from '@/lib/utils/timer'
 import { generateDeterministicUsername } from '@/lib/bots/usernameGenerator'
 import { getProductImageWithFallback } from '@/lib/utils/productImages'
 import { CreditPacksModal } from '@/components/modals/CreditPacksModal'
+import VIPSubscriptionModal from '@/components/modals/VIPSubscriptionModal'
 import { trackGameClick, trackGameWin } from '@/lib/analytics'
+import { createVIPCheckoutSession, checkVIPStatus } from '@/actions/stripe'
 import type { Game, Item } from '@/types/database'
 
 // Generate UUID with fallback for browsers that don't support crypto.randomUUID
@@ -64,6 +66,9 @@ export function GameClient({
   const [error, setError] = useState<string | null>(null)
   const [showWinnerModal, setShowWinnerModal] = useState(false)
   const [showCreditModal, setShowCreditModal] = useState(false)
+  const [showVIPModal, setShowVIPModal] = useState(false)
+  const [isVip, setIsVip] = useState(false)
+  const [vipLoading, setVipLoading] = useState(false)
   const [clickAnimation, setClickAnimation] = useState(false)
   const [creditsAnimation, setCreditsAnimation] = useState(false)
 
@@ -90,6 +95,18 @@ export function GameClient({
   const isWinner = game.status === 'ended' && game.winner_id === userId
   const canClick = !isEnded && game.status !== 'ended' && game.status !== 'waiting'
   const hasCredits = credits >= GAME_CONSTANTS.CREDIT_COST_PER_CLICK
+  const isPremiumProduct = (game.item?.retail_value ?? 0) >= 1000
+
+  // Check VIP status on mount for premium products
+  useEffect(() => {
+    if (isPremiumProduct) {
+      checkVIPStatus().then((result) => {
+        if (result.success && result.data) {
+          setIsVip(result.data.isVip)
+        }
+      })
+    }
+  }, [isPremiumProduct])
 
   // Get leader name (real or bot-generated for consistency)
   const leaderName = useMemo(() => {
@@ -130,8 +147,32 @@ export function GameClient({
     }
   }, [])
 
+  // Handle VIP subscription
+  const handleVIPSubscribe = useCallback(async () => {
+    setVipLoading(true)
+    try {
+      const result = await createVIPCheckoutSession()
+      if (result.success && result.data?.url) {
+        window.location.href = result.data.url
+      } else {
+        setError(result.error || 'Erreur lors de la création de l\'abonnement')
+        setShowVIPModal(false)
+      }
+    } catch {
+      setError('Erreur lors de la création de l\'abonnement')
+      setShowVIPModal(false)
+    }
+    setVipLoading(false)
+  }, [])
+
   const handleClick = useCallback(() => {
     if (isPending || !hasCredits || !canClick) return
+
+    // Check VIP for premium products
+    if (isPremiumProduct && !isVip) {
+      setShowVIPModal(true)
+      return
+    }
 
     setError(null)
     playClick()
@@ -177,7 +218,7 @@ export function GameClient({
         showBadgeNotifications(result.data.newBadges)
       }
     })
-  }, [isPending, hasCredits, canClick, playClick, triggerHaptic, username, game, optimisticUpdate, decrementCredits, addClick, removeClick, showBadgeNotifications])
+  }, [isPending, hasCredits, canClick, isPremiumProduct, isVip, playClick, triggerHaptic, username, game, optimisticUpdate, decrementCredits, addClick, removeClick, showBadgeNotifications])
 
   // Border gradient style (same as lobby cards)
   const borderStyle = useMemo(() => {
@@ -982,6 +1023,14 @@ export function GameClient({
       <CreditPacksModal
         isOpen={showCreditModal}
         onClose={() => setShowCreditModal(false)}
+      />
+
+      {/* VIP Subscription Modal */}
+      <VIPSubscriptionModal
+        isOpen={showVIPModal}
+        onClose={() => setShowVIPModal(false)}
+        onSubscribe={handleVIPSubscribe}
+        isLoading={vipLoading}
       />
     </div>
   )

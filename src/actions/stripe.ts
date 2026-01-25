@@ -102,3 +102,126 @@ export async function createCheckoutSession(
     return { success: false, error: `Erreur Stripe: ${errorMessage}` }
   }
 }
+
+/**
+ * Create a Stripe Checkout session for VIP subscription
+ */
+export async function createVIPCheckoutSession(): Promise<ActionResult<{ url: string }>> {
+  const supabase = await createClient()
+
+  // Verify user is authenticated
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user) {
+    return { success: false, error: 'Non authentifié' }
+  }
+
+  // Check if user already has VIP
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('is_vip, vip_expires_at')
+    .eq('id', user.id)
+    .single()
+
+  const typedProfile = profile as { is_vip: boolean; vip_expires_at: string | null } | null
+  if (typedProfile?.is_vip && typedProfile.vip_expires_at) {
+    const expiresAt = new Date(typedProfile.vip_expires_at)
+    if (expiresAt > new Date()) {
+      return { success: false, error: 'Vous êtes déjà abonné V.I.P' }
+    }
+  }
+
+  try {
+    const stripeInstance = getStripeInstance()
+    if (!stripeInstance) {
+      return { success: false, error: 'Service de paiement non configuré' }
+    }
+
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
+
+    // Create Stripe Checkout session for subscription
+    const session = await stripeInstance.checkout.sessions.create({
+      payment_method_types: ['card'],
+      line_items: [
+        {
+          price_data: {
+            currency: 'eur',
+            product_data: {
+              name: 'Abonnement V.I.P Cleekzy',
+              description: 'Accès aux produits premium (+1000€), badge exclusif, support prioritaire',
+            },
+            unit_amount: 999, // 9.99€ in cents
+            recurring: {
+              interval: 'month',
+            },
+          },
+          quantity: 1,
+        },
+      ],
+      mode: 'subscription',
+      success_url: `${baseUrl}/lobby?vip=success`,
+      cancel_url: `${baseUrl}/lobby?vip=cancelled`,
+      customer_email: user.email,
+      metadata: {
+        userId: user.id,
+        type: 'vip_subscription',
+      },
+      subscription_data: {
+        metadata: {
+          userId: user.id,
+          type: 'vip_subscription',
+        },
+      },
+    })
+
+    if (!session.url) {
+      return { success: false, error: 'Erreur lors de la création de la session' }
+    }
+
+    return { success: true, data: { url: session.url } }
+  } catch (error) {
+    console.error('VIP Checkout session error:', error)
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+    return { success: false, error: `Erreur Stripe: ${errorMessage}` }
+  }
+}
+
+/**
+ * Check if user has active VIP subscription
+ */
+export async function checkVIPStatus(): Promise<ActionResult<{ isVip: boolean; expiresAt: string | null }>> {
+  const supabase = await createClient()
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user) {
+    return { success: false, error: 'Non authentifié' }
+  }
+
+  const { data: profile, error } = await supabase
+    .from('profiles')
+    .select('is_vip, vip_expires_at')
+    .eq('id', user.id)
+    .single()
+
+  if (error) {
+    return { success: false, error: 'Erreur lors de la vérification du statut VIP' }
+  }
+
+  const typedProfile = profile as { is_vip: boolean; vip_expires_at: string | null } | null
+  const isVip = typedProfile?.is_vip && typedProfile.vip_expires_at
+    ? new Date(typedProfile.vip_expires_at) > new Date()
+    : false
+
+  return {
+    success: true,
+    data: {
+      isVip,
+      expiresAt: typedProfile?.vip_expires_at || null,
+    },
+  }
+}

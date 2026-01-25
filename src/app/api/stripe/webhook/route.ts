@@ -106,5 +106,91 @@ export async function POST(request: NextRequest) {
     }
   }
 
+  // Handle VIP subscription created/renewed
+  if (event.type === 'customer.subscription.created' || event.type === 'customer.subscription.updated') {
+    const subscription = event.data.object as Stripe.Subscription & { current_period_end: number }
+
+    // Only process VIP subscriptions
+    if (subscription.metadata?.type !== 'vip_subscription') {
+      return NextResponse.json({ received: true })
+    }
+
+    const userId = subscription.metadata?.userId
+    if (!userId) {
+      console.error('Missing userId in subscription metadata:', subscription.metadata)
+      return NextResponse.json({ error: 'Missing userId' }, { status: 400 })
+    }
+
+    // Only activate if subscription is active
+    if (subscription.status !== 'active') {
+      return NextResponse.json({ received: true })
+    }
+
+    try {
+      const supabase = getSupabaseAdmin()
+
+      // Calculate expiration date (current period end)
+      const expiresAt = new Date(subscription.current_period_end * 1000).toISOString()
+
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({
+          is_vip: true,
+          vip_subscription_id: subscription.id,
+          vip_expires_at: expiresAt,
+        })
+        .eq('id', userId)
+
+      if (updateError) {
+        console.error('Error updating VIP status:', updateError)
+        return NextResponse.json({ error: 'Failed to activate VIP' }, { status: 500 })
+      }
+
+      console.log(`VIP activated for user ${userId} until ${expiresAt}`)
+    } catch (error) {
+      console.error('Error processing VIP subscription:', error)
+      return NextResponse.json({ error: 'VIP processing failed' }, { status: 500 })
+    }
+  }
+
+  // Handle VIP subscription cancelled/ended
+  if (event.type === 'customer.subscription.deleted') {
+    const subscription = event.data.object as Stripe.Subscription
+
+    // Only process VIP subscriptions
+    if (subscription.metadata?.type !== 'vip_subscription') {
+      return NextResponse.json({ received: true })
+    }
+
+    const userId = subscription.metadata?.userId
+    if (!userId) {
+      console.error('Missing userId in subscription metadata:', subscription.metadata)
+      return NextResponse.json({ error: 'Missing userId' }, { status: 400 })
+    }
+
+    try {
+      const supabase = getSupabaseAdmin()
+
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({
+          is_vip: false,
+          vip_subscription_id: null,
+          vip_expires_at: null,
+        })
+        .eq('id', userId)
+
+      if (updateError) {
+        console.error('Error deactivating VIP status:', updateError)
+        return NextResponse.json({ error: 'Failed to deactivate VIP' }, { status: 500 })
+      }
+
+      console.log(`VIP deactivated for user ${userId}`)
+    } catch (error) {
+      console.error('Error processing VIP cancellation:', error)
+      return NextResponse.json({ error: 'VIP cancellation processing failed' }, { status: 500 })
+    }
+  }
+
   return NextResponse.json({ received: true })
 }

@@ -27,6 +27,9 @@ export interface Database {
           referred_by: string | null
           referral_count: number
           referral_credits_earned: number
+          is_vip: boolean
+          vip_subscription_id: string | null
+          vip_expires_at: string | null
           shipping_firstname: string | null
           shipping_lastname: string | null
           shipping_address: string | null
@@ -53,6 +56,9 @@ export interface Database {
           referred_by?: string | null
           referral_count?: number
           referral_credits_earned?: number
+          is_vip?: boolean
+          vip_subscription_id?: string | null
+          vip_expires_at?: string | null
           shipping_firstname?: string | null
           shipping_lastname?: string | null
           shipping_address?: string | null
@@ -79,6 +85,9 @@ export interface Database {
           referred_by?: string | null
           referral_count?: number
           referral_credits_earned?: number
+          is_vip?: boolean
+          vip_subscription_id?: string | null
+          vip_expires_at?: string | null
           shipping_firstname?: string | null
           shipping_lastname?: string | null
           shipping_address?: string | null
