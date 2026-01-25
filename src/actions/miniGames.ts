@@ -28,10 +28,6 @@ function getTodayMidnightFrench(): Date {
   // Set to midnight
   frenchTime.setHours(0, 0, 0, 0)
 
-  // Convert back to UTC for database comparison
-  const frenchMidnightStr = frenchTime.toLocaleString('en-US', { timeZone: 'Europe/Paris' })
-  const frenchMidnight = new Date(frenchMidnightStr)
-
   // Calculate the offset and return UTC equivalent
   const offsetMs = now.getTime() - new Date(now.toLocaleString('en-US', { timeZone: 'Europe/Paris' })).getTime()
 
@@ -97,31 +93,6 @@ export async function getMiniGameEligibility(): Promise<ActionResult<MiniGameEli
   }
 
   return { success: true, data: eligibility }
-}
-
-/**
- * Calculate result based on game type
- */
-function calculateGameResult(gameType: MiniGameType): number {
-  switch (gameType) {
-    case 'wheel': {
-      // Random segment from wheel
-      const segmentIndex = Math.floor(Math.random() * WHEEL_SEGMENTS.length)
-      return WHEEL_SEGMENTS[segmentIndex]
-    }
-    case 'scratch': {
-      // Random value from scratch card (weighted)
-      const valueIndex = Math.floor(Math.random() * SCRATCH_VALUES.length)
-      return SCRATCH_VALUES[valueIndex]
-    }
-    case 'pachinko': {
-      // Random slot from pachinko
-      const slotIndex = Math.floor(Math.random() * PACHINKO_SLOTS.length)
-      return PACHINKO_SLOTS[slotIndex]
-    }
-    default:
-      return 0
-  }
 }
 
 /**

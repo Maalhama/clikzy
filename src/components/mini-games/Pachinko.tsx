@@ -105,6 +105,7 @@ export default function Pachinko({
     setupCanvas()
     pegsRef.current = generatePegs()
     drawBoard()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [generatePegs, setupCanvas])
 
   const drawBoard = useCallback(() => {

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
+import { createClient, SupabaseClient } from '@supabase/supabase-js'
 import { getNextRotationTime, DEFAULT_GAME_DURATION } from '@/lib/constants/rotation'
 
 // Cette route crée les jeux pour la PROCHAINE rotation
@@ -19,48 +19,18 @@ const RETRY_DELAY_MS = 2000 // 2 secondes, doublé à chaque retry
 // Fonction utilitaire pour attendre
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
 
-// Wrapper avec retry et exponential backoff
-async function withRetry<T>(
-  fn: () => Promise<T>,
-  retries = MAX_RETRIES,
-  delay = RETRY_DELAY_MS
-): Promise<T> {
+// Exécute la logique principale avec retry en cas de rate limit
+async function executeWithRetry(
+  supabase: SupabaseClient,
+  retryCount = 0
+): Promise<NextResponse> {
   try {
-    return await fn()
-  } catch (error: unknown) {
-    const isRateLimitError =
-      error instanceof Error &&
-      (error.message.includes('429') || error.message.includes('Too Many Requests'))
-
-    if (retries > 0 && isRateLimitError) {
-      console.log(`Rate limit hit, retrying in ${delay}ms... (${retries} retries left)`)
-      await sleep(delay)
-      return withRetry(fn, retries - 1, delay * 2)
-    }
-    throw error
-  }
-}
-
-export async function GET(request: NextRequest) {
-  // Vérifier l'authentification (Vercel Cron envoie un header spécial)
-  const authHeader = request.headers.get('authorization')
-  const isVercelCron = request.headers.get('x-vercel-cron') === '1'
-
-  if (!isVercelCron && CRON_SECRET && authHeader !== `Bearer ${CRON_SECRET}`) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
-
-  try {
-    const supabase = createClient(supabaseUrl, supabaseServiceKey)
-
     // 1. Supprimer tous les jeux terminés (nettoyage avant nouvelle rotation)
-    const { data: deletedEnded } = await withRetry(() =>
-      supabase
-        .from('games')
-        .delete()
-        .eq('status', 'ended')
-        .select('id')
-    )
+    const { data: deletedEnded } = await supabase
+      .from('games')
+      .delete()
+      .eq('status', 'ended')
+      .select('id')
 
     const endedCount = deletedEnded?.length || 0
     if (endedCount > 0) {
@@ -68,13 +38,11 @@ export async function GET(request: NextRequest) {
     }
 
     // 2. Supprimer les anciens jeux en attente (garder la place pour la nouvelle rotation)
-    const { data: deletedWaiting } = await withRetry(() =>
-      supabase
-        .from('games')
-        .delete()
-        .eq('status', 'waiting')
-        .select('id')
-    )
+    const { data: deletedWaiting } = await supabase
+      .from('games')
+      .delete()
+      .eq('status', 'waiting')
+      .select('id')
 
     const waitingCount = deletedWaiting?.length || 0
     if (waitingCount > 0) {
@@ -88,12 +56,10 @@ export async function GET(request: NextRequest) {
     const endTime = utcStartTime.getTime() + DEFAULT_GAME_DURATION
 
     // Récupérer des items disponibles
-    const { data: availableItems, error: itemsError } = await withRetry(() =>
-      supabase
-        .from('items')
-        .select('id, name')
-        .limit(50)
-    )
+    const { data: availableItems, error: itemsError } = await supabase
+      .from('items')
+      .select('id, name')
+      .limit(50)
 
     if (itemsError) {
       console.error('Error fetching items:', itemsError)
@@ -105,15 +71,13 @@ export async function GET(request: NextRequest) {
     }
 
     // Vérifier les items qui ont déjà un jeu actif ou en attente
-    const { data: existingGames } = await withRetry(() =>
-      supabase
-        .from('games')
-        .select('item_id')
-        .in('status', ['waiting', 'active', 'final_phase'])
-    )
+    const { data: existingGames } = await supabase
+      .from('games')
+      .select('item_id')
+      .in('status', ['waiting', 'active', 'final_phase'])
 
-    const usedItemIds = new Set((existingGames || []).map(g => g.item_id))
-    const freeItems = availableItems.filter(item => !usedItemIds.has(item.id))
+    const usedItemIds = new Set((existingGames || []).map((g: { item_id: string }) => g.item_id))
+    const freeItems = availableItems.filter((item: { id: string }) => !usedItemIds.has(item.id))
 
     if (freeItems.length === 0) {
       return NextResponse.json({
@@ -127,7 +91,7 @@ export async function GET(request: NextRequest) {
     const selectedItems = shuffled.slice(0, Math.min(GAMES_PER_ROTATION, shuffled.length))
 
     // Créer les jeux en status 'waiting' (seront activés par activate-games)
-    const games = selectedItems.map(item => ({
+    const games = selectedItems.map((item: { id: string }) => ({
       item_id: item.id,
       status: 'waiting' as const,
       start_time: utcStartTime.toISOString(),
@@ -136,12 +100,10 @@ export async function GET(request: NextRequest) {
       total_clicks: 0,
     }))
 
-    const { data: createdGames, error: createError } = await withRetry(() =>
-      supabase
-        .from('games')
-        .insert(games)
-        .select('id, item:items(name), status')
-    )
+    const { data: createdGames, error: createError } = await supabase
+      .from('games')
+      .insert(games)
+      .select('id, item:items(name), status')
 
     if (createError) {
       console.error('Error creating games:', createError)
@@ -155,7 +117,7 @@ export async function GET(request: NextRequest) {
       return 'Unknown'
     }
 
-    const createdNames = createdGames?.map(g => getItemName(g.item)).join(', ') || ''
+    const createdNames = createdGames?.map((g: { item: unknown }) => getItemName(g.item)).join(', ') || ''
     console.log(`Created ${createdGames?.length || 0} games: ${createdNames}`)
 
     // Calculer l'heure Paris pour le log
@@ -172,7 +134,7 @@ export async function GET(request: NextRequest) {
         ended: endedCount,
         waiting: waitingCount,
       },
-      games: createdGames?.map(g => ({
+      games: createdGames?.map((g: { id: string; item: unknown }) => ({
         id: g.id,
         name: getItemName(g.item),
       })),
@@ -182,6 +144,34 @@ export async function GET(request: NextRequest) {
         parisTime: parisFormatter.format(utcStartTime),
       }
     })
+  } catch (error: unknown) {
+    // Vérifier si c'est une erreur de rate limit
+    const errorMessage = error instanceof Error ? error.message : String(error)
+    const isRateLimitError = errorMessage.includes('429') || errorMessage.includes('Too Many Requests')
+
+    if (isRateLimitError && retryCount < MAX_RETRIES) {
+      const delay = RETRY_DELAY_MS * Math.pow(2, retryCount)
+      console.log(`Rate limit hit, retrying in ${delay}ms... (${MAX_RETRIES - retryCount} retries left)`)
+      await sleep(delay)
+      return executeWithRetry(supabase, retryCount + 1)
+    }
+
+    throw error
+  }
+}
+
+export async function GET(request: NextRequest) {
+  // Vérifier l'authentification (Vercel Cron envoie un header spécial)
+  const authHeader = request.headers.get('authorization')
+  const isVercelCron = request.headers.get('x-vercel-cron') === '1'
+
+  if (!isVercelCron && CRON_SECRET && authHeader !== `Bearer ${CRON_SECRET}`) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  try {
+    const supabase = createClient(supabaseUrl, supabaseServiceKey)
+    return await executeWithRetry(supabase)
   } catch (error) {
     console.error('Cron error:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })

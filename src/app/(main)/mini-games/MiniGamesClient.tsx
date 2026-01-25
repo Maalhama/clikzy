@@ -11,7 +11,7 @@ import { CreditPacksModal } from '@/components/modals/CreditPacksModal';
 import { useCredits } from '@/contexts/CreditsContext';
 import { useCountdown } from '@/hooks/useCountdown';
 import { playMiniGame, playMiniGamePaid } from '@/actions/miniGames';
-import { MiniGameType, MiniGameEligibility, WHEEL_SEGMENTS, SCRATCH_VALUES, PACHINKO_SLOTS } from '@/types/miniGames';
+import { MiniGameType, MiniGameEligibility, WHEEL_SEGMENTS, PACHINKO_SLOTS } from '@/types/miniGames';
 
 import WheelOfFortune from '@/components/mini-games/WheelOfFortune';
 import ScratchCard from '@/components/mini-games/ScratchCard';

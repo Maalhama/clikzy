@@ -114,7 +114,6 @@ export default function ScratchCard({
     ctx.fillText('✨ RÉVÉLEZ VOTRE GAIN ✨', width / 2, height / 2 + 20)
 
     // Corner decorations
-    const cornerSize = 20
     ctx.strokeStyle = '#3CCBFF'
     ctx.lineWidth = 2
     ctx.shadowColor = '#3CCBFF'
