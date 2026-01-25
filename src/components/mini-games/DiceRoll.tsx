@@ -105,12 +105,12 @@ function Dice3D({
   return (
     <motion.div
       className="relative"
-      style={{ perspective: '600px' }}
+      style={{ perspective: '500px' }}
       initial={{ scale: 0.8, opacity: 0 }}
       animate={{
         scale: 1,
         opacity: 1,
-        y: isRolling ? [-20, 0, -40, 0, -20, 0] : 0,
+        y: isRolling ? [-15, 0, -30, 0, -15, 0] : 0,
       }}
       transition={{
         scale: { duration: 0.3, delay: delay * 0.3 },
@@ -118,7 +118,7 @@ function Dice3D({
       }}
     >
       <motion.div
-        className="w-20 h-20 sm:w-24 sm:h-24 relative"
+        className="w-14 h-14 sm:w-16 sm:h-16 relative"
         style={{
           transformStyle: 'preserve-3d',
         }}
@@ -140,7 +140,7 @@ function Dice3D({
         <div
           className="absolute w-full h-full rounded-lg flex items-center justify-center"
           style={{
-            transform: 'translateZ(40px)',
+            transform: 'translateZ(28px)',
             background: `linear-gradient(135deg, ${color}, ${color}cc)`,
             boxShadow: `inset 0 2px 4px rgba(255,255,255,0.3), inset 0 -2px 4px rgba(0,0,0,0.2)`,
             border: '2px solid rgba(255,255,255,0.2)',
@@ -157,7 +157,7 @@ function Dice3D({
         <div
           className="absolute w-full h-full rounded-lg flex items-center justify-center"
           style={{
-            transform: 'rotateY(180deg) translateZ(40px)',
+            transform: 'rotateY(180deg) translateZ(28px)',
             background: `linear-gradient(135deg, ${color}cc, ${color})`,
             boxShadow: `inset 0 2px 4px rgba(255,255,255,0.3), inset 0 -2px 4px rgba(0,0,0,0.2)`,
             border: '2px solid rgba(255,255,255,0.2)',
@@ -174,7 +174,7 @@ function Dice3D({
         <div
           className="absolute w-full h-full rounded-lg flex items-center justify-center"
           style={{
-            transform: 'rotateY(90deg) translateZ(40px)',
+            transform: 'rotateY(90deg) translateZ(28px)',
             background: `linear-gradient(135deg, ${color}, ${color}cc)`,
             boxShadow: `inset 0 2px 4px rgba(255,255,255,0.3), inset 0 -2px 4px rgba(0,0,0,0.2)`,
             border: '2px solid rgba(255,255,255,0.2)',
@@ -191,7 +191,7 @@ function Dice3D({
         <div
           className="absolute w-full h-full rounded-lg flex items-center justify-center"
           style={{
-            transform: 'rotateY(-90deg) translateZ(40px)',
+            transform: 'rotateY(-90deg) translateZ(28px)',
             background: `linear-gradient(135deg, ${color}cc, ${color})`,
             boxShadow: `inset 0 2px 4px rgba(255,255,255,0.3), inset 0 -2px 4px rgba(0,0,0,0.2)`,
             border: '2px solid rgba(255,255,255,0.2)',
@@ -208,7 +208,7 @@ function Dice3D({
         <div
           className="absolute w-full h-full rounded-lg flex items-center justify-center"
           style={{
-            transform: 'rotateX(90deg) translateZ(40px)',
+            transform: 'rotateX(90deg) translateZ(28px)',
             background: `linear-gradient(135deg, ${color}, ${color}cc)`,
             boxShadow: `inset 0 2px 4px rgba(255,255,255,0.3), inset 0 -2px 4px rgba(0,0,0,0.2)`,
             border: '2px solid rgba(255,255,255,0.2)',
@@ -225,7 +225,7 @@ function Dice3D({
         <div
           className="absolute w-full h-full rounded-lg flex items-center justify-center"
           style={{
-            transform: 'rotateX(-90deg) translateZ(40px)',
+            transform: 'rotateX(-90deg) translateZ(28px)',
             background: `linear-gradient(135deg, ${color}cc, ${color})`,
             boxShadow: `inset 0 2px 4px rgba(255,255,255,0.3), inset 0 -2px 4px rgba(0,0,0,0.2)`,
             border: '2px solid rgba(255,255,255,0.2)',
@@ -300,52 +300,22 @@ export default function DiceRoll({
   const calculatedCredits = getCreditsFromSum(total)
 
   return (
-    <div className="relative flex flex-col items-center justify-center p-4 select-none">
+    <div className="relative flex flex-col items-center justify-center p-2 select-none">
       {/* Glow Atmosphere */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-[#9B5CFF] opacity-10 blur-[100px] rounded-full" />
-        <div className="absolute top-1/4 right-1/4 w-[200px] h-[200px] bg-[#FF4FD8] opacity-10 blur-[80px] rounded-full" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] bg-[#9B5CFF] opacity-10 blur-[80px] rounded-full" />
       </div>
 
-      {/* Payout table */}
-      {!showDice && (
-        <div className="mb-4 grid grid-cols-3 gap-2 text-center text-xs">
-          <div className="bg-white/5 rounded-lg p-2">
-            <div className="text-white/60">2-3</div>
-            <div className="text-[#00FF88] font-bold">2 cr</div>
-          </div>
-          <div className="bg-white/5 rounded-lg p-2">
-            <div className="text-white/60">4-5</div>
-            <div className="text-[#00FF88] font-bold">3 cr</div>
-          </div>
-          <div className="bg-white/5 rounded-lg p-2">
-            <div className="text-white/60">6-7</div>
-            <div className="text-[#00FF88] font-bold">4 cr</div>
-          </div>
-          <div className="bg-white/5 rounded-lg p-2">
-            <div className="text-white/60">8-9</div>
-            <div className="text-[#00FF88] font-bold">6 cr</div>
-          </div>
-          <div className="bg-white/5 rounded-lg p-2">
-            <div className="text-white/60">10-11</div>
-            <div className="text-[#00FF88] font-bold">8 cr</div>
-          </div>
-          <div className="bg-white/5 rounded-lg p-2 border border-[#FFB800]/30">
-            <div className="text-[#FFB800]">12</div>
-            <div className="text-[#FFB800] font-bold">10 cr</div>
-          </div>
-        </div>
-      )}
 
       {/* Dice Table */}
-      <div className="relative mb-6">
+      <div className="relative mb-3">
         {/* Table surface */}
-        <div className="relative w-72 h-48 sm:w-80 sm:h-56 bg-gradient-to-b from-[#1E2942] to-[#141B2D] rounded-2xl border-4 border-[#1E2942] shadow-[inset_0_4px_20px_rgba(0,0,0,0.5),0_0_30px_rgba(155,92,255,0.2)]">
+        <div className="relative w-56 h-36 sm:w-64 sm:h-40 bg-gradient-to-b from-[#1E2942] to-[#141B2D] rounded-xl border-2 border-[#1E2942] shadow-[inset_0_4px_15px_rgba(0,0,0,0.5),0_0_20px_rgba(155,92,255,0.2)]">
           {/* Felt texture overlay */}
-          <div className="absolute inset-2 rounded-xl bg-[#0B0F1A]/50" />
+          <div className="absolute inset-1.5 rounded-lg bg-[#0B0F1A]/50" />
 
           {/* Dice container */}
-          <div className="absolute inset-0 flex items-center justify-center gap-6">
+          <div className="absolute inset-0 flex items-center justify-center gap-4">
             {showDice ? (
               <>
                 <Dice3D
@@ -362,22 +332,22 @@ export default function DiceRoll({
                 />
               </>
             ) : (
-              <div className="text-[var(--text-secondary)] text-lg">
-                Cliquez pour lancer les dés
+              <div className="text-[var(--text-secondary)] text-sm">
+                Cliquez pour lancer
               </div>
             )}
           </div>
 
           {/* Corner decorations */}
           {[
-            'top-2 left-2',
-            'top-2 right-2',
-            'bottom-2 left-2',
-            'bottom-2 right-2',
+            'top-1.5 left-1.5',
+            'top-1.5 right-1.5',
+            'bottom-1.5 left-1.5',
+            'bottom-1.5 right-1.5',
           ].map((position, i) => (
             <div
               key={i}
-              className={`absolute ${position} w-3 h-3 rounded-full bg-[#9B5CFF]/30`}
+              className={`absolute ${position} w-2 h-2 rounded-full bg-[#9B5CFF]/30`}
             />
           ))}
         </div>
@@ -387,32 +357,32 @@ export default function DiceRoll({
       <AnimatePresence>
         {showDice && !isRolling && (
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0 }}
-            className="mb-4 text-center"
+            className="mb-2 text-center"
           >
-            <div className="flex items-center justify-center gap-2 mb-2">
+            <div className="flex items-center justify-center gap-1.5 mb-1">
               <motion.span
-                className="text-4xl font-black text-[#9B5CFF]"
+                className="text-2xl font-black text-[#9B5CFF]"
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 transition={{ delay: 0.1, type: 'spring' }}
               >
                 {diceResults[0]}
               </motion.span>
-              <span className="text-2xl text-white/60">+</span>
+              <span className="text-lg text-white/60">+</span>
               <motion.span
-                className="text-4xl font-black text-[#FF4FD8]"
+                className="text-2xl font-black text-[#FF4FD8]"
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 transition={{ delay: 0.2, type: 'spring' }}
               >
                 {diceResults[1]}
               </motion.span>
-              <span className="text-2xl text-white/60">=</span>
+              <span className="text-lg text-white/60">=</span>
               <motion.span
-                className={`text-4xl font-black ${total === 12 ? 'text-[#FFB800]' : 'text-white'}`}
+                className={`text-2xl font-black ${total === 12 ? 'text-[#FFB800]' : 'text-white'}`}
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 transition={{ delay: 0.3, type: 'spring' }}
@@ -424,30 +394,16 @@ export default function DiceRoll({
             {/* Conversion animation */}
             {showConversion && (
               <motion.div
-                initial={{ opacity: 0, scale: 0.5 }}
+                initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
-                className="flex items-center justify-center gap-3"
+                className="flex items-center justify-center gap-2"
               >
-                <motion.div
-                  animate={{ x: [-5, 5, -5] }}
-                  transition={{ duration: 0.3, repeat: 3 }}
-                >
-                  <Sparkles className="w-5 h-5 text-[#FFB800]" />
-                </motion.div>
-                <span className="text-lg text-white/60">→</span>
+                <span className="text-sm text-white/60">→</span>
                 <motion.span
-                  className={`text-3xl font-black ${calculatedCredits >= 8 ? 'text-[#FFB800]' : 'text-[#00FF88]'}`}
-                  animate={{ scale: [1, 1.2, 1] }}
-                  transition={{ duration: 0.5 }}
+                  className={`text-xl font-black ${calculatedCredits >= 8 ? 'text-[#FFB800]' : 'text-[#00FF88]'}`}
                 >
-                  {calculatedCredits} CRÉDITS
+                  +{calculatedCredits}
                 </motion.span>
-                <motion.div
-                  animate={{ x: [5, -5, 5] }}
-                  transition={{ duration: 0.3, repeat: 3 }}
-                >
-                  <Sparkles className="w-5 h-5 text-[#FFB800]" />
-                </motion.div>
               </motion.div>
             )}
 
@@ -456,9 +412,9 @@ export default function DiceRoll({
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                className="mt-2 text-[#FFB800] font-bold text-sm uppercase tracking-wider"
+                className="text-[#FFB800] font-bold text-xs uppercase tracking-wider"
               >
-                Double 6 ! Jackpot !
+                Double 6 !
               </motion.div>
             )}
           </motion.div>
@@ -471,45 +427,33 @@ export default function DiceRoll({
           onClick={roll}
           disabled={isRolling || disabled}
           className={`
-            px-10 py-4 rounded-xl font-black text-lg uppercase tracking-wider
+            px-6 py-2.5 rounded-xl font-bold text-sm uppercase tracking-wider
             transition-all duration-300
             ${isRolling || disabled
               ? 'bg-[#1E2942] text-[#4A5568] cursor-not-allowed'
-              : 'bg-gradient-to-r from-[#9B5CFF] to-[#FF4FD8] text-white hover:shadow-[0_0_30px_rgba(155,92,255,0.5)] hover:scale-105 active:scale-95'
+              : 'bg-gradient-to-r from-[#9B5CFF] to-[#FF4FD8] text-white hover:shadow-[0_0_20px_rgba(155,92,255,0.5)] active:scale-95'
             }
           `}
         >
-          {isRolling ? (
-            <span className="flex items-center gap-2">
-              <motion.span
-                animate={{ rotate: 360 }}
-                transition={{ duration: 0.3, repeat: Infinity, ease: 'linear' }}
-              >
-                🎲
-              </motion.span>
-              En cours...
-            </span>
-          ) : (
-            '🎲 Lancer les dés'
-          )}
+          {isRolling ? '🎲 ...' : '🎲 Lancer'}
         </button>
       )}
 
       {/* Result */}
-      <div className="h-16 mt-4 flex items-center justify-center">
+      <div className="h-14 mt-2 flex items-center justify-center">
         <AnimatePresence mode="wait">
           {hasFinished && (
             <motion.div
               initial={{ opacity: 0, y: 10, scale: 0.9 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, scale: 0.9 }}
-              className="flex items-center gap-3 px-6 py-3 rounded-full bg-[#141B2D] border border-white/10 shadow-lg"
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl border ${prizeAmount >= 8 ? 'bg-[#FFB800]/20 border-[#FFB800]/50' : 'bg-[#141B2D] border-white/10'}`}
             >
-              <Trophy className={`w-6 h-6 ${prizeAmount >= 8 ? 'text-[#FFB800]' : 'text-[#9B5CFF]'}`} />
+              <Trophy className={`w-5 h-5 ${prizeAmount >= 8 ? 'text-[#FFB800]' : 'text-[#9B5CFF]'}`} />
               <div className="flex flex-col">
-                <span className="text-white/60 text-[10px] uppercase font-bold tracking-widest">Gagné</span>
-                <span className={`text-xl font-black ${prizeAmount >= 8 ? 'text-[#FFB800]' : 'text-white'}`}>
-                  {prizeAmount} CRÉDITS
+                <span className="text-white/60 text-[9px] uppercase font-bold tracking-widest">Gagné</span>
+                <span className={`text-lg font-black ${prizeAmount >= 8 ? 'text-[#FFB800]' : 'text-white'}`}>
+                  +{prizeAmount}
                 </span>
               </div>
             </motion.div>

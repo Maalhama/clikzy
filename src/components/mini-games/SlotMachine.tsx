@@ -78,7 +78,7 @@ function SpinningReel({
   }, [isStopped, finalSymbol])
 
   return (
-    <div className="relative w-24 h-28 bg-gradient-to-b from-[#0B0F1A] to-[#141B2D] rounded-xl overflow-hidden border-2 border-[#2A3A5A] shadow-[inset_0_0_20px_rgba(0,0,0,0.5)]">
+    <div className="relative w-16 h-20 sm:w-20 sm:h-24 bg-gradient-to-b from-[#0B0F1A] to-[#141B2D] rounded-lg overflow-hidden border-2 border-[#2A3A5A] shadow-[inset_0_0_15px_rgba(0,0,0,0.5)]">
       {/* Reel window highlight */}
       <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-transparent to-black/50 pointer-events-none z-10" />
 
@@ -89,19 +89,19 @@ function SpinningReel({
       {/* Symbols container */}
       <motion.div
         className="absolute inset-0 flex flex-col items-center justify-center"
-        animate={isSpinning && !isStopped ? { y: [0, -28, 0] } : {}}
+        animate={isSpinning && !isStopped ? { y: [0, -20, 0] } : {}}
         transition={isSpinning && !isStopped ? { duration: 0.08, repeat: Infinity, ease: 'linear' } : {}}
       >
         {/* Top symbol (blurred) */}
-        <span className="text-4xl opacity-30 blur-[1px] -mb-1">
+        <span className="text-2xl sm:text-3xl opacity-30 blur-[1px] -mb-0.5">
           {REEL_ITEMS[displaySymbols[0]]}
         </span>
         {/* Center symbol (main) */}
-        <span className="text-6xl drop-shadow-[0_0_10px_rgba(255,255,255,0.3)]">
+        <span className="text-4xl sm:text-5xl drop-shadow-[0_0_8px_rgba(255,255,255,0.3)]">
           {REEL_ITEMS[displaySymbols[1]]}
         </span>
         {/* Bottom symbol (blurred) */}
-        <span className="text-4xl opacity-30 blur-[1px] -mt-1">
+        <span className="text-2xl sm:text-3xl opacity-30 blur-[1px] -mt-0.5">
           {REEL_ITEMS[displaySymbols[2]]}
         </span>
       </motion.div>
@@ -187,7 +187,7 @@ export default function SlotMachine({
   const allMatch = targetSymbols[0] === targetSymbols[1] && targetSymbols[1] === targetSymbols[2]
 
   return (
-    <div className="relative flex flex-col items-center justify-center p-4 select-none">
+    <div className="relative flex flex-col items-center justify-center p-2 select-none">
       {/* Animated Background Glow */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <motion.div
@@ -222,65 +222,45 @@ export default function SlotMachine({
       </AnimatePresence>
 
       {/* Machine Frame */}
-      <div className="relative flex items-stretch gap-4">
-        {/* Lever */}
-        <div className="relative flex flex-col items-center justify-center">
-          <div className="relative w-8 h-40">
+      <div className="relative flex items-stretch gap-2">
+        {/* Lever - hidden on mobile */}
+        <div className="relative flex-col items-center justify-center hidden sm:flex">
+          <div className="relative w-6 h-32">
             {/* Lever track */}
-            <div className="absolute inset-x-0 top-4 bottom-4 bg-[#1E2942] rounded-full border-2 border-[#2A3A5A]" />
+            <div className="absolute inset-x-0 top-3 bottom-3 bg-[#1E2942] rounded-full border-2 border-[#2A3A5A]" />
             {/* Lever arm */}
             <motion.div
-              animate={{ y: leverPulled ? 60 : 0 }}
+              animate={{ y: leverPulled ? 50 : 0 }}
               transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-              className="absolute top-2 left-1/2 -translate-x-1/2 w-6 h-20 bg-gradient-to-b from-[#9B5CFF] to-[#6B3CAF] rounded-full border-2 border-[#B47CFF] shadow-[0_0_15px_rgba(155,92,255,0.5)]"
+              className="absolute top-1 left-1/2 -translate-x-1/2 w-5 h-16 bg-gradient-to-b from-[#9B5CFF] to-[#6B3CAF] rounded-full border-2 border-[#B47CFF] shadow-[0_0_12px_rgba(155,92,255,0.5)]"
             >
               {/* Lever ball */}
-              <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-10 h-10 rounded-full bg-gradient-to-br from-[#FF4FD8] to-[#B82A9C] border-2 border-[#FF7FE8] shadow-[0_0_20px_rgba(255,79,216,0.6)]" />
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-8 h-8 rounded-full bg-gradient-to-br from-[#FF4FD8] to-[#B82A9C] border-2 border-[#FF7FE8] shadow-[0_0_15px_rgba(255,79,216,0.6)]" />
             </motion.div>
           </div>
         </div>
 
         <div className="flex flex-col items-center">
           {/* Title */}
-          <div className="text-center mb-4">
+          <div className="text-center mb-2">
             <motion.div
               animate={isSpinning ? { scale: [1, 1.05, 1] } : {}}
               transition={{ duration: 0.3, repeat: isSpinning ? Infinity : 0 }}
-              className="relative inline-flex items-center gap-2 px-8 py-3 bg-gradient-to-r from-[#FFB800] via-[#FFD700] to-[#FF8C00] rounded-xl shadow-[0_0_30px_rgba(255,184,0,0.5)]"
+              className="relative inline-flex items-center gap-1.5 px-4 py-2 bg-gradient-to-r from-[#FFB800] via-[#FFD700] to-[#FF8C00] rounded-lg shadow-[0_0_20px_rgba(255,184,0,0.5)]"
             >
-              {/* Animated sparkles on title */}
-              {isSpinning && (
-                <>
-                  <motion.div
-                    animate={{ opacity: [0, 1, 0], scale: [0.5, 1, 0.5] }}
-                    transition={{ duration: 0.5, repeat: Infinity }}
-                    className="absolute -top-2 -left-2"
-                  >
-                    <Sparkles size={16} className="text-white" />
-                  </motion.div>
-                  <motion.div
-                    animate={{ opacity: [0, 1, 0], scale: [0.5, 1, 0.5] }}
-                    transition={{ duration: 0.5, repeat: Infinity, delay: 0.25 }}
-                    className="absolute -top-2 -right-2"
-                  >
-                    <Sparkles size={16} className="text-white" />
-                  </motion.div>
-                </>
-              )}
-              <Zap className="w-6 h-6 text-[#0B0F1A]" fill="currentColor" />
-              <span className="text-[#0B0F1A] font-black text-xl tracking-wider">JACKPOT</span>
-              <Zap className="w-6 h-6 text-[#0B0F1A]" fill="currentColor" />
+              <Zap className="w-4 h-4 text-[#0B0F1A]" fill="currentColor" />
+              <span className="text-[#0B0F1A] font-black text-sm tracking-wider">JACKPOT</span>
+              <Zap className="w-4 h-4 text-[#0B0F1A]" fill="currentColor" />
             </motion.div>
           </div>
 
           {/* Reels Container */}
-          <div className="relative bg-gradient-to-b from-[#0B0F1A] to-[#141B2D] rounded-2xl p-6 border-4 border-[#1E2942] shadow-[0_0_40px_rgba(0,0,0,0.6),inset_0_0_30px_rgba(155,92,255,0.15)]">
+          <div className="relative bg-gradient-to-b from-[#0B0F1A] to-[#141B2D] rounded-xl p-3 sm:p-4 border-2 border-[#1E2942] shadow-[0_0_30px_rgba(0,0,0,0.6),inset_0_0_20px_rgba(155,92,255,0.15)]">
             {/* Outer glow border */}
-            <div className="absolute inset-[-3px] rounded-2xl border-2 border-[#FFB800]/40 pointer-events-none" />
-            <div className="absolute inset-[-6px] rounded-2xl border border-[#9B5CFF]/20 pointer-events-none" />
+            <div className="absolute inset-[-2px] rounded-xl border-2 border-[#FFB800]/40 pointer-events-none" />
 
             {/* Reels */}
-            <div className="flex gap-4">
+            <div className="flex gap-2 sm:gap-3">
               {[0, 1, 2].map((reelIndex) => (
                 <SpinningReel
                   key={reelIndex}
@@ -296,13 +276,13 @@ export default function SlotMachine({
             <motion.div
               animate={isSpinning ? { opacity: [0.3, 0.8, 0.3] } : { opacity: 0.5 }}
               transition={{ duration: 0.5, repeat: isSpinning ? Infinity : 0 }}
-              className="absolute left-4 right-4 top-1/2 -translate-y-1/2 h-[3px] bg-gradient-to-r from-transparent via-[#FFB800] to-transparent pointer-events-none"
+              className="absolute left-2 right-2 top-1/2 -translate-y-1/2 h-[2px] bg-gradient-to-r from-transparent via-[#FFB800] to-transparent pointer-events-none"
             />
 
-            {/* Bottom lights - enhanced */}
-            <div className="flex justify-center gap-3 mt-5">
-              {[0, 1, 2, 3, 4, 5, 6].map((i) => {
-                const colors = ['#9B5CFF', '#FF4FD8', '#3CCBFF', '#FFB800', '#00FF88', '#FF4FD8', '#9B5CFF']
+            {/* Bottom lights */}
+            <div className="flex justify-center gap-2 mt-3">
+              {[0, 1, 2, 3, 4].map((i) => {
+                const colors = ['#9B5CFF', '#FF4FD8', '#FFB800', '#FF4FD8', '#9B5CFF']
                 const color = colors[i]
                 return (
                   <motion.div
@@ -310,15 +290,14 @@ export default function SlotMachine({
                     animate={isSpinning ? {
                       opacity: [0.3, 1, 0.3],
                       scale: [1, 1.2, 1],
-                      boxShadow: [`0 0 5px ${color}`, `0 0 20px ${color}`, `0 0 5px ${color}`]
                     } : {
                       opacity: 0.5
                     }}
                     transition={{ duration: 0.2, repeat: isSpinning ? Infinity : 0, delay: i * 0.05 }}
-                    className="w-3 h-3 rounded-full"
+                    className="w-2 h-2 rounded-full"
                     style={{
                       backgroundColor: color,
-                      boxShadow: `0 0 10px ${color}`,
+                      boxShadow: `0 0 6px ${color}`,
                     }}
                   />
                 )
@@ -327,75 +306,50 @@ export default function SlotMachine({
           </div>
 
           {/* Spin Button */}
-          <div className="mt-6 flex justify-center">
+          <div className="mt-3 flex justify-center">
             <motion.button
               onClick={spin}
               disabled={isSpinning || disabled}
               whileHover={!isSpinning && !disabled ? { scale: 1.05 } : {}}
               whileTap={!isSpinning && !disabled ? { scale: 0.95 } : {}}
               className={`
-                relative px-14 py-4 rounded-xl font-black text-lg uppercase tracking-wider
+                relative px-8 py-2.5 rounded-lg font-bold text-sm uppercase tracking-wider
                 transition-all duration-300 overflow-hidden
                 ${isSpinning || disabled
                   ? 'bg-[#1E2942] text-[#4A5568] cursor-not-allowed'
-                  : 'bg-gradient-to-r from-[#9B5CFF] to-[#FF4FD8] text-white shadow-[0_0_30px_rgba(155,92,255,0.5)]'
+                  : 'bg-gradient-to-r from-[#9B5CFF] to-[#FF4FD8] text-white shadow-[0_0_20px_rgba(155,92,255,0.5)]'
                 }
               `}
             >
-              {/* Button shine effect */}
-              {!isSpinning && !disabled && (
-                <motion.div
-                  animate={{ x: [-200, 200] }}
-                  transition={{ duration: 2, repeat: Infinity, repeatDelay: 1 }}
-                  className="absolute inset-y-0 w-20 bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-12"
-                />
-              )}
-              {isSpinning ? (
-                <span className="flex items-center gap-2">
-                  <motion.span
-                    animate={{ rotate: 360 }}
-                    transition={{ duration: 0.4, repeat: Infinity, ease: 'linear' }}
-                  >
-                    ⚡
-                  </motion.span>
-                  SPINNING...
-                </span>
-              ) : (
-                'SPIN!'
-              )}
+              {isSpinning ? '⚡ ...' : 'SPIN!'}
             </motion.button>
           </div>
         </div>
       </div>
 
       {/* Result */}
-      <div className="h-20 mt-4 flex items-center justify-center">
+      <div className="h-16 mt-3 flex items-center justify-center">
         <AnimatePresence mode="wait">
           {hasFinished && (
             <motion.div
-              initial={{ opacity: 0, y: 20, scale: 0.8 }}
+              initial={{ opacity: 0, y: 10, scale: 0.9 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.8 }}
-              className={`flex items-center gap-4 px-8 py-4 rounded-2xl border shadow-lg ${
+              exit={{ opacity: 0, scale: 0.9 }}
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl border ${
                 isJackpot || allMatch
-                  ? 'bg-gradient-to-r from-[#FFB800]/20 to-[#FF8C00]/20 border-[#FFB800]/50 shadow-[0_0_30px_rgba(255,184,0,0.3)]'
+                  ? 'bg-[#FFB800]/20 border-[#FFB800]/50'
                   : isWin
-                    ? 'bg-[#141B2D] border-[#9B5CFF]/30'
+                    ? 'bg-[#9B5CFF]/20 border-[#9B5CFF]/30'
                     : 'bg-[#141B2D] border-white/10'
               }`}
             >
-              <motion.div
-                animate={(isJackpot || allMatch) ? { rotate: [0, -10, 10, 0], scale: [1, 1.2, 1] } : {}}
-                transition={{ duration: 0.5, repeat: (isJackpot || allMatch) ? Infinity : 0 }}
-              >
-                <Trophy className={`w-8 h-8 ${(isJackpot || allMatch) ? 'text-[#FFB800]' : isWin ? 'text-[#9B5CFF]' : 'text-white/40'}`} />
-              </motion.div>
+              <Trophy className={`w-5 h-5 ${(isJackpot || allMatch) ? 'text-[#FFB800]' : isWin ? 'text-[#9B5CFF]' : 'text-white/40'}`} />
               <div className="flex flex-col">
-                <span className="text-white/60 text-[10px] uppercase font-bold tracking-widest">
-                  {allMatch ? '🎰 TRIPLE!' : isJackpot ? '🎉 JACKPOT!' : 'Gagné'}
+                <span className="text-white/60 text-[9px] uppercase font-bold tracking-widest">
+                  {allMatch ? 'TRIPLE' : isJackpot ? 'JACKPOT' : isWin ? 'Gagné' : 'Perdu'}
                 </span>
-                <span className={`text-2xl font-black ${(isJackpot || allMatch) ? 'text-[#FFB800]' : isWin ? 'text-white' : 'text-white/60'}`}>
-                  {prizeAmount} CRÉDITS
+                <span className={`text-lg font-black ${(isJackpot || allMatch) ? 'text-[#FFB800]' : isWin ? 'text-white' : 'text-white/60'}`}>
+                  {isWin ? '+' : ''}{prizeAmount}
                 </span>
               </div>
             </motion.div>

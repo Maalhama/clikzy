@@ -11,8 +11,8 @@ interface ScratchCardProps {
 }
 
 // Responsive card dimensions
-const CARD_WIDTH = 280
-const CARD_HEIGHT = 180
+const CARD_WIDTH = 240
+const CARD_HEIGHT = 150
 
 export default function ScratchCard({
   onComplete,
@@ -98,21 +98,21 @@ export default function ScratchCard({
     ctx.strokeRect(15, 15, width - 30, height - 30)
 
     // Text with neon glow
-    ctx.font = 'bold 22px "Inter", system-ui, sans-serif'
+    ctx.font = 'bold 18px "Inter", system-ui, sans-serif'
     ctx.textAlign = 'center'
     ctx.textBaseline = 'middle'
 
     // Text shadow/glow
     ctx.shadowColor = '#FF4FD8'
-    ctx.shadowBlur = 20
+    ctx.shadowBlur = 15
     ctx.fillStyle = '#FF4FD8'
-    ctx.fillText('GRATTEZ ICI', width / 2, height / 2 - 10)
+    ctx.fillText('GRATTEZ ICI', width / 2, height / 2 - 8)
     ctx.shadowBlur = 0
 
     // Subtitle
-    ctx.font = 'bold 12px "Inter", system-ui, sans-serif'
+    ctx.font = 'bold 10px "Inter", system-ui, sans-serif'
     ctx.fillStyle = 'rgba(255, 255, 255, 0.5)'
-    ctx.fillText('✨ RÉVÉLEZ VOTRE GAIN ✨', width / 2, height / 2 + 20)
+    ctx.fillText('RÉVÉLEZ VOTRE GAIN', width / 2, height / 2 + 15)
 
     // Corner decorations
     ctx.strokeStyle = '#3CCBFF'
@@ -231,16 +231,6 @@ export default function ScratchCard({
 
   return (
     <div className="relative flex flex-col items-center p-2 sm:p-4">
-      {/* Payout info before scratching */}
-      {!isRevealed && !isScratching && (
-        <div className="mb-3 text-center">
-          <div className="flex justify-center gap-2 text-[10px] sm:text-xs">
-            <span className="px-2 py-1 bg-white/5 rounded text-white/50">0-3</span>
-            <span className="px-2 py-1 bg-[#9B5CFF]/20 rounded text-[#9B5CFF] border border-[#9B5CFF]/30">1-2</span>
-            <span className="px-2 py-1 bg-[#FFB800]/20 rounded text-[#FFB800] border border-[#FFB800]/50 font-bold">10 ⚡</span>
-          </div>
-        </div>
-      )}
 
       <div
         className="relative select-none touch-none max-w-full"
@@ -270,22 +260,22 @@ export default function ScratchCard({
           >
             {/* Trophy with glow */}
             <motion.div
-              className={`p-4 rounded-full mb-3 ${prizeAmount >= 5 ? 'bg-gradient-to-br from-[#FFB800] to-[#FF8C00]' : 'bg-gradient-to-br from-[#9B5CFF] to-[#FF4FD8]'}`}
+              className={`p-3 rounded-full mb-2 ${prizeAmount >= 5 ? 'bg-gradient-to-br from-[#FFB800] to-[#FF8C00]' : 'bg-gradient-to-br from-[#9B5CFF] to-[#FF4FD8]'}`}
               animate={isRevealed ? {
                 boxShadow: prizeAmount >= 5
-                  ? ['0 0 20px rgba(255, 184, 0, 0.5)', '0 0 40px rgba(255, 184, 0, 0.8)', '0 0 20px rgba(255, 184, 0, 0.5)']
-                  : ['0 0 20px rgba(155, 92, 255, 0.5)', '0 0 40px rgba(155, 92, 255, 0.8)', '0 0 20px rgba(155, 92, 255, 0.5)']
+                  ? ['0 0 15px rgba(255, 184, 0, 0.5)', '0 0 30px rgba(255, 184, 0, 0.8)', '0 0 15px rgba(255, 184, 0, 0.5)']
+                  : ['0 0 15px rgba(155, 92, 255, 0.5)', '0 0 30px rgba(155, 92, 255, 0.8)', '0 0 15px rgba(155, 92, 255, 0.5)']
               } : {}}
               transition={{ duration: 1.5, repeat: Infinity }}
             >
-              <Trophy className={`w-8 h-8 ${prizeAmount >= 5 ? 'text-[#0B0F1A]' : 'text-white'}`} />
+              <Trophy className={`w-6 h-6 ${prizeAmount >= 5 ? 'text-[#0B0F1A]' : 'text-white'}`} />
             </motion.div>
 
-            <span className="text-[10px] uppercase tracking-[0.2em] text-[#9B5CFF] font-bold mb-1">Vous avez gagné</span>
+            <span className="text-[9px] uppercase tracking-[0.15em] text-[#9B5CFF] font-bold mb-0.5">Gagné</span>
 
-            <div className="flex items-baseline gap-2">
+            <div className="flex items-baseline gap-1.5">
               <motion.span
-                className="text-5xl font-black"
+                className="text-4xl font-black"
                 style={{
                   background: prizeAmount >= 5
                     ? 'linear-gradient(to bottom, #FFD700, #FFB800, #FF8C00)'
@@ -296,9 +286,8 @@ export default function ScratchCard({
                 animate={isRevealed ? { scale: [1, 1.1, 1] } : {}}
                 transition={{ duration: 0.5, repeat: isRevealed ? 2 : 0 }}
               >
-                {prizeAmount}
+                +{prizeAmount}
               </motion.span>
-              <span className="text-lg font-bold text-white/60 uppercase tracking-wider">Crédits</span>
             </div>
           </motion.div>
 
@@ -400,18 +389,16 @@ export default function ScratchCard({
       {/* Hint */}
       {!isRevealed && !isScratching && (
         <motion.div
-          initial={{ opacity: 0, y: 10 }}
+          initial={{ opacity: 0, y: 5 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mt-4 text-center"
+          className="mt-2 text-center"
         >
           <motion.p
             animate={{ opacity: [0.3, 0.7, 0.3] }}
             transition={{ duration: 2, repeat: Infinity }}
-            className="text-xs tracking-widest text-white/50 uppercase font-medium flex items-center justify-center gap-2"
+            className="text-[10px] tracking-widest text-white/50 uppercase font-medium"
           >
-            <span>👆</span>
-            <span>Grattez avec le doigt</span>
-            <span>👆</span>
+            👆 Grattez 👆
           </motion.p>
         </motion.div>
       )}
@@ -419,19 +406,17 @@ export default function ScratchCard({
       {/* Result after reveal */}
       {isRevealed && (
         <motion.div
-          initial={{ opacity: 0, y: 10 }}
+          initial={{ opacity: 0, y: 5 }}
           animate={{ opacity: 1, y: 0 }}
-          className={`mt-4 px-6 py-3 rounded-xl ${
+          className={`mt-2 px-4 py-2 rounded-lg text-xs ${
             isJackpot
-              ? 'bg-[#FFB800]/20 border border-[#FFB800]/50'
+              ? 'bg-[#FFB800]/20 border border-[#FFB800]/50 text-[#FFB800]'
               : isWin
-                ? 'bg-[#00FF88]/20 border border-[#00FF88]/50'
-                : 'bg-white/5 border border-white/10'
+                ? 'bg-[#00FF88]/20 border border-[#00FF88]/50 text-[#00FF88]'
+                : 'bg-white/5 border border-white/10 text-white/50'
           }`}
         >
-          <p className={`text-center font-bold ${isJackpot ? 'text-[#FFB800]' : isWin ? 'text-[#00FF88]' : 'text-white/50'}`}>
-            {isJackpot ? '🎉 JACKPOT !' : isWin ? '✨ Bien joué !' : 'Pas de chance...'}
-          </p>
+          {isJackpot ? 'JACKPOT !' : isWin ? 'Bien joué !' : 'Perdu'}
         </motion.div>
       )}
     </div>
