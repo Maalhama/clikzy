@@ -3,6 +3,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { GAME_CONSTANTS } from '@/lib/constants'
 import { checkAndAwardBadges, type Badge } from '@/actions/badges'
+import { checkClickFraud, auditLog } from '@/lib/security'
 import type { Game, Click, Item, Profile } from '@/types/database'
 
 type GameWithItem = Game & {
@@ -31,6 +32,17 @@ export async function clickGame(gameId: string): Promise<ActionResult<{ newEndTi
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) {
     return { success: false, error: 'Non authentifié' }
+  }
+
+  // Fraud detection check
+  const fraudCheck = checkClickFraud(user.id, gameId, 'server-action')
+  if (!fraudCheck.allowed) {
+    auditLog('game.fraud_detected', {
+      gameId,
+      riskScore: fraudCheck.riskScore,
+      flags: fraudCheck.flags,
+    }, { userId: user.id, severity: 'critical' })
+    return { success: false, error: 'Action bloquée pour raison de sécurité' }
   }
 
   // Get user profile to check credits (both daily and earned)
@@ -160,6 +172,14 @@ export async function clickGame(gameId: string): Promise<ActionResult<{ newEndTi
   } catch (error) {
     console.error('Error checking badges:', error)
   }
+
+  // Audit log successful click
+  auditLog('game.click', {
+    gameId,
+    newEndTime,
+    totalClicks: game.total_clicks + 1,
+    inFinalPhase: !!newEndTime,
+  }, { userId: user.id, username: profile.username })
 
   return { success: true, data: { newEndTime, newBadges } }
 }
