@@ -84,6 +84,17 @@ export function Header({ profile }: HeaderProps) {
           {/* Navigation Links */}
           <nav className="flex items-center gap-6">
             <Link
+              href="/"
+              className="flex items-center gap-2 text-white/60 hover:text-neon-blue transition-colors font-medium group"
+            >
+              {/* Home icon - Neon blue style */}
+              <svg className="w-5 h-5 text-neon-blue/70 group-hover:text-neon-blue transition-colors drop-shadow-[0_0_6px_rgba(60,203,255,0.5)] group-hover:drop-shadow-[0_0_8px_rgba(60,203,255,0.8)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                <polyline points="9 22 9 12 15 12 15 22" />
+              </svg>
+              <span>Accueil</span>
+            </Link>
+            <Link
               href="/lobby"
               className="flex items-center gap-2 text-white/60 hover:text-neon-pink transition-colors font-medium group"
             >
@@ -321,6 +332,20 @@ export function Header({ profile }: HeaderProps) {
 
             {/* Navigation Links */}
             <div className="px-4 py-2 space-y-1">
+              <Link
+                href="/"
+                onClick={closeMenu}
+                className="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-neon-blue/10 transition-colors border border-transparent hover:border-neon-blue/30 group"
+              >
+                {/* Home icon - Neon blue style */}
+                <div className="w-8 h-8 rounded-lg bg-neon-blue/10 border border-neon-blue/30 flex items-center justify-center group-hover:bg-neon-blue/20 transition-colors shadow-[0_0_10px_rgba(60,203,255,0.2)] group-hover:shadow-[0_0_15px_rgba(60,203,255,0.4)]">
+                  <svg className="w-4 h-4 text-neon-blue" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                    <polyline points="9 22 9 12 15 12 15 22" />
+                  </svg>
+                </div>
+                <span className="font-medium text-white/80 group-hover:text-neon-blue transition-colors">Accueil</span>
+              </Link>
               <Link
                 href="/lobby"
                 onClick={closeMenu}
