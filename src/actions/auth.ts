@@ -57,9 +57,9 @@ export async function signInWithOAuth(provider: 'google' | 'github'): Promise<{ 
   try {
     console.log('[OAuth] Starting OAuth flow for provider:', provider)
 
-    const headersList = await headers()
-    const origin = headersList.get('origin') || process.env.NEXT_PUBLIC_SITE_URL
-    console.log('[OAuth] Origin:', origin)
+    // Always use SITE_URL to avoid domain mismatch (www vs non-www)
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://cleekzy.com'
+    console.log('[OAuth] Site URL:', siteUrl)
 
     const supabase = await createClient()
     console.log('[OAuth] Supabase client created')
@@ -67,7 +67,7 @@ export async function signInWithOAuth(provider: 'google' | 'github'): Promise<{ 
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider,
       options: {
-        redirectTo: `${origin}/auth/callback?next=/lobby`,
+        redirectTo: `${siteUrl}/auth/callback?next=/lobby`,
       },
     })
 
