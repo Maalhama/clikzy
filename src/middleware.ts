@@ -109,13 +109,6 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(url)
   }
 
-  // Landing page - redirect authenticated users to lobby
-  if (request.nextUrl.pathname === '/' && user) {
-    const url = request.nextUrl.clone()
-    url.pathname = '/lobby'
-    return NextResponse.redirect(url)
-  }
-
   return supabaseResponse
 }
 
