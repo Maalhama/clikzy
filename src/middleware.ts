@@ -24,23 +24,6 @@ function getClientIP(request: NextRequest): string {
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
-  const host = request.headers.get('host') || ''
-
-  // Redirect all domains to www.cleekzy.com
-  const canonicalDomain = 'www.cleekzy.com'
-  const domainsToRedirect = [
-    'clikzy.vercel.app',
-    'cleekzy.com',           // non-www
-    'clikzy.com',            // old domain
-    'www.clikzy.com',        // old domain with www
-  ]
-
-  if (domainsToRedirect.some(d => host.includes(d))) {
-    const url = new URL(request.url)
-    url.host = canonicalDomain
-    url.protocol = 'https'
-    return NextResponse.redirect(url, { status: 301 })
-  }
 
   // Rate limiting for API routes
   if (pathname.startsWith('/api/')) {

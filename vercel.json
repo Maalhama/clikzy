@@ -11,17 +11,6 @@
       ],
       "destination": "https://www.cleekzy.com/:path*",
       "permanent": true
-    },
-    {
-      "source": "/:path*",
-      "has": [
-        {
-          "type": "host",
-          "value": "cleekzy.com"
-        }
-      ],
-      "destination": "https://www.cleekzy.com/:path*",
-      "permanent": true
     }
   ]
 }
