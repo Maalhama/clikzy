@@ -99,15 +99,17 @@ interface VIPDashboardProps {
   memberSince: string
   daysUntilNextTier: number
   totalCreditsEarned: number
-  dailyBonusReceived: boolean
+  currentCredits: number
+  canCollectBonus: boolean
+  isCollectingBonus?: boolean
+  onCollectBonus: () => void
   onManageSubscription: () => void
 }
 
-// Tier configuration
+// Tier configuration - VIP users keep credits forever (no daily reset)
 const TIER_CONFIG = {
   bronze: {
     name: 'Bronze',
-    dailyBonus: 10,
     color: 'from-amber-600 to-amber-800',
     borderColor: 'border-amber-500/30',
     bgColor: 'bg-amber-500/10',
@@ -119,7 +121,6 @@ const TIER_CONFIG = {
   },
   silver: {
     name: 'Silver',
-    dailyBonus: 15,
     color: 'from-slate-300 to-slate-500',
     borderColor: 'border-slate-400/30',
     bgColor: 'bg-slate-400/10',
@@ -131,7 +132,6 @@ const TIER_CONFIG = {
   },
   gold: {
     name: 'Gold',
-    dailyBonus: 20,
     color: 'from-yellow-400 to-amber-500',
     borderColor: 'border-yellow-500/30',
     bgColor: 'bg-yellow-500/10',
@@ -143,23 +143,23 @@ const TIER_CONFIG = {
   },
 }
 
-// Benefits by tier
+// Benefits by tier - VIP users get +10 bonus credits daily to collect
 const BENEFITS = {
   bronze: [
-    { icon: CreditIcon, title: '+10 crédits bonus/jour', description: 'Reçois 10 crédits supplémentaires chaque jour' },
+    { icon: CreditIcon, title: '+10 Bonus quotidien', description: '20 crédits par jour au total (10 gratuits + 10 bonus)' },
     { icon: DiamondIcon, title: 'Produits Premium', description: 'Accès aux produits de +1000€' },
     { icon: StarIcon, title: 'Badge V.I.P Bronze', description: 'Badge exclusif sur ton profil' },
     { icon: RocketIcon, title: 'Support prioritaire', description: 'Réponses rapides de notre équipe' },
   ],
   silver: [
-    { icon: CreditIcon, title: '+15 crédits bonus/jour', description: 'Reçois 15 crédits supplémentaires chaque jour' },
+    { icon: CreditIcon, title: '+10 Bonus quotidien', description: '20 crédits par jour au total (10 gratuits + 10 bonus)' },
     { icon: DiamondIcon, title: 'Produits Premium', description: 'Accès aux produits de +1000€' },
     { icon: StarIcon, title: 'Badge V.I.P Silver', description: 'Badge exclusif sur ton profil' },
     { icon: RocketIcon, title: 'Support prioritaire', description: 'Réponses rapides de notre équipe' },
     { icon: SparkleIcon, title: 'Accès anticipé', description: 'Joue aux nouveaux jeux en avant-première' },
   ],
   gold: [
-    { icon: CreditIcon, title: '+20 crédits bonus/jour', description: 'Reçois 20 crédits supplémentaires chaque jour' },
+    { icon: CreditIcon, title: '+10 Bonus quotidien', description: '20 crédits par jour au total (10 gratuits + 10 bonus)' },
     { icon: DiamondIcon, title: 'Produits Premium', description: 'Accès aux produits de +1000€' },
     { icon: StarIcon, title: 'Badge V.I.P Gold', description: 'Badge légendaire sur ton profil' },
     { icon: RocketIcon, title: 'Support prioritaire', description: 'Réponses rapides de notre équipe' },
@@ -193,12 +193,17 @@ const itemVariants = {
   visible: { opacity: 1, y: 0 },
 }
 
+const VIP_DAILY_BONUS = 10
+
 export function VIPDashboard({
   tier,
   memberSince,
   daysUntilNextTier,
   totalCreditsEarned,
-  dailyBonusReceived,
+  currentCredits,
+  canCollectBonus,
+  isCollectingBonus = false,
+  onCollectBonus,
   onManageSubscription,
 }: VIPDashboardProps) {
   const config = TIER_CONFIG[tier]
@@ -260,28 +265,47 @@ export function VIPDashboard({
 
       {/* Stats Cards */}
       <motion.section variants={itemVariants} className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {/* Daily Bonus Card */}
-        <div className="relative overflow-hidden rounded-xl bg-bg-secondary/50 border border-white/10 p-5">
+        {/* Daily Bonus Card - VIP Exclusive */}
+        <div className="relative overflow-hidden rounded-xl bg-bg-secondary/50 border border-neon-purple/30 p-5">
           <div className="absolute top-0 right-0 w-20 h-20 bg-neon-purple/10 blur-[40px]" />
           <div className="relative z-10">
             <div className="flex items-center gap-3 mb-3">
               <div className="w-10 h-10 rounded-lg bg-neon-purple/20 flex items-center justify-center">
                 <CreditIcon className="w-5 h-5 text-neon-purple drop-shadow-[0_0_8px_rgba(155,92,255,0.6)]" />
               </div>
-              <span className="text-text-secondary text-sm">Bonus du jour</span>
+              <span className="text-text-secondary text-sm">Bonus V.I.P</span>
             </div>
             <div className="flex items-baseline gap-2">
-              <span className="text-3xl font-bold text-white">+{config.dailyBonus}</span>
+              <span className="text-3xl font-bold text-white">+{VIP_DAILY_BONUS}</span>
               <span className="text-text-secondary">crédits</span>
             </div>
-            <div className="mt-2">
-              {dailyBonusReceived ? (
-                <span className="inline-flex items-center gap-1 text-xs text-success">
-                  <CheckIcon className="w-3.5 h-3.5" />
-                  Reçus aujourd&apos;hui
-                </span>
+            <div className="mt-3">
+              {canCollectBonus ? (
+                <button
+                  onClick={onCollectBonus}
+                  disabled={isCollectingBonus}
+                  className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-gradient-to-r from-neon-purple to-neon-pink text-white text-sm font-medium hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_0_20px_rgba(155,92,255,0.4)]"
+                >
+                  {isCollectingBonus ? (
+                    <>
+                      <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                      </svg>
+                      Récupération...
+                    </>
+                  ) : (
+                    <>
+                      <SparkleIcon className="w-4 h-4" />
+                      Récupérer mon bonus
+                    </>
+                  )}
+                </button>
               ) : (
-                <span className="text-xs text-warning">En attente...</span>
+                <span className="inline-flex items-center gap-1.5 text-xs text-success">
+                  <CheckIcon className="w-4 h-4" />
+                  Bonus récupéré ! Reviens demain
+                </span>
               )}
             </div>
           </div>

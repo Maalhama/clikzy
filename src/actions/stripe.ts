@@ -240,7 +240,7 @@ export async function getVIPDetails(): Promise<ActionResult<{
   memberSince: string
   daysUntilNextTier: number
   totalCreditsEarned: number
-  dailyBonusReceived: boolean
+  currentCredits: number
   subscriptionId: string | null
 }>> {
   const supabase = await createClient()
@@ -255,7 +255,7 @@ export async function getVIPDetails(): Promise<ActionResult<{
 
   const { data: profile, error } = await supabase
     .from('profiles')
-    .select('is_vip, vip_subscription_id, vip_expires_at, created_at, earned_credits, last_credits_reset')
+    .select('is_vip, vip_subscription_id, vip_expires_at, created_at, credits, earned_credits')
     .eq('id', user.id)
     .single()
 
@@ -268,8 +268,8 @@ export async function getVIPDetails(): Promise<ActionResult<{
     vip_subscription_id: string | null
     vip_expires_at: string | null
     created_at: string
+    credits: number
     earned_credits: number
-    last_credits_reset: string | null
   }
 
   if (!typedProfile.is_vip) {
@@ -299,11 +299,8 @@ export async function getVIPDetails(): Promise<ActionResult<{
     daysUntilNextTier = 90 - daysAsMember
   }
 
-  // Check if daily bonus was received today
-  const lastReset = typedProfile.last_credits_reset ? new Date(typedProfile.last_credits_reset) : null
-  const today = new Date()
-  today.setHours(0, 0, 0, 0)
-  const dailyBonusReceived = lastReset ? lastReset >= today : false
+  // Calculate total credits (daily + earned)
+  const currentCredits = (typedProfile.credits || 0) + (typedProfile.earned_credits || 0)
 
   return {
     success: true,
@@ -313,7 +310,7 @@ export async function getVIPDetails(): Promise<ActionResult<{
       memberSince,
       daysUntilNextTier: Math.max(0, daysUntilNextTier),
       totalCreditsEarned: typedProfile.earned_credits || 0,
-      dailyBonusReceived,
+      currentCredits,
       subscriptionId: typedProfile.vip_subscription_id,
     },
   }

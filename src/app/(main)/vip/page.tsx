@@ -5,6 +5,7 @@ import { motion } from 'framer-motion'
 import { VIPDashboard } from '@/components/vip/VIPDashboard'
 import VIPSubscriptionModal from '@/components/modals/VIPSubscriptionModal'
 import { createVIPCheckoutSession, getVIPDetails, createBillingPortalSession, type VIPTier } from '@/actions/stripe'
+import { collectVIPDailyBonus, canCollectVIPBonus } from '@/actions/credits'
 
 // Neon Medal Icons for VIP tiers
 const BronzeMedalIcon = () => (
@@ -68,7 +69,7 @@ const VIP_TIERS = [
     bgColor: 'bg-amber-500/10',
     textColor: 'text-amber-400',
     benefits: [
-      '+10 crédits bonus par jour',
+      '+10 crédits bonus V.I.P par jour (20 au total)',
       'Accès aux produits premium (+1000€)',
       'Badge V.I.P Bronze',
       'Support prioritaire',
@@ -83,7 +84,7 @@ const VIP_TIERS = [
     bgColor: 'bg-slate-400/10',
     textColor: 'text-slate-300',
     benefits: [
-      '+15 crédits bonus par jour',
+      '+10 crédits bonus V.I.P par jour (20 au total)',
       'Tous les avantages Bronze',
       'Badge V.I.P Silver exclusif',
       'Accès anticipé aux nouveaux jeux',
@@ -98,7 +99,7 @@ const VIP_TIERS = [
     bgColor: 'bg-yellow-500/10',
     textColor: 'text-yellow-400',
     benefits: [
-      '+20 crédits bonus par jour',
+      '+10 crédits bonus V.I.P par jour (20 au total)',
       'Tous les avantages Silver',
       'Badge V.I.P Gold légendaire',
       'Accès aux événements exclusifs',
@@ -112,8 +113,8 @@ const FAQ_ITEMS = [
     answer: 'L\'abonnement V.I.P est un paiement mensuel de 9,99€. Il se renouvelle automatiquement chaque mois. Tu peux annuler à tout moment depuis ton profil.',
   },
   {
-    question: 'Les bonus de crédits sont-ils cumulés ?',
-    answer: 'Les bonus de crédits remplacent le bonus du niveau précédent. Par exemple, au niveau Gold, tu reçois +20 crédits/jour (pas 10+15+20).',
+    question: 'Comment fonctionnent les crédits V.I.P ?',
+    answer: 'En tant que V.I.P, tu reçois les 10 crédits gratuits quotidiens comme tout le monde, PLUS un bonus de +10 crédits à récupérer chaque jour sur ton dashboard V.I.P. Soit 20 crédits par jour au total !',
   },
   {
     question: 'Puis-je annuler mon abonnement ?',
@@ -132,7 +133,7 @@ type VIPDetailsState = {
   memberSince: string
   daysUntilNextTier: number
   totalCreditsEarned: number
-  dailyBonusReceived: boolean
+  currentCredits: number
   subscriptionId: string | null
 } | null
 
@@ -142,14 +143,24 @@ export default function VIPPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [isCheckingVIP, setIsCheckingVIP] = useState(true)
   const [vipDetails, setVipDetails] = useState<VIPDetailsState>(null)
+  const [canCollect, setCanCollect] = useState(false)
+  const [isCollectingBonus, setIsCollectingBonus] = useState(false)
 
   // Check VIP status on mount
   useEffect(() => {
     async function checkVIP() {
       try {
-        const result = await getVIPDetails()
-        if (result.success && result.data) {
-          setVipDetails(result.data)
+        const [vipResult, bonusResult] = await Promise.all([
+          getVIPDetails(),
+          canCollectVIPBonus()
+        ])
+
+        if (vipResult.success && vipResult.data) {
+          setVipDetails(vipResult.data)
+        }
+
+        if (bonusResult.success && bonusResult.data) {
+          setCanCollect(bonusResult.data.canCollect)
         }
       } catch {
         // User is not VIP or not logged in
@@ -195,6 +206,32 @@ export default function VIPPage() {
     }
   }
 
+  const handleCollectBonus = async () => {
+    setIsCollectingBonus(true)
+    try {
+      const result = await collectVIPDailyBonus()
+      if (result.success && result.data) {
+        setCanCollect(false)
+        // Update current credits in vipDetails
+        if (vipDetails) {
+          setVipDetails({
+            ...vipDetails,
+            currentCredits: result.data.newTotal,
+            totalCreditsEarned: vipDetails.totalCreditsEarned + result.data.creditsAdded
+          })
+        }
+      } else {
+        console.error('Failed to collect bonus:', result.error)
+        alert(result.error || 'Erreur lors de la récupération du bonus')
+      }
+    } catch (error) {
+      console.error('Error collecting bonus:', error)
+      alert('Erreur lors de la récupération du bonus')
+    } finally {
+      setIsCollectingBonus(false)
+    }
+  }
+
   // Loading state
   if (isCheckingVIP) {
     return (
@@ -217,7 +254,10 @@ export default function VIPPage() {
             memberSince={vipDetails.memberSince}
             daysUntilNextTier={vipDetails.daysUntilNextTier}
             totalCreditsEarned={vipDetails.totalCreditsEarned}
-            dailyBonusReceived={vipDetails.dailyBonusReceived}
+            currentCredits={vipDetails.currentCredits}
+            canCollectBonus={canCollect}
+            isCollectingBonus={isCollectingBonus}
+            onCollectBonus={handleCollectBonus}
             onManageSubscription={handleManageSubscription}
           />
         </div>

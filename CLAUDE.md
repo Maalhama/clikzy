@@ -21,6 +21,49 @@ Toutes les interactions avec la base de données passent par les outils appropri
 - Retourne 500 uniquement pour les vraies erreurs serveur
 - Messages d'erreur clairs et actionnables
 
+### 5. Persistance des données joueur (CRITIQUE)
+
+**RÈGLE ABSOLUE** : Les données importantes des joueurs ne sont JAMAIS supprimées ou réinitialisées.
+
+| Donnée | Champ | Reset quotidien ? | Supprimée ? |
+|--------|-------|-------------------|-------------|
+| Victoires | `profiles.total_wins` | JAMAIS | JAMAIS |
+| Total clics | `profiles.total_clicks` | JAMAIS | JAMAIS |
+| Crédits gagnés | `profiles.earned_credits` | JAMAIS | JAMAIS |
+| Badges | `user_badges` | JAMAIS | JAMAIS |
+| Historique victoires | `winners` | JAMAIS | JAMAIS |
+| Parrainages | `profiles.referral_count` | JAMAIS | JAMAIS |
+| Mini-jeux joués | `mini_game_plays` | JAMAIS | JAMAIS |
+| Crédits quotidiens | `profiles.credits` | OUI (free only) | Non |
+
+**Ce qui EST reset quotidiennement :**
+- `profiles.credits` → Reset à 10 pour les utilisateurs gratuits ET VIP
+- Compteur de parties gratuites mini-jeux (1/jour)
+
+**Qui N'EST PAS reset :**
+- Utilisateurs ayant acheté des crédits (`has_purchased_credits = true`) → Gardent leurs crédits à vie
+
+**Bonus V.I.P :**
+- Les VIP reçoivent 10 crédits gratuits comme tout le monde (reset quotidien)
+- PLUS +10 crédits bonus à récolter manuellement sur leur dashboard VIP
+- Soit 20 crédits par jour au total (10 auto + 10 à cliquer)
+
+**Ce qui n'est JAMAIS reset :**
+- Tous les compteurs permanents (wins, clicks, earned_credits)
+- Tous les badges obtenus
+- Tout l'historique de victoires
+- Données de parrainage
+- Informations de profil (username, avatar, adresse)
+
+**Quand tu ajoutes des crédits comme récompense (badges, mini-jeux, parrainages) :**
+```typescript
+// CORRECT - Ajoute aux earned_credits (permanent)
+.update({ earned_credits: profile.earned_credits + reward })
+
+// INCORRECT - Serait reset le lendemain
+.update({ credits: profile.credits + reward })
+```
+
 ## Priorité de documentation
 
 1. **Context7 MCP** pour la doc des librairies

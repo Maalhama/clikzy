@@ -166,20 +166,21 @@ export async function checkAndAwardBadges(): Promise<BadgeCheckResult> {
     }
   }
 
-  // Award all credits at once
+  // Award all credits at once to EARNED_CREDITS (permanent, never reset)
   if (totalCreditsEarned > 0) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data: currentProfile } = await (supabase as any)
       .from('profiles')
-      .select('credits')
+      .select('earned_credits')
       .eq('id', user.id)
       .single()
 
     if (currentProfile) {
+      // IMPORTANT: Add to earned_credits (permanent), NOT credits (resets daily)
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       await (supabase as any)
         .from('profiles')
-        .update({ credits: (currentProfile.credits || 0) + totalCreditsEarned })
+        .update({ earned_credits: (currentProfile.earned_credits || 0) + totalCreditsEarned })
         .eq('id', user.id)
     }
   }
