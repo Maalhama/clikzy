@@ -102,7 +102,7 @@ export function BrandMarquee() {
           {BRAND_LOGOS.map((brand, index) => (
             <div
               key={`brand-1-${index}`}
-              className="flex-shrink-0 opacity-80 hover:opacity-100 transition-all duration-300 hover:scale-110"
+              className="flex-shrink-0 transition-all duration-300 hover:scale-110"
             >
               <BrandLogo brand={brand} />
             </div>
@@ -114,7 +114,7 @@ export function BrandMarquee() {
           {BRAND_LOGOS.map((brand, index) => (
             <div
               key={`brand-2-${index}`}
-              className="flex-shrink-0 opacity-80 hover:opacity-100 transition-all duration-300 hover:scale-110"
+              className="flex-shrink-0 transition-all duration-300 hover:scale-110"
             >
               <BrandLogo brand={brand} />
             </div>
