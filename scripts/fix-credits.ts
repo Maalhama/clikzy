@@ -8,14 +8,26 @@ const supabase = createClient(
 )
 
 async function fix() {
-  // Restore Malhamaa's credits - they had 50+ before the migration issue
+  // Add 100 earned_credits to Mehdijouez
+  const { data: current } = await supabase
+    .from('profiles')
+    .select('username, credits, earned_credits')
+    .ilike('username', '%mehdijouez%')
+    .single()
+
+  if (!current) {
+    console.log('User not found')
+    return
+  }
+
+  console.log('Current:', current)
+
   const { data, error } = await supabase
     .from('profiles')
-    .update({ 
-      credits: 10,  // Daily credits
-      earned_credits: 50  // Restore earned credits
+    .update({
+      earned_credits: (current.earned_credits || 0) + 100
     })
-    .ilike('username', '%malhamaa%')
+    .ilike('username', '%mehdijouez%')
     .select('username, credits, earned_credits')
 
   if (error) {

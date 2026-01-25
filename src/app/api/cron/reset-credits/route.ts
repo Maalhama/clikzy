@@ -9,6 +9,7 @@ const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
 
 const CRON_SECRET = process.env.CRON_SECRET
 const DAILY_FREE_CREDITS = 10
+const DAILY_VIP_CREDITS = 20 // 10 base + 10 VIP bonus
 
 export async function GET(request: NextRequest) {
   // Verify authentication
@@ -41,7 +42,7 @@ export async function GET(request: NextRequest) {
     // Find all free users who haven't been reset today
     const { data: freeUsers, error: fetchError } = await supabase
       .from('profiles')
-      .select('id, username, credits, earned_credits, last_credits_reset')
+      .select('id, username, credits, earned_credits, last_credits_reset, is_vip, vip_expires_at')
       .eq('has_purchased_credits', false)
       .lt('last_credits_reset', todayMidnight.toISOString())
 
@@ -50,7 +51,27 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Failed to fetch profiles' }, { status: 500 })
     }
 
-    if (!freeUsers || freeUsers.length === 0) {
+    // Also find VIP users who need reset (VIP overrides has_purchased_credits for daily reset)
+    const { data: vipUsers, error: vipFetchError } = await supabase
+      .from('profiles')
+      .select('id, username, credits, earned_credits, last_credits_reset, is_vip, vip_expires_at')
+      .eq('is_vip', true)
+      .gt('vip_expires_at', new Date().toISOString())
+      .lt('last_credits_reset', todayMidnight.toISOString())
+
+    if (vipFetchError) {
+      console.error('Error fetching VIP profiles:', vipFetchError)
+    }
+
+    const allUsers = freeUsers || []
+    const activeVipUsers = vipUsers || []
+
+    // Separate VIP and non-VIP users (avoid duplicates)
+    const vipUserIds = new Set(activeVipUsers.map(u => u.id))
+    const nonVipFreeUsers = allUsers.filter(u => !vipUserIds.has(u.id) && !u.is_vip)
+    const vipUsersToReset = activeVipUsers
+
+    if (nonVipFreeUsers.length === 0 && vipUsersToReset.length === 0) {
       return NextResponse.json({
         message: 'No users need daily credits reset',
         resetCount: 0,
@@ -59,28 +80,45 @@ export async function GET(request: NextRequest) {
 
     const resetTimestamp = new Date().toISOString()
 
-    // Reset daily credits to 10 for all free users
-    // Note: earned_credits (from mini-games) are NOT touched - they persist forever
-    const { error: resetError } = await supabase
-      .from('profiles')
-      .update({
-        credits: DAILY_FREE_CREDITS, // Reset daily credits to 10
-        last_credits_reset: resetTimestamp,
-      })
-      .in('id', freeUsers.map(u => u.id))
+    // Reset daily credits to 10 for free non-VIP users
+    if (nonVipFreeUsers.length > 0) {
+      const { error: resetError } = await supabase
+        .from('profiles')
+        .update({
+          credits: DAILY_FREE_CREDITS,
+          last_credits_reset: resetTimestamp,
+        })
+        .in('id', nonVipFreeUsers.map(u => u.id))
 
-    if (resetError) {
-      console.error('Error resetting credits:', resetError)
-      return NextResponse.json({ error: 'Failed to reset credits' }, { status: 500 })
+      if (resetError) {
+        console.error('Error resetting free users credits:', resetError)
+      }
     }
 
-    console.log(`Reset daily credits for ${freeUsers.length} free users (earned_credits preserved)`)
+    // Reset daily credits to 20 for VIP users (10 base + 10 VIP bonus)
+    if (vipUsersToReset.length > 0) {
+      const { error: vipResetError } = await supabase
+        .from('profiles')
+        .update({
+          credits: DAILY_VIP_CREDITS,
+          last_credits_reset: resetTimestamp,
+        })
+        .in('id', vipUsersToReset.map(u => u.id))
+
+      if (vipResetError) {
+        console.error('Error resetting VIP users credits:', vipResetError)
+      }
+    }
+
+    const totalReset = nonVipFreeUsers.length + vipUsersToReset.length
+    console.log(`Reset daily credits: ${nonVipFreeUsers.length} free users (10 credits), ${vipUsersToReset.length} VIP users (20 credits)`)
 
     return NextResponse.json({
-      message: `Reset daily credits for ${freeUsers.length} users`,
-      resetCount: freeUsers.length,
-      dailyCreditsGiven: DAILY_FREE_CREDITS,
-      note: 'earned_credits preserved',
+      message: `Reset daily credits for ${totalReset} users`,
+      resetCount: totalReset,
+      freeUsersReset: nonVipFreeUsers.length,
+      vipUsersReset: vipUsersToReset.length,
+      note: 'VIP users get 20 credits (10 base + 10 bonus)',
     })
   } catch (error) {
     console.error('Cron error:', error)
