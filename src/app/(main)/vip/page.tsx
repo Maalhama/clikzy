@@ -2,7 +2,8 @@
 
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { VIPSubscriptionModal } from '@/components/modals/VIPSubscriptionModal'
+import VIPSubscriptionModal from '@/components/modals/VIPSubscriptionModal'
+import { createVIPCheckoutSession } from '@/actions/stripe'
 
 const VIP_TIERS = [
   {
@@ -74,6 +75,23 @@ const FAQ_ITEMS = [
 export default function VIPPage() {
   const [showModal, setShowModal] = useState(false)
   const [openFAQ, setOpenFAQ] = useState<number | null>(null)
+  const [isLoading, setIsLoading] = useState(false)
+
+  const handleSubscribe = async () => {
+    setIsLoading(true)
+    try {
+      const result = await createVIPCheckoutSession()
+      if (result.success && result.data?.url) {
+        window.location.href = result.data.url
+      } else {
+        console.error('Failed to create checkout session:', result.error)
+        setIsLoading(false)
+      }
+    } catch (error) {
+      console.error('Error creating checkout session:', error)
+      setIsLoading(false)
+    }
+  }
 
   return (
     <>
@@ -256,12 +274,12 @@ export default function VIPPage() {
       </div>
 
       {/* VIP Subscription Modal */}
-      {showModal && (
-        <VIPSubscriptionModal
-          isOpen={showModal}
-          onClose={() => setShowModal(false)}
-        />
-      )}
+      <VIPSubscriptionModal
+        isOpen={showModal}
+        onClose={() => setShowModal(false)}
+        onSubscribe={handleSubscribe}
+        isLoading={isLoading}
+      />
     </>
   )
 }
