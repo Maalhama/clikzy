@@ -202,7 +202,6 @@ function SlotMachineFrame() {
         color="#0B0F1A"
         anchorX="center"
         anchorY="middle"
-        font="/fonts/Inter-Bold.ttf"
       >
         ⚡ JACKPOT ⚡
       </Text>
@@ -473,8 +472,7 @@ function SlotMachineScene({
             color={isJackpot || allMatch ? NEON_COLORS.orange : prizeAmount > 0 ? NEON_COLORS.green : '#ffffff'}
             anchorX="center"
             anchorY="middle"
-            font="/fonts/Inter-Bold.ttf"
-          >
+              >
             {allMatch ? 'TRIPLE!' : isJackpot ? 'JACKPOT!' : prizeAmount > 0 ? 'Gagné!' : 'Perdu'}
           </Text>
           <Text
@@ -483,8 +481,7 @@ function SlotMachineScene({
             color={isJackpot || allMatch ? NEON_COLORS.orange : '#ffffff'}
             anchorX="center"
             anchorY="middle"
-            font="/fonts/Inter-Bold.ttf"
-          >
+              >
             {prizeAmount > 0 ? `+${prizeAmount}` : `${prizeAmount}`} crédits
           </Text>
         </group>

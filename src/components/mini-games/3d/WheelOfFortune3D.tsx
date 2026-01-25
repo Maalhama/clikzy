@@ -148,7 +148,6 @@ function WheelSegment({
         color={segment.textColor}
         anchorX="center"
         anchorY="middle"
-        font="/fonts/Inter-Bold.ttf"
       >
         {segment.value}
       </Text>
@@ -210,7 +209,6 @@ function CenterHub({ onClick, isSpinning }: { onClick: () => void; isSpinning: b
         color="#ffffff"
         anchorX="center"
         anchorY="middle"
-        font="/fonts/Inter-Bold.ttf"
       >
         {isSpinning ? '...' : 'SPIN'}
       </Text>

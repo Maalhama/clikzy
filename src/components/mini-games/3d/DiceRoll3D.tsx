@@ -418,7 +418,6 @@ function DiceScene({
             color={sum === 12 ? NEON_COLORS.orange : NEON_COLORS.green}
             anchorX="center"
             anchorY="middle"
-            font="/fonts/Inter-Bold.ttf"
           >
             {landedValues[0]} + {landedValues[1]} = {sum}
           </Text>
@@ -428,7 +427,6 @@ function DiceScene({
             color={credits >= 8 ? NEON_COLORS.orange : '#ffffff'}
             anchorX="center"
             anchorY="middle"
-            font="/fonts/Inter-Bold.ttf"
           >
             +{credits} crédits
           </Text>
@@ -439,7 +437,6 @@ function DiceScene({
               color={NEON_COLORS.orange}
               anchorX="center"
               anchorY="middle"
-              font="/fonts/Inter-Bold.ttf"
             >
               DOUBLE 6 !
             </Text>
@@ -463,7 +460,6 @@ function DiceScene({
             color="#ffffff"
             anchorX="center"
             anchorY="middle"
-            font="/fonts/Inter-Bold.ttf"
           >
             LANCER
           </Text>

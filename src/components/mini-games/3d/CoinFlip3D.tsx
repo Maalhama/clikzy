@@ -236,7 +236,6 @@ function Coin3D({
         color="#4A5568"
         anchorX="center"
         anchorY="middle"
-        font="/fonts/Inter-Bold.ttf"
       >
         C
       </Text>
@@ -387,8 +386,7 @@ function CoinFlipScene({
             color={landedSide === 'heads' ? NEON_COLORS.orange : '#C0C0C0'}
             anchorX="center"
             anchorY="middle"
-            font="/fonts/Inter-Bold.ttf"
-          >
+              >
             {landedSide === 'heads' ? '⚡ PILE !' : '🪙 FACE !'}
           </Text>
           <Text
@@ -397,8 +395,7 @@ function CoinFlipScene({
             color={isWin ? NEON_COLORS.orange : '#ffffff'}
             anchorX="center"
             anchorY="middle"
-            font="/fonts/Inter-Bold.ttf"
-          >
+              >
             {isWin ? `+${prizeAmount}` : '0'} crédits
           </Text>
         </group>
@@ -421,8 +418,7 @@ function CoinFlipScene({
             color="#0B0F1A"
             anchorX="center"
             anchorY="middle"
-            font="/fonts/Inter-Bold.ttf"
-          >
+              >
             🪙 LANCER
           </Text>
         </group>
