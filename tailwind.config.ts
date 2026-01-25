@@ -54,6 +54,7 @@ const config: Config = {
         'scroll-loop': 'scroll-loop 20s linear infinite',
         'marquee': 'marquee 30s linear infinite',
         'marquee-infinite': 'marquee-infinite 40s linear infinite',
+        'marquee-slow': 'marquee-infinite 80s linear infinite',
         'fade-in': 'fadeIn 0.3s ease-out forwards',
         'fade-in-up': 'fadeInUp 0.5s ease-out forwards',
         'fade-in-slide': 'fadeInSlide 0.3s ease-out forwards',

@@ -98,7 +98,7 @@ export function BrandMarquee() {
         }}
       >
         {/* Premier groupe - animation continue */}
-        <div className="flex items-center gap-10 md:gap-14 pr-10 md:pr-14 animate-marquee-infinite">
+        <div className="flex items-center gap-16 md:gap-20 pr-16 md:pr-20 animate-marquee-slow">
           {BRAND_LOGOS.map((brand, index) => (
             <div
               key={`brand-1-${index}`}
@@ -110,7 +110,7 @@ export function BrandMarquee() {
         </div>
 
         {/* Deuxième groupe - dupliqué pour scroll infini seamless */}
-        <div className="flex items-center gap-10 md:gap-14 pr-10 md:pr-14 animate-marquee-infinite" aria-hidden="true">
+        <div className="flex items-center gap-16 md:gap-20 pr-16 md:pr-20 animate-marquee-slow" aria-hidden="true">
           {BRAND_LOGOS.map((brand, index) => (
             <div
               key={`brand-2-${index}`}
