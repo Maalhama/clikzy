@@ -85,15 +85,14 @@ export function Header({ profile }: HeaderProps) {
           <nav className="flex items-center gap-6">
             <Link
               href="/lobby"
-              className="flex items-center gap-2 text-white/60 hover:text-neon-blue transition-colors font-medium group"
+              className="flex items-center gap-2 text-white/60 hover:text-neon-pink transition-colors font-medium group"
             >
-              {/* Trophy icon - Neon style */}
-              <svg className="w-5 h-5 text-neon-blue/70 group-hover:text-neon-blue transition-colors drop-shadow-[0_0_6px_rgba(60,203,255,0.5)] group-hover:drop-shadow-[0_0_8px_rgba(60,203,255,0.8)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-                <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5C7 4 6 9 6 9Z" />
-                <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5C17 4 18 9 18 9Z" />
-                <path d="M4 22h16" />
-                <path d="M10 22V18.75a1.75 1.75 0 0 1 1.75-1.75h.5A1.75 1.75 0 0 1 14 18.75V22" />
-                <path d="M6 9a6 6 0 1 0 12 0H6Z" />
+              {/* Gamepad icon - Neon pink style */}
+              <svg className="w-5 h-5 text-neon-pink/70 group-hover:text-neon-pink transition-colors drop-shadow-[0_0_6px_rgba(255,79,216,0.5)] group-hover:drop-shadow-[0_0_8px_rgba(255,79,216,0.8)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                <path d="M6 11h4M8 9v4" />
+                <line x1="15" y1="12" x2="15.01" y2="12" />
+                <line x1="18" y1="10" x2="18.01" y2="10" />
+                <path d="M17.32 5H6.68a4 4 0 0 0-3.978 3.59c-.006.052-.01.101-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 0 1 9.828 16h4.344a2 2 0 0 1 1.414.586L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.545-.604-6.584-.685-7.258-.007-.05-.011-.1-.017-.151A4 4 0 0 0 17.32 5z" />
               </svg>
               <span>Lobby</span>
             </Link>
@@ -181,12 +180,16 @@ export function Header({ profile }: HeaderProps) {
                     {profile.is_vip && (
                       <span title="Membre V.I.P">
                         <svg
-                          className="w-4 h-4 text-yellow-400 drop-shadow-[0_0_8px_rgba(250,204,21,0.8)]"
+                          className="w-4 h-4 text-yellow-400 drop-shadow-[0_0_6px_rgba(250,204,21,0.8)]"
                           viewBox="0 0 24 24"
                           fill="currentColor"
                           aria-label="Membre V.I.P"
                         >
-                          <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" />
+                          <path d="M12 6l3.5 4.5L19 6l-2 10H7L5 6l3.5 4.5L12 6z" />
+                          <circle cx="12" cy="4" r="1.5" />
+                          <circle cx="5" cy="5" r="1.5" />
+                          <circle cx="19" cy="5" r="1.5" />
+                          <rect x="6" y="16" width="12" height="2" rx="0.5" />
                         </svg>
                       </span>
                     )}
@@ -288,12 +291,16 @@ export function Header({ profile }: HeaderProps) {
                       {profile.is_vip && (
                         <span title="Membre V.I.P">
                           <svg
-                            className="w-4 h-4 text-yellow-400 drop-shadow-[0_0_8px_rgba(250,204,21,0.8)]"
+                            className="w-4 h-4 text-yellow-400 drop-shadow-[0_0_6px_rgba(250,204,21,0.8)]"
                             viewBox="0 0 24 24"
                             fill="currentColor"
                             aria-label="Membre V.I.P"
                           >
-                            <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" />
+                            <path d="M12 6l3.5 4.5L19 6l-2 10H7L5 6l3.5 4.5L12 6z" />
+                            <circle cx="12" cy="4" r="1.5" />
+                            <circle cx="5" cy="5" r="1.5" />
+                            <circle cx="19" cy="5" r="1.5" />
+                            <rect x="6" y="16" width="12" height="2" rx="0.5" />
                           </svg>
                         </span>
                       )}
@@ -317,19 +324,18 @@ export function Header({ profile }: HeaderProps) {
               <Link
                 href="/lobby"
                 onClick={closeMenu}
-                className="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-neon-blue/10 transition-colors border border-transparent hover:border-neon-blue/30 group"
+                className="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-neon-pink/10 transition-colors border border-transparent hover:border-neon-pink/30 group"
               >
-                {/* Trophy icon - Neon style */}
-                <div className="w-8 h-8 rounded-lg bg-neon-blue/10 border border-neon-blue/30 flex items-center justify-center group-hover:bg-neon-blue/20 transition-colors shadow-[0_0_10px_rgba(60,203,255,0.2)] group-hover:shadow-[0_0_15px_rgba(60,203,255,0.4)]">
-                  <svg className="w-4 h-4 text-neon-blue" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5C7 4 6 9 6 9Z" />
-                    <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5C17 4 18 9 18 9Z" />
-                    <path d="M4 22h16" />
-                    <path d="M10 22V18.75a1.75 1.75 0 0 1 1.75-1.75h.5A1.75 1.75 0 0 1 14 18.75V22" />
-                    <path d="M6 9a6 6 0 1 0 12 0H6Z" />
+                {/* Gamepad icon - Neon pink style */}
+                <div className="w-8 h-8 rounded-lg bg-neon-pink/10 border border-neon-pink/30 flex items-center justify-center group-hover:bg-neon-pink/20 transition-colors shadow-[0_0_10px_rgba(255,79,216,0.2)] group-hover:shadow-[0_0_15px_rgba(255,79,216,0.4)]">
+                  <svg className="w-4 h-4 text-neon-pink" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M6 11h4M8 9v4" />
+                    <line x1="15" y1="12" x2="15.01" y2="12" />
+                    <line x1="18" y1="10" x2="18.01" y2="10" />
+                    <path d="M17.32 5H6.68a4 4 0 0 0-3.978 3.59c-.006.052-.01.101-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 0 1 9.828 16h4.344a2 2 0 0 1 1.414.586L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.545-.604-6.584-.685-7.258-.007-.05-.011-.1-.017-.151A4 4 0 0 0 17.32 5z" />
                   </svg>
                 </div>
-                <span className="font-medium text-white/80 group-hover:text-neon-blue transition-colors">Lobby</span>
+                <span className="font-medium text-white/80 group-hover:text-neon-pink transition-colors">Lobby</span>
               </Link>
               <Link
                 href="/mini-games"
