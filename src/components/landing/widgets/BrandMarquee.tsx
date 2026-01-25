@@ -56,8 +56,21 @@ const BRAND_LOGOS: BrandIcon[] = [
   siSteelseries,
 ]
 
+// Calcule la luminosité d'une couleur hex (0-255)
+function getLuminance(hex: string): number {
+  const r = parseInt(hex.slice(0, 2), 16)
+  const g = parseInt(hex.slice(2, 4), 16)
+  const b = parseInt(hex.slice(4, 6), 16)
+  // Formule de luminosité perçue
+  return (0.299 * r + 0.587 * g + 0.114 * b)
+}
+
 function BrandLogo({ brand }: { brand: BrandIcon }) {
-  const color = `#${brand.hex}`
+  const luminance = getLuminance(brand.hex)
+  // Si la couleur est trop sombre (luminance < 80), utiliser blanc
+  const color = luminance < 80 ? '#FFFFFF' : `#${brand.hex}`
+  const glowColor = luminance < 80 ? '#9B5CFF' : `#${brand.hex}` // Glow violet pour les logos blancs
+
   return (
     <svg
       viewBox="0 0 24 24"
@@ -66,7 +79,7 @@ function BrandLogo({ brand }: { brand: BrandIcon }) {
       role="img"
       aria-label={brand.title}
       style={{
-        filter: `drop-shadow(0 0 8px ${color}50) drop-shadow(0 0 16px ${color}30)`,
+        filter: `drop-shadow(0 0 8px ${glowColor}50) drop-shadow(0 0 16px ${glowColor}30)`,
       }}
     >
       <path d={brand.path} />
