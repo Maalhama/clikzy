@@ -62,7 +62,7 @@ export function Header({ profile }: HeaderProps) {
 
           {/* Logo - Center */}
           <div className="absolute left-1/2 -translate-x-1/2 z-10">
-            <Logo size="md" animated={false} href="/" />
+            <Logo size="md" animated={true} href="/" />
           </div>
 
           {/* Credits badge - Right */}
