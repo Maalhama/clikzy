@@ -618,17 +618,24 @@ export const GameCard = memo(function GameCard({ game, index = 0, isFavorite = f
         ) : (
           <div
             className={`
-              py-3 rounded-xl text-center font-bold text-sm transition-all
+              py-3 rounded-xl text-center font-bold text-sm transition-all flex items-center justify-center gap-2
               ${
-                isUrgent
+                (game.item?.retail_value ?? 0) >= 1000
+                  ? isUrgent
+                    ? 'bg-gradient-to-r from-[#FFB800] via-[#FF8C00] to-[#FFD700] text-[#0B0F1A] group-hover:opacity-90 shadow-[0_0_20px_rgba(255,184,0,0.5)] animate-pulse'
+                    : 'bg-gradient-to-r from-[#FFB800] via-[#FFD700] to-[#FF8C00] text-[#0B0F1A] group-hover:opacity-90 shadow-[0_0_15px_rgba(255,184,0,0.4)]'
+                  : isUrgent
                   ? 'bg-danger text-white group-hover:bg-danger/90 shadow-neon-danger'
-                  : (game.item?.retail_value ?? 0) >= 1000
-                  ? 'bg-gradient-to-r from-yellow-500 to-amber-600 text-white group-hover:opacity-90 shadow-[0_0_15px_rgba(234,179,8,0.4)]'
                   : 'bg-gradient-to-r from-neon-purple to-neon-pink text-white group-hover:opacity-90 shadow-neon-purple'
               }
             `}
           >
-            {isCritical ? 'CLIQUE !' : isUrgent ? 'FONCE' : (game.item?.retail_value ?? 0) >= 1000 ? 'V.I.P' : 'JOUER'}
+            {(game.item?.retail_value ?? 0) >= 1000 && (
+              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M5 16L3 5l5.5 5L12 4l3.5 6L21 5l-2 11H5zm14 3c0 .6-.4 1-1 1H6c-.6 0-1-.4-1-1v-1h14v1z"/>
+              </svg>
+            )}
+            {isCritical ? 'CLIQUE !' : isUrgent ? 'FONCE !' : (game.item?.retail_value ?? 0) >= 1000 ? 'V.I.P' : 'JOUER'}
           </div>
         )}
       </div>
