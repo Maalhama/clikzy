@@ -1,38 +1,58 @@
-## Description
+## 📝 Description
 
-<!-- Décris les changements apportés -->
+Résumé clair de ce que fait cette PR et pourquoi.
 
-## Type de changement
+Fixes #(issue_number)
 
-- [ ] Nouvelle fonctionnalité (feat)
-- [ ] Correction de bug (fix)
-- [ ] Refactoring (refactor)
-- [ ] Style / UI (style)
-- [ ] Documentation (docs)
-- [ ] Tests (test)
-- [ ] Maintenance (chore)
+## 🎯 Type de Changement
 
-## Changements
+- [ ] 🐛 Bug fix (changement non-breaking qui corrige un bug)
+- [ ] ✨ New feature (changement non-breaking qui ajoute une fonctionnalité)
+- [ ] 💥 Breaking change (fix ou feature qui casse la compatibilité)
+- [ ] 📚 Documentation update
+- [ ] 🎨 Style/UI update
+- [ ] ♻️ Refactoring
+- [ ] ⚡ Performance improvement
+- [ ] ✅ Test update
 
-<!-- Liste les fichiers modifiés et pourquoi -->
+## 🧪 Comment Tester
 
--
+1. Checkout cette branche
+2. `npm install`
+3. `npm run dev`
+4. Tester : [décrire les étapes]
 
-## Tests effectués
+## ✅ Checklist
 
-- [ ] Tests unitaires passent (`npm run test:run`)
-- [ ] Lint OK (`npm run lint`)
-- [ ] Build OK (`npm run build`)
-- [ ] Tests manuels effectués
-
-## Screenshots (si applicable)
-
-<!-- Ajoute des captures d'écran pour les changements UI -->
-
-## Checklist
-
-- [ ] Mon code suit les conventions du projet
+- [ ] Mon code suit les standards du projet
+- [ ] J'ai commenté les parties complexes
 - [ ] J'ai mis à jour la documentation si nécessaire
-- [ ] J'ai ajouté des tests pour les nouvelles fonctionnalités
-- [ ] Tous les tests passent
-- [ ] Pas de console.log ou code de debug
+- [ ] Mes changements ne génèrent pas de nouveaux warnings
+- [ ] J'ai ajouté des tests qui valident mon fix/feature
+- [ ] Tous les tests passent (`npm run test:run`)
+- [ ] Le build passe (`npm run build`)
+- [ ] Le linting passe (`npm run lint`)
+
+## 📸 Screenshots / GIFs
+
+Si changement UI, ajoute des screenshots avant/après.
+
+**Avant** :
+
+**Après** :
+
+## 📊 Performance Impact
+
+- [ ] Aucun impact
+- [ ] Amélioration
+- [ ] Dégradation (justifier)
+
+## 🔒 Sécurité
+
+- [ ] Cette PR n'introduit pas de problème de sécurité
+- [ ] J'ai vérifié les inputs utilisateur
+- [ ] J'ai vérifié les permissions RLS (Supabase)
+
+## 📝 Notes Additionnelles
+
+Contexte supplémentaire pour les reviewers.
