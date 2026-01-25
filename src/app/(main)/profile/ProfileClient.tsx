@@ -266,6 +266,14 @@ export function ProfileClient({ profile, wins, gamesPlayed, totalValueWon, gameH
                     <h1 className="text-xl font-bold text-white truncate">
                       {profile.username || 'Joueur'}
                     </h1>
+                    {profile.is_vip && (
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-gradient-to-r from-yellow-500/20 to-amber-500/20 border border-yellow-500/30 shadow-[0_0_10px_rgba(234,179,8,0.3)]">
+                        <svg className="w-3.5 h-3.5 text-yellow-400" viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" />
+                        </svg>
+                        <span className="text-xs font-bold text-yellow-400 tracking-wide">V.I.P</span>
+                      </span>
+                    )}
                     <button
                       onClick={() => setIsEditingUsername(true)}
                       className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-white/50 hover:text-white transition-all"
