@@ -3,6 +3,43 @@
 import { useState, useCallback, memo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 
+// Neon SVG Icons
+const WaitingIcon = () => (
+  <svg className="w-12 h-12 text-neon-blue drop-shadow-[0_0_10px_rgba(60,203,255,0.8)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round">
+    <circle cx="12" cy="12" r="10" />
+    <path d="M12 6v6l4 2" />
+  </svg>
+)
+
+const EndedIcon = () => (
+  <svg className="w-12 h-12 text-neon-purple drop-shadow-[0_0_10px_rgba(155,92,255,0.8)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round">
+    <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z" />
+    <line x1="4" y1="22" x2="4" y2="15" />
+  </svg>
+)
+
+const NoCreditsIcon = () => (
+  <svg className="w-12 h-12 text-danger drop-shadow-[0_0_10px_rgba(239,68,68,0.8)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round">
+    <circle cx="12" cy="12" r="10" />
+    <path d="M12 6v12M9 9c0-1 1-2 3-2s3 1 3 2-1 2-3 2-3 1-3 2 1 2 3 2 3-1 3-2" />
+    <line x1="4" y1="4" x2="20" y2="20" strokeWidth={2} />
+  </svg>
+)
+
+const ClickIcon = () => (
+  <svg className="w-14 h-14 text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.8)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round">
+    <path d="M15 15l-2 5L9 9l11 4-5 2z" />
+    <path d="M14 14l5 5" />
+  </svg>
+)
+
+const CrownIcon = () => (
+  <svg className="w-4 h-4 text-yellow-400 drop-shadow-[0_0_6px_rgba(250,204,21,0.8)]" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M12 6l3.5 4.5L19 6l-2 10H7L5 6l3.5 4.5L12 6z" />
+    <rect x="6" y="16" width="12" height="2" rx="0.5" />
+  </svg>
+)
+
 interface GameClickZoneProps {
   onClickAction: () => void
   disabled: boolean
@@ -84,7 +121,7 @@ export const GameClickZone = memo(function GameClickZone({
     if (status === 'waiting') {
       return (
         <div className="flex flex-col items-center gap-2">
-          <span className="text-5xl">⏳</span>
+          <WaitingIcon />
           <span className="text-lg font-medium">En attente</span>
         </div>
       )
@@ -93,7 +130,7 @@ export const GameClickZone = memo(function GameClickZone({
     if (status === 'ended') {
       return (
         <div className="flex flex-col items-center gap-2">
-          <span className="text-5xl">🏁</span>
+          <EndedIcon />
           <span className="text-lg font-medium">Partie terminée</span>
         </div>
       )
@@ -102,7 +139,7 @@ export const GameClickZone = memo(function GameClickZone({
     if (!hasCredits) {
       return (
         <div className="flex flex-col items-center gap-2">
-          <span className="text-5xl">💸</span>
+          <NoCreditsIcon />
           <span className="text-lg font-medium">Crédits insuffisants</span>
         </div>
       )
@@ -110,14 +147,13 @@ export const GameClickZone = memo(function GameClickZone({
 
     return (
       <div className="flex flex-col items-center gap-1">
-        <motion.span
+        <motion.div
           key={clickCount}
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          className="text-6xl"
         >
-          👆
-        </motion.span>
+          <ClickIcon />
+        </motion.div>
         <span className="text-2xl font-bold">CLIQUER</span>
         <span className="text-sm opacity-75">1 crédit par clic</span>
       </div>
@@ -231,7 +267,7 @@ export const GameClickZone = memo(function GameClickZone({
         >
           <span className="text-text-secondary">Leader actuel :</span>
           <span className="font-semibold text-neon-purple flex items-center gap-1">
-            <span>👑</span>
+            <CrownIcon />
             {lastClickUsername}
           </span>
         </motion.div>

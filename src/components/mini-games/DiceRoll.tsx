@@ -435,7 +435,7 @@ export default function DiceRoll({
             }
           `}
         >
-          {isRolling ? '🎲 ...' : '🎲 Lancer'}
+          {isRolling ? 'Lancer...' : 'Lancer'}
         </button>
       )}
 

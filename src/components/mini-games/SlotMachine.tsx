@@ -321,7 +321,7 @@ export default function SlotMachine({
                 }
               `}
             >
-              {isSpinning ? '⚡ ...' : 'SPIN!'}
+              {isSpinning ? 'SPIN...' : 'SPIN!'}
             </motion.button>
           </div>
         </div>

@@ -20,7 +20,7 @@ export function Timer({ timeLeft, isUrgent, status }: TimerProps) {
   const getStatusLabel = () => {
     if (status === 'waiting') return 'Commence bientôt'
     if (status === 'ended') return 'Terminé'
-    if (isUrgent) return '⚡ Phase finale !'
+    if (isUrgent) return 'Phase finale !'
     return 'Temps restant'
   }
 

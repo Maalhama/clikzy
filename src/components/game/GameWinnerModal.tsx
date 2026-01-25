@@ -6,6 +6,27 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 
+// Neon SVG Icons
+const CelebrationIcon = () => (
+  <svg className="w-20 h-20 text-success drop-shadow-[0_0_25px_rgba(0,255,136,0.8)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round">
+    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" fill="currentColor" />
+    <circle cx="5" cy="5" r="1" fill="currentColor" />
+    <circle cx="19" cy="5" r="1" fill="currentColor" />
+    <circle cx="3" cy="12" r="1" fill="currentColor" />
+    <circle cx="21" cy="12" r="1" fill="currentColor" />
+  </svg>
+)
+
+const TrophyIcon = () => (
+  <svg className="w-16 h-16 text-neon-purple drop-shadow-[0_0_20px_rgba(155,92,255,0.8)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round">
+    <path d="M6 9H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h2" />
+    <path d="M18 9h2a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-2" />
+    <path d="M6 3h12v9a6 6 0 0 1-12 0V3z" />
+    <path d="M12 18v4" />
+    <path d="M8 22h8" />
+  </svg>
+)
+
 interface GameWinnerModalProps {
   isOpen: boolean
   isWinner: boolean
@@ -120,9 +141,9 @@ export const GameWinnerModal = memo(function GameWinnerModal({
                     <motion.div
                       animate={{ scale: [1, 1.2, 1], rotate: [0, 10, -10, 0] }}
                       transition={{ repeat: Infinity, duration: 2 }}
-                      className="text-8xl mb-4"
+                      className="mb-4 flex justify-center"
                     >
-                      🎉
+                      <CelebrationIcon />
                     </motion.div>
                     <motion.h2
                       initial={{ opacity: 0, y: 10 }}
@@ -181,7 +202,7 @@ export const GameWinnerModal = memo(function GameWinnerModal({
                 <>
                   {/* Loser content */}
                   <div className="text-center">
-                    <div className="text-7xl mb-4">🏆</div>
+                    <div className="mb-4 flex justify-center"><TrophyIcon /></div>
                     <h2 className="text-2xl font-bold text-white mb-2">
                       Partie terminée
                     </h2>

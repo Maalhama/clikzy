@@ -5,10 +5,32 @@ import { motion } from 'framer-motion'
 import VIPSubscriptionModal from '@/components/modals/VIPSubscriptionModal'
 import { createVIPCheckoutSession } from '@/actions/stripe'
 
+// Neon Medal Icons for VIP tiers
+const BronzeMedalIcon = () => (
+  <svg className="w-6 h-6 text-amber-600 drop-shadow-[0_0_8px_rgba(217,119,6,0.6)]" viewBox="0 0 24 24" fill="currentColor">
+    <circle cx="12" cy="9" r="6" />
+    <path d="M8 15l-2 7 6-3 6 3-2-7" />
+  </svg>
+)
+
+const SilverMedalIcon = () => (
+  <svg className="w-6 h-6 text-slate-300 drop-shadow-[0_0_8px_rgba(148,163,184,0.6)]" viewBox="0 0 24 24" fill="currentColor">
+    <circle cx="12" cy="9" r="6" />
+    <path d="M8 15l-2 7 6-3 6 3-2-7" />
+  </svg>
+)
+
+const GoldMedalIcon = () => (
+  <svg className="w-6 h-6 text-yellow-400 drop-shadow-[0_0_8px_rgba(250,204,21,0.6)]" viewBox="0 0 24 24" fill="currentColor">
+    <circle cx="12" cy="9" r="6" />
+    <path d="M8 15l-2 7 6-3 6 3-2-7" />
+  </svg>
+)
+
 const VIP_TIERS = [
   {
     name: 'Bronze',
-    emoji: '🥉',
+    icon: BronzeMedalIcon,
     duration: 'Dès le 1er mois',
     color: 'from-amber-600 to-amber-800',
     borderColor: 'border-amber-500/30',
@@ -23,7 +45,7 @@ const VIP_TIERS = [
   },
   {
     name: 'Silver',
-    emoji: '🥈',
+    icon: SilverMedalIcon,
     duration: 'Après 3 mois',
     color: 'from-slate-300 to-slate-500',
     borderColor: 'border-slate-400/30',
@@ -38,7 +60,7 @@ const VIP_TIERS = [
   },
   {
     name: 'Gold',
-    emoji: '🥇',
+    icon: GoldMedalIcon,
     duration: 'Après 6 mois',
     color: 'from-yellow-400 to-amber-500',
     borderColor: 'border-yellow-500/30',
@@ -172,8 +194,8 @@ export default function VIPPage() {
                 >
                   {/* Tier header */}
                   <div className="flex items-center gap-3 mb-4">
-                    <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${tier.color} flex items-center justify-center text-2xl`}>
-                      {tier.emoji}
+                    <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${tier.color} flex items-center justify-center`}>
+                      <tier.icon />
                     </div>
                     <div>
                       <h3 className={`text-xl font-bold ${tier.textColor}`}>
@@ -224,7 +246,10 @@ export default function VIPPage() {
               onClick={() => setShowModal(true)}
               className="inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-gradient-to-r from-yellow-500 to-amber-600 text-black font-bold text-lg hover:from-yellow-400 hover:to-amber-500 transition-all transform hover:scale-105 shadow-lg shadow-yellow-500/30"
             >
-              <span>👑</span>
+              <svg className="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 6l3.5 4.5L19 6l-2 10H7L5 6l3.5 4.5L12 6z" />
+                <rect x="6" y="16" width="12" height="2" rx="0.5" />
+              </svg>
               <span>S&apos;abonner V.I.P</span>
               <span className="text-sm font-normal opacity-75">9,99€/mois</span>
             </button>

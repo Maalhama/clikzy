@@ -4,6 +4,17 @@ import { memo, useState } from 'react'
 import { motion } from 'framer-motion'
 import type { Item } from '@/types/database'
 
+// Neon SVG Icon for fallback
+const GiftIcon = () => (
+  <svg className="w-8 h-8 text-neon-purple drop-shadow-[0_0_10px_rgba(155,92,255,0.8)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round">
+    <rect x="3" y="8" width="18" height="14" rx="2" />
+    <path d="M12 8v14" />
+    <path d="M3 12h18" />
+    <path d="M12 8c-2-2-4-3-6-2s-2 3 0 4 4 0 6-2z" />
+    <path d="M12 8c2-2 4-3 6-2s2 3 0 4-4 0-6-2z" />
+  </svg>
+)
+
 interface GameItemDisplayProps {
   item: Item
   isUrgent: boolean
@@ -47,8 +58,8 @@ export const GameItemDisplay = memo(function GameItemDisplay({
           `} />
           <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-xl bg-bg-tertiary/50 border border-white/10 flex items-center justify-center overflow-hidden">
             {imgError ? (
-              <div className="flex flex-col items-center justify-center text-text-secondary">
-                <span className="text-3xl">🎁</span>
+              <div className="flex flex-col items-center justify-center">
+                <GiftIcon />
               </div>
             ) : (
               <motion.img
@@ -107,7 +118,11 @@ export const GameItemDisplay = memo(function GameItemDisplay({
               }
             `}
           >
-            {isCritical ? '!!!' : '⚡'}
+{isCritical ? '!!!' : (
+              <svg className="w-3 h-3" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+              </svg>
+            )}
           </motion.div>
         )}
       </div>

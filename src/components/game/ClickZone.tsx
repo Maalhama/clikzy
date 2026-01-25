@@ -2,6 +2,36 @@
 
 import { useState } from 'react'
 
+// Neon SVG Icons
+const WaitingIcon = () => (
+  <svg className="w-10 h-10 text-neon-blue drop-shadow-[0_0_10px_rgba(60,203,255,0.8)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round">
+    <circle cx="12" cy="12" r="10" />
+    <path d="M12 6v6l4 2" />
+  </svg>
+)
+
+const EndedIcon = () => (
+  <svg className="w-10 h-10 text-neon-purple drop-shadow-[0_0_10px_rgba(155,92,255,0.8)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round">
+    <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z" />
+    <line x1="4" y1="22" x2="4" y2="15" />
+  </svg>
+)
+
+const NoCreditsIcon = () => (
+  <svg className="w-10 h-10 text-danger drop-shadow-[0_0_10px_rgba(239,68,68,0.8)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round">
+    <circle cx="12" cy="12" r="10" />
+    <path d="M12 6v12M9 9c0-1 1-2 3-2s3 1 3 2-1 2-3 2-3 1-3 2 1 2 3 2 3-1 3-2" />
+    <line x1="4" y1="4" x2="20" y2="20" strokeWidth={2} />
+  </svg>
+)
+
+const ClickIcon = () => (
+  <svg className="w-12 h-12 text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.8)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round">
+    <path d="M15 15l-2 5L9 9l11 4-5 2z" />
+    <path d="M14 14l5 5" />
+  </svg>
+)
+
 type ClickZoneProps = {
   onClickAction: () => void
   disabled: boolean
@@ -70,7 +100,7 @@ export function ClickZone({
     if (status === 'waiting') {
       return (
         <span className="flex flex-col items-center">
-          <span className="text-4xl mb-2">⏳</span>
+          <span className="mb-2"><WaitingIcon /></span>
           <span>En attente du démarrage</span>
         </span>
       )
@@ -79,7 +109,7 @@ export function ClickZone({
     if (status === 'ended') {
       return (
         <span className="flex flex-col items-center">
-          <span className="text-4xl mb-2">🏁</span>
+          <span className="mb-2"><EndedIcon /></span>
           <span>Partie terminée</span>
         </span>
       )
@@ -88,7 +118,7 @@ export function ClickZone({
     if (!hasCredits) {
       return (
         <span className="flex flex-col items-center">
-          <span className="text-4xl mb-2">💸</span>
+          <span className="mb-2"><NoCreditsIcon /></span>
           <span>Crédits insuffisants</span>
         </span>
       )
@@ -96,8 +126,8 @@ export function ClickZone({
 
     return (
       <span className="flex flex-col items-center">
-        <span className="text-5xl mb-2 transition-transform group-hover:scale-110">
-          👆
+        <span className="mb-2 transition-transform group-hover:scale-110">
+          <ClickIcon />
         </span>
         <span className="text-2xl font-bold">CLIQUER</span>
         <span className="text-sm font-normal opacity-75 mt-1">1 crédit par clic</span>

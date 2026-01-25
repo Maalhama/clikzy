@@ -59,7 +59,10 @@ export function GameHeader({ credits, isConnected }: GameHeaderProps) {
           animate={{ scale: 1 }}
           className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-neon-purple/10 border border-neon-purple/20"
         >
-          <span className="text-lg">💰</span>
+          <svg className="w-5 h-5 text-neon-purple drop-shadow-[0_0_6px_rgba(155,92,255,0.8)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
+            <circle cx="12" cy="12" r="10" />
+            <path d="M12 6v12M9 9c0-1 1-2 3-2s3 1 3 2-1 2-3 2-3 1-3 2 1 2 3 2 3-1 3-2" strokeLinecap="round" />
+          </svg>
           <span className="font-bold text-neon-purple">{credits}</span>
         </motion.div>
       </div>

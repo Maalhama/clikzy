@@ -398,7 +398,7 @@ export default function ScratchCard({
             transition={{ duration: 2, repeat: Infinity }}
             className="text-[10px] tracking-widest text-white/50 uppercase font-medium"
           >
-            👆 Grattez 👆
+            Grattez ici
           </motion.p>
         </motion.div>
       )}
