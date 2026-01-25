@@ -1,266 +1,165 @@
-# Guide de contribution
+# Guide de Contribution - CLEEKZY
 
-Merci de contribuer à CLIKZY ! Ce guide explique comment participer au projet.
+Merci de vouloir contribuer à CLEEKZY ! Ce document explique comment participer au développement du projet.
 
-## Prérequis
+## 📋 Table des Matières
 
-- Node.js 18+
-- npm
-- Git
-- Un éditeur avec support TypeScript (VS Code recommandé)
+- [Code de Conduite](#code-de-conduite)
+- [Comment Contribuer](#comment-contribuer)
+- [Setup Développement](#setup-développement)
+- [Standards de Code](#standards-de-code)
+- [Process de Pull Request](#process-de-pull-request)
+- [Conventions de Commit](#conventions-de-commit)
+- [Tests](#tests)
 
-## Setup du projet
+## 🤝 Code de Conduite
 
-1. **Fork et clone**
-   ```bash
-   git clone https://github.com/YOUR_USERNAME/clikzy.git
-   cd clikzy
-   ```
+- Sois respectueux et professionnel
+- Accepte les critiques constructives
+- Focus sur ce qui est le mieux pour le projet
 
-2. **Installer les dépendances**
-   ```bash
-   npm install
-   ```
+## 🚀 Comment Contribuer
 
-3. **Configurer l'environnement**
-   ```bash
-   cp .env.example .env.local
-   # Remplir les variables nécessaires
-   ```
+### Signaler un Bug
 
-4. **Lancer le projet**
-   ```bash
-   npm run dev
-   ```
+Crée une issue avec :
+- **Titre clair** : "Bug: Le timer ne se reset pas en phase finale"
+- **Description** : Étapes pour reproduire le bug
+- **Comportement attendu** vs **Comportement actuel**
+- **Environnement** : Navigateur, OS, version
 
-## Workflow Git
+### Proposer une Feature
 
-### Branches
+Crée une issue avec :
+- **Titre clair** : "Feature: Ajouter un système de succès"
+- **Description** : Explication de la feature et pourquoi elle est utile
+- **Mockups** : Si c'est une feature UI, ajoute des screenshots/maquettes
 
-| Branche | Usage |
-|---------|-------|
-| `main` | Production, toujours stable |
-| `feature/*` | Nouvelles fonctionnalités |
-| `fix/*` | Corrections de bugs |
-| `refactor/*` | Refactoring sans changement fonctionnel |
+### Améliorer la Documentation
 
-### Créer une branche
+Les PRs pour améliorer la doc sont toujours bienvenues !
 
-```bash
-git checkout -b feature/ma-feature
-```
+## 💻 Setup Développement
 
-### Commits
+### 1. Fork & Clone
 
-Utiliser [Conventional Commits](https://www.conventionalcommits.org/) :
+\`\`\`bash
+# Fork le repo sur GitHub
+# Puis clone ton fork
+git clone https://github.com/TON_USERNAME/Clikzy.git
+cd Clikzy
+\`\`\`
 
-```
-<type>(<scope>): <description>
+### 2. Installation
 
-[body optionnel]
+\`\`\`bash
+npm install
+\`\`\`
 
-[footer optionnel]
-```
+### 3. Variables d'Environnement
 
-**Types** :
-- `feat` : Nouvelle fonctionnalité
-- `fix` : Correction de bug
-- `refactor` : Refactoring
-- `style` : Changements de style (CSS, formatage)
-- `docs` : Documentation
-- `test` : Tests
-- `chore` : Maintenance (deps, config)
+Copie \`.env.example\` vers \`.env.local\` et remplis les valeurs :
 
-**Exemples** :
-```bash
-git commit -m "feat(game): add winner celebration animation"
-git commit -m "fix(auth): resolve magic link redirect issue"
-git commit -m "refactor(lobby): extract game card component"
-```
+\`\`\`bash
+cp .env.example .env.local
+\`\`\`
 
-## Standards de code
+Variables requises :
+- \`NEXT_PUBLIC_SUPABASE_URL\`
+- \`NEXT_PUBLIC_SUPABASE_ANON_KEY\`
+- \`SUPABASE_SERVICE_ROLE_KEY\`
+- \`STRIPE_SECRET_KEY\`
+- \`NEXT_PUBLIC_SITE_URL\`
+
+### 4. Lancer en Développement
+
+\`\`\`bash
+npm run dev
+\`\`\`
+
+Le site sera disponible sur \`http://localhost:3000\`
+
+## 📏 Standards de Code
 
 ### TypeScript
 
-- **Strict mode** : Pas de `any`, types explicites
-- **Interfaces** : Préférer `interface` pour les objets
-- **Types** : Utiliser `type` pour les unions/intersections
-
-```typescript
-// Bon
-interface GameProps {
-  id: string
-  status: GameStatus
-}
-
-// Éviter
-const game: any = {}
-```
+- **Strict mode** activé (pas de \`any\`)
+- Toujours typer les paramètres et retours de fonction
+- Utiliser les types de \`@/types/database\` pour les données Supabase
 
 ### React
 
-- **Server Components** : Par défaut pour les pages
-- **Client Components** : Uniquement si interactivité nécessaire
-- **Hooks** : Extraire la logique dans des hooks custom
+- **Server Components par défaut** (pas de \`'use client'\` sauf nécessaire)
+- Utiliser les Server Actions pour les mutations
 
-```typescript
-// Bon - Server Component
-export default async function LobbyPage() {
-  const games = await getActiveGames()
-  return <GameList games={games} />
-}
+### Base de Données
 
-// Client Component si nécessaire
-'use client'
-export function ClickButton({ gameId }: { gameId: string }) {
-  const [isLoading, setIsLoading] = useState(false)
-  // ...
-}
-```
+- **JAMAIS de queries SQL directes** (utiliser Supabase client)
+- Toujours utiliser RLS (Row Level Security)
+- Utiliser les RPC functions pour la logique complexe
 
-### Styling
+## 🔄 Process de Pull Request
 
-- **Tailwind CSS** : Classes utilitaires
-- **Design tokens** : Utiliser les variables CSS définies
-- **Responsive** : Mobile-first (`sm:`, `md:`, `lg:`)
+### 1. Créer une Branche
 
-```tsx
-// Bon
-<div className="p-4 bg-bg-secondary rounded-xl border border-white/10">
+\`\`\`bash
+git checkout -b feature/nom-de-la-feature
+# ou
+git checkout -b fix/nom-du-bug
+\`\`\`
 
-// Éviter
-<div style={{ padding: '16px', background: '#141B2D' }}>
-```
+### 2. Vérifications Avant PR
 
-### Palette de couleurs
+\`\`\`bash
+# Linting
+npm run lint
 
-```css
---bg-primary: #0B0F1A;      /* Fond principal */
---bg-secondary: #141B2D;    /* Cartes */
---neon-purple: #9B5CFF;     /* Accent principal */
---neon-blue: #3CCBFF;       /* Accent secondaire */
---neon-pink: #FF4FD8;       /* Highlights */
---success: #00FF88;         /* Succès */
---danger: #FF4757;          /* Erreur */
-```
+# Tests
+npm run test:run
 
-## Structure des fichiers
+# Build
+npm run build
+\`\`\`
 
-### Composants
+Tout doit passer ✅
 
-```
-src/components/
-├── ui/              # Composants génériques (Button, Input)
-├── game/            # Composants liés au jeu
-├── lobby/           # Composants du lobby
-├── layout/          # Header, Footer, Navigation
-└── modals/          # Modales
-```
+### 3. Commit
 
-### Hooks
+Utilise [Conventional Commits](https://www.conventionalcommits.org/) :
 
-```
-src/hooks/
-├── game/            # Hooks liés au jeu
-├── lobby/           # Hooks du lobby
-└── useAuth.ts       # Hook d'authentification
-```
+\`\`\`bash
+git commit -m "feat: ajouter système de succès quotidiens"
+git commit -m "fix: corriger le reset du timer en phase finale"
+\`\`\`
 
-### Actions
+## 📝 Conventions de Commit
 
-```
-src/actions/
-├── auth.ts          # Authentification
-├── game.ts          # Actions de jeu
-└── credits.ts       # Gestion des crédits
-```
+| Type | Description | Exemple |
+|------|-------------|---------|
+| \`feat\` | Nouvelle feature | \`feat: ajouter mini-jeu roulette\` |
+| \`fix\` | Bug fix | \`fix: corriger le calcul des crédits\` |
+| \`docs\` | Documentation | \`docs: ajouter guide contribution\` |
+| \`test\` | Tests | \`test: ajouter tests pour badges\` |
+| \`refactor\` | Refactoring | \`refactor: simplifier logique\` |
+| \`chore\` | Maintenance | \`chore: update dependencies\` |
 
-## Tests
+## 🧪 Tests
 
-### Tests unitaires (Vitest)
+### Lancer les Tests
 
-```bash
-# Lancer les tests
+\`\`\`bash
+# Mode watch
 npm run test
 
-# Avec couverture
-npm run test:coverage
-```
+# Run une fois
+npm run test:run
+\`\`\`
 
-**Emplacement** : `src/__tests__/`
+Objectif : **>70% de couverture** sur le code critique
 
-```typescript
-// src/__tests__/lib/utils.test.ts
-import { formatTime } from '@/lib/utils/timer'
+## 🆘 Besoin d'Aide ?
 
-describe('formatTime', () => {
-  it('formats milliseconds to mm:ss', () => {
-    expect(formatTime(65000)).toBe('01:05')
-  })
-})
-```
+- **Issues** : Pour questions techniques sur GitHub
+- **Email** : contact@cleekzy.com
 
-### Tests E2E (Playwright)
-
-```bash
-# Lancer les tests E2E
-npm run test:e2e
-
-# Mode UI
-npm run test:e2e:ui
-```
-
-**Emplacement** : `tests/`
-
-## Pull Request
-
-### Checklist avant PR
-
-- [ ] Code lint sans erreurs (`npm run lint`)
-- [ ] Types OK (`npm run type-check`)
-- [ ] Tests passent (`npm run test:run`)
-- [ ] Build OK (`npm run build`)
-
-### Template de PR
-
-```markdown
-## Description
-[Description des changements]
-
-## Type de changement
-- [ ] Nouvelle fonctionnalité
-- [ ] Correction de bug
-- [ ] Refactoring
-- [ ] Documentation
-
-## Tests
-- [ ] Tests unitaires ajoutés/modifiés
-- [ ] Tests manuels effectués
-
-## Screenshots (si applicable)
-[Captures d'écran]
-```
-
-## Bonnes pratiques
-
-### Sécurité
-
-- **Validation serveur** : Toujours valider côté serveur
-- **RLS** : Row Level Security sur toutes les tables Supabase
-- **Secrets** : Jamais de secrets dans le code, utiliser `.env`
-
-### Performance
-
-- **Server Components** : Privilégier pour le rendu initial
-- **Lazy loading** : Charger les composants lourds dynamiquement
-- **Images** : Utiliser `next/image` avec optimisation
-
-### Accessibilité
-
-- **Labels** : Tous les inputs ont des labels
-- **Contraste** : Respecter les ratios WCAG
-- **Keyboard** : Navigation clavier fonctionnelle
-
-## Questions ?
-
-Ouvrir une issue avec le tag `question`.
+Merci de contribuer à CLEEKZY ! 🎮✨

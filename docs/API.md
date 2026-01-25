@@ -1,374 +1,491 @@
-# Documentation API
-
-Documentation des endpoints API de CLIKZY.
-
-## Base URL
-
-- **Développement** : `http://localhost:3000/api`
-- **Production** : `https://clikzy.fr/api`
-
-## Authentification
-
-La plupart des endpoints nécessitent une session Supabase active. L'authentification est gérée automatiquement via les cookies de session.
-
-Les endpoints cron nécessitent un header `Authorization: Bearer {CRON_SECRET}`.
-
----
-
-## Endpoints publics
-
-### Health Check
-
-Vérifie l'état de l'API et de la base de données.
-
-```
-GET /api/health
-```
-
-**Réponse 200** (OK) :
-```json
-{
-  "status": "ok",
-  "timestamp": "2026-01-25T12:00:00.000Z",
-  "services": {
-    "api": true,
-    "database": true
-  }
-}
-```
-
-**Réponse 503** (Service Unavailable) :
-```json
-{
-  "status": "error",
-  "timestamp": "2026-01-25T12:00:00.000Z",
-  "services": {
-    "api": true,
-    "database": false
-  }
-}
-```
-
----
-
-### Recent Clicks
-
-Récupère les clics récents pour le feed temps réel.
-
-```
-GET /api/clicks/recent
-```
-
-**Query Parameters** :
-
-| Paramètre | Type | Défaut | Description |
-|-----------|------|--------|-------------|
-| `limit` | number | 20 | Nombre de clics (max: 50) |
-| `game_id` | string | - | Filtrer par jeu |
-
-**Exemple** :
-```
-GET /api/clicks/recent?limit=10&game_id=abc-123
-```
-
-**Réponse 200** :
-```json
-{
-  "clicks": [
-    {
-      "id": "click-uuid",
-      "username": "music.emma",
-      "game_id": "game-uuid",
-      "item_name": "iPhone 17 Pro",
-      "is_bot": false,
-      "timestamp": 1706180400000
-    }
-  ],
-  "count": 10
-}
-```
-
----
-
-## Endpoints de paiement (Stripe)
-
-### Créer une session checkout
-
-Crée une session Stripe pour l'achat de crédits.
-
-```
-POST /api/stripe/checkout
-```
-
-**Headers** :
-- Session Supabase requise (cookie)
-
-**Body** :
-```json
-{
-  "packId": "starter" | "popular" | "premium"
-}
-```
-
-**Packs disponibles** :
-
-| ID | Crédits | Prix |
-|----|---------|------|
-| `starter` | 50 | 4,99 EUR |
-| `popular` | 150 | 9,99 EUR |
-| `premium` | 500 | 24,99 EUR |
-
-**Réponse 200** :
-```json
-{
-  "url": "https://checkout.stripe.com/pay/cs_xxx"
-}
-```
-
-**Réponse 401** :
-```json
-{
-  "error": "Non authentifié"
-}
-```
-
-**Réponse 400** :
-```json
-{
-  "error": "Pack invalide"
-}
-```
-
----
-
-### Webhook Stripe
-
-Endpoint appelé par Stripe pour notifier les événements de paiement.
-
-```
-POST /api/stripe/webhook
-```
-
-**Headers** :
-- `stripe-signature` : Signature Stripe
-
-**Événements gérés** :
-
-| Événement | Action |
-|-----------|--------|
-| `checkout.session.completed` | Crédite l'utilisateur |
-| `customer.subscription.created` | Active le VIP |
-| `customer.subscription.updated` | Met à jour le VIP |
-| `customer.subscription.deleted` | Désactive le VIP |
-
-**Réponse 200** :
-```json
-{
-  "received": true
-}
-```
-
----
-
-## Endpoints Cron (protégés)
-
-Tous les endpoints cron nécessitent le header :
-```
-Authorization: Bearer {CRON_SECRET}
-```
-
-### Bot Clicks
-
-Gère le cycle de vie des jeux : activation, simulation bots, fin des parties.
-
-```
-GET /api/cron/bot-clicks
-POST /api/cron/bot-clicks
-```
-
-**Actions effectuées** :
-1. Active les jeux en attente (`waiting` → `active`)
-2. Simule les clics des bots en phase normale
-3. Maintient le timer en phase finale (bataille)
-4. Termine les jeux quand timer = 0
-5. Envoie les emails de victoire
-
-**Réponse 200** :
-```json
-{
-  "message": "Activated 2, checked 5 games, 1 ended",
-  "activated": 2,
-  "processed": 5,
-  "ended": 1,
-  "games": [
-    {
-      "gameId": "game-uuid",
-      "action": "bot_click (music.emma)"
-    }
-  ]
-}
-```
-
----
-
-### Activate Games
-
-Active les jeux planifiés dont l'heure de démarrage est passée.
-
-```
-GET /api/cron/activate-games
-```
-
-**Réponse 200** :
-```json
-{
-  "message": "Activated 3 games",
-  "activated": 3,
-  "games": ["game-1", "game-2", "game-3"]
-}
-```
-
----
-
-### Create Rotation
-
-Crée une nouvelle rotation de jeux à partir des items disponibles.
-
-```
-GET /api/cron/create-rotation
-```
-
-**Réponse 200** :
-```json
-{
-  "message": "Created 6 games for rotation",
-  "created": 6,
-  "games": [
-    {
-      "id": "game-uuid",
-      "itemName": "iPhone 17 Pro",
-      "startTime": "2026-01-25T15:00:00.000Z"
-    }
-  ]
-}
-```
-
----
-
-### Reset Credits
-
-Remet les crédits à 10 pour les utilisateurs gratuits (ceux qui n'ont jamais acheté).
-
-```
-GET /api/cron/reset-credits
-```
-
-**Logique** :
-- Ne touche pas aux utilisateurs avec `has_purchased_credits = true`
-- Reset à 10 crédits les autres utilisateurs
-
-**Réponse 200** :
-```json
-{
-  "message": "Reset credits for 150 free users",
-  "reset": 150
-}
-```
+# API Documentation - CLEEKZY
+
+Documentation complète des endpoints API et Server Actions.
+
+## 📋 Table des Matières
+
+- [Server Actions](#server-actions)
+  - [Game Actions](#game-actions)
+  - [Credit Actions](#credit-actions)
+  - [Referral Actions](#referral-actions)
+  - [Badge Actions](#badge-actions)
+  - [Mini-Game Actions](#mini-game-actions)
+- [API Routes](#api-routes)
+  - [Cron Jobs](#cron-jobs)
+  - [Stripe Webhooks](#stripe-webhooks)
+  - [Health Check](#health-check)
 
 ---
 
 ## Server Actions
 
-Les actions principales sont des Server Actions Next.js (pas des routes API).
+Les Server Actions sont des fonctions côté serveur appelées depuis les composants React.
 
-### Game Actions (`src/actions/game.ts`)
+### Game Actions
 
-| Action | Description |
-|--------|-------------|
-| `getActiveGames()` | Liste les jeux actifs |
-| `getGame(id)` | Détails d'un jeu |
-| `click(gameId)` | Enregistre un clic |
-| `joinGame(gameId)` | Rejoindre un jeu |
+#### `clickGame(gameId: string)`
 
-### Auth Actions (`src/actions/auth.ts`)
+Effectue un clic sur une partie en cours.
 
-| Action | Description |
-|--------|-------------|
-| `signInWithMagicLink(email)` | Connexion par email |
-| `signInWithOAuth(provider)` | Connexion OAuth |
-| `signOut()` | Déconnexion |
-| `updateProfile(data)` | Mise à jour profil |
+**Fichier** : `src/actions/game.ts`
 
-### Credit Actions (`src/actions/credits.ts`)
+**Paramètres** :
+- `gameId` (string) : ID de la partie
 
-| Action | Description |
-|--------|-------------|
-| `getCredits()` | Solde actuel |
-| `useCredits(amount)` | Déduire des crédits |
+**Retour** :
+```typescript
+{
+  success: boolean
+  data?: {
+    newEndTime?: number      // Nouveau timestamp de fin (si phase finale)
+    newBadges?: Badge[]      // Nouveaux badges obtenus
+  }
+  error?: string
+}
+```
+
+**Comportement** :
+1. Vérifie l'authentification
+2. Vérifie les crédits disponibles (daily + earned)
+3. Détecte la fraude (rate limiting, patterns suspects)
+4. Déduit 1 crédit (daily d'abord, puis earned)
+5. Enregistre le clic dans la DB
+6. Reset le timer à 90s si < 1min30 restant
+7. Met à jour les statistiques du joueur
+8. Vérifie les nouveaux badges
+
+**Erreurs** :
+- `"Non authentifié"` : Utilisateur non connecté
+- `"Crédits insuffisants"` : Plus de crédits disponibles
+- `"Partie non trouvée"` : Game ID invalide
+- `"Cette partie n'accepte plus de clics"` : Partie terminée
+- `"Action bloquée pour raison de sécurité"` : Fraude détectée
+
+**Exemple** :
+```typescript
+const result = await clickGame('game-123')
+
+if (!result.success) {
+  toast.error(result.error)
+  return
+}
+
+if (result.data?.newBadges?.length) {
+  toast.success(`Nouveau badge obtenu : ${result.data.newBadges[0].name}`)
+}
+```
+
+#### `getActiveGames()`
+
+Récupère toutes les parties actives.
+
+**Retour** :
+```typescript
+{
+  success: boolean
+  data?: GameWithItem[]
+  error?: string
+}
+
+type GameWithItem = Game & { item: Item }
+```
+
+#### `endGame(gameId: string)`
+
+Termine une partie et désigne le gagnant (CRON uniquement).
 
 ---
 
-## Codes d'erreur
+### Credit Actions
 
-| Code | Signification |
-|------|---------------|
-| 200 | Succès |
-| 400 | Requête invalide |
-| 401 | Non authentifié |
-| 403 | Non autorisé |
-| 404 | Ressource non trouvée |
-| 429 | Trop de requêtes |
-| 500 | Erreur serveur |
+#### `getUserCredits()`
+
+Récupère le solde de crédits de l'utilisateur.
+
+**Fichier** : `src/actions/credits.ts`
+
+**Retour** :
+```typescript
+{
+  dailyCredits: number       // Crédits gratuits (reset quotidien)
+  earnedCredits: number      // Crédits gagnés (permanent)
+  totalCredits: number       // dailyCredits + earnedCredits
+  hasPurchased: boolean      // Si l'utilisateur a acheté des crédits
+  isVip: boolean            // Si l'utilisateur est VIP
+}
+```
+
+**Exemple** :
+```typescript
+const credits = await getUserCredits()
+console.log(`Tu as ${credits.totalCredits} crédits`)
+```
+
+#### `purchaseCredits(packageId: string)`
+
+Achète un pack de crédits via Stripe.
+
+**Paramètres** :
+- `packageId` : `"pack_50"`, `"pack_100"`, `"pack_250"`
+
+**Retour** :
+```typescript
+{
+  success: boolean
+  data?: { checkoutUrl: string }
+  error?: string
+}
+```
+
+---
+
+### Referral Actions
+
+#### `applyReferralCode(code: string)`
+
+Applique un code de parrainage (1 fois par utilisateur).
+
+**Fichier** : `src/actions/referral.ts`
+
+**Paramètres** :
+- `code` (string) : Code de parrainage (4+ caractères)
+
+**Retour** :
+```typescript
+{
+  success: boolean
+  creditsAwarded?: number   // 10 crédits ajoutés au parrain
+  error?: string
+}
+```
+
+**Erreurs** :
+- `"Code invalide"` : Code trop court
+- `"Non authentifié"` : Utilisateur non connecté
+- `"Tu as déjà utilisé un code de parrainage"` : Code déjà appliqué
+- `"Tu ne peux pas utiliser ton propre code"` : Code = propre code
+- `"Code de parrainage introuvable"` : Code inexistant
+
+**Comportement** :
+- Ajoute 10 crédits à `earned_credits` du parrain (permanent)
+- Incrémente `referral_count` du parrain
+- Enregistre `referred_by` sur le filleul
+
+**Exemple** :
+```typescript
+const result = await applyReferralCode('ABC123')
+
+if (result.success) {
+  toast.success('Code de parrainage appliqué !')
+}
+```
+
+#### `getReferralStats()`
+
+Récupère les statistiques de parrainage de l'utilisateur.
+
+**Retour** :
+```typescript
+{
+  referralCode: string | null
+  referralCount: number
+  creditsEarned: number
+  referredBy: string | null
+}
+```
+
+#### `getReferralLink()`
+
+Génère le lien de parrainage personnalisé.
+
+**Retour** : `string | null`
+
+**Exemple** : `"https://cleekzy.com/register?ref=ABC123"`
+
+---
+
+### Badge Actions
+
+#### `checkAndAwardBadges()`
+
+Vérifie et attribue les badges au joueur.
+
+**Fichier** : `src/actions/badges.ts`
+
+**Retour** :
+```typescript
+{
+  newBadges: Badge[]
+  allBadges: Badge[]
+}
+
+type Badge = {
+  id: string
+  name: string
+  description: string
+  icon: string
+  type: 'clicks' | 'wins' | 'referrals' | 'mini_games' | 'special'
+  tier: 'bronze' | 'silver' | 'gold' | 'platinum' | 'diamond'
+  requirement: number
+  credits_reward: number
+  awarded_at?: string
+}
+```
+
+**Badges disponibles** :
+- **Clicks** : 10, 50, 100, 500, 1000 clics
+- **Wins** : 1, 5, 10, 25 victoires
+- **Referrals** : 1, 5, 10 parrainages
+- **Mini-Games** : 10, 50 parties jouées
+
+**Exemple** :
+```typescript
+const { newBadges } = await checkAndAwardBadges()
+
+if (newBadges.length > 0) {
+  newBadges.forEach(badge => {
+    toast.success(`Nouveau badge : ${badge.name} (+${badge.credits_reward} crédits)`)
+  })
+}
+```
+
+---
+
+### Mini-Game Actions
+
+#### `playMiniGame(gameType: string)`
+
+Joue à un mini-jeu (1 partie gratuite/jour, puis payant).
+
+**Fichier** : `src/actions/miniGames.ts`
+
+**Paramètres** :
+- `gameType` : `"slots"`, `"dice"`, `"coin_flip"`, `"wheel"`, `"scratch"`, `"number_guess"`
+
+**Retour** :
+```typescript
+{
+  success: boolean
+  data?: {
+    won: boolean
+    amount: number           // Crédits gagnés/perdus
+    result: unknown         // Résultat du jeu (dés, roue, etc.)
+  }
+  error?: string
+}
+```
+
+**Erreurs** :
+- `"Non authentifié"`
+- `"Type de mini-jeu invalide"`
+- `"Crédits insuffisants"` : Si pas de partie gratuite et pas de crédits
+- `"Limite quotidienne atteinte"` : Plus de parties gratuites
+
+---
+
+## API Routes
+
+### Cron Jobs
+
+Toutes les routes cron nécessitent l'en-tête :
+```
+Authorization: Bearer <CRON_SECRET>
+```
+
+#### `POST /api/cron/bot-clicks`
+
+**Fréquence** : Toutes les 1 minute
+
+**Fonction** : Fait cliquer les bots pour maintenir la bataille en phase finale
+
+**Comportement** :
+- Récupère les parties en `final_phase`
+- Vérifie si la bataille dure depuis 30-119 minutes
+- Fait cliquer 1-3 bots aléatoires par partie
+- Reset le timer à 90 secondes
+
+**Réponse** :
+```json
+{
+  "success": true,
+  "processedGames": 3,
+  "totalClicks": 5
+}
+```
+
+#### `POST /api/cron/activate-games`
+
+**Fréquence** : Toutes les 1 minute
+
+**Fonction** : Active les parties en attente quand assez de joueurs
+
+**Comportement** :
+- Récupère les parties `waiting`
+- Active celles avec ≥2 joueurs
+- Définit `end_time` à maintenant + 24h
+
+#### `POST /api/cron/create-rotation`
+
+**Fréquence** : Toutes les 3 heures (:45 des heures 23,2,5,8,11,14,17,20)
+
+**Fonction** : Crée une nouvelle rotation de parties
+
+**Comportement** :
+- Récupère les 8 items les plus populaires
+- Crée une partie `waiting` pour chaque
+- Garantit la variété des lots
+
+#### `POST /api/cron/reset-credits`
+
+**Fréquence** : Tous les jours à minuit UTC
+
+**Fonction** : Reset les crédits quotidiens
+
+**Comportement** :
+- Reset `credits` à 10 pour les utilisateurs gratuits
+- Reset `credits` à 10 pour les VIP (ils ont aussi +10 bonus à récolter)
+- Ignore les utilisateurs ayant acheté des crédits (`has_purchased_credits = true`)
+
+---
+
+### Stripe Webhooks
+
+#### `POST /api/stripe/webhook`
+
+**Fonction** : Reçoit les événements Stripe
+
+**Événements gérés** :
+- `checkout.session.completed` : Ajoute les crédits achetés
+- `customer.subscription.created` : Active le statut VIP
+- `customer.subscription.deleted` : Désactive le statut VIP
+
+**Sécurité** :
+- Signature Stripe validée
+- Replay attack protection
+
+---
+
+### Health Check
+
+#### `GET /api/health`
+
+**Fonction** : Vérifie l'état du service
+
+**Réponse** :
+```json
+{
+  "status": "ok",
+  "timestamp": 1706123456789,
+  "uptime": 123456
+}
+```
 
 ---
 
 ## Rate Limiting
 
-| Endpoint | Limite |
-|----------|--------|
-| `/api/clicks/recent` | 60 req/min |
-| `/api/stripe/checkout` | 10 req/min |
-| Server Actions (click) | 1 req/sec par user |
+Toutes les routes API sont rate-limitées :
+
+| Type | Limite | Fenêtre |
+|------|--------|---------|
+| API générale | 60 requêtes | 1 minute |
+| Paiement Stripe | 10 requêtes | 1 minute |
+| Cron jobs | 10 requêtes | 1 minute |
+
+**Header de réponse** (si limite dépassée) :
+```
+HTTP 429 Too Many Requests
+Retry-After: 45
+X-RateLimit-Remaining: 0
+```
 
 ---
 
-## Exemples d'intégration
+## Authentification
 
-### Fetch des clics récents
-
-```typescript
-const response = await fetch('/api/clicks/recent?limit=20')
-const data = await response.json()
-
-data.clicks.forEach(click => {
-  console.log(`${click.username} a cliqué sur ${click.item_name}`)
-})
-```
-
-### Créer une session de paiement
+Toutes les Server Actions utilisent **Supabase Auth** :
 
 ```typescript
-const response = await fetch('/api/stripe/checkout', {
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json',
-  },
-  body: JSON.stringify({ packId: 'popular' }),
-})
+const { data: { user } } = await supabase.auth.getUser()
 
-const { url } = await response.json()
-window.location.href = url
-```
-
-### Vérifier la santé de l'API
-
-```typescript
-const response = await fetch('/api/health')
-const health = await response.json()
-
-if (health.status === 'ok') {
-  console.log('API opérationnelle')
-} else {
-  console.error('Problème détecté:', health.services)
+if (!user) {
+  return { success: false, error: 'Non authentifié' }
 }
 ```
+
+Les API routes cron utilisent un **Bearer token** :
+```typescript
+const authHeader = request.headers.get('Authorization')
+if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+  return new Response('Unauthorized', { status: 401 })
+}
+```
+
+---
+
+## Codes d'Erreur
+
+| Code | Signification |
+|------|---------------|
+| 400 | Bad Request - Paramètres invalides |
+| 401 | Unauthorized - Non authentifié |
+| 403 | Forbidden - Pas les permissions |
+| 404 | Not Found - Ressource introuvable |
+| 429 | Too Many Requests - Rate limit dépassé |
+| 500 | Internal Server Error - Erreur serveur |
+
+---
+
+## Exemple Complet
+
+```typescript
+'use client'
+
+import { useState } from 'react'
+import { clickGame } from '@/actions/game'
+import { getUserCredits } from '@/actions/credits'
+
+export default function GameButton({ gameId }: { gameId: string }) {
+  const [loading, setLoading] = useState(false)
+
+  async function handleClick() {
+    setLoading(true)
+
+    // Vérifier les crédits
+    const credits = await getUserCredits()
+    if (credits.totalCredits < 1) {
+      toast.error('Plus de crédits')
+      setLoading(false)
+      return
+    }
+
+    // Cliquer
+    const result = await clickGame(gameId)
+
+    if (!result.success) {
+      toast.error(result.error)
+    } else {
+      toast.success('Clic enregistré !')
+
+      // Afficher les nouveaux badges
+      if (result.data?.newBadges?.length) {
+        result.data.newBadges.forEach(badge => {
+          toast.success(`Badge obtenu : ${badge.name}`)
+        })
+      }
+    }
+
+    setLoading(false)
+  }
+
+  return (
+    <button onClick={handleClick} disabled={loading}>
+      {loading ? 'Chargement...' : 'Cliquer'}
+    </button>
+  )
+}
+```
+
+---
+
+Pour plus d'informations, voir le code source dans `src/actions/` et `src/app/api/`.
