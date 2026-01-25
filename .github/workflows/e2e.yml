@@ -38,9 +38,12 @@ jobs:
           NEXT_PUBLIC_SUPABASE_ANON_KEY: fake-anon-key
           SUPABASE_SERVICE_ROLE_KEY: fake-service-key
           STRIPE_SECRET_KEY: sk_test_fake
+          STRIPE_WEBHOOK_SECRET: whsec_fake
           NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: pk_test_fake
-          NEXT_PUBLIC_SITE_URL: http://localhost:3000
+          RESEND_API_KEY: re_fake
+          RESEND_FROM_EMAIL: "CLEEKZY <noreply@cleekzy.com>"
           CRON_SECRET: fake-cron-secret
+          NEXT_PUBLIC_SITE_URL: http://localhost:3000
 
       - name: Upload test results
         uses: actions/upload-artifact@v4
