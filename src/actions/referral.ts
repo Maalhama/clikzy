@@ -87,7 +87,7 @@ export async function applyReferralCode(code: string): Promise<ReferralResult> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { data: referrer } = await (supabase as any)
     .from('profiles')
-    .select('id, referral_code, referral_count, referral_credits_earned, credits')
+    .select('id, referral_code, referral_count, referral_credits_earned, credits, earned_credits')
     .eq('referral_code', code.toUpperCase())
     .single()
 
@@ -112,7 +112,7 @@ export async function applyReferralCode(code: string): Promise<ReferralResult> {
   const { error: updateReferrerError } = await (supabase as any)
     .from('profiles')
     .update({
-      credits: (referrer.credits || 0) + REFERRAL_BONUS,
+      earned_credits: (referrer.earned_credits || 0) + REFERRAL_BONUS,
       referral_count: (referrer.referral_count || 0) + 1,
       referral_credits_earned: (referrer.referral_credits_earned || 0) + REFERRAL_BONUS,
     })
