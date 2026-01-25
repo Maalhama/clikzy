@@ -74,7 +74,7 @@ export default function LoginPage() {
         <div className="absolute bottom-1/3 left-1/4 w-56 h-56 bg-neon-pink/10 rounded-full blur-[80px]" />
 
         <div className="relative z-10 max-w-md">
-          <Logo size="lg" animated={false} href="/" />
+          <Logo size="lg" animated={true} href="/" />
           <h1 className="text-3xl font-bold text-white mt-6 mb-3">Content de te revoir !</h1>
           <p className="text-text-secondary text-lg mb-10">
             Connecte-toi pour accéder à tes parties et tes récompenses.
@@ -112,7 +112,7 @@ export default function LoginPage() {
         <div className="w-full max-w-sm">
           {/* Mobile Logo */}
           <div className="lg:hidden flex justify-center mb-6">
-            <Logo size="lg" animated={false} href="/" />
+            <Logo size="lg" animated={true} href="/" />
           </div>
 
           {/* Header */}

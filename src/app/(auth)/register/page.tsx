@@ -143,7 +143,7 @@ export default function RegisterPage() {
         <div className="absolute bottom-1/4 right-1/3 w-56 h-56 bg-neon-pink/10 rounded-full blur-[80px]" />
 
         <div className="relative z-10 max-w-md">
-          <Logo size="lg" animated={false} href="/" />
+          <Logo size="lg" animated={true} href="/" />
           <h1 className="text-3xl font-bold text-white mt-6 mb-3">Rejoins l&apos;aventure</h1>
           <p className="text-text-secondary text-lg mb-10">
             Crée ton compte et reçois 10 crédits gratuits pour commencer à jouer.
@@ -192,7 +192,7 @@ export default function RegisterPage() {
         <div className="w-full max-w-sm">
           {/* Mobile Logo */}
           <div className="lg:hidden flex justify-center mb-6">
-            <Logo size="lg" animated={false} href="/" />
+            <Logo size="lg" animated={true} href="/" />
           </div>
 
           {/* Header */}
