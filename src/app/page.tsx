@@ -50,11 +50,11 @@ async function getLandingData() {
     fallbackItemResult,
     activeGamesResult,
   ] = await Promise.all([
-    // Fetch recent winners from last 24h (including bots)
+    // Fetch recent winners from last 72h (including bots)
     supabase
       .from('winners')
       .select('id, item_name, item_value, won_at, user_id, username, is_bot')
-      .gte('won_at', new Date(now - 24 * 60 * 60 * 1000).toISOString())
+      .gte('won_at', new Date(now - 72 * 60 * 60 * 1000).toISOString())
       .order('won_at', { ascending: false })
       .limit(10),
 

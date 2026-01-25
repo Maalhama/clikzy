@@ -53,12 +53,12 @@ const GUARANTEES = [
   },
 ]
 
-// Delivery proofs with diverse usernames - 2026 edition
+// Delivery proofs with real unboxing photos - 2026 edition
 const DELIVERY_PROOFS = [
-  { id: 1, image: '/proofs/delivery-1.jpg', username: 'Rachid_75', item: 'iPhone 17 Pro' },
-  { id: 2, image: '/proofs/delivery-2.jpg', username: 'AmeliaFR', item: 'PlayStation 5 Pro' },
-  { id: 3, image: '/proofs/delivery-3.jpg', username: 'Youssef_dz', item: 'MacBook Air M4' },
-  { id: 4, image: '/proofs/delivery-4.jpg', username: 'ClementP', item: 'AirPods Pro 3' },
+  { id: 1, image: '/delivery-proofs/delivery-proof-iphone.jpg', username: 'beger2303', item: 'iPhone 17 Pro Max' },
+  { id: 2, image: '/delivery-proofs/delivery-proof-ps5.jpg', username: 'Ibra_sn', item: 'PlayStation 5 Pro' },
+  { id: 3, image: '/delivery-proofs/delivery-proof-macbook.jpg', username: 'samipsg', item: 'MacBook Pro M5' },
+  { id: 4, image: '/delivery-proofs/delivery-proof-airpods.jpg', username: 'Bilal_69', item: 'AirPods Pro 3' },
 ]
 
 export function Guarantees({ className = '' }: GuaranteesProps) {

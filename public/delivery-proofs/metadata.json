@@ -1,0 +1,38 @@
+[
+  {
+    "id": "1",
+    "product": "iPhone 17 Pro Max",
+    "winner": "Sophie, 24 ans",
+    "imagePath": "/delivery-proofs/delivery-proof-iphone.jpg"
+  },
+  {
+    "id": "2",
+    "product": "PlayStation 5 Pro",
+    "winner": "Lucas, 19 ans",
+    "imagePath": "/delivery-proofs/delivery-proof-ps5.jpg"
+  },
+  {
+    "id": "3",
+    "product": "MacBook Pro M5",
+    "winner": "Camille, 28 ans",
+    "imagePath": "/delivery-proofs/delivery-proof-macbook.jpg"
+  },
+  {
+    "id": "4",
+    "product": "AirPods Pro 3",
+    "winner": "Yanis, 17 ans",
+    "imagePath": "/delivery-proofs/delivery-proof-airpods.jpg"
+  },
+  {
+    "id": "5",
+    "product": "Apple Watch Ultra 3",
+    "winner": "Thomas, 32 ans",
+    "imagePath": "/delivery-proofs/delivery-proof-watch.jpg"
+  },
+  {
+    "id": "6",
+    "product": "iPad Pro M4",
+    "winner": "Inès, 22 ans",
+    "imagePath": "/delivery-proofs/delivery-proof-ipad.jpg"
+  }
+]
