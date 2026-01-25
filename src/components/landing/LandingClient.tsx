@@ -1385,7 +1385,7 @@ export function LandingClient({
 
 
           {/* CTA Section */}
-          <div className="px-4 pb-4">
+          <div className="px-4 pt-4 pb-4">
             <div className="p-3 rounded-xl bg-gradient-to-br from-neon-purple/10 to-neon-pink/10 border border-neon-purple/20">
               {isLoggedIn ? (
                 <div className="space-y-2">
