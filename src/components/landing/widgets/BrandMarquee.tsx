@@ -69,7 +69,6 @@ function BrandLogo({ brand }: { brand: BrandIcon }) {
   const luminance = getLuminance(brand.hex)
   // Si la couleur est trop sombre (luminance < 80), utiliser blanc
   const color = luminance < 80 ? '#FFFFFF' : `#${brand.hex}`
-  const glowColor = luminance < 80 ? '#9B5CFF' : `#${brand.hex}` // Glow violet pour les logos blancs
 
   return (
     <svg
@@ -78,9 +77,6 @@ function BrandLogo({ brand }: { brand: BrandIcon }) {
       fill={color}
       role="img"
       aria-label={brand.title}
-      style={{
-        filter: `drop-shadow(0 0 8px ${glowColor}50) drop-shadow(0 0 16px ${glowColor}30)`,
-      }}
     >
       <path d={brand.path} />
     </svg>
