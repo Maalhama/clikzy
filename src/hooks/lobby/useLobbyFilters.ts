@@ -30,7 +30,7 @@ export const FILTER_OPTIONS: FilterOption[] = [
   { value: 'favorites', label: 'Favoris' },
   { value: 'urgent', label: 'Phase finale' },
   { value: 'soon', label: 'Bientôt' },
-  { value: 'high_value', label: 'Premium' },
+  { value: 'high_value', label: 'V.I.P' },
   { value: 'ended', label: 'Terminés' },
 ]
 
