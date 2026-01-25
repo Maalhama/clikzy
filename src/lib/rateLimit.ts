@@ -91,6 +91,6 @@ export const rateLimiters = {
   // Auth routes - 10 requests per minute
   auth: (identifier: string) => checkRateLimit(identifier, 10, 60 * 1000),
 
-  // Cron routes - 1 request per 30 seconds
-  cron: (identifier: string) => checkRateLimit(identifier, 1, 30 * 1000),
+  // Cron routes - 10 requests per minute (crons are protected by CRON_SECRET)
+  cron: (identifier: string) => checkRateLimit(identifier, 10, 60 * 1000),
 }
