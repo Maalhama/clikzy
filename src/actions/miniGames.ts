@@ -11,8 +11,6 @@ import {
   PACHINKO_SLOTS,
   SLOTS_PAYOUTS,
   SLOTS_SYMBOLS,
-  COINFLIP_PAYOUTS,
-  DICE_PAYOUTS,
 } from '@/types/miniGames'
 
 type ActionResult<T = void> = {
@@ -160,9 +158,10 @@ export async function playMiniGame(gameType: MiniGameType): Promise<ActionResult
       break
     }
     case 'coinflip': {
-      coinResult = Math.random() < 0.5 ? 'heads' : 'tails'
-      const coinPayoutIndex = Math.floor(Math.random() * COINFLIP_PAYOUTS.length)
-      creditsWon = COINFLIP_PAYOUTS[coinPayoutIndex]
+      // 10% chance to win (heads), 90% chance to lose (tails)
+      const isWin = Math.random() < 0.1
+      coinResult = isWin ? 'heads' : 'tails'
+      creditsWon = isWin ? 10 : 0
       break
     }
     case 'dice': {
@@ -171,8 +170,16 @@ export async function playMiniGame(gameType: MiniGameType): Promise<ActionResult
         Math.floor(Math.random() * 6) + 1,
         Math.floor(Math.random() * 6) + 1,
       ]
-      const dicePayoutIndex = Math.floor(Math.random() * DICE_PAYOUTS.length)
-      creditsWon = DICE_PAYOUTS[dicePayoutIndex]
+      // Calculate credits based on dice sum (min 2, max 10)
+      const diceSum = diceResults[0] + diceResults[1]
+      // Map sum (2-12) to credits (2-10)
+      // 2-3: 2, 4-5: 3, 6-7: 4, 8-9: 6, 10-11: 8, 12: 10
+      if (diceSum <= 3) creditsWon = 2
+      else if (diceSum <= 5) creditsWon = 3
+      else if (diceSum <= 7) creditsWon = 4
+      else if (diceSum <= 9) creditsWon = 6
+      else if (diceSum <= 11) creditsWon = 8
+      else creditsWon = 10 // Double 6!
       break
     }
     default:
@@ -313,18 +320,28 @@ export async function playMiniGamePaid(gameType: MiniGameType): Promise<ActionRe
       break
     }
     case 'coinflip': {
-      coinResult = Math.random() < 0.5 ? 'heads' : 'tails'
-      const coinPayoutIndex = Math.floor(Math.random() * COINFLIP_PAYOUTS.length)
-      creditsWon = COINFLIP_PAYOUTS[coinPayoutIndex]
+      // 10% chance to win (heads), 90% chance to lose (tails)
+      const isWin = Math.random() < 0.1
+      coinResult = isWin ? 'heads' : 'tails'
+      creditsWon = isWin ? 10 : 0
       break
     }
     case 'dice': {
+      // Generate 2 dice values (1-6)
       diceResults = [
         Math.floor(Math.random() * 6) + 1,
         Math.floor(Math.random() * 6) + 1,
       ]
-      const dicePayoutIndex = Math.floor(Math.random() * DICE_PAYOUTS.length)
-      creditsWon = DICE_PAYOUTS[dicePayoutIndex]
+      // Calculate credits based on dice sum (min 2, max 10)
+      const diceSumPaid = diceResults[0] + diceResults[1]
+      // Map sum (2-12) to credits (2-10)
+      // 2-3: 2, 4-5: 3, 6-7: 4, 8-9: 6, 10-11: 8, 12: 10
+      if (diceSumPaid <= 3) creditsWon = 2
+      else if (diceSumPaid <= 5) creditsWon = 3
+      else if (diceSumPaid <= 7) creditsWon = 4
+      else if (diceSumPaid <= 9) creditsWon = 6
+      else if (diceSumPaid <= 11) creditsWon = 8
+      else creditsWon = 10 // Double 6!
       break
     }
     default:

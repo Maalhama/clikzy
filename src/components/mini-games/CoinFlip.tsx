@@ -123,6 +123,22 @@ export default function CoinFlip({
         </motion.div>
       </div>
 
+      {/* Payout info */}
+      {!isFlipping && !hasFinished && (
+        <div className="flex justify-center gap-6 mb-4">
+          <div className="text-center">
+            <div className="text-[#FFB800] text-2xl font-black">👑 PILE</div>
+            <div className="text-[#00FF88] text-lg font-bold">+10 crédits</div>
+            <div className="text-white/40 text-xs">10% de chance</div>
+          </div>
+          <div className="text-center">
+            <div className="text-[#C0C0C0] text-2xl font-black">🪙 FACE</div>
+            <div className="text-[#FF4F4F] text-lg font-bold">0 crédit</div>
+            <div className="text-white/40 text-xs">90% de chance</div>
+          </div>
+        </div>
+      )}
+
       {/* Instructions or Result */}
       <div className="text-center mb-6">
         {!isFlipping && !hasFinished && (
@@ -140,13 +156,18 @@ export default function CoinFlip({
           </motion.p>
         )}
         {hasFinished && (
-          <motion.p
+          <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className={`text-2xl font-black ${result === 'heads' ? 'text-[#FFB800]' : 'text-[#C0C0C0]'}`}
+            className="text-center"
           >
-            {result === 'heads' ? '👑 PILE !' : '🪙 FACE !'}
-          </motion.p>
+            <p className={`text-3xl font-black ${result === 'heads' ? 'text-[#FFB800]' : 'text-[#C0C0C0]'}`}>
+              {result === 'heads' ? '👑 PILE !' : '🪙 FACE !'}
+            </p>
+            <p className={`text-lg mt-1 ${result === 'heads' ? 'text-[#00FF88]' : 'text-white/50'}`}>
+              {result === 'heads' ? 'Félicitations !' : 'Pas de chance...'}
+            </p>
+          </motion.div>
         )}
       </div>
 
