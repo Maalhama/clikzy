@@ -2,7 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { GAME_CONSTANTS } from '@/lib/constants'
-import { checkAndAwardBadges } from '@/actions/badges'
+import { checkAndAwardBadges, type Badge } from '@/actions/badges'
 import type { Game, Click, Item, Profile } from '@/types/database'
 
 type GameWithItem = Game & {
@@ -24,7 +24,7 @@ type ActionResult<T = void> = {
  * - Records click
  * - Resets timer if in final phase (<1 minute)
  */
-export async function clickGame(gameId: string): Promise<ActionResult<{ newEndTime?: number }>> {
+export async function clickGame(gameId: string): Promise<ActionResult<{ newEndTime?: number; newBadges?: Badge[] }>> {
   const supabase = await createClient()
 
   // Get current user
@@ -152,10 +152,16 @@ export async function clickGame(gameId: string): Promise<ActionResult<{ newEndTi
     })
     .eq('id', user.id)
 
-  // 5. Check for new badges (non-blocking)
-  checkAndAwardBadges().catch(console.error)
+  // 5. Check for new badges and return them
+  let newBadges: Badge[] = []
+  try {
+    const badgeResult = await checkAndAwardBadges()
+    newBadges = badgeResult.newBadges
+  } catch (error) {
+    console.error('Error checking badges:', error)
+  }
 
-  return { success: true, data: { newEndTime } }
+  return { success: true, data: { newEndTime, newBadges } }
 }
 
 /**

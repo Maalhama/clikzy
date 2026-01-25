@@ -8,6 +8,7 @@ import { useTimer } from '@/hooks/useTimer'
 import { useSounds } from '@/hooks/useSounds'
 import { useBotSimulation } from '@/hooks/useBotSimulation'
 import { useCredits } from '@/contexts/CreditsContext'
+import { useBadgeNotification } from '@/contexts/BadgeNotificationContext'
 import { clickGame } from '@/actions/game'
 import { GAME_CONSTANTS } from '@/lib/constants'
 import { formatTime } from '@/lib/utils/timer'
@@ -57,6 +58,7 @@ export function GameClient({
   // useGame now provides recentClicks from DB (synced with lobby)
   const { game, isConnected, optimisticUpdate, addClick, removeClick } = useGame(initialGame)
   const { credits, decrementCredits } = useCredits()
+  const { showBadgeNotifications } = useBadgeNotification()
 
   const [isPending, startTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
@@ -170,9 +172,12 @@ export function GameClient({
         decrementCredits(-GAME_CONSTANTS.CREDIT_COST_PER_CLICK)
         removeClick(newClick.id)
         setError(result.error || 'Une erreur est survenue')
+      } else if (result.data?.newBadges && result.data.newBadges.length > 0) {
+        // Show badge notifications for newly earned badges
+        showBadgeNotifications(result.data.newBadges)
       }
     })
-  }, [isPending, hasCredits, canClick, playClick, triggerHaptic, username, game, optimisticUpdate, decrementCredits, addClick, removeClick])
+  }, [isPending, hasCredits, canClick, playClick, triggerHaptic, username, game, optimisticUpdate, decrementCredits, addClick, removeClick, showBadgeNotifications])
 
   // Border gradient style (same as lobby cards)
   const borderStyle = useMemo(() => {

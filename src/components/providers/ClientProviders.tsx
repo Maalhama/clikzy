@@ -2,6 +2,8 @@
 
 import { ReactNode } from 'react'
 import { CreditsProvider } from '@/contexts/CreditsContext'
+import { BadgeNotificationProvider } from '@/contexts/BadgeNotificationContext'
+import { BadgeNotificationContainer } from '@/components/notifications/BadgeNotification'
 
 interface ClientProvidersProps {
   children: ReactNode
@@ -12,7 +14,10 @@ interface ClientProvidersProps {
 export function ClientProviders({ children, initialCredits, userId }: ClientProvidersProps) {
   return (
     <CreditsProvider initialCredits={initialCredits} userId={userId}>
-      {children}
+      <BadgeNotificationProvider>
+        {children}
+        <BadgeNotificationContainer />
+      </BadgeNotificationProvider>
     </CreditsProvider>
   )
 }
