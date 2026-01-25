@@ -84,32 +84,23 @@ function BrandLogo({ brand }: { brand: BrandIcon }) {
 }
 
 export function BrandMarquee() {
+  // Doubler les logos pour le scroll infini
+  const allLogos = [...BRAND_LOGOS, ...BRAND_LOGOS]
+
   return (
     <section className="py-6 md:py-8 overflow-hidden bg-gradient-to-r from-transparent via-white/[0.02] to-transparent">
       <div
-        className="relative flex overflow-hidden"
+        className="relative overflow-hidden"
         style={{
           maskImage: 'linear-gradient(to right, transparent, black 5%, black 95%, transparent)',
           WebkitMaskImage: 'linear-gradient(to right, transparent, black 5%, black 95%, transparent)'
         }}
       >
-        {/* Premier groupe - animation continue */}
-        <div className="flex items-center gap-16 md:gap-20 pr-16 md:pr-20 animate-marquee-slow">
-          {BRAND_LOGOS.map((brand, index) => (
+        {/* Conteneur animé - translate de -50% pour boucle seamless */}
+        <div className="flex items-center gap-16 md:gap-20 animate-marquee-slow w-max">
+          {allLogos.map((brand, index) => (
             <div
-              key={`brand-1-${index}`}
-              className="flex-shrink-0 transition-all duration-300 hover:scale-110"
-            >
-              <BrandLogo brand={brand} />
-            </div>
-          ))}
-        </div>
-
-        {/* Deuxième groupe - dupliqué pour scroll infini seamless */}
-        <div className="flex items-center gap-16 md:gap-20 pr-16 md:pr-20 animate-marquee-slow" aria-hidden="true">
-          {BRAND_LOGOS.map((brand, index) => (
-            <div
-              key={`brand-2-${index}`}
+              key={`brand-${index}`}
               className="flex-shrink-0 transition-all duration-300 hover:scale-110"
             >
               <BrandLogo brand={brand} />
