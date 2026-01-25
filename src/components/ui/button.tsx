@@ -12,19 +12,19 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const variantStyles: Record<ButtonVariant, string> = {
   primary:
-    'bg-neon-purple hover:bg-neon-purple/90 text-white hover:shadow-neon-purple hover:scale-[1.02] active:scale-[0.98]',
+    'bg-neon-purple [@media(hover:hover)]:hover:bg-neon-purple/90 text-white [@media(hover:hover)]:hover:shadow-neon-purple [@media(hover:hover)]:hover:scale-[1.02] active:scale-[0.98]',
   secondary:
-    'bg-neon-blue hover:bg-neon-blue/90 text-white hover:shadow-neon-blue hover:scale-[1.02] active:scale-[0.98]',
+    'bg-neon-blue [@media(hover:hover)]:hover:bg-neon-blue/90 text-white [@media(hover:hover)]:hover:shadow-neon-blue [@media(hover:hover)]:hover:scale-[1.02] active:scale-[0.98]',
   outline:
-    'border-2 border-neon-purple text-neon-purple hover:bg-neon-purple/10 hover:shadow-neon-purple/50',
+    'border-2 border-neon-purple text-neon-purple [@media(hover:hover)]:hover:bg-neon-purple/10 [@media(hover:hover)]:hover:shadow-neon-purple/50',
   ghost:
-    'text-text-secondary hover:text-text-primary hover:bg-bg-tertiary',
+    'text-text-secondary [@media(hover:hover)]:hover:text-text-primary [@media(hover:hover)]:hover:bg-bg-tertiary',
   danger:
-    'bg-danger hover:bg-danger/90 text-white hover:shadow-neon-danger hover:scale-[1.02] active:scale-[0.98]',
+    'bg-danger [@media(hover:hover)]:hover:bg-danger/90 text-white [@media(hover:hover)]:hover:shadow-neon-danger [@media(hover:hover)]:hover:scale-[1.02] active:scale-[0.98]',
   neon:
-    'bg-gradient-to-r from-neon-purple to-neon-blue text-white hover:shadow-neon-purple hover:scale-[1.02] active:scale-[0.98]',
+    'bg-gradient-to-r from-neon-purple to-neon-blue text-white [@media(hover:hover)]:hover:shadow-neon-purple [@media(hover:hover)]:hover:scale-[1.02] active:scale-[0.98]',
   'neon-pink':
-    'bg-gradient-to-r from-neon-purple to-neon-pink text-white hover:brightness-110 hover:scale-[1.02] active:scale-[0.98]',
+    'bg-gradient-to-r from-neon-purple to-neon-pink text-white [@media(hover:hover)]:hover:brightness-110 [@media(hover:hover)]:hover:scale-[1.02] active:scale-[0.98]',
 }
 
 const sizeStyles: Record<ButtonSize, string> = {

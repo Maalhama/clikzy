@@ -127,7 +127,7 @@ export default function LoginPage() {
           <button
             onClick={() => handleOAuth('google')}
             disabled={isOAuthLoading !== null || isLoading}
-            className="w-full flex items-center justify-center gap-3 px-5 py-4 rounded-2xl bg-white/5 border border-white/10 text-white font-medium transition-all active:scale-95 active:bg-white/15 hover:bg-white/10 hover:border-white/20 disabled:opacity-50 disabled:cursor-not-allowed mb-5"
+            className="w-full flex items-center justify-center gap-3 px-5 py-4 rounded-2xl bg-white/5 border border-white/10 text-white font-medium transition-all active:scale-95 active:bg-white/15 [@media(hover:hover)]:hover:bg-white/10 [@media(hover:hover)]:hover:border-white/20 disabled:opacity-50 disabled:cursor-not-allowed mb-5"
           >
             {isOAuthLoading === 'google' ? (
               <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />

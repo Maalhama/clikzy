@@ -53,6 +53,7 @@ const config: Config = {
         'border-scan': 'border-scan 3s linear infinite',
         'scroll-loop': 'scroll-loop 20s linear infinite',
         'marquee': 'marquee 30s linear infinite',
+        'marquee-infinite': 'marquee-infinite 40s linear infinite',
         'fade-in': 'fadeIn 0.3s ease-out forwards',
         'fade-in-up': 'fadeInUp 0.5s ease-out forwards',
         'fade-in-slide': 'fadeInSlide 0.3s ease-out forwards',
@@ -88,6 +89,10 @@ const config: Config = {
         'marquee': {
           '0%': { transform: 'translateX(0)' },
           '100%': { transform: 'translateX(-50%)' },
+        },
+        'marquee-infinite': {
+          '0%': { transform: 'translateX(0)' },
+          '100%': { transform: 'translateX(-100%)' },
         },
         fadeIn: {
           '0%': { opacity: '0' },
