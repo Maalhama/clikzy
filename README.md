@@ -1,4 +1,4 @@
-# CLIKZY
+# CLEEKZY
 
 Plateforme d'enchères temps réel gamifiée. Le dernier joueur à cliquer avant la fin du timer remporte le produit.
 
@@ -38,8 +38,8 @@ Plateforme d'enchères temps réel gamifiée. Le dernier joueur à cliquer avant
 ### 1. Cloner le projet
 
 ```bash
-git clone https://github.com/Maalhama/clikzy.git
-cd clikzy
+git clone https://github.com/Maalhama/cleekzy.git
+cd cleekzy
 ```
 
 ### 2. Installer les dépendances
@@ -72,7 +72,7 @@ NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_xxx
 
 # Resend (pour les emails)
 RESEND_API_KEY=re_xxx
-RESEND_FROM_EMAIL=CLIKZY <noreply@clikzy.fr>
+RESEND_FROM_EMAIL=CLEEKZY <noreply@cleekzy.com>
 
 # Cron (pour cron-job.org)
 CRON_SECRET=your-secret
@@ -188,7 +188,7 @@ Voir [CONTRIBUTING.md](CONTRIBUTING.md) pour les guidelines de contribution.
 - [API Documentation](docs/API.md)
 - [Cron Jobs](docs/CRON_JOBS.md)
 - [Système de bots](BOTS.md)
-- [Features](CLIKZY_FEATURE.md)
+- [Features](CLEEKZY_FEATURE.md)
 
 ## Licence
 
