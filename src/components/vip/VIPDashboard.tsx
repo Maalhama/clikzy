@@ -200,7 +200,7 @@ export function VIPDashboard({
   memberSince,
   daysUntilNextTier,
   totalCreditsEarned,
-  currentCredits,
+  currentCredits: _currentCredits,
   canCollectBonus,
   isCollectingBonus = false,
   onCollectBonus,

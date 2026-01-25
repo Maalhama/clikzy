@@ -45,8 +45,6 @@ async function getLandingData() {
   const [
     winnersResult,
     gameResult,
-    statsResult,
-    winningsResult,
     fallbackItemResult,
     activeGamesResult,
     totalItemsValueResult,
@@ -68,17 +66,6 @@ async function getLandingData() {
       .order('end_time', { ascending: true })
       .limit(1)
       .single(),
-
-    // Fetch total games count
-    supabase
-      .from('games')
-      .select('*', { count: 'exact', head: true })
-      .eq('status', 'ended'),
-
-    // Fetch total winnings
-    supabase
-      .from('winners')
-      .select('item_value'),
 
     // Fetch fallback item (in case no active game)
     supabase
@@ -181,13 +168,6 @@ async function getLandingData() {
       }
     }
   }
-
-  // Process stats
-  const typedWinningsData = winningsResult.data as Pick<DbWinner, 'item_value'>[] | null
-  const totalWinningsValue = (typedWinningsData || []).reduce(
-    (sum, w) => sum + (w.item_value || 0),
-    0
-  )
 
   // Calculate total value of all items (potential prizes) and count
   const typedItemsData = totalItemsValueResult.data as { retail_value: number }[] | null
