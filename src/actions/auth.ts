@@ -67,7 +67,7 @@ export async function signInWithOAuth(provider: 'google' | 'github'): Promise<{ 
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider,
       options: {
-        redirectTo: `${origin}/auth/callback`,
+        redirectTo: `${origin}/auth/callback?next=/lobby`,
       },
     })
 
