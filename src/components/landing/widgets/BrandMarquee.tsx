@@ -58,10 +58,10 @@ const BRAND_LOGOS: BrandIcon[] = [
 
 function BrandLogo({ brand }: { brand: BrandIcon }) {
   return (
-    <div className="w-20 md:w-24 h-8 flex items-center justify-center">
+    <div className="w-28 md:w-36 h-12 flex items-center justify-center">
       <svg
         viewBox="0 0 24 24"
-        className="h-5 md:h-6 w-auto max-w-full"
+        className="h-8 md:h-10 w-auto max-w-full"
         fill={`#${brand.hex}`}
         role="img"
         aria-label={brand.title}
