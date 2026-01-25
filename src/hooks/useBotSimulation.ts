@@ -169,13 +169,18 @@ export function useBotSimulation({
       }
 
       // SNIPE LOGIC: Quand joueur réel est leader en phase finale
-      // Délai aléatoire entre 10s et 50s (moyenne ~20s) pour paraître naturel
+      // Délai aléatoire entre 10s et 50s (moyenne ~30s) - FIXE par jeu pour être naturel
       if (hasRealPlayer && isInFinalPhase) {
-        // Générer un seuil de snipe aléatoire basé sur le gameId et le moment
-        // Cela donne un délai différent à chaque "tentative" mais cohérent entre clients
-        const snipeThresholdSeed = getDeterministicSeed(gameId + '-threshold', Math.floor(now / 5000))
+        // Seuil de snipe FIXE par jeu (ne change pas pendant la partie)
+        // Chaque jeu a son propre seuil entre 10s et 50s
+        const snipeThresholdSeed = getDeterministicSeed(gameId + '-snipe-threshold', 0)
         // Seuil entre 10s et 50s (10000ms à 50000ms)
         const snipeThreshold = 10000 + (snipeThresholdSeed % 40000)
+
+        // Log le seuil pour debug (à supprimer plus tard)
+        if (timeSinceLastClick < 2000) {
+          console.log(`[BOT SIM] Snipe threshold for this game: ${Math.floor(snipeThreshold/1000)}s, timer: ${Math.floor(timeLeft/1000)}s`)
+        }
 
         if (timeLeft <= 8000) {
           // SNIPE URGENT! Timer très critique (<8s), on reprend le lead immédiatement

@@ -162,8 +162,8 @@ export function useLobbyBotSimulation({
           battleEnded = !shouldBotClickInBattle(game.id, battleProgress)
         }
 
-        // SNIPE: Seuil aléatoire entre 10s et 50s (synchronisé avec la page jeu)
-        const snipeThresholdSeed = getDeterministicSeed(game.id + '-threshold', Math.floor(now / 5000))
+        // SNIPE: Seuil FIXE par jeu entre 10s et 50s (synchronisé avec la page jeu)
+        const snipeThresholdSeed = getDeterministicSeed(game.id + '-snipe-threshold', 0)
         const snipeThreshold = 10000 + (snipeThresholdSeed % 40000) // 10s à 50s
 
         // Snipe urgent si timer < 8s
