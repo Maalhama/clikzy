@@ -21,6 +21,7 @@ interface UsePullToRefreshReturn {
 
 /**
  * Hook pour implémenter le Pull to Refresh sur mobile
+ * Détecte la direction du swipe et ignore les mouvements horizontaux
  */
 export function usePullToRefresh({
   onRefresh,
@@ -32,8 +33,10 @@ export function usePullToRefresh({
   const [isPulling, setIsPulling] = useState(false)
 
   const startYRef = useRef(0)
+  const startXRef = useRef(0)
   const currentYRef = useRef(0)
   const isAtTopRef = useRef(false)
+  const directionLockedRef = useRef<'vertical' | 'horizontal' | null>(null)
 
   // Check if page is scrolled to top
   const checkIfAtTop = useCallback(() => {
@@ -47,7 +50,9 @@ export function usePullToRefresh({
     if (!isAtTopRef.current) return
 
     startYRef.current = e.touches[0].clientY
+    startXRef.current = e.touches[0].clientX
     currentYRef.current = startYRef.current
+    directionLockedRef.current = null // Reset direction lock
     setIsPulling(true)
   }, [isRefreshing, checkIfAtTop])
 
@@ -55,17 +60,40 @@ export function usePullToRefresh({
     if (isRefreshing || !isPulling) return
     if (!isAtTopRef.current) return
 
-    currentYRef.current = e.touches[0].clientY
-    const diff = currentYRef.current - startYRef.current
+    const currentX = e.touches[0].clientX
+    const currentY = e.touches[0].clientY
+    currentYRef.current = currentY
+
+    const diffY = currentY - startYRef.current
+    const diffX = currentX - startXRef.current
+
+    // Determine direction on first significant movement (10px threshold)
+    if (directionLockedRef.current === null && (Math.abs(diffX) > 10 || Math.abs(diffY) > 10)) {
+      if (Math.abs(diffX) > Math.abs(diffY)) {
+        // Horizontal swipe - don't interfere
+        directionLockedRef.current = 'horizontal'
+        setIsPulling(false)
+        setPullDistance(0)
+        return
+      } else {
+        // Vertical swipe - enable pull to refresh
+        directionLockedRef.current = 'vertical'
+      }
+    }
+
+    // If locked to horizontal, don't do anything
+    if (directionLockedRef.current === 'horizontal') {
+      return
+    }
 
     // Only pull down, not up
-    if (diff > 0) {
+    if (diffY > 0 && directionLockedRef.current === 'vertical') {
       // Apply resistance - the further you pull, the harder it gets
       const resistance = 0.5
-      const distance = Math.min(diff * resistance, maxPull)
+      const distance = Math.min(diffY * resistance, maxPull)
       setPullDistance(distance)
 
-      // Prevent default scroll when pulling
+      // Prevent default scroll when pulling down
       if (distance > 10) {
         e.preventDefault()
       }
@@ -76,6 +104,7 @@ export function usePullToRefresh({
     if (isRefreshing || !isPulling) return
 
     setIsPulling(false)
+    directionLockedRef.current = null
 
     if (pullDistance >= threshold) {
       // Trigger refresh
