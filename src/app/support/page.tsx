@@ -116,7 +116,7 @@ export default function SupportPage() {
       {/* Header */}
       <header className="relative z-10 border-b border-white/10 bg-bg-primary/80 backdrop-blur-xl">
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
-          <Logo size="md" animated={false} href="/" />
+          <Logo size="md" animated={true} href="/" />
           <Link
             href="/"
             className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-sm text-white/70 hover:text-white hover:border-neon-purple/50 transition-all"
