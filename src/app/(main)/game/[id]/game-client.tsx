@@ -514,36 +514,6 @@ export function GameClient({
             </div>
           </div>
 
-          {/* Mobile: Rules */}
-          <div className="mt-6 p-5 rounded-2xl bg-bg-secondary/30 border border-white/5">
-            <h3 className="text-sm font-semibold text-white mb-3 flex items-center gap-2">
-              <svg className="w-4 h-4 text-neon-purple" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-              </svg>
-              Règles du jeu
-            </h3>
-            <ul className="text-sm text-white/50 space-y-2">
-              <li className="flex items-center gap-2">
-                <svg className="w-4 h-4 text-neon-purple flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                1 clic = 1 crédit
-              </li>
-              <li className="flex items-center gap-2">
-                <svg className="w-4 h-4 text-neon-blue flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
-                </svg>
-                Le dernier clic avant la fin gagne
-              </li>
-              <li className="flex items-center gap-2">
-                <svg className="w-4 h-4 text-neon-pink flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-                Phase finale : chaque clic remet 1 min
-              </li>
-            </ul>
-          </div>
-
           {/* Mobile: Game Rules */}
           <div className="mt-6 rounded-2xl bg-bg-secondary/30 border border-white/10 overflow-hidden">
             <div className="px-4 py-3 border-b border-white/10">
