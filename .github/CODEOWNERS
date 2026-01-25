@@ -1,23 +1,32 @@
-# CODEOWNERS - Définit les reviewers par défaut pour les PR
+# CODEOWNERS
+# https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
 
-# Propriétaire global (review toutes les PR)
-* @Maalhama
-
-# Backend / API
-/src/app/api/ @Maalhama
-/src/actions/ @Maalhama
-/src/lib/ @Maalhama
-
-# Frontend / Components
-/src/components/ @Maalhama
-/src/app/(main)/ @Maalhama
-/src/app/(auth)/ @Maalhama
-
-# Configuration
-/.github/ @Maalhama
-/next.config.ts @Maalhama
-/tailwind.config.ts @Maalhama
+# Default owners for everything in the repo
+* @a-mehdi
 
 # Documentation
-*.md @Maalhama
-/docs/ @Maalhama
+*.md @a-mehdi
+/docs/ @a-mehdi
+
+# GitHub workflows and configs
+/.github/ @a-mehdi
+
+# Database and migrations
+/supabase/ @a-mehdi
+/src/types/database.ts @a-mehdi
+
+# Security-critical files
+/src/lib/security/ @a-mehdi
+/src/proxy.ts @a-mehdi
+
+# Payment integration
+/src/app/api/stripe/ @a-mehdi
+/src/actions/credits.ts @a-mehdi
+
+# Core game logic
+/src/actions/game.ts @a-mehdi
+/src/lib/constants.ts @a-mehdi
+
+# Tests
+/src/__tests__/ @a-mehdi
+/playwright/ @a-mehdi

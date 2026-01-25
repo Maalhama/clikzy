@@ -1,6 +1,6 @@
 version: 2
 updates:
-  # npm dependencies
+  # Enable version updates for npm
   - package-ecosystem: "npm"
     directory: "/"
     schedule:
@@ -9,30 +9,46 @@ updates:
       time: "09:00"
       timezone: "Europe/Paris"
     open-pull-requests-limit: 10
-    commit-message:
-      prefix: "chore(deps)"
+    reviewers:
+      - "a-mehdi"
     labels:
       - "dependencies"
+      - "automated"
+    # Group minor and patch updates together
     groups:
-      # Group minor and patch updates together
-      minor-and-patch:
+      production-dependencies:
         patterns:
           - "*"
+        exclude-patterns:
+          - "@types/*"
+          - "eslint*"
+          - "prettier"
         update-types:
           - "minor"
           - "patch"
+      development-dependencies:
+        patterns:
+          - "@types/*"
+          - "eslint*"
+          - "prettier"
+          - "vitest"
+          - "playwright"
+        update-types:
+          - "minor"
+          - "patch"
+    # Ignore major updates for stability (review manually)
     ignore:
-      # Ignore major version updates for stability
       - dependency-name: "*"
         update-types: ["version-update:semver-major"]
 
-  # GitHub Actions
+  # Enable version updates for GitHub Actions
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "monthly"
-    commit-message:
-      prefix: "chore(ci)"
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "Europe/Paris"
     labels:
-      - "ci"
       - "dependencies"
+      - "github-actions"
