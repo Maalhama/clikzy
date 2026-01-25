@@ -1,3 +1,27 @@
 {
-  "$schema": "https://openapi.vercel.sh/vercel.json"
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "redirects": [
+    {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "clikzy.vercel.app"
+        }
+      ],
+      "destination": "https://www.cleekzy.com/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "cleekzy.com"
+        }
+      ],
+      "destination": "https://www.cleekzy.com/:path*",
+      "permanent": true
+    }
+  ]
 }
