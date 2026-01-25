@@ -87,8 +87,8 @@ export function Header({ profile }: HeaderProps) {
               href="/lobby"
               className="flex items-center gap-2 text-white/60 hover:text-neon-blue transition-colors font-medium group"
             >
-              {/* Trophy/Crown icon for Lobby */}
-              <svg className="w-5 h-5 text-neon-blue/70 group-hover:text-neon-blue transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+              {/* Trophy icon - Neon style */}
+              <svg className="w-5 h-5 text-neon-blue/70 group-hover:text-neon-blue transition-colors drop-shadow-[0_0_6px_rgba(60,203,255,0.5)] group-hover:drop-shadow-[0_0_8px_rgba(60,203,255,0.8)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
                 <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5C7 4 6 9 6 9Z" />
                 <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5C17 4 18 9 18 9Z" />
                 <path d="M4 22h16" />
@@ -101,8 +101,8 @@ export function Header({ profile }: HeaderProps) {
               href="/mini-games"
               className="flex items-center gap-2 text-white/60 hover:text-neon-purple transition-colors font-medium group"
             >
-              {/* Dice icon for Mini-Jeux */}
-              <svg className="w-5 h-5 text-neon-purple/70 group-hover:text-neon-purple transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+              {/* Dice icon - Neon style */}
+              <svg className="w-5 h-5 text-neon-purple/70 group-hover:text-neon-purple transition-colors drop-shadow-[0_0_6px_rgba(155,92,255,0.5)] group-hover:drop-shadow-[0_0_8px_rgba(155,92,255,0.8)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
                 <rect x="2" y="2" width="20" height="20" rx="3" />
                 <circle cx="8" cy="8" r="1.5" fill="currentColor" />
                 <circle cx="16" cy="8" r="1.5" fill="currentColor" />
@@ -111,7 +111,7 @@ export function Header({ profile }: HeaderProps) {
                 <circle cx="12" cy="12" r="1.5" fill="currentColor" />
               </svg>
               <span>Mini-Jeux</span>
-              <span className="px-1.5 py-0.5 text-[10px] font-bold bg-neon-purple/20 text-neon-purple rounded uppercase">
+              <span className="px-1.5 py-0.5 text-[10px] font-bold bg-neon-purple/20 text-neon-purple rounded uppercase shadow-[0_0_8px_rgba(155,92,255,0.3)]">
                 Gratuit
               </span>
             </Link>
@@ -119,13 +119,28 @@ export function Header({ profile }: HeaderProps) {
               href="/shop"
               className="flex items-center gap-2 text-white/60 hover:text-neon-pink transition-colors font-medium group"
             >
-              {/* Shopping bag icon */}
-              <svg className="w-5 h-5 text-neon-pink/70 group-hover:text-neon-pink transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+              {/* Shopping bag icon - Neon style */}
+              <svg className="w-5 h-5 text-neon-pink/70 group-hover:text-neon-pink transition-colors drop-shadow-[0_0_6px_rgba(255,79,216,0.5)] group-hover:drop-shadow-[0_0_8px_rgba(255,79,216,0.8)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
                 <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
                 <line x1="3" y1="6" x2="21" y2="6" />
                 <path d="M16 10a4 4 0 0 1-8 0" />
               </svg>
               <span>Boutique</span>
+            </Link>
+            <Link
+              href="/vip"
+              className="flex items-center gap-2 text-white/60 hover:text-yellow-400 transition-colors font-medium group"
+            >
+              {/* Crown icon - Neon style */}
+              <svg className="w-5 h-5 text-yellow-500/70 group-hover:text-yellow-400 transition-colors drop-shadow-[0_0_6px_rgba(234,179,8,0.5)] group-hover:drop-shadow-[0_0_8px_rgba(234,179,8,0.8)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 6l3.5 4.5L19 6l-2 10H7L5 6l3.5 4.5L12 6z" />
+                <circle cx="12" cy="4" r="1" fill="currentColor" />
+                <circle cx="5" cy="5" r="1" fill="currentColor" />
+                <circle cx="19" cy="5" r="1" fill="currentColor" />
+                <path d="M7 16h10" />
+                <path d="M6 20h12" />
+              </svg>
+              <span className="bg-gradient-to-r from-yellow-400 to-amber-500 bg-clip-text text-transparent font-bold drop-shadow-[0_0_10px_rgba(234,179,8,0.3)]">V.I.P</span>
             </Link>
           </nav>
 
@@ -279,8 +294,8 @@ export function Header({ profile }: HeaderProps) {
                 onClick={closeMenu}
                 className="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-neon-blue/10 transition-colors border border-transparent hover:border-neon-blue/30 group"
               >
-                {/* Trophy/Crown icon for Lobby */}
-                <div className="w-8 h-8 rounded-lg bg-neon-blue/10 border border-neon-blue/30 flex items-center justify-center group-hover:bg-neon-blue/20 transition-colors">
+                {/* Trophy icon - Neon style */}
+                <div className="w-8 h-8 rounded-lg bg-neon-blue/10 border border-neon-blue/30 flex items-center justify-center group-hover:bg-neon-blue/20 transition-colors shadow-[0_0_10px_rgba(60,203,255,0.2)] group-hover:shadow-[0_0_15px_rgba(60,203,255,0.4)]">
                   <svg className="w-4 h-4 text-neon-blue" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
                     <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5C7 4 6 9 6 9Z" />
                     <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5C17 4 18 9 18 9Z" />
@@ -296,8 +311,8 @@ export function Header({ profile }: HeaderProps) {
                 onClick={closeMenu}
                 className="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-neon-purple/10 transition-colors border border-transparent hover:border-neon-purple/30 group"
               >
-                {/* Dice icon for Mini-Jeux */}
-                <div className="w-8 h-8 rounded-lg bg-neon-purple/10 border border-neon-purple/30 flex items-center justify-center group-hover:bg-neon-purple/20 transition-colors">
+                {/* Dice icon - Neon style */}
+                <div className="w-8 h-8 rounded-lg bg-neon-purple/10 border border-neon-purple/30 flex items-center justify-center group-hover:bg-neon-purple/20 transition-colors shadow-[0_0_10px_rgba(155,92,255,0.2)] group-hover:shadow-[0_0_15px_rgba(155,92,255,0.4)]">
                   <svg className="w-4 h-4 text-neon-purple" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
                     <rect x="2" y="2" width="20" height="20" rx="3" />
                     <circle cx="8" cy="8" r="1.5" fill="currentColor" />
@@ -308,7 +323,7 @@ export function Header({ profile }: HeaderProps) {
                   </svg>
                 </div>
                 <span className="font-medium text-white/80 group-hover:text-neon-purple transition-colors">Mini-Jeux</span>
-                <span className="px-2 py-0.5 text-[10px] font-bold bg-neon-purple/20 text-neon-purple rounded uppercase ml-auto">
+                <span className="px-2 py-0.5 text-[10px] font-bold bg-neon-purple/20 text-neon-purple rounded uppercase ml-auto shadow-[0_0_8px_rgba(155,92,255,0.3)]">
                   Gratuit
                 </span>
               </Link>
@@ -317,8 +332,8 @@ export function Header({ profile }: HeaderProps) {
                 onClick={closeMenu}
                 className="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-neon-pink/10 transition-colors border border-transparent hover:border-neon-pink/30 group"
               >
-                {/* Shopping bag icon */}
-                <div className="w-8 h-8 rounded-lg bg-neon-pink/10 border border-neon-pink/30 flex items-center justify-center group-hover:bg-neon-pink/20 transition-colors">
+                {/* Shopping bag icon - Neon style */}
+                <div className="w-8 h-8 rounded-lg bg-neon-pink/10 border border-neon-pink/30 flex items-center justify-center group-hover:bg-neon-pink/20 transition-colors shadow-[0_0_10px_rgba(255,79,216,0.2)] group-hover:shadow-[0_0_15px_rgba(255,79,216,0.4)]">
                   <svg className="w-4 h-4 text-neon-pink" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
                     <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
                     <line x1="3" y1="6" x2="21" y2="6" />
@@ -326,6 +341,24 @@ export function Header({ profile }: HeaderProps) {
                   </svg>
                 </div>
                 <span className="font-medium text-white/80 group-hover:text-neon-pink transition-colors">Boutique</span>
+              </Link>
+              <Link
+                href="/vip"
+                onClick={closeMenu}
+                className="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-yellow-500/10 transition-colors border border-transparent hover:border-yellow-500/30 group"
+              >
+                {/* Crown icon - Neon style */}
+                <div className="w-8 h-8 rounded-lg bg-yellow-500/10 border border-yellow-500/30 flex items-center justify-center group-hover:bg-yellow-500/20 transition-colors shadow-[0_0_10px_rgba(234,179,8,0.2)] group-hover:shadow-[0_0_15px_rgba(234,179,8,0.4)]">
+                  <svg className="w-4 h-4 text-yellow-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M12 6l3.5 4.5L19 6l-2 10H7L5 6l3.5 4.5L12 6z" />
+                    <circle cx="12" cy="4" r="1" fill="currentColor" />
+                    <circle cx="5" cy="5" r="1" fill="currentColor" />
+                    <circle cx="19" cy="5" r="1" fill="currentColor" />
+                    <path d="M7 16h10" />
+                    <path d="M6 20h12" />
+                  </svg>
+                </div>
+                <span className="font-bold bg-gradient-to-r from-yellow-400 to-amber-500 bg-clip-text text-transparent group-hover:from-yellow-300 group-hover:to-amber-400 transition-colors">V.I.P</span>
               </Link>
             </div>
 
