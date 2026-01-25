@@ -20,7 +20,7 @@ export interface LeaderboardData {
 }
 
 /**
- * Recupere les derniers gagnants pour la landing page
+ * Récupère les derniers gagnants pour la landing page
  * Garde les gagnants des dernières 24h minimum, indépendamment des rotations de jeux
  */
 export async function getRecentWinners(limit: number = 50): Promise<WinnerData[]> {
@@ -81,7 +81,7 @@ export async function getRecentWinners(limit: number = 50): Promise<WinnerData[]
 }
 
 /**
- * Recupere le leaderboard des meilleurs joueurs
+ * Récupère le leaderboard des meilleurs joueurs
  */
 export async function getLeaderboard(
   period: 'today' | 'week' | 'month' | 'all' = 'week',
@@ -168,7 +168,7 @@ export async function getLeaderboard(
 }
 
 /**
- * Recupere les statistiques globales pour la landing page
+ * Récupère les statistiques globales pour la landing page
  */
 export async function getGlobalStats(): Promise<{
   totalWinnings: number
@@ -188,13 +188,13 @@ export async function getGlobalStats(): Promise<{
     0
   ) || 0
 
-  // Nombre de parties terminees
+  // Nombre de parties terminées
   const { count: totalGames } = await supabase
     .from('games')
     .select('*', { count: 'exact', head: true })
     .eq('status', 'ended')
 
-  // Joueurs actifs (approximation: joueurs ayant clique dans les 5 dernieres minutes)
+  // Joueurs actifs (approximation: joueurs ayant cliqué dans les 5 dernières minutes)
   const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString()
   const { count: recentClickers } = await supabase
     .from('clicks')

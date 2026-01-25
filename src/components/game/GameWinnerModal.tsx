@@ -130,7 +130,7 @@ export const GameWinnerModal = memo(function GameWinnerModal({
                       transition={{ delay: 0.2 }}
                       className="text-3xl font-bold text-success mb-2"
                     >
-                      Felicitations !
+                      Félicitations !
                     </motion.h2>
                     <motion.p
                       initial={{ opacity: 0, y: 10 }}
@@ -138,7 +138,7 @@ export const GameWinnerModal = memo(function GameWinnerModal({
                       transition={{ delay: 0.3 }}
                       className="text-xl text-white mb-6"
                     >
-                      Tu as gagne !
+                      Tu as gagné !
                     </motion.p>
 
                     {/* Item won */}
@@ -173,7 +173,7 @@ export const GameWinnerModal = memo(function GameWinnerModal({
                       transition={{ delay: 0.5 }}
                       className="text-text-secondary text-sm mb-6"
                     >
-                      Un email de confirmation t&apos;a ete envoye avec les instructions.
+                      Un email de confirmation t&apos;a été envoyé avec les instructions.
                     </motion.p>
                   </div>
                 </>
@@ -183,7 +183,7 @@ export const GameWinnerModal = memo(function GameWinnerModal({
                   <div className="text-center">
                     <div className="text-7xl mb-4">🏆</div>
                     <h2 className="text-2xl font-bold text-white mb-2">
-                      Partie terminee
+                      Partie terminée
                     </h2>
                     <p className="text-text-secondary mb-4">
                       Le gagnant est :
@@ -193,7 +193,7 @@ export const GameWinnerModal = memo(function GameWinnerModal({
                         {winnerUsername || 'Inconnu'}
                       </p>
                       <p className="text-text-secondary text-sm">
-                        a remporte {itemName}
+                        a remporté {itemName}
                       </p>
                     </div>
                     <p className="text-text-secondary text-sm mb-6">

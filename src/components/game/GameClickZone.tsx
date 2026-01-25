@@ -94,7 +94,7 @@ export const GameClickZone = memo(function GameClickZone({
       return (
         <div className="flex flex-col items-center gap-2">
           <span className="text-5xl">🏁</span>
-          <span className="text-lg font-medium">Partie terminee</span>
+          <span className="text-lg font-medium">Partie terminée</span>
         </div>
       )
     }
@@ -103,7 +103,7 @@ export const GameClickZone = memo(function GameClickZone({
       return (
         <div className="flex flex-col items-center gap-2">
           <span className="text-5xl">💸</span>
-          <span className="text-lg font-medium">Credits insuffisants</span>
+          <span className="text-lg font-medium">Crédits insuffisants</span>
         </div>
       )
     }
@@ -119,7 +119,7 @@ export const GameClickZone = memo(function GameClickZone({
           👆
         </motion.span>
         <span className="text-2xl font-bold">CLIQUER</span>
-        <span className="text-sm opacity-75">1 credit par clic</span>
+        <span className="text-sm opacity-75">1 crédit par clic</span>
       </div>
     )
   }
