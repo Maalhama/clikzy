@@ -215,7 +215,7 @@ export async function checkVIPStatus(): Promise<ActionResult<{ isVip: boolean; e
   const typedProfile = profile as { is_vip: boolean; vip_expires_at: string | null } | null
   const isVip = typedProfile?.is_vip && typedProfile.vip_expires_at
     ? new Date(typedProfile.vip_expires_at) > new Date()
-    : false
+    : typedProfile?.is_vip || false
 
   return {
     success: true,
@@ -223,5 +223,151 @@ export async function checkVIPStatus(): Promise<ActionResult<{ isVip: boolean; e
       isVip,
       expiresAt: typedProfile?.vip_expires_at || null,
     },
+  }
+}
+
+/**
+ * VIP tier type
+ */
+export type VIPTier = 'bronze' | 'silver' | 'gold'
+
+/**
+ * Get detailed VIP information for dashboard
+ */
+export async function getVIPDetails(): Promise<ActionResult<{
+  isVip: boolean
+  tier: VIPTier
+  memberSince: string
+  daysUntilNextTier: number
+  totalCreditsEarned: number
+  dailyBonusReceived: boolean
+  subscriptionId: string | null
+}>> {
+  const supabase = await createClient()
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user) {
+    return { success: false, error: 'Non authentifié' }
+  }
+
+  const { data: profile, error } = await supabase
+    .from('profiles')
+    .select('is_vip, vip_subscription_id, vip_expires_at, created_at, earned_credits, last_credits_reset')
+    .eq('id', user.id)
+    .single()
+
+  if (error || !profile) {
+    return { success: false, error: 'Erreur lors de la récupération du profil' }
+  }
+
+  const typedProfile = profile as {
+    is_vip: boolean
+    vip_subscription_id: string | null
+    vip_expires_at: string | null
+    created_at: string
+    earned_credits: number
+    last_credits_reset: string | null
+  }
+
+  if (!typedProfile.is_vip) {
+    return { success: false, error: 'Utilisateur non VIP' }
+  }
+
+  // Calculate VIP membership duration
+  // Note: We use vip_subscription_id creation or created_at as fallback
+  const memberSince = typedProfile.created_at
+
+  // Calculate tier based on subscription duration
+  const now = new Date()
+  const subscriptionStart = new Date(memberSince)
+  const daysAsMember = Math.floor((now.getTime() - subscriptionStart.getTime()) / (1000 * 60 * 60 * 24))
+
+  let tier: VIPTier = 'bronze'
+  let daysUntilNextTier = 90 - daysAsMember
+
+  if (daysAsMember >= 180) {
+    tier = 'gold'
+    daysUntilNextTier = 0
+  } else if (daysAsMember >= 90) {
+    tier = 'silver'
+    daysUntilNextTier = 180 - daysAsMember
+  } else {
+    tier = 'bronze'
+    daysUntilNextTier = 90 - daysAsMember
+  }
+
+  // Check if daily bonus was received today
+  const lastReset = typedProfile.last_credits_reset ? new Date(typedProfile.last_credits_reset) : null
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  const dailyBonusReceived = lastReset ? lastReset >= today : false
+
+  return {
+    success: true,
+    data: {
+      isVip: true,
+      tier,
+      memberSince,
+      daysUntilNextTier: Math.max(0, daysUntilNextTier),
+      totalCreditsEarned: typedProfile.earned_credits || 0,
+      dailyBonusReceived,
+      subscriptionId: typedProfile.vip_subscription_id,
+    },
+  }
+}
+
+/**
+ * Create Stripe Billing Portal session for managing subscription
+ */
+export async function createBillingPortalSession(): Promise<ActionResult<{ url: string }>> {
+  const supabase = await createClient()
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user) {
+    return { success: false, error: 'Non authentifié' }
+  }
+
+  try {
+    const stripeInstance = getStripeInstance()
+    if (!stripeInstance) {
+      return { success: false, error: 'Service de paiement non configuré' }
+    }
+
+    // Get user's Stripe customer ID from subscription
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('vip_subscription_id')
+      .eq('id', user.id)
+      .single()
+
+    const typedProfile = profile as { vip_subscription_id: string | null } | null
+
+    if (!typedProfile?.vip_subscription_id) {
+      return { success: false, error: 'Aucun abonnement trouvé' }
+    }
+
+    // Get subscription to find customer ID
+    const subscription = await stripeInstance.subscriptions.retrieve(typedProfile.vip_subscription_id)
+    const customerId = subscription.customer as string
+
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
+
+    // Create billing portal session
+    const session = await stripeInstance.billingPortal.sessions.create({
+      customer: customerId,
+      return_url: `${baseUrl}/vip`,
+    })
+
+    return { success: true, data: { url: session.url } }
+  } catch (error) {
+    console.error('Billing portal error:', error)
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+    return { success: false, error: `Erreur: ${errorMessage}` }
   }
 }

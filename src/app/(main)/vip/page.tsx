@@ -1,9 +1,10 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
+import { VIPDashboard } from '@/components/vip/VIPDashboard'
 import VIPSubscriptionModal from '@/components/modals/VIPSubscriptionModal'
-import { createVIPCheckoutSession } from '@/actions/stripe'
+import { createVIPCheckoutSession, getVIPDetails, createBillingPortalSession, type VIPTier } from '@/actions/stripe'
 
 // Neon Medal Icons for VIP tiers
 const BronzeMedalIcon = () => (
@@ -24,6 +25,36 @@ const GoldMedalIcon = () => (
   <svg className="w-6 h-6 text-yellow-400 drop-shadow-[0_0_8px_rgba(250,204,21,0.6)]" viewBox="0 0 24 24" fill="currentColor">
     <circle cx="12" cy="9" r="6" />
     <path d="M8 15l-2 7 6-3 6 3-2-7" />
+  </svg>
+)
+
+const CrownIcon = ({ className }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="currentColor">
+    <path d="M12 6l3.5 4.5L19 6l-2 10H7L5 6l3.5 4.5L12 6z" />
+    <circle cx="12" cy="4" r="1.5" />
+    <circle cx="5" cy="5" r="1.5" />
+    <circle cx="19" cy="5" r="1.5" />
+    <rect x="6" y="16" width="12" height="2" rx="0.5" />
+    <rect x="5" y="19" width="14" height="2" rx="0.5" />
+  </svg>
+)
+
+const CheckIcon = ({ className }: { className?: string }) => (
+  <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+  </svg>
+)
+
+const ChevronIcon = ({ className }: { className?: string }) => (
+  <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+    <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+  </svg>
+)
+
+const LoadingSpinner = () => (
+  <svg className="w-5 h-5 animate-spin" viewBox="0 0 24 24" fill="none">
+    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
   </svg>
 )
 
@@ -94,10 +125,41 @@ const FAQ_ITEMS = [
   },
 ]
 
+// VIP Details state type
+type VIPDetailsState = {
+  isVip: boolean
+  tier: VIPTier
+  memberSince: string
+  daysUntilNextTier: number
+  totalCreditsEarned: number
+  dailyBonusReceived: boolean
+  subscriptionId: string | null
+} | null
+
 export default function VIPPage() {
   const [showModal, setShowModal] = useState(false)
   const [openFAQ, setOpenFAQ] = useState<number | null>(null)
   const [isLoading, setIsLoading] = useState(false)
+  const [isCheckingVIP, setIsCheckingVIP] = useState(true)
+  const [vipDetails, setVipDetails] = useState<VIPDetailsState>(null)
+
+  // Check VIP status on mount
+  useEffect(() => {
+    async function checkVIP() {
+      try {
+        const result = await getVIPDetails()
+        if (result.success && result.data) {
+          setVipDetails(result.data)
+        }
+      } catch {
+        // User is not VIP or not logged in
+        console.log('Not VIP or not logged in')
+      } finally {
+        setIsCheckingVIP(false)
+      }
+    }
+    checkVIP()
+  }, [])
 
   const handleSubscribe = async () => {
     setIsLoading(true)
@@ -115,6 +177,55 @@ export default function VIPPage() {
     }
   }
 
+  const handleManageSubscription = async () => {
+    setIsLoading(true)
+    try {
+      const result = await createBillingPortalSession()
+      if (result.success && result.data?.url) {
+        window.location.href = result.data.url
+      } else {
+        // Fallback: show message if no billing portal available
+        alert('Pour gérer ton abonnement, contacte le support.')
+        setIsLoading(false)
+      }
+    } catch (error) {
+      console.error('Error creating billing portal session:', error)
+      alert('Pour gérer ton abonnement, contacte le support.')
+      setIsLoading(false)
+    }
+  }
+
+  // Loading state
+  if (isCheckingVIP) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <LoadingSpinner />
+          <span className="text-text-secondary">Chargement...</span>
+        </div>
+      </div>
+    )
+  }
+
+  // VIP User Dashboard
+  if (vipDetails) {
+    return (
+      <div className="min-h-screen pb-20 px-4 py-8">
+        <div className="max-w-4xl mx-auto">
+          <VIPDashboard
+            tier={vipDetails.tier}
+            memberSince={vipDetails.memberSince}
+            daysUntilNextTier={vipDetails.daysUntilNextTier}
+            totalCreditsEarned={vipDetails.totalCreditsEarned}
+            dailyBonusReceived={vipDetails.dailyBonusReceived}
+            onManageSubscription={handleManageSubscription}
+          />
+        </div>
+      </div>
+    )
+  }
+
+  // Non-VIP User: Subscription Page
   return (
     <>
       <div className="min-h-screen pb-20">
@@ -134,14 +245,7 @@ export default function VIPPage() {
             >
               {/* Crown icon - Neon style */}
               <div className="relative inline-flex items-center justify-center w-20 h-20 mb-6 rounded-2xl bg-gradient-to-br from-yellow-400 to-amber-600 shadow-[0_0_30px_rgba(234,179,8,0.5),0_0_60px_rgba(234,179,8,0.3)]">
-                <svg className="w-10 h-10 text-[#0B0F1A] drop-shadow-[0_0_10px_rgba(234,179,8,0.8)]" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M12 6l3.5 4.5L19 6l-2 10H7L5 6l3.5 4.5L12 6z" />
-                  <circle cx="12" cy="4" r="1.5" />
-                  <circle cx="5" cy="5" r="1.5" />
-                  <circle cx="19" cy="5" r="1.5" />
-                  <rect x="6" y="16" width="12" height="2" rx="0.5" />
-                  <rect x="5" y="19" width="14" height="2" rx="0.5" />
-                </svg>
+                <CrownIcon className="w-10 h-10 text-[#0B0F1A] drop-shadow-[0_0_10px_rgba(234,179,8,0.8)]" />
               </div>
 
               <h1 className="text-4xl md:text-5xl font-bold mb-4">
@@ -209,15 +313,7 @@ export default function VIPPage() {
                   <ul className="space-y-3">
                     {tier.benefits.map((benefit, i) => (
                       <li key={i} className="flex items-start gap-2 text-sm">
-                        <svg
-                          className={`w-5 h-5 ${tier.textColor} flex-shrink-0 mt-0.5`}
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                          strokeWidth={2}
-                        >
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                        </svg>
+                        <CheckIcon className={`w-5 h-5 ${tier.textColor} flex-shrink-0 mt-0.5`} />
                         <span className="text-text-primary">{benefit}</span>
                       </li>
                     ))}
@@ -246,10 +342,7 @@ export default function VIPPage() {
               onClick={() => setShowModal(true)}
               className="inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-gradient-to-r from-yellow-500 to-amber-600 text-black font-bold text-lg hover:from-yellow-400 hover:to-amber-500 transition-all transform hover:scale-105 shadow-lg shadow-yellow-500/30"
             >
-              <svg className="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 6l3.5 4.5L19 6l-2 10H7L5 6l3.5 4.5L12 6z" />
-                <rect x="6" y="16" width="12" height="2" rx="0.5" />
-              </svg>
+              <CrownIcon className="w-6 h-6" />
               <span>S&apos;abonner V.I.P</span>
               <span className="text-sm font-normal opacity-75">9,99€/mois</span>
             </button>
@@ -283,15 +376,9 @@ export default function VIPPage() {
                     className="w-full px-5 py-4 flex items-center justify-between text-left hover:bg-white/5 transition-colors"
                   >
                     <span className="font-medium text-text-primary">{item.question}</span>
-                    <svg
+                    <ChevronIcon
                       className={`w-5 h-5 text-text-secondary transition-transform ${openFAQ === index ? 'rotate-180' : ''}`}
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                      strokeWidth={2}
-                    >
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-                    </svg>
+                    />
                   </button>
                   {openFAQ === index && (
                     <div className="px-5 pb-4 text-sm text-text-secondary">
