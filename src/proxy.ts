@@ -22,7 +22,7 @@ function getClientIP(request: NextRequest): string {
   return 'unknown'
 }
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
 
   // Rate limiting for API routes
@@ -33,11 +33,11 @@ export async function middleware(request: NextRequest) {
     let rateLimitResult
 
     if (pathname.startsWith('/api/stripe')) {
-      rateLimitResult = rateLimiters.payment(ip)
+      rateLimitResult = await rateLimiters.payment(ip)
     } else if (pathname.startsWith('/api/cron')) {
-      rateLimitResult = rateLimiters.cron(ip)
+      rateLimitResult = await rateLimiters.cron(ip)
     } else {
-      rateLimitResult = rateLimiters.api(ip)
+      rateLimitResult = await rateLimiters.api(ip)
     }
 
     if (!rateLimitResult.success) {
