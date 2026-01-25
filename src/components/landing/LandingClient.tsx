@@ -851,7 +851,7 @@ export function LandingClient({
       <section className="hidden md:block relative py-20">
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid lg:grid-cols-2 gap-8">
-            <Leaderboard />
+            <Leaderboard realWinners={recentWinners} />
             <Testimonials />
           </div>
         </div>
