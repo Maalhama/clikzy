@@ -603,7 +603,7 @@ export function GameClient({
                 </div>
                 <div>
                   <p className="text-white text-sm font-medium">Phase finale</p>
-                  <p className="text-white/50 text-xs">Quand il reste moins d&apos;1 min, chaque clic remet le timer à 1 min</p>
+                  <p className="text-white/50 text-xs">Quand il reste moins d&apos;1min30, chaque clic remet le timer à 1min30</p>
                 </div>
               </div>
             </div>
@@ -937,7 +937,7 @@ export function GameClient({
                     </div>
                     <div>
                       <p className="text-white text-sm font-medium">Phase finale</p>
-                      <p className="text-white/50 text-xs">Quand il reste moins d&apos;1 min, chaque clic remet le timer à 1 min</p>
+                      <p className="text-white/50 text-xs">Quand il reste moins d&apos;1min30, chaque clic remet le timer à 1min30</p>
                     </div>
                   </div>
                 </div>
@@ -967,7 +967,7 @@ export function GameClient({
                 <svg className="w-4 h-4 text-neon-pink" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
-                Phase finale: reset 1 min
+                Phase finale: reset 1min30
               </div>
             </div>
           </div>

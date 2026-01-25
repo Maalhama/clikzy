@@ -158,7 +158,7 @@ export const GameSidebar = memo(function GameSidebar({
           </li>
           <li className="flex items-center gap-2">
             <span className="text-neon-pink">•</span>
-            Phase finale : +1 min/clic
+            Phase finale : +1min30/clic
           </li>
         </ul>
       </motion.div>

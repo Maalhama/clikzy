@@ -131,7 +131,7 @@ export function GameStats({
             </li>
             <li className="flex items-center gap-2">
               <span className="text-neon-pink">•</span>
-              Phase finale : chaque clic remet 1 min
+              Phase finale : chaque clic remet 1min30
             </li>
           </ul>
         </CardContent>

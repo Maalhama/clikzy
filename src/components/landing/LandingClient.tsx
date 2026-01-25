@@ -682,7 +682,7 @@ export function LandingClient({
             {[
               { num: '1', title: 'CHOISIS', desc: 'Parcours les lots et choisis celui qui te fait envie', Icon: TargetIcon, hex: '#9B5CFF' },
               { num: '2', title: 'CLIQUE', desc: '1 clic = 1 crédit (10 gratuits chaque jour)', Icon: CursorClickIcon, hex: '#3CCBFF' },
-              { num: '3', title: 'ATTENDS', desc: 'Sous 1 min, chaque clic relance le timer à 1 min', Icon: TrophyIcon, hex: '#00FF88' },
+              { num: '3', title: 'ATTENDS', desc: 'Sous 1min30, chaque clic relance le timer à 1min30', Icon: TrophyIcon, hex: '#00FF88' },
               { num: '4', title: 'GAGNE', desc: 'Timer à zéro ? Le dernier clic remporte le lot !', Icon: GiftIcon, hex: '#FF4FD8' },
             ].map((step, i) => (
               <div
