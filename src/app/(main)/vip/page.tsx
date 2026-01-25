@@ -6,6 +6,7 @@ import { VIPDashboard } from '@/components/vip/VIPDashboard'
 import VIPSubscriptionModal from '@/components/modals/VIPSubscriptionModal'
 import { createVIPCheckoutSession, getVIPDetails, createBillingPortalSession, type VIPTier } from '@/actions/stripe'
 import { collectVIPDailyBonus, canCollectVIPBonus } from '@/actions/credits'
+import { useCredits } from '@/contexts/CreditsContext'
 
 // Neon Medal Icons for VIP tiers
 const BronzeMedalIcon = () => (
@@ -145,6 +146,7 @@ export default function VIPPage() {
   const [vipDetails, setVipDetails] = useState<VIPDetailsState>(null)
   const [canCollect, setCanCollect] = useState(false)
   const [isCollectingBonus, setIsCollectingBonus] = useState(false)
+  const { updateCredits } = useCredits()
 
   // Check VIP status on mount
   useEffect(() => {
@@ -220,6 +222,8 @@ export default function VIPPage() {
             totalCreditsEarned: vipDetails.totalCreditsEarned + result.data.creditsAdded
           })
         }
+        // Instantly update header credits display
+        updateCredits(result.data.newTotal)
       } else {
         console.error('Failed to collect bonus:', result.error)
         alert(result.error || 'Erreur lors de la récupération du bonus')
