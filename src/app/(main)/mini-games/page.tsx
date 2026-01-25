@@ -15,6 +15,9 @@ export default async function MiniGamesPage() {
         wheel: { canPlay: true, lastPlayedAt: null, nextPlayAt: null },
         scratch: { canPlay: true, lastPlayedAt: null, nextPlayAt: null },
         pachinko: { canPlay: true, lastPlayedAt: null, nextPlayAt: null },
+        slots: { canPlay: true, lastPlayedAt: null, nextPlayAt: null },
+        coinflip: { canPlay: true, lastPlayedAt: null, nextPlayAt: null },
+        dice: { canPlay: true, lastPlayedAt: null, nextPlayAt: null },
       }
 
   return <MiniGamesClient initialEligibility={eligibility} />

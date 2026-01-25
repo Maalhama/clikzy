@@ -271,3 +271,208 @@ export function CreditIcon({ className = '' }: { className?: string }) {
     </svg>
   )
 }
+
+export function SlotsIcon({ className = '', animate = false }: IconProps) {
+  return (
+    <motion.div
+      className={`relative ${className}`}
+      animate={animate ? { scale: [1, 1.02, 1] } : {}}
+      transition={animate ? { duration: 1.5, repeat: Infinity, ease: 'easeInOut' } : {}}
+    >
+      <svg viewBox="0 0 100 100" className="w-full h-full">
+        <defs>
+          <linearGradient id="slotsFrame" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#FFB800" />
+            <stop offset="50%" stopColor="#FF8C00" />
+            <stop offset="100%" stopColor="#FFB800" />
+          </linearGradient>
+          <linearGradient id="slotsInner" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stopColor="#0B0F1A" />
+            <stop offset="100%" stopColor="#141B2D" />
+          </linearGradient>
+          <filter id="slotsGlow" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+            <feMerge>
+              <feMergeNode in="coloredBlur"/>
+              <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+          </filter>
+        </defs>
+
+        {/* Machine frame */}
+        <rect x="10" y="15" width="80" height="70" rx="8" fill="#1E2942" />
+        <rect x="12" y="17" width="76" height="66" rx="6" fill="url(#slotsInner)" stroke="url(#slotsFrame)" strokeWidth="2" />
+
+        {/* Title bar */}
+        <rect x="20" y="22" width="60" height="10" rx="3" fill="#FFB800" filter="url(#slotsGlow)" />
+        <text x="50" y="30" textAnchor="middle" fill="#0B0F1A" fontSize="7" fontWeight="bold">JACKPOT</text>
+
+        {/* Reels */}
+        {[25, 45, 65].map((x, i) => (
+          <g key={i}>
+            <rect x={x - 8} y="38" width="16" height="28" rx="2" fill="#0B0F1A" stroke="#3CCBFF" strokeWidth="0.5" />
+            <motion.g
+              animate={animate ? { y: [0, -3, 0, 3, 0] } : {}}
+              transition={animate ? { duration: 0.3, repeat: Infinity, delay: i * 0.1 } : {}}
+            >
+              <text x={x} y="56" textAnchor="middle" fontSize="16">
+                {['🍒', '💎', '7️⃣'][i]}
+              </text>
+            </motion.g>
+          </g>
+        ))}
+
+        {/* Lever */}
+        <rect x="85" y="35" width="5" height="30" rx="2" fill="#9B5CFF" filter="url(#slotsGlow)" />
+        <circle cx="87.5" cy="32" r="5" fill="#FF4FD8" filter="url(#slotsGlow)" />
+
+        {/* Bottom lights */}
+        {[25, 40, 55, 70].map((x, i) => (
+          <motion.circle
+            key={i}
+            cx={x}
+            cy="75"
+            r="3"
+            fill={['#9B5CFF', '#FF4FD8', '#3CCBFF', '#FFB800'][i]}
+            animate={animate ? { opacity: [0.4, 1, 0.4] } : {}}
+            transition={animate ? { duration: 0.5, repeat: Infinity, delay: i * 0.15 } : {}}
+            filter="url(#slotsGlow)"
+          />
+        ))}
+      </svg>
+    </motion.div>
+  )
+}
+
+export function CoinFlipIcon({ className = '', animate = false }: IconProps) {
+  return (
+    <motion.div
+      className={`relative ${className}`}
+      animate={animate ? { rotateY: [0, 180, 360] } : {}}
+      transition={animate ? { duration: 2, repeat: Infinity, ease: 'easeInOut' } : {}}
+      style={{ perspective: 1000 }}
+    >
+      <svg viewBox="0 0 100 100" className="w-full h-full">
+        <defs>
+          <linearGradient id="coinGold" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#FFD700" />
+            <stop offset="30%" stopColor="#FFB800" />
+            <stop offset="70%" stopColor="#FF8C00" />
+            <stop offset="100%" stopColor="#FFB800" />
+          </linearGradient>
+          <linearGradient id="coinShine" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor="#FFFFFF" stopOpacity="0" />
+            <stop offset="50%" stopColor="#FFFFFF" stopOpacity="0.4" />
+            <stop offset="100%" stopColor="#FFFFFF" stopOpacity="0" />
+          </linearGradient>
+          <filter id="coinGlow" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+            <feMerge>
+              <feMergeNode in="coloredBlur"/>
+              <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+          </filter>
+          <filter id="coinShadow">
+            <feDropShadow dx="2" dy="4" stdDeviation="3" floodColor="#000" floodOpacity="0.4"/>
+          </filter>
+        </defs>
+
+        {/* Shadow ellipse */}
+        <ellipse cx="50" cy="85" rx="25" ry="6" fill="#000" opacity="0.3" />
+
+        {/* Main coin */}
+        <ellipse cx="50" cy="50" rx="35" ry="35" fill="url(#coinGold)" filter="url(#coinShadow)" />
+
+        {/* Coin edge (3D effect) */}
+        <ellipse cx="50" cy="50" rx="35" ry="35" fill="none" stroke="#B8860B" strokeWidth="3" />
+        <ellipse cx="50" cy="52" rx="33" ry="33" fill="none" stroke="#8B6914" strokeWidth="1" opacity="0.5" />
+
+        {/* Inner ring */}
+        <circle cx="50" cy="50" r="28" fill="none" stroke="#0B0F1A" strokeWidth="1.5" opacity="0.3" />
+        <circle cx="50" cy="50" r="25" fill="none" stroke="#0B0F1A" strokeWidth="0.5" opacity="0.2" />
+
+        {/* Crown symbol */}
+        <g fill="#0B0F1A" opacity="0.8">
+          <path d="M35 55 L40 40 L45 50 L50 35 L55 50 L60 40 L65 55 Z" />
+          <rect x="35" y="55" width="30" height="5" rx="1" />
+        </g>
+
+        {/* Shine effect */}
+        <ellipse cx="50" cy="50" rx="32" ry="32" fill="url(#coinShine)" />
+
+        {/* Highlight */}
+        <ellipse cx="38" cy="38" rx="8" ry="6" fill="#FFF" opacity="0.3" transform="rotate(-30 38 38)" />
+
+        {/* Glow effect */}
+        <circle cx="50" cy="50" r="36" fill="none" stroke="#FFB800" strokeWidth="1" opacity="0.5" filter="url(#coinGlow)" />
+      </svg>
+    </motion.div>
+  )
+}
+
+export function DiceIcon({ className = '', animate = false }: IconProps) {
+  return (
+    <motion.div
+      className={`relative ${className}`}
+      animate={animate ? { rotate: [0, 10, -10, 5, 0] } : {}}
+      transition={animate ? { duration: 1, repeat: Infinity, ease: 'easeInOut' } : {}}
+    >
+      <svg viewBox="0 0 100 100" className="w-full h-full">
+        <defs>
+          <linearGradient id="diceGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#9B5CFF" />
+            <stop offset="100%" stopColor="#6E36FF" />
+          </linearGradient>
+          <linearGradient id="diceGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#FF4FD8" />
+            <stop offset="100%" stopColor="#D434B1" />
+          </linearGradient>
+          <filter id="diceGlow" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+            <feMerge>
+              <feMergeNode in="coloredBlur"/>
+              <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+          </filter>
+          <filter id="diceShadow">
+            <feDropShadow dx="2" dy="3" stdDeviation="2" floodColor="#000" floodOpacity="0.4"/>
+          </filter>
+        </defs>
+
+        {/* Dice 1 (purple) - tilted left */}
+        <g transform="translate(15, 25) rotate(-15)">
+          <rect x="0" y="0" width="35" height="35" rx="6" fill="url(#diceGrad1)" filter="url(#diceShadow)" />
+          <rect x="0" y="0" width="35" height="35" rx="6" fill="none" stroke="#FFF" strokeWidth="0.5" opacity="0.3" />
+          {/* Dots for 6 */}
+          {[[8, 8], [8, 17.5], [8, 27], [27, 8], [27, 17.5], [27, 27]].map(([cx, cy], i) => (
+            <circle key={i} cx={cx} cy={cy} r="3" fill="#FFF" />
+          ))}
+        </g>
+
+        {/* Dice 2 (pink) - tilted right */}
+        <g transform="translate(50, 35) rotate(15)">
+          <rect x="0" y="0" width="35" height="35" rx="6" fill="url(#diceGrad2)" filter="url(#diceShadow)" />
+          <rect x="0" y="0" width="35" height="35" rx="6" fill="none" stroke="#FFF" strokeWidth="0.5" opacity="0.3" />
+          {/* Dots for 5 */}
+          {[[8, 8], [8, 27], [17.5, 17.5], [27, 8], [27, 27]].map(([cx, cy], i) => (
+            <circle key={i} cx={cx} cy={cy} r="3" fill="#FFF" />
+          ))}
+        </g>
+
+        {/* Glow circles */}
+        <circle cx="32" cy="42" r="20" fill="none" stroke="#9B5CFF" strokeWidth="1" opacity="0.3" filter="url(#diceGlow)" />
+        <circle cx="68" cy="52" r="20" fill="none" stroke="#FF4FD8" strokeWidth="1" opacity="0.3" filter="url(#diceGlow)" />
+
+        {/* Sparkles */}
+        <motion.g
+          animate={animate ? { opacity: [0.5, 1, 0.5] } : {}}
+          transition={animate ? { duration: 0.8, repeat: Infinity } : {}}
+        >
+          <polygon points="20,15 22,18 25,15 22,12" fill="#FFB800" />
+          <polygon points="80,65 82,68 85,65 82,62" fill="#FFB800" />
+          <polygon points="45,75 47,78 50,75 47,72" fill="#3CCBFF" />
+        </motion.g>
+      </svg>
+    </motion.div>
+  )
+}

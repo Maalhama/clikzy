@@ -61,7 +61,7 @@ export function trackLogin(method: 'email' | 'google' | 'github'): void {
 /**
  * Track mini-game plays
  */
-export function trackMiniGame(gameType: 'wheel' | 'scratch' | 'pachinko', creditsWon: number): void {
+export function trackMiniGame(gameType: 'wheel' | 'scratch' | 'pachinko' | 'slots' | 'coinflip' | 'dice', creditsWon: number): void {
   trackEvent('mini_game', { gameType, creditsWon })
 }
 

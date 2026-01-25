@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Trophy, Clock, Zap, ChevronRight, X, Sparkles, Coins } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
-import { WheelIcon, ScratchIcon, PachinkoIcon, CreditIcon } from '@/components/mini-games/GameIcons';
+import { WheelIcon, ScratchIcon, PachinkoIcon, CreditIcon, SlotsIcon, CoinFlipIcon, DiceIcon } from '@/components/mini-games/GameIcons';
 import { CreditPacksModal } from '@/components/modals/CreditPacksModal';
 
 import { useCredits } from '@/contexts/CreditsContext';
@@ -16,6 +16,9 @@ import { MiniGameType, MiniGameEligibility, WHEEL_SEGMENTS, PACHINKO_SLOTS } fro
 import WheelOfFortune from '@/components/mini-games/WheelOfFortune';
 import ScratchCard from '@/components/mini-games/ScratchCard';
 import Pachinko from '@/components/mini-games/Pachinko';
+import SlotMachine from '@/components/mini-games/SlotMachine';
+import CoinFlip from '@/components/mini-games/CoinFlip';
+import DiceRoll from '@/components/mini-games/DiceRoll';
 import { trackMiniGame } from '@/lib/analytics';
 
 const PLAY_COST = 3; // Coût en crédits pour une partie payante
@@ -61,6 +64,10 @@ interface PendingGame {
   segmentIndex?: number;
   slotIndex?: number;
   finalCredits?: number; // For paid games: the final credit total after winnings
+  // New game properties
+  slotsSymbols?: number[]; // For slots: indices of symbols for each reel
+  coinResult?: 'heads' | 'tails'; // For coinflip
+  diceResults?: [number, number]; // For dice: values 1-6
 }
 
 const GAME_CONFIG = {
@@ -93,6 +100,36 @@ const GAME_CONFIG = {
     glowClass: 'neon-glow-blue',
     textClass: 'neon-text-blue',
     gradient: 'from-[#3CCBFF] to-[#1DA1D1]',
+  },
+  slots: {
+    id: 'slots' as MiniGameType,
+    title: 'Machine à Sous',
+    IconComponent: SlotsIcon,
+    description: 'Alignez les symboles et décrochez le jackpot !',
+    color: 'var(--warning)',
+    glowClass: 'neon-glow',
+    textClass: 'text-[#FFB800]',
+    gradient: 'from-[#FFB800] to-[#FF8C00]',
+  },
+  coinflip: {
+    id: 'coinflip' as MiniGameType,
+    title: 'Pile ou Face',
+    IconComponent: CoinFlipIcon,
+    description: 'Lancez la pièce et tentez votre chance !',
+    color: 'var(--warning)',
+    glowClass: 'neon-glow',
+    textClass: 'text-[#FFB800]',
+    gradient: 'from-[#FFD700] to-[#FFB800]',
+  },
+  dice: {
+    id: 'dice' as MiniGameType,
+    title: 'Lancer de Dés',
+    IconComponent: DiceIcon,
+    description: 'Lancez les dés et voyez ce que le destin vous réserve !',
+    color: 'var(--neon-purple)',
+    glowClass: 'neon-glow',
+    textClass: 'neon-text',
+    gradient: 'from-[#9B5CFF] to-[#FF4FD8]',
   },
 };
 
@@ -141,6 +178,9 @@ export default function MiniGamesClient({ initialEligibility }: MiniGamesClientP
           creditsWon: gameResult.data.creditsWon,
           segmentIndex: gameResult.data.segmentIndex,
           slotIndex: gameResult.data.slotIndex,
+          slotsSymbols: gameResult.data.slotsSymbols,
+          coinResult: gameResult.data.coinResult,
+          diceResults: gameResult.data.diceResults,
         });
 
         // Update eligibility - next play at midnight French time
@@ -194,6 +234,9 @@ export default function MiniGamesClient({ initialEligibility }: MiniGamesClientP
           segmentIndex: gameResult.data.segmentIndex,
           slotIndex: gameResult.data.slotIndex,
           finalCredits: gameResult.data.newTotalCredits,
+          slotsSymbols: gameResult.data.slotsSymbols,
+          coinResult: gameResult.data.coinResult,
+          diceResults: gameResult.data.diceResults,
         });
       } else {
         // Error - restore credits and close modal
@@ -292,7 +335,7 @@ export default function MiniGamesClient({ initialEligibility }: MiniGamesClientP
             transition={{ delay: 0.2 }}
             className="text-[var(--text-secondary)] text-lg md:text-xl max-w-2xl mx-auto"
           >
-            Jouez à nos 3 jeux exclusifs chaque jour pour gagner des crédits gratuits.
+            Jouez à nos 6 jeux exclusifs chaque jour pour gagner des crédits gratuits.
             Réinitialisation à minuit.
           </motion.p>
         </div>
@@ -386,6 +429,30 @@ export default function MiniGamesClient({ initialEligibility }: MiniGamesClientP
                     <Pachinko
                       onComplete={handleGameComplete}
                       targetSlot={getGameTarget()}
+                    />
+                  )}
+
+                  {activeGame === 'slots' && (
+                    <SlotMachine
+                      onComplete={handleGameComplete}
+                      targetSymbols={pendingGame.slotsSymbols || [0, 0, 0]}
+                      prizeAmount={pendingGame.creditsWon}
+                    />
+                  )}
+
+                  {activeGame === 'coinflip' && (
+                    <CoinFlip
+                      onComplete={handleGameComplete}
+                      result={pendingGame.coinResult || 'heads'}
+                      prizeAmount={pendingGame.creditsWon}
+                    />
+                  )}
+
+                  {activeGame === 'dice' && (
+                    <DiceRoll
+                      onComplete={handleGameComplete}
+                      diceResults={pendingGame.diceResults || [1, 1]}
+                      prizeAmount={pendingGame.creditsWon}
                     />
                   )}
                 </div>

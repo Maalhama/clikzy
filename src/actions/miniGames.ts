@@ -9,6 +9,10 @@ import {
   WHEEL_SEGMENTS,
   SCRATCH_VALUES,
   PACHINKO_SLOTS,
+  SLOTS_PAYOUTS,
+  SLOTS_SYMBOLS,
+  COINFLIP_PAYOUTS,
+  DICE_PAYOUTS,
 } from '@/types/miniGames'
 
 type ActionResult<T = void> = {
@@ -74,11 +78,14 @@ export async function getMiniGameEligibility(): Promise<ActionResult<MiniGameEli
   const typedPlays = (plays || []) as { game_type: MiniGameType; played_at: string }[]
 
   // Build eligibility map
-  const gameTypes: MiniGameType[] = ['wheel', 'scratch', 'pachinko']
+  const gameTypes: MiniGameType[] = ['wheel', 'scratch', 'pachinko', 'slots', 'coinflip', 'dice']
   const eligibility: MiniGameEligibility = {
     wheel: { canPlay: true, lastPlayedAt: null, nextPlayAt: null },
     scratch: { canPlay: true, lastPlayedAt: null, nextPlayAt: null },
     pachinko: { canPlay: true, lastPlayedAt: null, nextPlayAt: null },
+    slots: { canPlay: true, lastPlayedAt: null, nextPlayAt: null },
+    coinflip: { canPlay: true, lastPlayedAt: null, nextPlayAt: null },
+    dice: { canPlay: true, lastPlayedAt: null, nextPlayAt: null },
   }
 
   for (const gameType of gameTypes) {
@@ -98,7 +105,7 @@ export async function getMiniGameEligibility(): Promise<ActionResult<MiniGameEli
 /**
  * Play a mini-game and receive credits
  */
-export async function playMiniGame(gameType: MiniGameType): Promise<ActionResult<MiniGameResult & { segmentIndex?: number; slotIndex?: number }>> {
+export async function playMiniGame(gameType: MiniGameType): Promise<ActionResult<MiniGameResult & { segmentIndex?: number; slotIndex?: number; slotsSymbols?: number[]; coinResult?: 'heads' | 'tails'; diceResults?: [number, number] }>> {
   const supabase = await createClient()
 
   const { data: { user } } = await supabase.auth.getUser()
@@ -120,6 +127,9 @@ export async function playMiniGame(gameType: MiniGameType): Promise<ActionResult
   let creditsWon: number
   let segmentIndex: number | undefined
   let slotIndex: number | undefined
+  let slotsSymbols: number[] | undefined
+  let coinResult: 'heads' | 'tails' | undefined
+  let diceResults: [number, number] | undefined
 
   switch (gameType) {
     case 'wheel': {
@@ -135,6 +145,34 @@ export async function playMiniGame(gameType: MiniGameType): Promise<ActionResult
     case 'pachinko': {
       slotIndex = Math.floor(Math.random() * PACHINKO_SLOTS.length)
       creditsWon = PACHINKO_SLOTS[slotIndex]
+      break
+    }
+    case 'slots': {
+      // Generate 3 random symbol indices
+      slotsSymbols = [
+        Math.floor(Math.random() * SLOTS_SYMBOLS.length),
+        Math.floor(Math.random() * SLOTS_SYMBOLS.length),
+        Math.floor(Math.random() * SLOTS_SYMBOLS.length),
+      ]
+      // Random payout from distribution
+      const slotsPayoutIndex = Math.floor(Math.random() * SLOTS_PAYOUTS.length)
+      creditsWon = SLOTS_PAYOUTS[slotsPayoutIndex]
+      break
+    }
+    case 'coinflip': {
+      coinResult = Math.random() < 0.5 ? 'heads' : 'tails'
+      const coinPayoutIndex = Math.floor(Math.random() * COINFLIP_PAYOUTS.length)
+      creditsWon = COINFLIP_PAYOUTS[coinPayoutIndex]
+      break
+    }
+    case 'dice': {
+      // Generate 2 dice values (1-6)
+      diceResults = [
+        Math.floor(Math.random() * 6) + 1,
+        Math.floor(Math.random() * 6) + 1,
+      ]
+      const dicePayoutIndex = Math.floor(Math.random() * DICE_PAYOUTS.length)
+      creditsWon = DICE_PAYOUTS[dicePayoutIndex]
       break
     }
     default:
@@ -191,6 +229,9 @@ export async function playMiniGame(gameType: MiniGameType): Promise<ActionResult
       newTotalCredits,
       segmentIndex,
       slotIndex,
+      slotsSymbols,
+      coinResult,
+      diceResults,
     },
   }
 }
@@ -200,7 +241,7 @@ const PLAY_COST = 3 // Coût en crédits pour une partie payante
 /**
  * Play a mini-game with credits (paid play, no daily limit)
  */
-export async function playMiniGamePaid(gameType: MiniGameType): Promise<ActionResult<MiniGameResult & { segmentIndex?: number; slotIndex?: number }>> {
+export async function playMiniGamePaid(gameType: MiniGameType): Promise<ActionResult<MiniGameResult & { segmentIndex?: number; slotIndex?: number; slotsSymbols?: number[]; coinResult?: 'heads' | 'tails'; diceResults?: [number, number] }>> {
   const supabase = await createClient()
 
   const { data: { user } } = await supabase.auth.getUser()
@@ -241,6 +282,9 @@ export async function playMiniGamePaid(gameType: MiniGameType): Promise<ActionRe
   let creditsWon: number
   let segmentIndex: number | undefined
   let slotIndex: number | undefined
+  let slotsSymbols: number[] | undefined
+  let coinResult: 'heads' | 'tails' | undefined
+  let diceResults: [number, number] | undefined
 
   switch (gameType) {
     case 'wheel': {
@@ -256,6 +300,31 @@ export async function playMiniGamePaid(gameType: MiniGameType): Promise<ActionRe
     case 'pachinko': {
       slotIndex = Math.floor(Math.random() * PACHINKO_SLOTS.length)
       creditsWon = PACHINKO_SLOTS[slotIndex]
+      break
+    }
+    case 'slots': {
+      slotsSymbols = [
+        Math.floor(Math.random() * SLOTS_SYMBOLS.length),
+        Math.floor(Math.random() * SLOTS_SYMBOLS.length),
+        Math.floor(Math.random() * SLOTS_SYMBOLS.length),
+      ]
+      const slotsPayoutIndex = Math.floor(Math.random() * SLOTS_PAYOUTS.length)
+      creditsWon = SLOTS_PAYOUTS[slotsPayoutIndex]
+      break
+    }
+    case 'coinflip': {
+      coinResult = Math.random() < 0.5 ? 'heads' : 'tails'
+      const coinPayoutIndex = Math.floor(Math.random() * COINFLIP_PAYOUTS.length)
+      creditsWon = COINFLIP_PAYOUTS[coinPayoutIndex]
+      break
+    }
+    case 'dice': {
+      diceResults = [
+        Math.floor(Math.random() * 6) + 1,
+        Math.floor(Math.random() * 6) + 1,
+      ]
+      const dicePayoutIndex = Math.floor(Math.random() * DICE_PAYOUTS.length)
+      creditsWon = DICE_PAYOUTS[dicePayoutIndex]
       break
     }
     default:
@@ -292,6 +361,9 @@ export async function playMiniGamePaid(gameType: MiniGameType): Promise<ActionRe
       newTotalCredits,
       segmentIndex,
       slotIndex,
+      slotsSymbols,
+      coinResult,
+      diceResults,
     },
   }
 }
