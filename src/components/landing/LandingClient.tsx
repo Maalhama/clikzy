@@ -21,7 +21,7 @@ import {
   Testimonials,
   FloatingPrizes,
   FAQ,
-  TodayWinsCounter,
+  BrandMarquee,
   Guarantees,
 } from './widgets'
 
@@ -660,8 +660,8 @@ export function LandingClient({
       {/* TRUST BADGES */}
       <TrustBadges variant="horizontal" />
 
-      {/* TODAY'S WINS COUNTER */}
-      <TodayWinsCounter />
+      {/* BRAND MARQUEE - Social Proof */}
+      <BrandMarquee />
 
       {/* HOW IT WORKS */}
       {/* === MOBILE HOW IT WORKS === */}

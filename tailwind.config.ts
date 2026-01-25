@@ -52,6 +52,7 @@ const config: Config = {
         'bounce-subtle': 'bounce-subtle 2s ease-in-out infinite',
         'border-scan': 'border-scan 3s linear infinite',
         'scroll-loop': 'scroll-loop 20s linear infinite',
+        'marquee': 'marquee 30s linear infinite',
         'fade-in': 'fadeIn 0.3s ease-out forwards',
         'fade-in-up': 'fadeInUp 0.5s ease-out forwards',
         'fade-in-slide': 'fadeInSlide 0.3s ease-out forwards',
@@ -81,6 +82,10 @@ const config: Config = {
           '100%': { transform: 'translateX(100%)' },
         },
         'scroll-loop': {
+          '0%': { transform: 'translateX(0)' },
+          '100%': { transform: 'translateX(-50%)' },
+        },
+        'marquee': {
           '0%': { transform: 'translateX(0)' },
           '100%': { transform: 'translateX(-50%)' },
         },
