@@ -336,7 +336,7 @@ export default function MiniGamesClient({ initialEligibility }: MiniGamesClientP
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className="relative w-full max-w-2xl glass-dark rounded-2xl border border-[var(--bg-tertiary)] overflow-hidden my-8"
+              className="relative w-full max-w-md lg:max-w-lg glass-dark rounded-2xl border border-[var(--bg-tertiary)] overflow-hidden my-4 lg:my-6"
             >
               {/* Close button - only when showing result */}
               {result && (
@@ -363,8 +363,8 @@ export default function MiniGamesClient({ initialEligibility }: MiniGamesClientP
 
               {/* Game Component */}
               {!isLoading && pendingGame && !result && (
-                <div className="p-4">
-                  <h2 className={`text-2xl font-black text-center mb-4 ${GAME_CONFIG[activeGame].textClass}`}>
+                <div className="p-3 lg:p-4">
+                  <h2 className={`text-xl lg:text-2xl font-black text-center mb-3 ${GAME_CONFIG[activeGame].textClass}`}>
                     {GAME_CONFIG[activeGame].title}
                   </h2>
 

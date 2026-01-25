@@ -53,7 +53,7 @@ export default function WheelOfFortune({
   }
 
   return (
-    <div className="relative flex flex-col items-center justify-center p-4 sm:p-8 select-none">
+    <div className="relative flex flex-col items-center justify-center p-2 sm:p-4 select-none">
       {/* Glow Atmosphere */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-[#9B5CFF] opacity-10 blur-[120px] rounded-full" />
@@ -93,7 +93,7 @@ export default function WheelOfFortune({
                 style={{
                   top: '50%',
                   left: '50%',
-                  transform: `rotate(${i * 22.5}deg) translateY(-152px) translateX(-50%)`,
+                  transform: `rotate(${i * 22.5}deg) translateY(-138px) translateX(-50%)`,
                   backgroundColor: color,
                   boxShadow: `0 0 10px ${color}, 0 0 20px ${color}40`
                 }}
@@ -105,7 +105,7 @@ export default function WheelOfFortune({
         {/* Main Wheel */}
         <motion.div
           ref={wheelRef}
-          className="relative w-72 h-72 sm:w-80 sm:h-80 rounded-full overflow-hidden border-[8px] border-[#141B2D] shadow-2xl bg-[#0B0F1A]"
+          className="relative w-64 h-64 sm:w-72 sm:h-72 rounded-full overflow-hidden border-[8px] border-[#141B2D] shadow-2xl bg-[#0B0F1A]"
           animate={{ rotate: rotation }}
           transition={{
             duration: 5,
@@ -173,7 +173,7 @@ export default function WheelOfFortune({
                 key={i}
                 className="absolute top-1/2 left-1/2 flex flex-col items-center pointer-events-none"
                 style={{
-                  transform: `translate(-50%, -50%) rotate(${angle}deg) translateY(-90px)`,
+                  transform: `translate(-50%, -50%) rotate(${angle}deg) translateY(-80px)`,
                 }}
               >
                 <span
@@ -219,7 +219,7 @@ export default function WheelOfFortune({
       </div>
 
       {/* Result */}
-      <div className="h-20 mt-6 flex items-center justify-center">
+      <div className="h-16 mt-4 flex items-center justify-center">
         <AnimatePresence mode="wait">
           {hasFinished && (
             <motion.div
