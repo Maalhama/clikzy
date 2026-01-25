@@ -29,9 +29,12 @@ export default async function MainLayout({
 
   const profile = profileData as Profile | null
 
+  // Total credits = daily credits + earned credits (from mini-games/purchases)
+  const totalCredits = (profile?.credits ?? 0) + (profile?.earned_credits ?? 0)
+
   return (
     <ClientProviders
-      initialCredits={profile?.credits ?? 0}
+      initialCredits={totalCredits}
       userId={user.id}
     >
       <div className="min-h-screen flex flex-col bg-bg-primary">

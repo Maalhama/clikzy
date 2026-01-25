@@ -50,7 +50,8 @@ export default async function GamePage({ params }: PageProps) {
   }
 
   const game = gameData as GameWithItem
-  const credits = creditsResult.success ? (creditsResult.data?.credits ?? 0) : 0
+  // Use totalCredits (daily + earned) for display
+  const credits = creditsResult.success ? (creditsResult.data?.totalCredits ?? 0) : 0
   const profile = profileResult.data as { username: string } | null
   const username = profile?.username ?? 'Joueur'
 

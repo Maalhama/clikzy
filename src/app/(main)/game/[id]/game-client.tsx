@@ -106,10 +106,10 @@ export function GameClient({
     return () => stopSounds()
   }, [isCritical, game.status, playHeartbeat, stopSounds])
 
-  // Show winner modal when game ends (either via status or timer reaching 0)
-  const gameEnded = game.status === 'ended' || isEnded
+  // Show winner modal ONLY when game is officially ended in database
+  // Don't rely on local timer (isEnded) as it can have race conditions with realtime updates
   useEffect(() => {
-    if (gameEnded && !showWinnerModal) {
+    if (game.status === 'ended' && !showWinnerModal) {
       const timer = setTimeout(() => {
         setShowWinnerModal(true)
         if (game.winner_id === userId) {
@@ -119,7 +119,7 @@ export function GameClient({
       }, 500)
       return () => clearTimeout(timer)
     }
-  }, [gameEnded, showWinnerModal, game.winner_id, userId, playWin, game.id, game.item.name, game.item])
+  }, [game.status, showWinnerModal, game.winner_id, userId, playWin, game.id, game.item.name, game.item])
 
   // Haptic feedback
   const triggerHaptic = useCallback(() => {

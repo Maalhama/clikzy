@@ -13,8 +13,9 @@ type ActionResult<T = void> = {
  * Check and reset daily credits if needed
  * Credits reset to 10 every day at midnight (00:00)
  * ONLY for users who haven't purchased credits
+ * Returns total credits (daily + earned)
  */
-export async function checkAndResetDailyCredits(): Promise<ActionResult<{ credits: number; wasReset: boolean }>> {
+export async function checkAndResetDailyCredits(): Promise<ActionResult<{ credits: number; earnedCredits: number; totalCredits: number; wasReset: boolean }>> {
   const supabase = await createClient()
 
   const { data: { user } } = await supabase.auth.getUser()
@@ -26,12 +27,13 @@ export async function checkAndResetDailyCredits(): Promise<ActionResult<{ credit
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { data: profileData } = await (supabase as any)
     .from('profiles')
-    .select('credits, last_credits_reset, has_purchased_credits')
+    .select('credits, earned_credits, last_credits_reset, has_purchased_credits')
     .eq('id', user.id)
     .single()
 
   const profile = profileData as {
     credits: number
+    earned_credits: number
     last_credits_reset: string
     has_purchased_credits: boolean
   } | null
@@ -40,12 +42,16 @@ export async function checkAndResetDailyCredits(): Promise<ActionResult<{ credit
     return { success: false, error: 'Profil non trouvé' }
   }
 
+  const earnedCredits = profile.earned_credits ?? 0
+
   // Skip reset for users who have purchased credits
   if (profile.has_purchased_credits) {
     return {
       success: true,
       data: {
         credits: profile.credits,
+        earnedCredits,
+        totalCredits: profile.credits + earnedCredits,
         wasReset: false
       }
     }
@@ -78,6 +84,8 @@ export async function checkAndResetDailyCredits(): Promise<ActionResult<{ credit
       success: true,
       data: {
         credits: INITIAL_CREDITS,
+        earnedCredits,
+        totalCredits: INITIAL_CREDITS + earnedCredits,
         wasReset: true
       }
     }
@@ -88,6 +96,8 @@ export async function checkAndResetDailyCredits(): Promise<ActionResult<{ credit
     success: true,
     data: {
       credits: profile.credits,
+      earnedCredits,
+      totalCredits: profile.credits + earnedCredits,
       wasReset: false
     }
   }
