@@ -24,7 +24,7 @@ const variantStyles: Record<ButtonVariant, string> = {
   neon:
     'bg-gradient-to-r from-neon-purple to-neon-blue text-white hover:shadow-neon-purple hover:scale-[1.02] active:scale-[0.98]',
   'neon-pink':
-    'bg-gradient-to-r from-neon-purple to-neon-pink text-white hover:shadow-neon-pink hover:scale-[1.02] active:scale-[0.98]',
+    'bg-gradient-to-r from-neon-purple to-neon-pink text-white hover:brightness-110 hover:scale-[1.02] active:scale-[0.98]',
 }
 
 const sizeStyles: Record<ButtonSize, string> = {

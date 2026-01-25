@@ -38,7 +38,7 @@ const config: Config = {
       boxShadow: {
         'neon-purple': '0 0 20px #9B5CFF, 0 0 40px rgba(155, 92, 255, 0.3)',
         'neon-blue': '0 0 20px #3CCBFF, 0 0 40px rgba(60, 203, 255, 0.3)',
-        'neon-pink': '0 0 20px #FF4FD8, 0 0 40px rgba(255, 79, 216, 0.3)',
+        'neon-pink': '0 0 10px rgba(255, 79, 216, 0.4)',
         'neon-success': '0 0 20px #00FF88, 0 0 40px rgba(0, 255, 136, 0.3)',
         'neon-danger': '0 0 20px #FF4757, 0 0 40px rgba(255, 71, 87, 0.3)',
       },
