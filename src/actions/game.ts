@@ -9,7 +9,7 @@ type GameWithItem = Game & {
   item: Item
 }
 
-type ProfileCredits = Pick<Profile, 'credits' | 'username' | 'total_clicks'>
+type ProfileCredits = Pick<Profile, 'credits' | 'earned_credits' | 'username' | 'total_clicks'>
 
 type ActionResult<T = void> = {
   success: boolean
@@ -33,10 +33,10 @@ export async function clickGame(gameId: string): Promise<ActionResult<{ newEndTi
     return { success: false, error: 'Non authentifié' }
   }
 
-  // Get user profile to check credits
+  // Get user profile to check credits (both daily and earned)
   const { data: profileData } = await supabase
     .from('profiles')
-    .select('credits, username, total_clicks')
+    .select('credits, earned_credits, username, total_clicks')
     .eq('id', user.id)
     .single()
 
@@ -46,7 +46,9 @@ export async function clickGame(gameId: string): Promise<ActionResult<{ newEndTi
     return { success: false, error: 'Profil non trouvé' }
   }
 
-  if (profile.credits < GAME_CONSTANTS.CREDIT_COST_PER_CLICK) {
+  // Check total credits (daily + earned)
+  const totalCredits = (profile.credits ?? 0) + (profile.earned_credits ?? 0)
+  if (totalCredits < GAME_CONSTANTS.CREDIT_COST_PER_CLICK) {
     return { success: false, error: 'Crédits insuffisants' }
   }
 
@@ -84,12 +86,12 @@ export async function clickGame(gameId: string): Promise<ActionResult<{ newEndTi
   const sequence = (seqData as number) ?? 1
 
   // Start transaction-like operations
-  // 1. Deduct credit
+  // 1. Deduct credit (uses daily credits first, then earned credits)
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { error: creditError } = await (supabase.rpc as any)('decrement_credits', { p_user_id: user.id, p_amount: GAME_CONSTANTS.CREDIT_COST_PER_CLICK })
+  const { data: deductResult, error: creditError } = await (supabase.rpc as any)('deduct_credits', { p_user_id: user.id, p_amount: GAME_CONSTANTS.CREDIT_COST_PER_CLICK })
 
-  if (creditError) {
-    return { success: false, error: 'Erreur lors de la déduction des crédits' }
+  if (creditError || deductResult === -1) {
+    return { success: false, error: 'Crédits insuffisants' }
   }
 
   // 2. Record click (with username and item_name for the live feed)
