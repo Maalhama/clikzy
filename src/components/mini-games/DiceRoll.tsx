@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Trophy, Sparkles } from 'lucide-react'
+import { Trophy } from 'lucide-react'
 
 interface DiceRollProps {
   onComplete: (creditsWon: number) => void
