@@ -70,6 +70,16 @@ Toutes les interactions avec la base de données passent par les outils appropri
 2. **WebSearch** pour les patterns récents
 3. **WebFetch** pour des pages de doc spécifiques
 
+## Choix du modèle
+
+| Contexte | Modèle |
+|----------|--------|
+| Discussion simple, questions | **Sonnet** (moins cher) |
+| Tâche complexe, implémentation | Opus |
+| `/ultrathink`, architecture | Opus |
+
+**Par défaut** : Utiliser Sonnet pour les échanges conversationnels.
+
 ## Workflow de développement
 
 ### Cycle recommandé

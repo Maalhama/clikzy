@@ -14,12 +14,17 @@
     "test:coverage": "vitest run --coverage",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
-    "seed:items": "tsx scripts/seed-items.ts"
+    "seed:items": "tsx scripts/seed-items.ts",
+    "remotion:studio": "remotion studio",
+    "remotion:render": "remotion render"
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",
     "@react-three/drei": "^10.7.7",
     "@react-three/fiber": "^9.5.0",
+    "@remotion/cli": "4.0.409",
+    "@remotion/player": "4.0.409",
+    "@remotion/transitions": "^4.0.409",
     "@sentry/nextjs": "^10.36.0",
     "@stripe/stripe-js": "^8.6.4",
     "@supabase/ssr": "^0.5.2",
@@ -32,6 +37,7 @@
     "next": "^16.1.3",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "remotion": "4.0.409",
     "resend": "^6.8.0",
     "simple-icons": "^16.6.1",
     "stripe": "^20.2.0",
