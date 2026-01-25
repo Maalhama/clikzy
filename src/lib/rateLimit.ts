@@ -85,6 +85,12 @@ async function checkRateLimitRedis(
   windowMs: number
 ): Promise<RateLimitResult> {
   const redis = getRedis()
+
+  if (!redis) {
+    // Fallback to in-memory if Redis not available
+    return checkRateLimitMemory(identifier, limit, windowMs)
+  }
+
   const key = `ratelimit:${identifier}`
   const windowSeconds = Math.ceil(windowMs / 1000)
 

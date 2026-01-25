@@ -3,7 +3,7 @@ import { Redis } from '@upstash/redis'
 // Initialize Redis client with lazy loading
 let redisClient: Redis | null = null
 
-export function getRedis(): Redis {
+export function getRedis(): Redis | null {
   if (!redisClient) {
     const url = process.env.UPSTASH_REDIS_REST_URL
     const token = process.env.UPSTASH_REDIS_REST_TOKEN
@@ -14,10 +14,10 @@ export function getRedis(): Redis {
       if (process.env.NODE_ENV === 'production') {
         throw new Error('UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN are required in production')
       }
-      
-      // Return a mock client for development
+
+      // Return null for development (falls back to in-memory rate limiting)
       console.warn('⚠️ Redis not configured - using in-memory rate limiting (dev only)')
-      return null as any
+      return null
     }
 
     redisClient = new Redis({
