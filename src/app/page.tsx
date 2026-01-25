@@ -49,6 +49,7 @@ async function getLandingData() {
     winningsResult,
     fallbackItemResult,
     activeGamesResult,
+    totalItemsValueResult,
   ] = await Promise.all([
     // Fetch recent winners from last 72h (including bots)
     supabase
@@ -95,6 +96,11 @@ async function getLandingData() {
       .gt('end_time', now)
       .order('end_time', { ascending: true })
       .limit(6),
+
+    // Fetch total value of all items (potential prizes) with count
+    supabase
+      .from('items')
+      .select('retail_value', { count: 'exact' }),
   ])
 
   const typedWinners = winnersResult.data as Pick<DbWinner, 'id' | 'item_name' | 'item_value' | 'won_at' | 'user_id' | 'username' | 'is_bot'>[] | null
@@ -183,6 +189,14 @@ async function getLandingData() {
     0
   )
 
+  // Calculate total value of all items (potential prizes) and count
+  const typedItemsData = totalItemsValueResult.data as { retail_value: number }[] | null
+  const totalItemsValue = (typedItemsData || []).reduce(
+    (sum, item) => sum + (item.retail_value || 0),
+    0
+  )
+  const totalItemsCount = totalItemsValueResult.count || 0
+
   // Process active games for prizes carousel
   const activeGames = activeGamesResult.data as Array<{
     id: string
@@ -211,8 +225,8 @@ async function getLandingData() {
     featuredItem,
     prizes,
     stats: {
-      totalWinningsValue: totalWinningsValue || 15000,
-      totalGames: statsResult.count || 50,
+      totalWinningsValue: totalItemsValue || 15000,
+      totalGames: totalItemsCount || 50,
     },
   }
 }
