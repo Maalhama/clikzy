@@ -111,9 +111,6 @@ export function Header({ profile }: HeaderProps) {
                 <circle cx="12" cy="12" r="1.5" fill="currentColor" />
               </svg>
               <span>Mini-Jeux</span>
-              <span className="px-1.5 py-0.5 text-[10px] font-bold bg-neon-purple/20 text-neon-purple rounded uppercase shadow-[0_0_8px_rgba(155,92,255,0.3)]">
-                Gratuit
-              </span>
             </Link>
             <Link
               href="/shop"
@@ -323,9 +320,6 @@ export function Header({ profile }: HeaderProps) {
                   </svg>
                 </div>
                 <span className="font-medium text-white/80 group-hover:text-neon-purple transition-colors">Mini-Jeux</span>
-                <span className="px-2 py-0.5 text-[10px] font-bold bg-neon-purple/20 text-neon-purple rounded uppercase ml-auto shadow-[0_0_8px_rgba(155,92,255,0.3)]">
-                  Gratuit
-                </span>
               </Link>
               <Link
                 href="/shop"
