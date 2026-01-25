@@ -2,7 +2,8 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { signUp, signInWithOAuth } from '@/actions/auth'
+import { useRouter } from 'next/navigation'
+import { signUp, signInWithOAuth, signInWithPassword } from '@/actions/auth'
 import { Button } from '@/components/ui/button'
 import { Logo } from '@/components/ui/Logo'
 import { trackSignup } from '@/lib/analytics'
@@ -23,6 +24,7 @@ function getPasswordStrength(password: string): { score: number; label: string; 
 }
 
 export default function RegisterPage() {
+  const router = useRouter()
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -54,6 +56,21 @@ export default function RegisterPage() {
 
     if (result.success) {
       trackSignup('email')
+
+      // Try to auto-login (works if email confirmation is disabled in Supabase)
+      const loginData = new FormData()
+      loginData.append('email', formData.email)
+      loginData.append('password', formData.password)
+
+      const loginResult = await signInWithPassword(loginData)
+
+      if (loginResult.success) {
+        // Auto-login successful, redirect to lobby
+        router.push('/lobby')
+        return
+      }
+
+      // Auto-login failed (email confirmation required), show success message
       setSuccess(true)
     } else {
       setError(result.error || 'Une erreur est survenue')
