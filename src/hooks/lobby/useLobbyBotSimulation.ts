@@ -162,10 +162,12 @@ export function useLobbyBotSimulation({
           battleEnded = !shouldBotClickInBattle(game.id, battleProgress)
         }
 
-        // SNIPE: Si joueur réel est leader et timer < 15s, sniper immédiatement
-        const shouldSnipe = hasRealPlayer && isInFinalPhase && timeLeft <= 15000
+        // SNIPE: Seuil aléatoire entre 10s et 50s (synchronisé avec la page jeu)
+        const snipeThresholdSeed = getDeterministicSeed(game.id + '-threshold', Math.floor(now / 5000))
+        const snipeThreshold = 10000 + (snipeThresholdSeed % 40000) // 10s à 50s
 
-        if (shouldSnipe) {
+        // Snipe urgent si timer < 8s
+        if (hasRealPlayer && isInFinalPhase && timeLeft <= 8000) {
           const roundedTime = Math.floor(now / 1000)
           const username = generateDeterministicUsername(`${game.id}-${roundedTime}-snipe`)
 
@@ -176,12 +178,33 @@ export function useLobbyBotSimulation({
             end_time: now + 90000,
           })
           lastClickTimesRef.current.set(game.id, now)
-          console.log(`[LOBBY BOT] SNIPE! ${username} stole from real player`)
+          console.log(`[LOBBY BOT] URGENT SNIPE! ${username} at ${Math.floor(timeLeft/1000)}s`)
           return
         }
 
-        // Si bataille terminée mais joueur réel leader et timer < 10s, snipe quand même
-        if (battleEnded && hasRealPlayer && timeLeft <= 10000) {
+        // Snipe si timer atteint le seuil aléatoire
+        if (hasRealPlayer && isInFinalPhase && timeLeft <= snipeThreshold) {
+          const snipeSeed = getDeterministicSeed(game.id + '-snipe', Math.floor(now / 3000))
+          // 70% chance de sniper
+          if (snipeSeed % 10 < 7) {
+            const roundedTime = Math.floor(now / 1000)
+            const username = generateDeterministicUsername(`${game.id}-${roundedTime}-snipe`)
+
+            onGameUpdateRef.current(game.id, {
+              total_clicks: (game.total_clicks || 0) + 1,
+              last_click_username: username,
+              last_click_user_id: null,
+              end_time: now + 90000,
+            })
+            lastClickTimesRef.current.set(game.id, now)
+            console.log(`[LOBBY BOT] SNIPE! ${username} at ${Math.floor(timeLeft/1000)}s (threshold: ${Math.floor(snipeThreshold/1000)}s)`)
+            return
+          }
+          return // Attendre le prochain cycle
+        }
+
+        // Si bataille terminée mais joueur réel leader et timer < 8s, snipe quand même
+        if (battleEnded && hasRealPlayer && timeLeft <= 8000) {
           const roundedTime = Math.floor(now / 1000)
           const username = generateDeterministicUsername(`${game.id}-${roundedTime}-endsnipe`)
 
@@ -199,7 +222,7 @@ export function useLobbyBotSimulation({
         // Si bataille terminée, laisser timer descendre
         if (battleEnded) return
 
-        // Si joueur réel leader en phase finale (hors zone snipe), attendre
+        // Si joueur réel leader en phase finale (au-dessus du seuil), attendre
         if (hasRealPlayer && isInFinalPhase) return
 
         const lastClickTime = lastClickTimesRef.current.get(game.id) || 0

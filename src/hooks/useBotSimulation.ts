@@ -169,9 +169,16 @@ export function useBotSimulation({
       }
 
       // SNIPE LOGIC: Quand joueur réel est leader en phase finale
+      // Délai aléatoire entre 10s et 50s (moyenne ~20s) pour paraître naturel
       if (hasRealPlayer && isInFinalPhase) {
-        if (timeLeft <= 15000) {
-          // SNIPE! Timer critique, on reprend le lead immédiatement
+        // Générer un seuil de snipe aléatoire basé sur le gameId et le moment
+        // Cela donne un délai différent à chaque "tentative" mais cohérent entre clients
+        const snipeThresholdSeed = getDeterministicSeed(gameId + '-threshold', Math.floor(now / 5000))
+        // Seuil entre 10s et 50s (10000ms à 50000ms)
+        const snipeThreshold = 10000 + (snipeThresholdSeed % 40000)
+
+        if (timeLeft <= 8000) {
+          // SNIPE URGENT! Timer très critique (<8s), on reprend le lead immédiatement
           const roundedTime = Math.floor(now / 1000)
           const username = generateDeterministicUsername(`${gameId}-${roundedTime}-snipe`)
           const clickId = `snipe-${gameId}-${roundedTime}`
@@ -194,12 +201,13 @@ export function useBotSimulation({
           lastClickTimeRef.current = now
           lastUsernameRef.current = username
 
-          console.log(`[BOT SIM] SNIPE! ${username} stole from real player at ${Math.floor(timeLeft/1000)}s`)
+          console.log(`[BOT SIM] URGENT SNIPE! ${username} stole at ${Math.floor(timeLeft/1000)}s`)
           return
-        } else if (timeLeft <= 30000) {
-          // Timer bas mais pas critique - 50% chance de sniper pour créer du suspense
-          const snipeSeed = getDeterministicSeed(gameId + '-snipe', Math.floor(now / 10000))
-          if (snipeSeed % 2 === 0) {
+        } else if (timeLeft <= snipeThreshold) {
+          // Timer atteint le seuil aléatoire - sniper avec probabilité
+          const snipeSeed = getDeterministicSeed(gameId + '-snipe', Math.floor(now / 3000))
+          // 70% chance de sniper quand le seuil est atteint
+          if (snipeSeed % 10 < 7) {
             const roundedTime = Math.floor(now / 1000)
             const username = generateDeterministicUsername(`${gameId}-${roundedTime}-earlysnipe`)
 
@@ -217,13 +225,13 @@ export function useBotSimulation({
             syncBotClickToDb(gameId, username)
 
             lastClickTimeRef.current = now
-            console.log(`[BOT SIM] EARLY SNIPE! ${username} at ${Math.floor(timeLeft/1000)}s`)
+            console.log(`[BOT SIM] SNIPE! ${username} at ${Math.floor(timeLeft/1000)}s (threshold: ${Math.floor(snipeThreshold/1000)}s)`)
             return
           }
-          // Sinon laisser le timer descendre pour le suspense
+          // Sinon attendre le prochain cycle
           return
         } else {
-          // Timer > 30s avec joueur réel - ne pas cliquer, laisser descendre
+          // Timer au-dessus du seuil - laisser descendre
           return
         }
       }
