@@ -19,6 +19,7 @@ const GRAVITY = 0.15 // Ralenti pour une descente plus douce
 const BOUNCE = 0.65
 const FRICTION = 0.995
 const MAX_VELOCITY = 4 // Limite la vitesse max
+const WALL_MARGIN = 15 // Marge pour éviter que la bille se coince
 
 interface Ball {
   x: number
@@ -142,6 +143,19 @@ export default function Pachinko({
       ctx.lineTo(BOARD_WIDTH, i)
       ctx.stroke()
     }
+
+    // Draw side walls/bumpers
+    const wallGradientLeft = ctx.createLinearGradient(0, 0, WALL_MARGIN, 0)
+    wallGradientLeft.addColorStop(0, 'rgba(155, 92, 255, 0.3)')
+    wallGradientLeft.addColorStop(1, 'rgba(155, 92, 255, 0)')
+    ctx.fillStyle = wallGradientLeft
+    ctx.fillRect(0, 0, WALL_MARGIN, BOARD_HEIGHT - 50)
+
+    const wallGradientRight = ctx.createLinearGradient(BOARD_WIDTH - WALL_MARGIN, 0, BOARD_WIDTH, 0)
+    wallGradientRight.addColorStop(0, 'rgba(155, 92, 255, 0)')
+    wallGradientRight.addColorStop(1, 'rgba(155, 92, 255, 0.3)')
+    ctx.fillStyle = wallGradientRight
+    ctx.fillRect(BOARD_WIDTH - WALL_MARGIN, 0, WALL_MARGIN, BOARD_HEIGHT - 50)
 
     // Draw pegs with better visuals
     pegsRef.current.forEach((peg, index) => {
@@ -340,14 +354,14 @@ export default function Pachinko({
     ball.x += ball.vx
     ball.y += ball.vy
 
-    // Wall collisions
-    if (ball.x - BALL_RADIUS < 0) {
-      ball.x = BALL_RADIUS
-      ball.vx = -ball.vx * BOUNCE
+    // Wall collisions with margin to prevent ball getting stuck
+    if (ball.x - BALL_RADIUS < WALL_MARGIN) {
+      ball.x = WALL_MARGIN + BALL_RADIUS
+      ball.vx = Math.abs(ball.vx) * BOUNCE + 0.5 // Push away from wall
     }
-    if (ball.x + BALL_RADIUS > BOARD_WIDTH) {
-      ball.x = BOARD_WIDTH - BALL_RADIUS
-      ball.vx = -ball.vx * BOUNCE
+    if (ball.x + BALL_RADIUS > BOARD_WIDTH - WALL_MARGIN) {
+      ball.x = BOARD_WIDTH - WALL_MARGIN - BALL_RADIUS
+      ball.vx = -Math.abs(ball.vx) * BOUNCE - 0.5 // Push away from wall
     }
 
     // Peg collisions
