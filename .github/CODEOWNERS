@@ -1,0 +1,23 @@
+# CODEOWNERS - Définit les reviewers par défaut pour les PR
+
+# Propriétaire global (review toutes les PR)
+* @Maalhama
+
+# Backend / API
+/src/app/api/ @Maalhama
+/src/actions/ @Maalhama
+/src/lib/ @Maalhama
+
+# Frontend / Components
+/src/components/ @Maalhama
+/src/app/(main)/ @Maalhama
+/src/app/(auth)/ @Maalhama
+
+# Configuration
+/.github/ @Maalhama
+/next.config.ts @Maalhama
+/tailwind.config.ts @Maalhama
+
+# Documentation
+*.md @Maalhama
+/docs/ @Maalhama
