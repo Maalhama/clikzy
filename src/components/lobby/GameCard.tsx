@@ -384,7 +384,9 @@ export const GameCard = memo(function GameCard({ game, index = 0, isFavorite = f
                   : 'drop-shadow-[0_0_25px_rgba(255,79,216,0.5)] drop-shadow-[0_0_50px_rgba(155,92,255,0.3)]'
                 }
               `}
-              sizes="224px"
+              sizes="(max-width: 640px) 160px, (max-width: 1024px) 200px, 224px"
+              quality={85}
+              priority={index < 4}
               onError={() => !imgError && setImgError(true)}
             />
           </div>

@@ -20,7 +20,9 @@ export function ItemDisplay({ item, className = '' }: ItemDisplayProps) {
             alt={item.name}
             fill
             className="object-contain drop-shadow-2xl transition-transform group-hover:scale-105 p-8"
-            sizes="(max-width: 768px) 100vw, 50vw"
+            sizes="(max-width: 768px) 90vw, (max-width: 1024px) 50vw, 45vw"
+            priority
+            quality={85}
           />
         </div>
       </div>

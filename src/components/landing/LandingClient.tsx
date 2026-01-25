@@ -4,6 +4,7 @@ import { useRef, useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import Link from 'next/link'
 import Image from 'next/image'
+import dynamic from 'next/dynamic'
 import { useRouter } from 'next/navigation'
 import { useGSAP } from '@gsap/react'
 import { gsap } from '@/lib/gsap/gsapConfig'
@@ -31,8 +32,11 @@ import { TargetIcon, CursorClickIcon, TrophyIcon, GiftIcon } from '@/components/
 // Widgets - PrizeCarousel
 import { PrizeCarousel } from './widgets/PrizeCarousel'
 
-// Background Effects
-import { BackgroundEffects } from '@/components/ui/BackgroundEffects'
+// Background Effects - Lazy loaded (heavy 3D component)
+const BackgroundEffects = dynamic(
+  () => import('@/components/ui/BackgroundEffects').then(mod => mod.BackgroundEffects),
+  { ssr: false }
+)
 
 // Components
 import { PlayerCounter } from './components/PlayerCounter'
