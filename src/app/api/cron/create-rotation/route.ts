@@ -13,6 +13,33 @@ const CRON_SECRET = process.env.CRON_SECRET
 
 // Configuration
 const GAMES_PER_ROTATION = 18
+const MAX_RETRIES = 3
+const RETRY_DELAY_MS = 2000 // 2 secondes, doublé à chaque retry
+
+// Fonction utilitaire pour attendre
+const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
+
+// Wrapper avec retry et exponential backoff
+async function withRetry<T>(
+  fn: () => Promise<T>,
+  retries = MAX_RETRIES,
+  delay = RETRY_DELAY_MS
+): Promise<T> {
+  try {
+    return await fn()
+  } catch (error: unknown) {
+    const isRateLimitError =
+      error instanceof Error &&
+      (error.message.includes('429') || error.message.includes('Too Many Requests'))
+
+    if (retries > 0 && isRateLimitError) {
+      console.log(`Rate limit hit, retrying in ${delay}ms... (${retries} retries left)`)
+      await sleep(delay)
+      return withRetry(fn, retries - 1, delay * 2)
+    }
+    throw error
+  }
+}
 
 export async function GET(request: NextRequest) {
   // Vérifier l'authentification (Vercel Cron envoie un header spécial)
@@ -27,11 +54,13 @@ export async function GET(request: NextRequest) {
     const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
     // 1. Supprimer tous les jeux terminés (nettoyage avant nouvelle rotation)
-    const { data: deletedEnded } = await supabase
-      .from('games')
-      .delete()
-      .eq('status', 'ended')
-      .select('id')
+    const { data: deletedEnded } = await withRetry(() =>
+      supabase
+        .from('games')
+        .delete()
+        .eq('status', 'ended')
+        .select('id')
+    )
 
     const endedCount = deletedEnded?.length || 0
     if (endedCount > 0) {
@@ -39,11 +68,13 @@ export async function GET(request: NextRequest) {
     }
 
     // 2. Supprimer les anciens jeux en attente (garder la place pour la nouvelle rotation)
-    const { data: deletedWaiting } = await supabase
-      .from('games')
-      .delete()
-      .eq('status', 'waiting')
-      .select('id')
+    const { data: deletedWaiting } = await withRetry(() =>
+      supabase
+        .from('games')
+        .delete()
+        .eq('status', 'waiting')
+        .select('id')
+    )
 
     const waitingCount = deletedWaiting?.length || 0
     if (waitingCount > 0) {
@@ -57,10 +88,12 @@ export async function GET(request: NextRequest) {
     const endTime = utcStartTime.getTime() + DEFAULT_GAME_DURATION
 
     // Récupérer des items disponibles
-    const { data: availableItems, error: itemsError } = await supabase
-      .from('items')
-      .select('id, name')
-      .limit(50)
+    const { data: availableItems, error: itemsError } = await withRetry(() =>
+      supabase
+        .from('items')
+        .select('id, name')
+        .limit(50)
+    )
 
     if (itemsError) {
       console.error('Error fetching items:', itemsError)
@@ -72,10 +105,12 @@ export async function GET(request: NextRequest) {
     }
 
     // Vérifier les items qui ont déjà un jeu actif ou en attente
-    const { data: existingGames } = await supabase
-      .from('games')
-      .select('item_id')
-      .in('status', ['waiting', 'active', 'final_phase'])
+    const { data: existingGames } = await withRetry(() =>
+      supabase
+        .from('games')
+        .select('item_id')
+        .in('status', ['waiting', 'active', 'final_phase'])
+    )
 
     const usedItemIds = new Set((existingGames || []).map(g => g.item_id))
     const freeItems = availableItems.filter(item => !usedItemIds.has(item.id))
@@ -101,10 +136,12 @@ export async function GET(request: NextRequest) {
       total_clicks: 0,
     }))
 
-    const { data: createdGames, error: createError } = await supabase
-      .from('games')
-      .insert(games)
-      .select('id, item:items(name), status')
+    const { data: createdGames, error: createError } = await withRetry(() =>
+      supabase
+        .from('games')
+        .insert(games)
+        .select('id, item:items(name), status')
+    )
 
     if (createError) {
       console.error('Error creating games:', createError)
