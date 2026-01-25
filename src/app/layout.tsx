@@ -3,6 +3,7 @@ import { Inter, JetBrains_Mono } from 'next/font/google'
 import { SkipLink } from '@/components/ui/SkipLink'
 import { CookieConsent } from '@/components/common/CookieConsent'
 import { Analytics } from '@/components/common/Analytics'
+import { WebVitalsReporter } from '@/components/analytics/WebVitalsReporter'
 import './globals.css'
 
 const inter = Inter({
@@ -112,6 +113,7 @@ export default function RootLayout({
         {children}
         <CookieConsent />
         <Analytics />
+        <WebVitalsReporter />
       </body>
     </html>
   )
