@@ -57,13 +57,17 @@ const BRAND_LOGOS: BrandIcon[] = [
 ]
 
 function BrandLogo({ brand }: { brand: BrandIcon }) {
+  const color = `#${brand.hex}`
   return (
     <svg
       viewBox="0 0 24 24"
-      className="h-7 md:h-9 w-7 md:w-9"
-      fill={`#${brand.hex}`}
+      className="h-8 md:h-10 w-8 md:w-10"
+      fill={color}
       role="img"
       aria-label={brand.title}
+      style={{
+        filter: `drop-shadow(0 0 8px ${color}50) drop-shadow(0 0 16px ${color}30)`,
+      }}
     >
       <path d={brand.path} />
     </svg>
@@ -81,11 +85,11 @@ export function BrandMarquee() {
         }}
       >
         {/* Premier groupe - animation continue */}
-        <div className="flex items-center gap-10 md:gap-14 animate-marquee-infinite">
+        <div className="flex items-center gap-10 md:gap-14 pr-10 md:pr-14 animate-marquee-infinite">
           {BRAND_LOGOS.map((brand, index) => (
             <div
               key={`brand-1-${index}`}
-              className="flex-shrink-0 opacity-60 hover:opacity-100 transition-opacity duration-300"
+              className="flex-shrink-0 opacity-80 hover:opacity-100 transition-all duration-300 hover:scale-110"
             >
               <BrandLogo brand={brand} />
             </div>
@@ -93,11 +97,11 @@ export function BrandMarquee() {
         </div>
 
         {/* Deuxième groupe - dupliqué pour scroll infini seamless */}
-        <div className="flex items-center gap-10 md:gap-14 animate-marquee-infinite" aria-hidden="true">
+        <div className="flex items-center gap-10 md:gap-14 pr-10 md:pr-14 animate-marquee-infinite" aria-hidden="true">
           {BRAND_LOGOS.map((brand, index) => (
             <div
               key={`brand-2-${index}`}
-              className="flex-shrink-0 opacity-60 hover:opacity-100 transition-opacity duration-300"
+              className="flex-shrink-0 opacity-80 hover:opacity-100 transition-all duration-300 hover:scale-110"
             >
               <BrandLogo brand={brand} />
             </div>
