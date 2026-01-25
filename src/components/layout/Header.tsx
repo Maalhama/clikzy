@@ -174,9 +174,27 @@ export function Header({ profile }: HeaderProps) {
                       {profile.username.charAt(0).toUpperCase()}
                     </div>
                   )}
-                  <span className="font-medium text-white/80 group-hover:text-white transition-colors">
-                    {profile.username}
-                  </span>
+                  <div className="flex items-center gap-1.5">
+                    <span className="font-medium text-white/80 group-hover:text-white transition-colors">
+                      {profile.username}
+                    </span>
+                    {profile.is_vip && (
+                      <span title="Membre V.I.P">
+                        <svg
+                          className="w-4 h-4 text-yellow-400 drop-shadow-[0_0_6px_rgba(250,204,21,0.8)]"
+                          viewBox="0 0 24 24"
+                          fill="currentColor"
+                          aria-label="Membre V.I.P"
+                        >
+                          <path d="M12 6l3.5 4.5L19 6l-2 10H7L5 6l3.5 4.5L12 6z" />
+                          <circle cx="12" cy="4" r="1.5" />
+                          <circle cx="5" cy="5" r="1.5" />
+                          <circle cx="19" cy="5" r="1.5" />
+                          <rect x="6" y="16" width="12" height="2" rx="0.5" />
+                        </svg>
+                      </span>
+                    )}
+                  </div>
                 </Link>
 
                 {/* Sign out */}
@@ -269,7 +287,25 @@ export function Header({ profile }: HeaderProps) {
                     </div>
                   )}
                   <div className="flex-1">
-                    <div className="font-bold text-white">{profile.username}</div>
+                    <div className="flex items-center gap-1.5">
+                      <span className="font-bold text-white">{profile.username}</span>
+                      {profile.is_vip && (
+                        <span title="Membre V.I.P">
+                          <svg
+                            className="w-4 h-4 text-yellow-400 drop-shadow-[0_0_6px_rgba(250,204,21,0.8)]"
+                            viewBox="0 0 24 24"
+                            fill="currentColor"
+                            aria-label="Membre V.I.P"
+                          >
+                            <path d="M12 6l3.5 4.5L19 6l-2 10H7L5 6l3.5 4.5L12 6z" />
+                            <circle cx="12" cy="4" r="1.5" />
+                            <circle cx="5" cy="5" r="1.5" />
+                            <circle cx="19" cy="5" r="1.5" />
+                            <rect x="6" y="16" width="12" height="2" rx="0.5" />
+                          </svg>
+                        </span>
+                      )}
+                    </div>
                     <div className="flex items-center gap-1 text-neon-purple text-sm">
                       <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
