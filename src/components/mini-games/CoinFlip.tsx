@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Trophy, Sparkles, Info } from 'lucide-react'
+import { Trophy, Sparkles, Zap } from 'lucide-react'
 
 interface CoinFlipProps {
   onComplete: (creditsWon: number) => void
@@ -121,7 +121,7 @@ export default function CoinFlip({
             <div className="w-full h-full rounded-full bg-gradient-to-br from-[#FFD700] via-[#FFB800] to-[#FF8C00] shadow-[0_0_30px_rgba(255,184,0,0.5),inset_0_-6px_12px_rgba(0,0,0,0.3),inset_0_6px_12px_rgba(255,255,255,0.3)]">
               <div className="absolute inset-3 rounded-full border-2 border-[#B8860B]/40" />
               <div className="absolute inset-0 flex items-center justify-center">
-                <span className="text-4xl sm:text-5xl">👑</span>
+                <Zap className="w-12 h-12 sm:w-14 sm:h-14 text-[#0B0F1A] drop-shadow-[0_0_8px_rgba(255,184,0,0.6)]" fill="currentColor" />
               </div>
               <div className="absolute top-3 left-4 w-6 h-8 bg-white/20 rounded-full rotate-[-30deg] blur-sm" />
             </div>
@@ -164,8 +164,8 @@ export default function CoinFlip({
             animate={{ opacity: 1, scale: 1 }}
             className="text-center"
           >
-            <p className={`text-2xl sm:text-3xl font-black ${result === 'heads' ? 'text-[#FFB800]' : 'text-[#C0C0C0]'}`}>
-              {result === 'heads' ? '👑 PILE !' : '🪙 FACE !'}
+            <p className={`text-2xl sm:text-3xl font-black flex items-center justify-center gap-2 ${result === 'heads' ? 'text-[#FFB800]' : 'text-[#C0C0C0]'}`}>
+              {result === 'heads' ? <><Zap className="w-6 h-6 sm:w-8 sm:h-8" fill="currentColor" /> PILE !</> : '🪙 FACE !'}
             </p>
           </motion.div>
         )}
