@@ -8,4 +8,4 @@ if (!resendApiKey) {
 
 export const resend = resendApiKey ? new Resend(resendApiKey) : null
 
-export const EMAIL_FROM = 'Cleekzy <noreply@cleekzy.com>'
+export const EMAIL_FROM = process.env.RESEND_FROM_EMAIL || 'Cleekzy <noreply@cleekzy.com>'
