@@ -181,16 +181,12 @@ export function Header({ profile }: HeaderProps) {
                     {profile.is_vip && (
                       <span title="Membre V.I.P">
                         <svg
-                          className="w-4 h-4 text-yellow-400 drop-shadow-[0_0_6px_rgba(250,204,21,0.8)]"
+                          className="w-4 h-4 text-yellow-400 drop-shadow-[0_0_8px_rgba(250,204,21,0.8)]"
                           viewBox="0 0 24 24"
                           fill="currentColor"
                           aria-label="Membre V.I.P"
                         >
-                          <path d="M12 6l3.5 4.5L19 6l-2 10H7L5 6l3.5 4.5L12 6z" />
-                          <circle cx="12" cy="4" r="1.5" />
-                          <circle cx="5" cy="5" r="1.5" />
-                          <circle cx="19" cy="5" r="1.5" />
-                          <rect x="6" y="16" width="12" height="2" rx="0.5" />
+                          <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" />
                         </svg>
                       </span>
                     )}
@@ -292,16 +288,12 @@ export function Header({ profile }: HeaderProps) {
                       {profile.is_vip && (
                         <span title="Membre V.I.P">
                           <svg
-                            className="w-4 h-4 text-yellow-400 drop-shadow-[0_0_6px_rgba(250,204,21,0.8)]"
+                            className="w-4 h-4 text-yellow-400 drop-shadow-[0_0_8px_rgba(250,204,21,0.8)]"
                             viewBox="0 0 24 24"
                             fill="currentColor"
                             aria-label="Membre V.I.P"
                           >
-                            <path d="M12 6l3.5 4.5L19 6l-2 10H7L5 6l3.5 4.5L12 6z" />
-                            <circle cx="12" cy="4" r="1.5" />
-                            <circle cx="5" cy="5" r="1.5" />
-                            <circle cx="19" cy="5" r="1.5" />
-                            <rect x="6" y="16" width="12" height="2" rx="0.5" />
+                            <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" />
                           </svg>
                         </span>
                       )}
