@@ -12,6 +12,7 @@ interface ContactMethod {
   action: string
   href: string
   color: string
+  disabled?: boolean
 }
 
 const CONTACT_METHODS: ContactMethod[] = [
@@ -35,9 +36,10 @@ const CONTACT_METHODS: ContactMethod[] = [
     ),
     title: 'Chat en direct',
     description: 'Disponible 24h/24, 7j/7',
-    action: 'Démarrer le chat',
+    action: 'Prochainement',
     href: '#',
     color: '#3CCBFF',
+    disabled: true,
   },
   {
     icon: (
@@ -47,9 +49,10 @@ const CONTACT_METHODS: ContactMethod[] = [
     ),
     title: 'Discord',
     description: 'Rejoins notre communauté',
-    action: 'Rejoindre le serveur',
+    action: 'Prochainement',
     href: '#',
     color: '#FF4FD8',
+    disabled: true,
   },
 ]
 
@@ -149,34 +152,59 @@ export default function SupportPage() {
 
         {/* Contact Methods */}
         <div className="grid md:grid-cols-3 gap-4 md:gap-6 mb-12 md:mb-16">
-          {CONTACT_METHODS.map((method, index) => (
-            <a
-              key={index}
-              href={method.href}
-              className="group p-6 rounded-2xl bg-bg-secondary/50 border border-white/10 hover:border-opacity-50 transition-all duration-300"
-              style={{
-                borderColor: `${method.color}30`,
-              }}
-            >
+          {CONTACT_METHODS.map((method, index) => {
+            const isDisabled = method.disabled
+
+            return isDisabled ? (
               <div
-                className="w-12 h-12 rounded-xl flex items-center justify-center mb-4 transition-transform group-hover:scale-110"
-                style={{ backgroundColor: `${method.color}20`, color: method.color }}
+                key={index}
+                className="relative p-6 rounded-2xl bg-bg-secondary/30 border border-white/5 opacity-60 cursor-not-allowed"
               >
-                {method.icon}
+                {/* Badge Prochainement */}
+                <div className="absolute top-3 right-3 px-2 py-1 rounded-full bg-white/10 text-white/50 text-[10px] font-medium uppercase tracking-wider">
+                  Bientôt
+                </div>
+                <div
+                  className="w-12 h-12 rounded-xl flex items-center justify-center mb-4"
+                  style={{ backgroundColor: `${method.color}10`, color: `${method.color}60` }}
+                >
+                  {method.icon}
+                </div>
+                <h3 className="font-bold text-white/50 text-lg mb-1">{method.title}</h3>
+                <p className="text-white/30 text-sm mb-3">{method.description}</p>
+                <span className="inline-flex items-center gap-1 text-sm font-medium text-white/30">
+                  {method.action}
+                </span>
               </div>
-              <h3 className="font-bold text-white text-lg mb-1">{method.title}</h3>
-              <p className="text-white/50 text-sm mb-3">{method.description}</p>
-              <span
-                className="inline-flex items-center gap-1 text-sm font-medium transition-colors"
-                style={{ color: method.color }}
+            ) : (
+              <a
+                key={index}
+                href={method.href}
+                className="group p-6 rounded-2xl bg-bg-secondary/50 border border-white/10 hover:border-opacity-50 transition-all duration-300"
+                style={{
+                  borderColor: `${method.color}30`,
+                }}
               >
-                {method.action}
-                <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                </svg>
-              </span>
-            </a>
-          ))}
+                <div
+                  className="w-12 h-12 rounded-xl flex items-center justify-center mb-4 transition-transform group-hover:scale-110"
+                  style={{ backgroundColor: `${method.color}20`, color: method.color }}
+                >
+                  {method.icon}
+                </div>
+                <h3 className="font-bold text-white text-lg mb-1">{method.title}</h3>
+                <p className="text-white/50 text-sm mb-3">{method.description}</p>
+                <span
+                  className="inline-flex items-center gap-1 text-sm font-medium transition-colors"
+                  style={{ color: method.color }}
+                >
+                  {method.action}
+                  <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                  </svg>
+                </span>
+              </a>
+            )
+          })}
         </div>
 
         <div className="grid lg:grid-cols-2 gap-8 md:gap-12">
