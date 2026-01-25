@@ -21,7 +21,15 @@ import CoinFlip from '@/components/mini-games/CoinFlip';
 import DiceRoll from '@/components/mini-games/DiceRoll';
 import { trackMiniGame } from '@/lib/analytics';
 
-const PLAY_COST = 3; // Coût en crédits pour une partie payante
+// Coût en crédits par type de jeu
+const PLAY_COSTS: Record<MiniGameType, number> = {
+  wheel: 3,
+  scratch: 3,
+  pachinko: 3,
+  slots: 5,
+  coinflip: 3,
+  dice: 5,
+};
 
 // Get tomorrow midnight in French timezone (Europe/Paris)
 function getTomorrowMidnightFrench(): Date {
@@ -142,7 +150,7 @@ export default function MiniGamesClient({ initialEligibility }: MiniGamesClientP
   const [isLoading, setIsLoading] = useState(false);
   const [showCreditModal, setShowCreditModal] = useState(false);
 
-  const hasEnoughCredits = credits >= PLAY_COST;
+  const hasEnoughCreditsFor = (gameType: MiniGameType) => credits >= PLAY_COSTS[gameType];
 
   const triggerWinEffect = useCallback(() => {
     const duration = 3 * 1000;
@@ -209,7 +217,8 @@ export default function MiniGamesClient({ initialEligibility }: MiniGamesClientP
 
   // Called when user clicks "Play with credits" - paid play
   const handleStartPaidGame = async (gameType: MiniGameType) => {
-    if (!hasEnoughCredits) {
+    const playCost = PLAY_COSTS[gameType];
+    if (!hasEnoughCreditsFor(gameType)) {
       setShowCreditModal(true);
       return;
     }
@@ -221,7 +230,7 @@ export default function MiniGamesClient({ initialEligibility }: MiniGamesClientP
 
     // Immediately show credit deduction for better UX
     const creditsBeforePlay = credits;
-    updateCredits(creditsBeforePlay - PLAY_COST);
+    updateCredits(creditsBeforePlay - playCost);
 
     try {
       const gameResult = await playMiniGamePaid(gameType);
@@ -349,7 +358,8 @@ export default function MiniGamesClient({ initialEligibility }: MiniGamesClientP
               eligibility={eligibility[key]}
               onPlayFree={() => handleStartGame(key)}
               onPlayPaid={() => handleStartPaidGame(key)}
-              hasEnoughCredits={hasEnoughCredits}
+              hasEnoughCredits={hasEnoughCreditsFor(key)}
+              playCost={PLAY_COSTS[key]}
               onBuyCredits={() => setShowCreditModal(true)}
               index={index}
             />
@@ -623,11 +633,12 @@ interface GameCardProps {
   onPlayFree: () => void;
   onPlayPaid: () => void;
   hasEnoughCredits: boolean;
+  playCost: number;
   onBuyCredits: () => void;
   index: number;
 }
 
-function GameCard({ config, eligibility, onPlayFree, onPlayPaid, hasEnoughCredits, onBuyCredits, index }: GameCardProps) {
+function GameCard({ config, eligibility, onPlayFree, onPlayPaid, hasEnoughCredits, playCost, onBuyCredits, index }: GameCardProps) {
   const { canPlay, nextPlayAt } = eligibility;
   const countdown = useCountdown(nextPlayAt);
 
@@ -702,7 +713,7 @@ function GameCard({ config, eligibility, onPlayFree, onPlayPaid, hasEnoughCredit
             className="w-full py-2.5 px-6 rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2 bg-[var(--bg-tertiary)] border border-white/10 text-white hover:bg-[var(--bg-secondary)] hover:border-[var(--neon-purple)]/50"
           >
             <Coins size={16} className="text-[#FFB800]" />
-            <span>Rejouer pour {PLAY_COST} crédits</span>
+            <span>Rejouer pour {playCost} crédits</span>
           </button>
         ) : (
           <button

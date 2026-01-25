@@ -243,7 +243,15 @@ export async function playMiniGame(gameType: MiniGameType): Promise<ActionResult
   }
 }
 
-const PLAY_COST = 3 // Coût en crédits pour une partie payante
+// Coût en crédits par type de jeu
+const PLAY_COSTS: Record<MiniGameType, number> = {
+  wheel: 3,
+  scratch: 3,
+  pachinko: 3,
+  slots: 5,
+  coinflip: 3,
+  dice: 5,
+}
 
 /**
  * Play a mini-game with credits (paid play, no daily limit)
@@ -268,9 +276,10 @@ export async function playMiniGamePaid(gameType: MiniGameType): Promise<ActionRe
     return { success: false, error: 'Erreur lors de la récupération du profil' }
   }
 
+  const playCost = PLAY_COSTS[gameType]
   const totalCredits = profile.credits + profile.earned_credits
-  if (totalCredits < PLAY_COST) {
-    return { success: false, error: `Crédits insuffisants. Il vous faut ${PLAY_COST} crédits pour jouer.` }
+  if (totalCredits < playCost) {
+    return { success: false, error: `Crédits insuffisants. Il vous faut ${playCost} crédits pour jouer.` }
   }
 
   // Deduct credits (use daily credits first, then earned credits)
@@ -278,7 +287,7 @@ export async function playMiniGamePaid(gameType: MiniGameType): Promise<ActionRe
   const { data: newTotal, error: deductError } = await (supabase as any)
     .rpc('deduct_credits', {
       p_user_id: user.id,
-      p_amount: PLAY_COST,
+      p_amount: playCost,
     })
 
   if (deductError || newTotal === -1) {
