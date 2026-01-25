@@ -110,9 +110,16 @@ export default function VIPPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
             >
-              {/* Crown icon */}
-              <div className="inline-flex items-center justify-center w-20 h-20 mb-6 rounded-2xl bg-gradient-to-br from-yellow-400 to-amber-600 shadow-lg shadow-yellow-500/30">
-                <span className="text-4xl">👑</span>
+              {/* Crown icon - Neon style */}
+              <div className="relative inline-flex items-center justify-center w-20 h-20 mb-6 rounded-2xl bg-gradient-to-br from-yellow-400 to-amber-600 shadow-[0_0_30px_rgba(234,179,8,0.5),0_0_60px_rgba(234,179,8,0.3)]">
+                <svg className="w-10 h-10 text-[#0B0F1A] drop-shadow-[0_0_10px_rgba(234,179,8,0.8)]" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 6l3.5 4.5L19 6l-2 10H7L5 6l3.5 4.5L12 6z" />
+                  <circle cx="12" cy="4" r="1.5" />
+                  <circle cx="5" cy="5" r="1.5" />
+                  <circle cx="19" cy="5" r="1.5" />
+                  <rect x="6" y="16" width="12" height="2" rx="0.5" />
+                  <rect x="5" y="19" width="14" height="2" rx="0.5" />
+                </svg>
               </div>
 
               <h1 className="text-4xl md:text-5xl font-bold mb-4">

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback, useTransition, useEffect, useMemo } from 'react'
+import { useState, useCallback, useTransition, useEffect, useMemo, useRef } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useGame } from '@/hooks/useGame'
@@ -64,7 +64,6 @@ export function GameClient({
 
   const [isPending, startTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
-  const [showWinnerModal, setShowWinnerModal] = useState(false)
   const [showCreditModal, setShowCreditModal] = useState(false)
   const [showVIPModal, setShowVIPModal] = useState(false)
   const [isVip, setIsVip] = useState(false)
@@ -125,20 +124,15 @@ export function GameClient({
     return () => stopSounds()
   }, [isCritical, game.status, playHeartbeat, stopSounds])
 
-  // Show winner modal ONLY when game is officially ended in database
-  // Don't rely on local timer (isEnded) as it can have race conditions with realtime updates
+  // Track win when game ends (sound + analytics, no modal)
+  const hasPlayedWinRef = useRef(false)
   useEffect(() => {
-    if (game.status === 'ended' && !showWinnerModal) {
-      const timer = setTimeout(() => {
-        setShowWinnerModal(true)
-        if (game.winner_id === userId) {
-          playWin()
-          trackGameWin(game.id, game.item.name, game.item.retail_value ?? 0)
-        }
-      }, 500)
-      return () => clearTimeout(timer)
+    if (game.status === 'ended' && game.winner_id === userId && !hasPlayedWinRef.current) {
+      hasPlayedWinRef.current = true
+      playWin()
+      trackGameWin(game.id, game.item.name, game.item.retail_value ?? 0)
     }
-  }, [game.status, showWinnerModal, game.winner_id, userId, playWin, game.id, game.item.name, game.item])
+  }, [game.status, game.winner_id, userId, playWin, game.id, game.item.name, game.item])
 
   // Haptic feedback
   const triggerHaptic = useCallback(() => {
@@ -973,51 +967,6 @@ export function GameClient({
           </div>
         </div>
       </div>
-
-      {/* Winner Modal */}
-      {showWinnerModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={() => setShowWinnerModal(false)} />
-          <div
-            className={`relative z-10 w-full max-w-md rounded-2xl overflow-hidden ${
-              isWinner ? 'bg-gradient-to-br from-success/20 via-bg-secondary to-neon-purple/20 border border-success/30' : 'bg-bg-secondary border border-white/10'
-            }`}
-          >
-            <div className="p-8 text-center">
-              {isWinner ? (
-                <>
-                  <div className="text-7xl mb-4 animate-bounce">🎉</div>
-                  <h2 className="text-2xl font-bold text-success mb-2">Félicitations !</h2>
-                  <p className="text-white mb-4">Tu as gagné {game.item.name} !</p>
-                  {game.item.retail_value && (
-                    <p className="text-success text-lg font-semibold mb-6">
-                      Valeur : {game.item.retail_value.toFixed(0)}€
-                    </p>
-                  )}
-                </>
-              ) : (
-                <>
-                  <div className="text-6xl mb-4">🏆</div>
-                  <h2 className="text-xl font-bold text-white mb-2">Partie terminée</h2>
-                  <p className="text-white/50 mb-2">Le gagnant est :</p>
-                  <p className="text-neon-purple font-bold text-xl mb-6">
-                    {leaderName || 'Inconnu'}
-                  </p>
-                </>
-              )}
-              <Link
-                href="/lobby"
-                className="inline-flex items-center justify-center gap-2 w-full py-3 rounded-xl bg-gradient-to-r from-neon-purple to-neon-pink text-white font-bold"
-              >
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                </svg>
-                Retour au lobby
-              </Link>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Credit Packs Modal */}
       <CreditPacksModal
