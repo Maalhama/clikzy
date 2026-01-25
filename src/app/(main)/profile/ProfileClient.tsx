@@ -327,7 +327,7 @@ export function ProfileClient({ profile, wins, gamesPlayed, totalValueWon, gameH
             <div className="text-left">
               <div className="text-white font-bold">Mes crédits</div>
               <div className="flex items-center gap-2">
-                <span className="text-2xl font-black text-neon-purple">{profile.credits || 0}</span>
+                <span className="text-2xl font-black text-neon-purple">{(profile.credits || 0) + (profile.earned_credits || 0)}</span>
                 <span className="text-white/40 text-sm">disponibles</span>
               </div>
             </div>
