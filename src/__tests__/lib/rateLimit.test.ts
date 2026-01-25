@@ -89,14 +89,18 @@ describe('Rate Limiter', () => {
       expect(result.success).toBe(false)
     })
 
-    it('cron limiter allows 1 request per 30 seconds', () => {
+    it('cron limiter allows 10 requests per minute', () => {
       const identifier = 'cron-test-ip'
 
-      const result1 = rateLimiters.cron(identifier)
-      expect(result1.success).toBe(true)
+      // Make 10 requests - all should succeed
+      for (let i = 0; i < 10; i++) {
+        const result = rateLimiters.cron(identifier)
+        expect(result.success).toBe(true)
+      }
 
-      const result2 = rateLimiters.cron(identifier)
-      expect(result2.success).toBe(false)
+      // 11th should fail
+      const result = rateLimiters.cron(identifier)
+      expect(result.success).toBe(false)
     })
   })
 })
