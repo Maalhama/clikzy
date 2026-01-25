@@ -13,12 +13,12 @@ import { useCountdown } from '@/hooks/useCountdown';
 import { playMiniGame, playMiniGamePaid } from '@/actions/miniGames';
 import { MiniGameType, MiniGameEligibility, WHEEL_SEGMENTS, PACHINKO_SLOTS } from '@/types/miniGames';
 
-import WheelOfFortune from '@/components/mini-games/WheelOfFortune';
-import ScratchCard from '@/components/mini-games/ScratchCard';
-import Pachinko from '@/components/mini-games/Pachinko';
-import SlotMachine from '@/components/mini-games/SlotMachine';
-import CoinFlip from '@/components/mini-games/CoinFlip';
-import DiceRoll from '@/components/mini-games/DiceRoll';
+import WheelOfFortune from '@/components/mini-games/WheelOfFortuneWrapper';
+import ScratchCard from '@/components/mini-games/ScratchCardWrapper';
+import Pachinko from '@/components/mini-games/PachinkoWrapper';
+import SlotMachine from '@/components/mini-games/SlotMachineWrapper';
+import CoinFlip from '@/components/mini-games/CoinFlipWrapper';
+import DiceRoll from '@/components/mini-games/DiceRollWrapper';
 import { trackMiniGame } from '@/lib/analytics';
 
 // Coût en crédits par type de jeu
