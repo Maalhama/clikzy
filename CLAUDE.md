@@ -82,13 +82,15 @@ Explore → Plan → Validate → Implement → Verify
 
 Garde le contexte propre en démarrant un nouveau chat pour chaque phase majeure.
 
-## Détection automatique des commandes
+## Détection automatique - Skills & Agents
 
-**IMPORTANT** : Détecter automatiquement la commande à exécuter depuis le langage naturel de l'utilisateur, sans qu'il ait besoin de taper `/commande`.
+**RÈGLE ABSOLUE** : Détecter automatiquement ce dont l'utilisateur a besoin depuis son langage naturel. Ne JAMAIS demander "voulez-vous que je lance X ?" - LANCER directement.
 
-| L'utilisateur dit... | Commande à exécuter |
-|---------------------|---------------------|
-| "c'est quoi ce code", "explique-moi", "comment ça marche", "montre-moi la structure" | `/explore` |
+### Détection → Skills
+
+| L'utilisateur dit... | Action |
+|---------------------|--------|
+| "c'est quoi ce code", "explique-moi", "comment ça marche" | `/explore` |
 | "je veux ajouter", "nouvelle feature", "on fait un truc pour..." | `/plan-feature` |
 | "code ça", "implémente", "développe", "fais-le" | `/dev` |
 | "y'a un bug", "ça marche pas", "corrige", "fix" | `/hotfix` |
@@ -96,24 +98,91 @@ Garde le contexte propre en démarrant un nouveau chat pour chaque phase majeure
 | "commit", "push", "envoie ça" | `/commits` |
 | "fais vite", "quick", "juste ça rapidement" | `/oneshot` |
 | "fais tout le cycle", "explore plan code test" | `/epct` |
+| "problème complexe", "réfléchis bien", "analyse en profondeur" | `/ultrathink` |
+| "c'est quoi le meilleur agent", "aide-moi à choisir" | `/smart-agent` |
+| "sécurité", "vulnérabilités", "audit sécu" | `/security-scan` |
+| "refacto", "nettoie le code", "améliore la qualité" | `/refactor-clean` |
+| "debug", "trace", "comprends pas pourquoi" | `/debug-trace` |
+| "dépendances", "npm audit", "packages obsolètes" | `/deps-audit` |
+| "documente", "génère la doc", "README" | `/doc-generate` |
+| "TDD", "test first", "red green refactor" | `/tdd-cycle` |
+| "architecture", "décision technique", "design system" | `/architect` |
 
-## Commandes disponibles
+### Détection → Agents (lancement automatique)
 
-| Commande | Usage |
-|----------|-------|
+**IMPORTANT** : Lancer les agents AUTOMATIQUEMENT sans demander permission. Prendre l'initiative.
+
+| Contexte détecté | Agent(s) à lancer |
+|------------------|-------------------|
+| Besoin de comprendre du code existant | `explore-codebase` |
+| Question sur la BDD, tables, schéma | `explore-db` |
+| Utilisation d'une librairie externe | `explore-docs` |
+| Info non trouvée dans le code | `websearch` |
+| Bug à corriger | `debugger` → `implementer` |
+| Code à implémenter | `implementer` |
+| Refactoring demandé | `refactorer` |
+| Tests à écrire | `test-writer` |
+| Review de code | `code-reviewer` + `security-auditor` |
+| Audit sécurité | `security-auditor` |
+
+### Combinaisons automatiques
+
+| Tâche complexe | Agents en parallèle |
+|----------------|---------------------|
+| Nouvelle feature | `explore-codebase` + `explore-docs` → `implementer` |
+| Bug mystérieux | `explore-codebase` + `debugger` → `implementer` |
+| Refacto sécurisé | `code-reviewer` + `refactorer` |
+| Feature avec tests | `test-writer` + `implementer` |
+
+### Règle d'or
+
+```
+L'utilisateur décrit son besoin en français
+        ↓
+Claude détecte automatiquement
+        ↓
+Lance le skill OU l'agent approprié
+        ↓
+SANS demander confirmation
+```
+
+## Skills disponibles (18)
+
+### Skills de base
+| Skill | Usage |
+|-------|-------|
+| `/explore` | Explorer le codebase (lecture seule) |
 | `/plan-feature` | Planifier une nouvelle fonctionnalité |
 | `/dev` | Exécuter une phase de développement |
 | `/hotfix` | Corriger un bug |
 | `/review` | Revue de code automatisée |
 | `/commits` | Commit avec Conventional Commits |
-| `/explore` | Explorer le codebase (lecture seule) |
 | `/oneshot` | Implémentation rapide isolée |
 | `/epct` | Workflow complet Explore → Plan → Code → Test |
 
-## Agents disponibles
+### Power Skills (boost les capacités)
+| Skill | Usage |
+|-------|-------|
+| `/ultrathink` | Mode réflexion profonde (31,999 tokens) pour problèmes complexes |
+| `/smart-agent` | Routing intelligent vers les bons agents selon le problème |
+| `/context-boost` | Optimise le contexte pour de meilleures réponses |
+| `/architect` | Décisions architecturales avec ADR et diagrammes |
+
+### Tools Skills (outils de travail)
+| Skill | Usage |
+|-------|-------|
+| `/tdd-cycle` | Workflow Test-Driven Development (RED → GREEN → REFACTOR) |
+| `/security-scan` | Audit sécurité complet (OWASP, secrets, deps) |
+| `/refactor-clean` | Refactoring selon Clean Code et SOLID |
+| `/debug-trace` | Debugging avancé avec traçage |
+| `/deps-audit` | Audit dépendances (sécu, licences, obsolètes) |
+| `/doc-generate` | Génération automatique de documentation |
+
+## Agents disponibles (10)
 
 **IMPORTANT** : Lancer les agents automatiquement sans demander permission quand le contexte l'exige. Prendre l'initiative.
 
+### Agents d'exploration
 | Agent | Mission | Quand l'utiliser |
 |-------|---------|------------------|
 | `explore-codebase` | Trouve le code et patterns existants | Besoin de comprendre le code existant |
@@ -121,7 +190,44 @@ Garde le contexte propre en démarrant un nouveau chat pour chaque phase majeure
 | `explore-docs` | Récupère la doc des librairies | Utilisation d'une lib externe |
 | `websearch` | Recherche web technique | Info non trouvée ailleurs |
 
+### Agents d'action
+| Agent | Mission | Quand l'utiliser |
+|-------|---------|------------------|
+| `implementer` | Implémente du code qualité prod | Phase d'implémentation |
+| `debugger` | Analyse et corrige les bugs | Bug difficile à comprendre |
+| `refactorer` | Améliore le code sans changer le comportement | Amélioration de code existant |
+| `test-writer` | Écrit des tests complets | Ajout de couverture de tests |
+| `code-reviewer` | Review multi-perspectives | Validation avant merge |
+| `security-auditor` | Audit sécurité OWASP | Vérification de sécurité |
+
+### Orchestration Skills → Agents
+```
+/explore         → explore-codebase
+/hotfix          → debugger + implementer
+/review          → code-reviewer + security-auditor
+/tdd-cycle       → test-writer + implementer
+/security-scan   → security-auditor
+/refactor-clean  → refactorer
+/smart-agent     → [routing automatique]
+```
+
 Lancer plusieurs agents en parallèle si nécessaire pour maximiser l'efficacité.
+
+## Ultrathink - Mode réflexion profonde
+
+**Quand utiliser** : Problèmes complexes, décisions architecturales, bugs mystérieux, code reviews critiques.
+
+**Trigger words** (par ordre de puissance) :
+- `think` → Budget standard
+- `think hard` / `think harder` → Budget augmenté
+- `ultrathink` → Budget maximum (31,999 tokens)
+
+**Exemple** :
+```
+ultrathink: Analyse cette architecture et propose des améliorations
+```
+
+**Attention** : Consomme beaucoup de tokens. Réserver pour les vrais problèmes complexes.
 
 ## Architecture (adapter selon ton stack)
 
@@ -243,64 +349,4 @@ Header requis : `Authorization: Bearer [CRON_SECRET]`
 Les fichiers `.claude/song/finish.mp3` et `.claude/song/need-human.mp3` sont configurés pour les notifications.
 
 ### Configuration MCP
-Voir la section MCP de la documentation pour configurer :
-- Context7 (documentation des librairies)
-- Supabase (si tu utilises Supabase)
-
-# MCP Gemini Design - MANDATORY FOR FRONTEND
-
-## ⛔ ABSOLUTE RULE - NEVER IGNORE
-
-**You MUST NEVER write frontend/UI code yourself.**
-
-Gemini is your frontend developer. You are NOT allowed to create visual components, pages, or interfaces without going through Gemini. This is NON-NEGOTIABLE.
-
-### When to use Gemini? ALWAYS for:
-- Creating a page (dashboard, landing, settings, etc.)
-- Creating a visual component (card, modal, sidebar, form, button, etc.)
-- Modifying the design of an existing element
-- Anything related to styling/layout
-
-### Exceptions (you can do it yourself):
-- Modifying text/copy
-- Adding JS logic without changing the UI
-- Non-visual bug fixes
-- Data wiring (useQuery, useMutation, etc.)
-
-## MANDATORY Workflow
-
-### 1. New project without existing design
-```
-STEP 1: generate_vibes → show options to the user
-STEP 2: User chooses their vibe
-STEP 3: create_frontend with the chosen vibe
-```
-
-### 2. Existing project with design
-```
-ALWAYS pass CSS/theme files in the `context` parameter
-```
-
-### 3. After Gemini's response
-```
-Gemini returns code → YOU write it to disk with Write/Edit
-```
-
-## Checklist before coding frontend
-
-- [ ] Am I creating/modifying something visual?
-- [ ] If YES → STOP → Use Gemini
-- [ ] If NO (pure logic) → You can continue
-
-## ❌ WHAT IS FORBIDDEN
-
-- Writing a React component with styling without Gemini
-- Creating a page without Gemini
-- "Reusing existing styles" as an excuse to not use Gemini
-- Doing frontend "quickly" yourself
-
-## ✅ WHAT IS EXPECTED
-
-- Call Gemini BEFORE writing any frontend code
-- Ask the user for their vibe choice if new project
-- Let Gemini design, you implement
+- Context7 (documentation des librairies) - `claude mcp add context7 npx -y @anthropics/context7-mcp`
