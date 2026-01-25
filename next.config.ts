@@ -58,13 +58,14 @@ const nextConfig: NextConfig = {
     // CSP directives
     const cspDirectives = [
       "default-src 'self'",
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval' blob: https://js.stripe.com https://challenges.cloudflare.com",
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' blob: data: https://js.stripe.com https://challenges.cloudflare.com",
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
       "img-src 'self' data: blob: https: http:",
-      "font-src 'self' https://fonts.gstatic.com",
-      "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.stripe.com https://*.sentry.io https://*.umami.is",
+      "font-src 'self' data: https://fonts.gstatic.com",
+      "connect-src 'self' data: blob: https://*.supabase.co wss://*.supabase.co https://api.stripe.com https://*.sentry.io https://*.umami.is",
       "frame-src 'self' https://js.stripe.com https://hooks.stripe.com https://challenges.cloudflare.com",
-      "worker-src 'self' blob:",
+      "worker-src 'self' blob: data:",
+      "child-src 'self' blob: data:",
       "object-src 'none'",
       "base-uri 'self'",
       "form-action 'self'",
