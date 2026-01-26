@@ -2,6 +2,11 @@
 
 import { useCallback, useRef } from 'react'
 
+// Type pour supporter webkitAudioContext (Safari)
+interface WindowWithWebkit extends Window {
+  webkitAudioContext?: typeof AudioContext
+}
+
 /**
  * Hook réutilisable pour les sons synthétisés des mini-jeux
  * Utilise Web Audio API pour générer des sons sans fichiers audio
@@ -10,9 +15,13 @@ export function useMiniGameSounds() {
   const audioContextRef = useRef<AudioContext | null>(null)
 
   // Obtenir ou créer le contexte audio
-  const getAudioContext = useCallback(() => {
+  const getAudioContext = useCallback((): AudioContext | null => {
     if (!audioContextRef.current) {
-      audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)()
+      const win = window as WindowWithWebkit
+      const AudioCtx = win.AudioContext || win.webkitAudioContext
+      if (AudioCtx) {
+        audioContextRef.current = new AudioCtx()
+      }
     }
     return audioContextRef.current
   }, [])
@@ -24,6 +33,8 @@ export function useMiniGameSounds() {
   const playTick = useCallback((pitch: number = 1) => {
     try {
       const ctx = getAudioContext()
+      if (!ctx) return
+
       const osc = ctx.createOscillator()
       const gain = ctx.createGain()
 
@@ -51,6 +62,8 @@ export function useMiniGameSounds() {
   const playImpact = useCallback((intensity: number = 0.5) => {
     try {
       const ctx = getAudioContext()
+      if (!ctx) return
+
       const osc = ctx.createOscillator()
       const gain = ctx.createGain()
       const filter = ctx.createBiquadFilter()
@@ -83,6 +96,8 @@ export function useMiniGameSounds() {
   const playWhoosh = useCallback((duration: number = 0.3) => {
     try {
       const ctx = getAudioContext()
+      if (!ctx) return
+
       const osc = ctx.createOscillator()
       const gain = ctx.createGain()
       const filter = ctx.createBiquadFilter()
@@ -117,6 +132,8 @@ export function useMiniGameSounds() {
   const playWin = useCallback(() => {
     try {
       const ctx = getAudioContext()
+      if (!ctx) return
+
       const notes = [523.25, 659.25, 783.99, 1046.50] // Do, Mi, Sol, Do (octave)
 
       notes.forEach((freq, i) => {
@@ -147,6 +164,8 @@ export function useMiniGameSounds() {
   const playScratch = useCallback(() => {
     try {
       const ctx = getAudioContext()
+      if (!ctx) return
+
       const bufferSize = ctx.sampleRate * 0.05 // 50ms
       const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate)
       const data = buffer.getChannelData(0)

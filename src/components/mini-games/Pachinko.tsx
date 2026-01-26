@@ -497,7 +497,7 @@ export default function Pachinko({
 
     drawBoard()
     animationRef.current = requestAnimationFrame(animate)
-  }, [drawBoard, getTargetX, onComplete, targetSlot, playTick, playImpact, playWin, vibrate, getTargetX, targetSlot])
+  }, [drawBoard, getTargetX, onComplete, targetSlot, playTick, playImpact, playWin, vibrate])
 
   useEffect(() => {
     return () => {

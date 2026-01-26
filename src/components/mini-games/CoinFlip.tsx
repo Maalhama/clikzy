@@ -54,7 +54,7 @@ export default function CoinFlip({
       }, 3000)
       return () => clearTimeout(timer)
     }
-  }, [game.isCompleted, game.reset])
+  }, [game])
 
   // Tick à chaque rotation visible pendant le flip
   useEffect(() => {

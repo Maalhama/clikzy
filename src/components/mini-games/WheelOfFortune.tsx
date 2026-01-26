@@ -35,7 +35,6 @@ export default function WheelOfFortune({
   const [showWinCelebration, setShowWinCelebration] = useState(false)
   const [pointerTickCount, setPointerTickCount] = useState(0)
   const wheelRef = useRef<HTMLDivElement>(null)
-  const tickIntervalRef = useRef<NodeJS.Timeout | null>(null)
   const currentSegmentRef = useRef<number>(0)
   const spinStartTimeRef = useRef<number>(0)
 
