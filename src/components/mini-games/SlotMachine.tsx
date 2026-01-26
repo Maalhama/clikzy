@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useCallback, useEffect, useRef } from 'react'
+import React, { useState, useCallback, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Trophy, Zap, Sparkles } from 'lucide-react'
 import { SLOTS_SYMBOLS } from '@/types/miniGames'
@@ -35,7 +35,7 @@ function SparkleParticle({ delay, x, color }: { delay: number; x: number; color:
   )
 }
 
-// Single reel component with continuous vertical scroll animation
+// Single reel component with proper spinning animation
 function SpinningReel({
   isSpinning,
   isStopped,
@@ -47,121 +47,42 @@ function SpinningReel({
   finalSymbol: number
   reelIndex: number
 }) {
-  const [scrollOffset, setScrollOffset] = useState(0)
-  const scrollSpeedRef = useRef(0)
-  const rafRef = useRef<number | undefined>(undefined)
-  const lastTimeRef = useRef<number>(0)
-  const targetOffsetRef = useRef(0)
-  const isStoppingRef = useRef(false)
+  const [currentIndex, setCurrentIndex] = useState(0)
+  const [displaySymbols, setDisplaySymbols] = useState<number[]>([0, 1, 2])
 
-  const SYMBOL_HEIGHT = 80 // Height of each symbol in pixels
-  const SPIN_SPEED = 15 // Pixels per frame during spin (15px * 60fps = 900px/s)
-
-  // Continuous scroll animation with RAF
+  // Spin animation - cycle through symbols
   useEffect(() => {
     if (isSpinning && !isStopped) {
-      isStoppingRef.current = false
-      scrollSpeedRef.current = SPIN_SPEED + reelIndex * 2 // Slightly different speeds
-
-      const animate = (time: number) => {
-        if (!lastTimeRef.current) lastTimeRef.current = time
-        const deltaTime = time - lastTimeRef.current
-        lastTimeRef.current = time
-
-        // Update scroll offset
-        setScrollOffset(prev => prev + scrollSpeedRef.current * (deltaTime / 16.67)) // Normalize to 60fps
-
-        if (isSpinning && !isStoppingRef.current) {
-          rafRef.current = requestAnimationFrame(animate)
-        }
-      }
-
-      rafRef.current = requestAnimationFrame(animate)
-
-      return () => {
-        if (rafRef.current) cancelAnimationFrame(rafRef.current)
-      }
+      const interval = setInterval(() => {
+        setCurrentIndex(prev => (prev + 1) % REEL_ITEMS.length)
+      }, 80 - reelIndex * 10) // Slightly different speeds for each reel
+      return () => clearInterval(interval)
     }
   }, [isSpinning, isStopped, reelIndex])
 
-  // Smooth stopping animation with ease-out
+  // Update display symbols based on current index
   useEffect(() => {
-    if (isStopped && !isStoppingRef.current) {
-      isStoppingRef.current = true
-
-      // Calculate target offset to land exactly on finalSymbol
-      const currentSymbolIndex = Math.floor(scrollOffset / SYMBOL_HEIGHT) % REEL_ITEMS.length
-      const distanceToFinal = ((finalSymbol - currentSymbolIndex + REEL_ITEMS.length) % REEL_ITEMS.length)
-
-      // Add extra spins for dramatic effect (2-3 full rotations)
-      const extraSpins = 2 + Math.random()
-      const targetDistance = (distanceToFinal + extraSpins * REEL_ITEMS.length) * SYMBOL_HEIGHT
-      targetOffsetRef.current = scrollOffset + targetDistance
-
-      const startOffset = scrollOffset
-      const startTime = performance.now()
-      const duration = 800 + reelIndex * 200 // Staggered stop duration
-
-      const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3)
-
-      const animateStop = (time: number) => {
-        const elapsed = time - startTime
-        const progress = Math.min(elapsed / duration, 1)
-        const easedProgress = easeOutCubic(progress)
-
-        const newOffset = startOffset + (targetOffsetRef.current - startOffset) * easedProgress
-        setScrollOffset(newOffset)
-
-        if (progress < 1) {
-          rafRef.current = requestAnimationFrame(animateStop)
-        } else {
-          // Spring bounce at the end
-          const bounceStart = performance.now()
-          const bounceDuration = 200
-
-          const animateBounce = (time: number) => {
-            const elapsed = time - bounceStart
-            const progress = Math.min(elapsed / bounceDuration, 1)
-
-            // Small bounce: overshoot then settle
-            const bounce = Math.sin(progress * Math.PI * 2) * (1 - progress) * 5
-            setScrollOffset(targetOffsetRef.current + bounce)
-
-            if (progress < 1) {
-              rafRef.current = requestAnimationFrame(animateBounce)
-            }
-          }
-
-          rafRef.current = requestAnimationFrame(animateBounce)
-        }
-      }
-
-      rafRef.current = requestAnimationFrame(animateStop)
-
-      return () => {
-        if (rafRef.current) cancelAnimationFrame(rafRef.current)
-      }
+    if (isSpinning && !isStopped) {
+      const prev = (currentIndex - 1 + REEL_ITEMS.length) % REEL_ITEMS.length
+      const next = (currentIndex + 1) % REEL_ITEMS.length
+      setDisplaySymbols([prev, currentIndex, next])
     }
-  }, [isStopped, finalSymbol, reelIndex])
+  }, [currentIndex, isSpinning, isStopped])
 
-  // Calculate which symbols to display based on scroll offset
-  const getVisibleSymbols = () => {
-    const baseIndex = Math.floor(scrollOffset / SYMBOL_HEIGHT)
-    // Show 5 symbols for smooth scrolling (2 above, center, 2 below)
-    return [-2, -1, 0, 1, 2].map(offset => {
-      const index = (baseIndex + offset + REEL_ITEMS.length * 100) % REEL_ITEMS.length
-      return { symbol: REEL_ITEMS[index], offset }
-    })
-  }
-
-  const visibleSymbols = getVisibleSymbols()
-  const scrollPosition = -(scrollOffset % (REEL_ITEMS.length * SYMBOL_HEIGHT))
+  // When stopped, show final symbol
+  useEffect(() => {
+    if (isStopped) {
+      const prev = (finalSymbol - 1 + REEL_ITEMS.length) % REEL_ITEMS.length
+      const next = (finalSymbol + 1) % REEL_ITEMS.length
+      setDisplaySymbols([prev, finalSymbol, next])
+    }
+  }, [isStopped, finalSymbol])
 
   return (
     <div
       className="relative w-16 h-20 sm:w-20 sm:h-24 bg-gradient-to-b from-[#0B0F1A] to-[#141B2D] rounded-lg overflow-hidden border-2 border-[#2A3A5A] shadow-[inset_0_0_15px_rgba(0,0,0,0.5)]"
       style={{
-        willChange: isSpinning && !isStopped ? 'transform, filter' : 'auto',
+        willChange: isSpinning && !isStopped ? 'filter' : 'auto',
       }}
     >
       {/* Reel window highlight */}
@@ -171,42 +92,29 @@ function SpinningReel({
       <div className="absolute left-0 top-0 bottom-0 w-2 bg-gradient-to-r from-[#9B5CFF]/20 to-transparent pointer-events-none z-10" />
       <div className="absolute right-0 top-0 bottom-0 w-2 bg-gradient-to-l from-[#9B5CFF]/20 to-transparent pointer-events-none z-10" />
 
-      {/* Symbols container - continuous scroll */}
-      <div
-        className="absolute inset-0 flex flex-col items-center justify-start pt-2"
+      {/* Symbols container */}
+      <motion.div
+        className="absolute inset-0 flex flex-col items-center justify-center"
+        animate={isSpinning && !isStopped ? { y: [0, -20, 0] } : {}}
+        transition={isSpinning && !isStopped ? { duration: 0.08, repeat: Infinity, ease: 'linear' } : {}}
         style={{
-          transform: `translateY(${scrollPosition}px)`,
           filter: isSpinning && !isStopped ? 'blur(2px)' : 'blur(0px)',
-          transition: isStopped ? 'filter 0.3s ease-out' : 'none',
+          transition: 'filter 0.3s ease-out',
         }}
       >
-        {visibleSymbols.map((item, index) => {
-          const isCenterSymbol = item.offset === 0
-          const distanceFromCenter = Math.abs(item.offset)
-
-          return (
-            <div
-              key={`${index}-${item.symbol}`}
-              className="flex items-center justify-center"
-              style={{
-                height: `${SYMBOL_HEIGHT}px`,
-                minHeight: `${SYMBOL_HEIGHT}px`,
-              }}
-            >
-              <span
-                className={`
-                  ${isCenterSymbol ? 'text-4xl sm:text-5xl drop-shadow-[0_0_8px_rgba(255,255,255,0.3)]' : 'text-2xl sm:text-3xl'}
-                  ${distanceFromCenter === 1 ? 'opacity-30 blur-[1px]' : ''}
-                  ${distanceFromCenter === 2 ? 'opacity-10 blur-[2px]' : ''}
-                  transition-opacity duration-200
-                `}
-              >
-                {item.symbol}
-              </span>
-            </div>
-          )
-        })}
-      </div>
+        {/* Top symbol (blurred) */}
+        <span className="text-2xl sm:text-3xl opacity-30 blur-[1px] -mb-0.5">
+          {REEL_ITEMS[displaySymbols[0]]}
+        </span>
+        {/* Center symbol (main) */}
+        <span className="text-4xl sm:text-5xl drop-shadow-[0_0_8px_rgba(255,255,255,0.3)]">
+          {REEL_ITEMS[displaySymbols[1]]}
+        </span>
+        {/* Bottom symbol (blurred) */}
+        <span className="text-2xl sm:text-3xl opacity-30 blur-[1px] -mt-0.5">
+          {REEL_ITEMS[displaySymbols[2]]}
+        </span>
+      </motion.div>
 
       {/* Stop flash effect - enhanced */}
       <AnimatePresence>
@@ -355,77 +263,18 @@ export default function SlotMachine({
         )}
       </div>
 
-      {/* Win Particles - Enhanced */}
+      {/* Win Particles */}
       <AnimatePresence>
         {showParticles && (
           <>
-            {/* Sparkles existants */}
             {[...Array(12)].map((_, i) => (
               <SparkleParticle
-                key={`sparkle-${i}`}
+                key={i}
                 delay={i * 0.1}
                 x={(i - 6) * 25}
                 color={i % 2 === 0 ? 'text-[#FFB800]' : 'text-[#9B5CFF]'}
               />
             ))}
-
-            {/* Cascade de pièces pour jackpots */}
-            {(isJackpot || allMatch) && (
-              <>
-                {[...Array(20)].map((_, i) => {
-                  const xStart = (Math.random() - 0.5) * 300
-                  const delay = i * 0.1
-
-                  return (
-                    <motion.div
-                      key={`coin-${i}`}
-                      initial={{ opacity: 0, x: xStart, y: -150, rotate: 0, scale: 0 }}
-                      animate={{
-                        opacity: [0, 1, 1, 0],
-                        x: xStart + (Math.random() - 0.5) * 100,
-                        y: 300,
-                        rotate: [0, 180, 360, 540, 720],
-                        scale: [0, 1, 1, 0.5],
-                      }}
-                      transition={{ duration: 2 + Math.random(), delay, ease: 'easeIn' }}
-                      className="absolute top-1/2 left-1/2 pointer-events-none z-50"
-                    >
-                      <div
-                        className="w-8 h-8 rounded-full"
-                        style={{
-                          background: 'radial-gradient(circle at 30% 30%, #FFD700, #FFB800, #FF8C00)',
-                          boxShadow: '0 0 16px rgba(255, 184, 0, 0.9), inset 0 0 8px rgba(255, 255, 255, 0.5)',
-                          border: '2px solid #FFD700',
-                        }}
-                      />
-                    </motion.div>
-                  )
-                })}
-
-                {/* Explosion d'étoiles supplémentaires */}
-                {[...Array(16)].map((_, i) => {
-                  const angle = (i / 16) * Math.PI * 2
-                  const distance = 100 + Math.random() * 60
-
-                  return (
-                    <motion.div
-                      key={`extra-star-${i}`}
-                      initial={{ opacity: 0, scale: 0, x: 0, y: 0 }}
-                      animate={{
-                        opacity: [0, 1, 0],
-                        scale: [0, 1.5, 0.5],
-                        x: Math.cos(angle) * distance,
-                        y: Math.sin(angle) * distance,
-                      }}
-                      transition={{ duration: 1.5, delay: i * 0.05 + 0.3 }}
-                      className="absolute top-1/2 left-1/2 pointer-events-none z-50"
-                    >
-                      <Sparkles size={20} className="text-[#FFB800]" />
-                    </motion.div>
-                  )
-                })}
-              </>
-            )}
           </>
         )}
       </AnimatePresence>
@@ -523,7 +372,7 @@ export default function SlotMachine({
               whileTap={!isSpinning && !disabled ? { scale: 0.95 } : {}}
               className={`
                 relative px-8 py-2.5 rounded-lg font-bold text-sm uppercase tracking-wider
-                transition-all duration-300 overflow-hidden min-h-[44px]
+                transition-all duration-300 overflow-hidden
                 ${isSpinning || disabled
                   ? 'bg-[#1E2942] text-[#4A5568] cursor-not-allowed'
                   : 'bg-gradient-to-r from-[#9B5CFF] to-[#FF4FD8] text-white shadow-[0_0_20px_rgba(155,92,255,0.5)]'

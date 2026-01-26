@@ -393,17 +393,6 @@ export default function Pachinko({
     ball.x += ball.vx
     ball.y += ball.vy
 
-    // Émettre trail de particules derrière la bille
-    if (particleManagerRef.current) {
-      particleManagerRef.current.emitTrail(ball.x, ball.y, {
-        color: '#3CCBFF',
-        size: 3,
-        lifetime: 400,
-        gravity: 0.05,
-        type: 'trail',
-      })
-    }
-
     // Wall collisions with margin to prevent ball getting stuck
     if (ball.x - BALL_RADIUS < WALL_MARGIN) {
       ball.x = WALL_MARGIN + BALL_RADIUS
