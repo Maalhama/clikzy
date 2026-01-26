@@ -33,7 +33,7 @@ export default function WheelOfFortune({
   const [rotation, setRotation] = useState(0)
   const [hasFinished, setHasFinished] = useState(false)
   const [showWinCelebration, setShowWinCelebration] = useState(false)
-  const [pointerFlash, setPointerFlash] = useState(false)
+  const [pointerTickCount, setPointerTickCount] = useState(0)
   const wheelRef = useRef<HTMLDivElement>(null)
   const tickIntervalRef = useRef<NodeJS.Timeout | null>(null)
   const currentSegmentRef = useRef<number>(0)
@@ -66,9 +66,8 @@ export default function WheelOfFortune({
           const pitch = 0.6 + progress * 0.8 // De 0.6 à 1.4
           playTick(pitch)
 
-          // Flash visuel sur le pointer
-          setPointerFlash(true)
-          setTimeout(() => setPointerFlash(false), 80)
+          // Incrémenter le compteur pour forcer l'animation du pointer
+          setPointerTickCount(prev => prev + 1)
 
           lastSegment = currentSeg
           currentSegmentRef.current = currentSeg
@@ -95,6 +94,7 @@ export default function WheelOfFortune({
     setIsSpinning(true)
     setHasFinished(false)
     setShowWinCelebration(false)
+    setPointerTickCount(0)
 
     const segmentAngle = 360 / SEGMENTS.length
     const extraRotations = (5 + Math.floor(Math.random() * 3)) * 360
@@ -246,35 +246,38 @@ export default function WheelOfFortune({
       {/* The Pointer */}
       <div className="relative z-20 mb-[-16px]">
         <motion.div
-          animate={pointerFlash ? {
+          key={pointerTickCount}
+          initial={{ rotate: 0, y: 0 }}
+          animate={{
             rotate: [0, 8, -3, 0],
             y: [0, 2, 0, 0],
-          } : {}}
+          }}
           transition={{
             duration: 0.15,
             ease: "easeOut"
           }}
         >
           <motion.div
-            animate={pointerFlash ? {
+            key={`inner-${pointerTickCount}`}
+            initial={{ filter: 'brightness(1)', scale: 1 }}
+            animate={{
               filter: ['brightness(1)', 'brightness(2)', 'brightness(1)'],
               scale: [1, 1.1, 1],
-            } : {}}
+            }}
             transition={{ duration: 0.15 }}
             className="w-8 h-12 bg-gradient-to-b from-white to-slate-300 drop-shadow-[0_0_12px_rgba(255,255,255,0.5)]"
             style={{
               clipPath: 'polygon(50% 100%, 0% 0%, 100% 0%)',
-              boxShadow: pointerFlash ? '0 0 20px rgba(255, 215, 0, 0.9)' : 'none',
             }}
           />
           <motion.div
-            animate={pointerFlash ? { scale: [1, 1.3, 1] } : {}}
+            key={`dot-${pointerTickCount}`}
+            initial={{ scale: 1 }}
+            animate={{ scale: [1, 1.3, 1] }}
             transition={{ duration: 0.15 }}
             className="absolute -top-1 left-1/2 -translate-x-1/2 w-3 h-3 bg-white rounded-full"
             style={{
-              boxShadow: pointerFlash
-                ? '0 0 16px rgba(255, 215, 0, 1)'
-                : '0 0 8px white',
+              boxShadow: '0 0 8px white',
             }}
           />
         </motion.div>
