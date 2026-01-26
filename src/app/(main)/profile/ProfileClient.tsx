@@ -9,7 +9,6 @@ import { CreditPacksModal } from '@/components/modals/CreditPacksModal'
 import { GameHistorySection } from '@/components/profile/GameHistorySection'
 import { ReferralSection } from '@/components/profile/ReferralSection'
 import { BadgesSection } from '@/components/profile/BadgesSection'
-import { AudioSettings } from '@/components/settings/AudioSettings'
 import { getProductSvg } from '@/lib/utils/productImages'
 import type { Badge } from '@/actions/badges'
 import {
@@ -413,22 +412,6 @@ export function ProfileClient({ profile, wins, gamesPlayed, totalValueWon, gameH
 
         {/* Game History Section */}
         <GameHistorySection history={gameHistory} stats={historyStats} />
-
-        {/* Audio Settings Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-          className="mt-8"
-        >
-          <div className="flex items-center gap-2 mb-4">
-            <svg className="w-5 h-5 text-neon-blue" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
-            </svg>
-            <h2 className="text-lg font-bold text-white">Parametres Audio</h2>
-          </div>
-          <AudioSettings />
-        </motion.div>
 
         {/* Play CTA */}
         <motion.div
