@@ -66,42 +66,119 @@ function Dice3D({
   delay: number
   onAnimationComplete?: () => void
 }) {
-  const [currentRotation, setCurrentRotation] = useState({ x: 0, y: 0 })
+  const [animationPhase, setAnimationPhase] = useState<'tumbling' | 'bouncing' | 'settling' | 'settled'>('settled')
 
   // Map face values to rotations (which rotation shows which face on top)
-  const faceRotations: Record<number, { x: number; y: number }> = {
-    1: { x: 0, y: 0 },
-    2: { x: 0, y: 90 },
-    3: { x: -90, y: 0 },
-    4: { x: 90, y: 0 },
-    5: { x: 0, y: -90 },
-    6: { x: 180, y: 0 },
+  const faceRotations: Record<number, { x: number; y: number; z: number }> = {
+    1: { x: 0, y: 0, z: 0 },
+    2: { x: 0, y: 90, z: 0 },
+    3: { x: -90, y: 0, z: 0 },
+    4: { x: 90, y: 0, z: 0 },
+    5: { x: 0, y: -90, z: 0 },
+    6: { x: 180, y: 0, z: 0 },
   }
+
+  const finalRotation = faceRotations[finalValue]
 
   useEffect(() => {
     if (isRolling) {
-      // Animate through random rotations during roll
-      const interval = setInterval(() => {
-        setCurrentRotation({
-          x: Math.random() * 360,
-          y: Math.random() * 360,
-        })
-      }, 100)
+      // Phase 1: Tumbling (chaotic rotation)
+      setAnimationPhase('tumbling')
 
-      // Stop after animation and land on final value
-      const timeout = setTimeout(() => {
-        clearInterval(interval)
-        setCurrentRotation(faceRotations[finalValue])
+      // Phase 2: Bouncing (landing with multiple bounces)
+      const bouncingTimeout = setTimeout(() => {
+        setAnimationPhase('bouncing')
+      }, 1200 + delay * 200)
+
+      // Phase 3: Settling (micro-oscillations)
+      const settlingTimeout = setTimeout(() => {
+        setAnimationPhase('settling')
+      }, 1800 + delay * 200)
+
+      // Phase 4: Settled (final position)
+      const settledTimeout = setTimeout(() => {
+        setAnimationPhase('settled')
         if (onAnimationComplete) onAnimationComplete()
-      }, 1500 + delay * 1000)
+      }, 2200 + delay * 200)
 
       return () => {
-        clearInterval(interval)
-        clearTimeout(timeout)
+        clearTimeout(bouncingTimeout)
+        clearTimeout(settlingTimeout)
+        clearTimeout(settledTimeout)
       }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isRolling, finalValue, delay])
+  }, [isRolling, delay])
+
+  // Physics-based animation variants
+  const getTumblingAnimation = () => {
+    // Chaotic tumbling with different speeds on each axis
+    const baseSpins = 3 + Math.random() * 2
+    return {
+      rotateX: [0, 360 * baseSpins + (Math.random() - 0.5) * 180],
+      rotateY: [0, 360 * (baseSpins + 0.5) + (Math.random() - 0.5) * 180],
+      rotateZ: [0, 360 * (baseSpins - 0.3) + (Math.random() - 0.5) * 180],
+      y: [0, -40, -25, -45, -20, -35, -10],
+    }
+  }
+
+  const getBouncingAnimation = () => {
+    // Multiple bounces with decreasing height
+    return {
+      rotateX: [
+        null, // Start from current
+        finalRotation.x + 720, // Extra spins while bouncing
+        finalRotation.x + 360,
+        finalRotation.x + 180,
+        finalRotation.x,
+      ],
+      rotateY: [
+        null,
+        finalRotation.y + 720,
+        finalRotation.y + 360,
+        finalRotation.y + 180,
+        finalRotation.y,
+      ],
+      rotateZ: [
+        null,
+        finalRotation.z + 360,
+        finalRotation.z + 180,
+        finalRotation.z + 90,
+        finalRotation.z,
+      ],
+      y: [null, -15, 0, -8, 0, -3, 0], // Bounces: 15px, 8px, 3px
+    }
+  }
+
+  const getSettlingAnimation = () => {
+    // Micro-oscillations (wobble) around final position
+    return {
+      rotateX: [
+        finalRotation.x,
+        finalRotation.x + 5,
+        finalRotation.x - 3,
+        finalRotation.x + 2,
+        finalRotation.x - 1,
+        finalRotation.x,
+      ],
+      rotateY: [
+        finalRotation.y,
+        finalRotation.y - 4,
+        finalRotation.y + 3,
+        finalRotation.y - 2,
+        finalRotation.y + 1,
+        finalRotation.y,
+      ],
+      rotateZ: [
+        finalRotation.z,
+        finalRotation.z + 3,
+        finalRotation.z - 2,
+        finalRotation.z + 1,
+        finalRotation.z,
+      ],
+      y: [0, -1, 0, -0.5, 0],
+    }
+  }
 
   return (
     <motion.div
@@ -111,11 +188,10 @@ function Dice3D({
       animate={{
         scale: 1,
         opacity: 1,
-        y: isRolling ? [-15, 0, -30, 0, -15, 0] : 0,
       }}
       transition={{
         scale: { duration: 0.3, delay: delay * 0.3 },
-        y: { duration: 1.5, repeat: isRolling ? Infinity : 0 },
+        opacity: { duration: 0.3, delay: delay * 0.3 },
       }}
     >
       <motion.div
@@ -123,15 +199,41 @@ function Dice3D({
         style={{
           transformStyle: 'preserve-3d',
         }}
-        animate={{
-          rotateX: isRolling ? [0, 720, 1440, 2160] : currentRotation.x,
-          rotateY: isRolling ? [0, 720, 1440, 2160] : currentRotation.y,
-        }}
-        transition={{
-          duration: isRolling ? 1.5 : 0.5,
-          delay: delay * 0.2,
-          ease: isRolling ? 'easeInOut' : 'easeOut',
-        }}
+        animate={
+          animationPhase === 'tumbling'
+            ? getTumblingAnimation()
+            : animationPhase === 'bouncing'
+              ? getBouncingAnimation()
+              : animationPhase === 'settling'
+                ? getSettlingAnimation()
+                : {
+                    rotateX: finalRotation.x,
+                    rotateY: finalRotation.y,
+                    rotateZ: finalRotation.z,
+                    y: 0,
+                  }
+        }
+        transition={
+          animationPhase === 'tumbling'
+            ? {
+                duration: 1.2,
+                ease: [0.25, 0.1, 0.25, 1], // Custom easing for chaotic feel
+              }
+            : animationPhase === 'bouncing'
+              ? {
+                  duration: 0.6,
+                  ease: [0.34, 1.56, 0.64, 1], // Bounce easing
+                }
+              : animationPhase === 'settling'
+                ? {
+                    duration: 0.4,
+                    ease: [0.16, 1, 0.3, 1], // Smooth settle
+                  }
+                : {
+                    duration: 0.3,
+                    ease: 'easeOut',
+                  }
+        }
       >
         {/* Front face (1) */}
         <DiceFace
@@ -240,18 +342,70 @@ function Dice3D({
         </div>
       </motion.div>
 
-      {/* Shadow */}
+      {/* Shadow - synchronized with dice bounces */}
       <motion.div
         className="absolute -bottom-4 left-1/2 -translate-x-1/2 w-16 h-4 bg-black/30 rounded-full blur-md"
-        animate={{
-          scale: isRolling ? [1, 0.5, 1] : 1,
-          opacity: isRolling ? [0.3, 0.1, 0.3] : 0.3,
-        }}
-        transition={{ duration: 0.5, repeat: isRolling ? Infinity : 0 }}
+        animate={
+          animationPhase === 'tumbling'
+            ? {
+                scale: [1, 0.5, 0.6, 0.4, 0.6, 0.5, 0.7],
+                opacity: [0.3, 0.1, 0.15, 0.08, 0.15, 0.12, 0.2],
+              }
+            : animationPhase === 'bouncing'
+              ? {
+                  scale: [0.7, 0.8, 1, 0.9, 1, 0.95, 1],
+                  opacity: [0.2, 0.15, 0.3, 0.2, 0.3, 0.25, 0.3],
+                }
+              : animationPhase === 'settling'
+                ? {
+                    scale: [1, 0.98, 1],
+                    opacity: [0.3, 0.28, 0.3],
+                  }
+                : {
+                    scale: 1,
+                    opacity: 0.3,
+                  }
+        }
+        transition={
+          animationPhase === 'tumbling'
+            ? { duration: 1.2 }
+            : animationPhase === 'bouncing'
+              ? { duration: 0.6 }
+              : animationPhase === 'settling'
+                ? { duration: 0.4 }
+                : { duration: 0.3 }
+        }
       />
 
-      {/* Glow effect when showing value */}
-      {!isRolling && (
+      {/* Glow effect - dynamic based on phase */}
+      {animationPhase !== 'settled' && isRolling && (
+        <motion.div
+          className="absolute inset-0 rounded-lg pointer-events-none"
+          animate={
+            animationPhase === 'tumbling'
+              ? {
+                  opacity: [0.2, 0.6, 0.2],
+                  scale: [1, 1.3, 1],
+                }
+              : animationPhase === 'bouncing'
+                ? {
+                    opacity: [0.6, 0.8, 0.4],
+                    scale: [1, 1.2, 1],
+                  }
+                : {
+                    opacity: [0.4, 1],
+                    scale: [1, 1.1],
+                  }
+          }
+          transition={{
+            duration: animationPhase === 'tumbling' ? 1.2 : animationPhase === 'bouncing' ? 0.6 : 0.4,
+          }}
+          style={{
+            boxShadow: `0 0 40px ${color}`,
+          }}
+        />
+      )}
+      {animationPhase === 'settled' && !isRolling && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -291,24 +445,44 @@ export default function DiceRoll({
     playWhoosh(0.5)
     vibrate(50)
 
-    // Impacts multiples pendant la rotation (simule les rebonds)
-    const impactTimes = [300, 600, 900, 1200, 1500, 1800]
-    impactTimes.forEach((time, i) => {
+    // Impacts pendant la phase tumbling (hits en l'air)
+    const tumblingImpacts = [300, 600, 900]
+    tumblingImpacts.forEach((time, i) => {
       setTimeout(() => {
-        const intensity = 0.2 + (i * 0.05)
-        playImpact(intensity)
-        vibrate(20)
+        playImpact(0.15 + i * 0.05)
+        vibrate(15)
       }, time)
     })
 
+    // Impacts des bounces (landing phase) - synchronized with bounce animation
+    // Bounce 1: fort (1200ms) - Premier atterrissage
     setTimeout(() => {
-      // Impact final au sol
-      playImpact(0.7)
-      vibrate([80, 30, 80])
-
-      // Screen shake à l'atterrissage
+      playImpact(0.6)
+      vibrate(50)
       setScreenShake(true)
-      setTimeout(() => setScreenShake(false), 300)
+      setTimeout(() => setScreenShake(false), 100)
+    }, 1200)
+
+    // Bounce 2: moyen (1400ms)
+    setTimeout(() => {
+      playImpact(0.4)
+      vibrate(30)
+      setScreenShake(true)
+      setTimeout(() => setScreenShake(false), 80)
+    }, 1400)
+
+    // Bounce 3: léger (1600ms)
+    setTimeout(() => {
+      playImpact(0.25)
+      vibrate(20)
+      setScreenShake(true)
+      setTimeout(() => setScreenShake(false), 60)
+    }, 1600)
+
+    // Settling: micro-impact (1800ms)
+    setTimeout(() => {
+      playImpact(0.15)
+      vibrate(10)
 
       setIsRolling(false)
 

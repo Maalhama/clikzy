@@ -33,22 +33,28 @@ export default function WheelOfFortune({
   const [rotation, setRotation] = useState(0)
   const [hasFinished, setHasFinished] = useState(false)
   const [showWinCelebration, setShowWinCelebration] = useState(false)
+  const [pointerFlash, setPointerFlash] = useState(false)
   const wheelRef = useRef<HTMLDivElement>(null)
   const tickIntervalRef = useRef<NodeJS.Timeout | null>(null)
   const currentSegmentRef = useRef<number>(0)
+  const spinStartTimeRef = useRef<number>(0)
 
   const { playTick, playWhoosh, playImpact, playWin, vibrate } = useMiniGameSounds()
 
-  // Effet de tick audio pendant la rotation
+  // Effet de tick audio/visuel amélioré pendant la rotation
   useEffect(() => {
     if (isSpinning) {
       // Whoosh au début
       playWhoosh(0.5)
+      spinStartTimeRef.current = Date.now()
 
-      let tickSpeed = 50 // ms entre chaque tick
       let lastSegment = currentSegmentRef.current
+      let animationFrameId: number
 
-      tickIntervalRef.current = setInterval(() => {
+      const checkTick = () => {
+        const elapsed = Date.now() - spinStartTimeRef.current
+        const progress = Math.min(elapsed / 5000, 1) // 5s total
+
         // Calculer le segment actuel basé sur la rotation
         const currentRotation = rotation % 360
         const segmentAngle = 360 / SEGMENTS.length
@@ -56,24 +62,29 @@ export default function WheelOfFortune({
 
         if (currentSeg !== lastSegment) {
           // Son tick à chaque changement de segment
-          const pitch = 0.8 + Math.random() * 0.4
+          // Pitch augmente progressivement pour créer de la tension
+          const pitch = 0.6 + progress * 0.8 // De 0.6 à 1.4
           playTick(pitch)
+
+          // Flash visuel sur le pointer
+          setPointerFlash(true)
+          setTimeout(() => setPointerFlash(false), 80)
+
           lastSegment = currentSeg
+          currentSegmentRef.current = currentSeg
         }
 
-        // Ralentir les ticks progressivement
-        tickSpeed *= 1.05
-      }, tickSpeed)
-    } else {
-      if (tickIntervalRef.current) {
-        clearInterval(tickIntervalRef.current)
-        tickIntervalRef.current = null
+        if (isSpinning) {
+          animationFrameId = requestAnimationFrame(checkTick)
+        }
       }
-    }
 
-    return () => {
-      if (tickIntervalRef.current) {
-        clearInterval(tickIntervalRef.current)
+      animationFrameId = requestAnimationFrame(checkTick)
+
+      return () => {
+        if (animationFrameId) {
+          cancelAnimationFrame(animationFrameId)
+        }
       }
     }
   }, [isSpinning, playTick, playWhoosh, rotation])
@@ -240,11 +251,28 @@ export default function WheelOfFortune({
             transition: { repeat: Infinity, duration: 0.2 }
           } : { rotate: 0 }}
         >
-          <div
+          <motion.div
+            animate={pointerFlash ? {
+              filter: ['brightness(1)', 'brightness(2)', 'brightness(1)'],
+              scale: [1, 1.1, 1],
+            } : {}}
+            transition={{ duration: 0.15 }}
             className="w-8 h-12 bg-gradient-to-b from-white to-slate-300 drop-shadow-[0_0_12px_rgba(255,255,255,0.5)]"
-            style={{ clipPath: 'polygon(50% 100%, 0% 0%, 100% 0%)' }}
+            style={{
+              clipPath: 'polygon(50% 100%, 0% 0%, 100% 0%)',
+              boxShadow: pointerFlash ? '0 0 20px rgba(255, 215, 0, 0.9)' : 'none',
+            }}
           />
-          <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-3 h-3 bg-white rounded-full shadow-[0_0_8px_white]" />
+          <motion.div
+            animate={pointerFlash ? { scale: [1, 1.3, 1] } : {}}
+            transition={{ duration: 0.15 }}
+            className="absolute -top-1 left-1/2 -translate-x-1/2 w-3 h-3 bg-white rounded-full"
+            style={{
+              boxShadow: pointerFlash
+                ? '0 0 16px rgba(255, 215, 0, 1)'
+                : '0 0 8px white',
+            }}
+          />
         </motion.div>
       </div>
 

@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Trophy, Sparkles, Zap } from 'lucide-react'
 import { useMiniGameSounds } from '@/hooks/mini-games/useMiniGameSounds'
+import { useMiniGameStateMachine } from '@/hooks/mini-games/useMiniGameStateMachine'
 
 interface CoinFlipProps {
   onComplete: (creditsWon: number) => void
@@ -18,57 +19,56 @@ export default function CoinFlip({
   prizeAmount,
   disabled = false,
 }: CoinFlipProps) {
-  const [isFlipping, setIsFlipping] = useState(false)
-  const [hasFinished, setHasFinished] = useState(false)
-  const [showResult, setShowResult] = useState(false)
   const [showWinCelebration, setShowWinCelebration] = useState(false)
 
   const { playTick, playWhoosh, playImpact, playWin, vibrate } = useMiniGameSounds()
 
+  // State machine for game flow
+  const game = useMiniGameStateMachine({
+    onStart: () => {
+      setShowWinCelebration(false)
+      playWhoosh(0.6)
+      vibrate(50)
+    },
+    onStop: () => {
+      playImpact(0.5)
+      vibrate(60)
+    },
+    onComplete: () => {
+      if (prizeAmount > 0) {
+        setShowWinCelebration(true)
+        playWin()
+        vibrate([100, 50, 100])
+      } else {
+        vibrate(30)
+      }
+      onComplete(prizeAmount)
+    },
+  })
+
   // Tick à chaque rotation visible pendant le flip
   useEffect(() => {
-    if (isFlipping) {
+    if (game.isPlaying) {
       const tickInterval = setInterval(() => {
         playTick(1.5 + Math.random() * 0.3)
       }, 111) // ~9 ticks pendant 2s (180° rotation = 111ms)
 
       return () => clearInterval(tickInterval)
     }
-  }, [isFlipping, playTick])
+  }, [game.isPlaying, playTick])
 
   const flipCoin = () => {
-    if (isFlipping || disabled) return
+    if (disabled || !game.isIdle) return
 
-    setIsFlipping(true)
-    setHasFinished(false)
-    setShowResult(false)
-    setShowWinCelebration(false)
+    // Start the game (idle -> playing)
+    if (!game.start()) return
 
-    // Whoosh au début du flip
-    playWhoosh(0.6)
-    vibrate(50)
-
-    // Flip animation duration
+    // Flip animation: playing -> stopping -> completed
     setTimeout(() => {
-      setShowResult(true)
-
-      // Impact au sol
-      playImpact(0.5)
-      vibrate(60)
+      game.stop() // playing -> stopping (show result)
 
       setTimeout(() => {
-        setIsFlipping(false)
-        setHasFinished(true)
-
-        if (prizeAmount > 0) {
-          setShowWinCelebration(true)
-          playWin()
-          vibrate([100, 50, 100])
-        } else {
-          vibrate(30)
-        }
-
-        onComplete(prizeAmount)
+        game.complete() // stopping -> completed
       }, 500)
     }, 2000)
   }
@@ -177,7 +177,7 @@ export default function CoinFlip({
       <div className="relative mb-4" style={{ perspective: '800px' }}>
         {/* Shadow */}
         <motion.div
-          animate={isFlipping ? { scale: [1, 0.5, 1], opacity: [0.3, 0.1, 0.3] } : {}}
+          animate={game.isPlaying ? { scale: [1, 0.5, 1], opacity: [0.3, 0.1, 0.3] } : {}}
           transition={{ duration: 2 }}
           className="absolute bottom-[-20px] left-1/2 -translate-x-1/2 w-24 h-6 bg-black/30 rounded-full blur-md"
         />
@@ -187,7 +187,7 @@ export default function CoinFlip({
           className="relative w-28 h-28 sm:w-32 sm:h-32 cursor-pointer"
           onClick={flipCoin}
           animate={
-            isFlipping
+            game.isPlaying
               ? {
                   rotateX: [0, 1800],
                   y: [0, -80, 0],
@@ -199,15 +199,15 @@ export default function CoinFlip({
             ease: [0.45, 0, 0.55, 1],
           }}
           style={{ transformStyle: 'preserve-3d' }}
-          whileHover={!isFlipping && !disabled && !hasFinished ? { scale: 1.05 } : {}}
-          whileTap={!isFlipping && !disabled && !hasFinished ? { scale: 0.95 } : {}}
+          whileHover={!isFlipping && !disabled && !game.isCompleted ? { scale: 1.05 } : {}}
+          whileTap={!isFlipping && !disabled && !game.isCompleted ? { scale: 0.95 } : {}}
         >
           {/* Front (Heads) */}
           <div
             className="absolute inset-0 rounded-full flex items-center justify-center"
             style={{
               backfaceVisibility: 'hidden',
-              transform: showResult && result === 'tails' ? 'rotateX(180deg)' : 'rotateX(0deg)',
+              transform: (game.isStopping || game.isCompleted) && result === 'tails' ? 'rotateX(180deg)' : 'rotateX(0deg)',
             }}
           >
             <div className="w-full h-full rounded-full bg-gradient-to-br from-[#FFD700] via-[#FFB800] to-[#FF8C00] shadow-[0_0_30px_rgba(255,184,0,0.5),inset_0_-6px_12px_rgba(0,0,0,0.3),inset_0_6px_12px_rgba(255,255,255,0.3)]">
@@ -224,7 +224,7 @@ export default function CoinFlip({
             className="absolute inset-0 rounded-full flex items-center justify-center"
             style={{
               backfaceVisibility: 'hidden',
-              transform: showResult && result === 'heads' ? 'rotateX(-180deg)' : 'rotateX(180deg)',
+              transform: (game.isStopping || game.isCompleted) && result === 'heads' ? 'rotateX(-180deg)' : 'rotateX(180deg)',
             }}
           >
             <div className="w-full h-full rounded-full bg-gradient-to-br from-[#C0C0C0] via-[#E8E8E8] to-[#A8A8A8] shadow-[0_0_30px_rgba(192,192,192,0.3),inset_0_-6px_12px_rgba(0,0,0,0.3),inset_0_6px_12px_rgba(255,255,255,0.4)]">
@@ -250,7 +250,7 @@ export default function CoinFlip({
             🪙 La pièce tourne...
           </motion.p>
         )}
-        {hasFinished && (
+        {game.isCompleted && (
           <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -264,7 +264,7 @@ export default function CoinFlip({
       </div>
 
       {/* Play Button - Compact */}
-      {!isFlipping && !hasFinished && (
+      {!isFlipping && !game.isCompleted && (
         <motion.button
           onClick={flipCoin}
           disabled={disabled}
@@ -286,7 +286,7 @@ export default function CoinFlip({
       {/* Result Card - Compact */}
       <div className="h-16 mt-3 flex items-center justify-center">
         <AnimatePresence mode="wait">
-          {hasFinished && (
+          {game.isCompleted && (
             <motion.div
               initial={{ opacity: 0, y: 10, scale: 0.9 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
