@@ -246,10 +246,14 @@ export default function WheelOfFortune({
       {/* The Pointer */}
       <div className="relative z-20 mb-[-16px]">
         <motion.div
-          animate={isSpinning ? {
-            rotate: [0, -15, 10, -10, 5, 0],
-            transition: { repeat: Infinity, duration: 0.2 }
-          } : { rotate: 0 }}
+          animate={pointerFlash ? {
+            rotate: [0, 8, -3, 0],
+            y: [0, 2, 0, 0],
+          } : {}}
+          transition={{
+            duration: 0.15,
+            ease: "easeOut"
+          }}
         >
           <motion.div
             animate={pointerFlash ? {
