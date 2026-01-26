@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useRef, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion, AnimatePresence, useAnimation } from 'framer-motion'
 import { Trophy, Zap, Sparkles } from 'lucide-react'
 import { useMiniGameSounds } from '@/hooks/mini-games/useMiniGameSounds'
 
@@ -40,6 +40,23 @@ export default function WheelOfFortune({
   const spinStartTimeRef = useRef<number>(0)
 
   const { playTick, playWhoosh, playImpact, playWin, vibrate } = useMiniGameSounds()
+
+  // Contrôles d'animation pour le pointer
+  const pointerControls = useAnimation()
+
+  // Déclencher l'animation du pointer à chaque tic
+  useEffect(() => {
+    if (pointerTickCount > 0) {
+      pointerControls.start({
+        rotate: [0, 8, -3, 0],
+        y: [0, 2, 0, 0],
+        transition: {
+          duration: 0.15,
+          ease: "easeOut"
+        }
+      })
+    }
+  }, [pointerTickCount, pointerControls])
 
   // Effet de tick audio/visuel amélioré pendant la rotation
   useEffect(() => {
@@ -246,36 +263,15 @@ export default function WheelOfFortune({
       {/* The Pointer */}
       <div className="relative z-20 mb-[-16px]">
         <motion.div
-          key={pointerTickCount}
+          animate={pointerControls}
           initial={{ rotate: 0, y: 0 }}
-          animate={{
-            rotate: [0, 8, -3, 0],
-            y: [0, 2, 0, 0],
-          }}
-          transition={{
-            duration: 0.15,
-            ease: "easeOut"
-          }}
         >
-          <motion.div
-            key={`inner-${pointerTickCount}`}
-            initial={{ filter: 'brightness(1)', scale: 1 }}
-            animate={{
-              filter: ['brightness(1)', 'brightness(2)', 'brightness(1)'],
-              scale: [1, 1.1, 1],
-            }}
-            transition={{ duration: 0.15 }}
-            className="w-8 h-12 bg-gradient-to-b from-white to-slate-300 drop-shadow-[0_0_12px_rgba(255,255,255,0.5)]"
+          <div className="w-8 h-12 bg-gradient-to-b from-white to-slate-300 drop-shadow-[0_0_12px_rgba(255,255,255,0.5)]"
             style={{
               clipPath: 'polygon(50% 100%, 0% 0%, 100% 0%)',
             }}
           />
-          <motion.div
-            key={`dot-${pointerTickCount}`}
-            initial={{ scale: 1 }}
-            animate={{ scale: [1, 1.3, 1] }}
-            transition={{ duration: 0.15 }}
-            className="absolute -top-1 left-1/2 -translate-x-1/2 w-3 h-3 bg-white rounded-full"
+          <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-3 h-3 bg-white rounded-full"
             style={{
               boxShadow: '0 0 8px white',
             }}
