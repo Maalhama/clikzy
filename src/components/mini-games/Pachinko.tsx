@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Trophy, Sparkles } from 'lucide-react'
 import { useMiniGameSounds } from '@/hooks/mini-games/useMiniGameSounds'
+import { ParticleManager } from '@/lib/particles/ParticleSystem'
 
 interface PachinkoProps {
   onComplete: (creditsWon: number) => void
@@ -34,6 +35,7 @@ interface Peg {
   x: number
   y: number
   hit: boolean
+  flashTime: number // Temps restant du flash en ms
 }
 
 export default function Pachinko({
@@ -49,8 +51,14 @@ export default function Pachinko({
   const pegsRef = useRef<Peg[]>([])
   const ballRef = useRef<Ball | null>(null)
   const dprRef = useRef<number>(1)
+  const particleManagerRef = useRef<ParticleManager | null>(null)
 
   const { playTick, playImpact, playWin, vibrate } = useMiniGameSounds()
+
+  // Initialiser le particle manager
+  useEffect(() => {
+    particleManagerRef.current = new ParticleManager(100)
+  }, [])
 
   // Generate pegs in pyramid pattern
   const generatePegs = useCallback(() => {
@@ -69,6 +77,7 @@ export default function Pachinko({
           x: startX + i * 30,
           y: startY + row * rowHeight,
           hit: false,
+          flashTime: 0,
         })
       }
     }
@@ -209,6 +218,27 @@ export default function Pachinko({
       ctx.arc(peg.x - 2, peg.y - 2, 2, 0, Math.PI * 2)
       ctx.fillStyle = 'rgba(255, 255, 255, 0.6)'
       ctx.fill()
+
+      // Flash effect on collision
+      if (peg.flashTime > 0) {
+        const flashIntensity = peg.flashTime / 200 // 0 à 1
+        const flashRadius = PEG_RADIUS + 4 + (1 - flashIntensity) * 6 // Expand pendant le flash
+
+        // Flash glow
+        ctx.beginPath()
+        ctx.arc(peg.x, peg.y, flashRadius, 0, Math.PI * 2)
+        ctx.fillStyle = `rgba(255, 255, 255, ${flashIntensity * 0.6})`
+        ctx.shadowColor = '#FFFFFF'
+        ctx.shadowBlur = flashRadius * 2
+        ctx.fill()
+        ctx.shadowBlur = 0
+
+        // Inner bright spot
+        ctx.beginPath()
+        ctx.arc(peg.x, peg.y, PEG_RADIUS, 0, Math.PI * 2)
+        ctx.fillStyle = `rgba(60, 203, 255, ${flashIntensity * 0.8})`
+        ctx.fill()
+      }
     })
 
     // Draw slots at bottom with better design
@@ -280,6 +310,11 @@ export default function Pachinko({
         ctx.shadowBlur = 0
       }
     })
+
+    // Draw particles (trail behind ball)
+    if (particleManagerRef.current) {
+      particleManagerRef.current.render(ctx)
+    }
 
     // Draw ball if exists
     if (ballRef.current) {
@@ -358,6 +393,17 @@ export default function Pachinko({
     ball.x += ball.vx
     ball.y += ball.vy
 
+    // Émettre trail de particules derrière la bille
+    if (particleManagerRef.current) {
+      particleManagerRef.current.emitTrail(ball.x, ball.y, {
+        color: '#3CCBFF',
+        size: 3,
+        lifetime: 400,
+        gravity: 0.05,
+        type: 'trail',
+      })
+    }
+
     // Wall collisions with margin to prevent ball getting stuck
     if (ball.x - BALL_RADIUS < WALL_MARGIN) {
       ball.x = WALL_MARGIN + BALL_RADIUS
@@ -376,11 +422,12 @@ export default function Pachinko({
       const minDist = BALL_RADIUS + PEG_RADIUS
 
       if (dist < minDist) {
-        // Son d'impact à chaque collision avec peg
+        // Son d'impact et flash à chaque collision avec peg
         if (!peg.hit) {
           const pitch = 1 + (peg.y / BOARD_HEIGHT) * 0.5
           playTick(pitch)
           vibrate(15)
+          peg.flashTime = 200 // Flash pendant 200ms
         }
 
         peg.hit = true
@@ -443,13 +490,25 @@ export default function Pachinko({
         onComplete(credits)
       }, 500)
 
+      // Nettoyer les particules à la fin
+      particleManagerRef.current?.clear()
       drawBoard()
       return
     }
 
+    // Mettre à jour les particules
+    particleManagerRef.current?.update()
+
+    // Décrémenter les flash times des pegs
+    pegsRef.current.forEach(peg => {
+      if (peg.flashTime > 0) {
+        peg.flashTime -= 16 // Approximation de 60fps
+      }
+    })
+
     drawBoard()
     animationRef.current = requestAnimationFrame(animate)
-  }, [drawBoard, getTargetX, onComplete, targetSlot])
+  }, [drawBoard, getTargetX, onComplete, targetSlot, playTick, playImpact, playWin, vibrate, getTargetX, targetSlot])
 
   useEffect(() => {
     return () => {

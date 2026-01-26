@@ -15,6 +15,15 @@ interface ScratchCardProps {
 const CARD_WIDTH = 240
 const CARD_HEIGHT = 150
 
+interface ScratchParticle {
+  id: number
+  x: number
+  y: number
+  vx: number
+  vy: number
+  color: string
+}
+
 export default function ScratchCard({
   onComplete,
   prizeAmount,
@@ -24,6 +33,8 @@ export default function ScratchCard({
   const [isScratching, setIsScratching] = useState(false)
   const [isRevealed, setIsRevealed] = useState(false)
   const dprRef = useRef<number>(1)
+  const [scratchParticles, setScratchParticles] = useState<ScratchParticle[]>([])
+  const particleIdRef = useRef(0)
 
   const { playScratch, playWin, vibrate } = useMiniGameSounds()
 
@@ -178,6 +189,32 @@ export default function ScratchCard({
     return (transparentPixels / totalSampled) * 100
   }
 
+  // Émettre des particules de grattage
+  const emitScratchParticles = useCallback((x: number, y: number) => {
+    const colors = ['#9B5CFF', '#FF4FD8', '#3CCBFF']
+    const newParticles: ScratchParticle[] = []
+
+    // Créer 3-5 particules
+    const count = 3 + Math.floor(Math.random() * 3)
+    for (let i = 0; i < count; i++) {
+      newParticles.push({
+        id: particleIdRef.current++,
+        x,
+        y,
+        vx: (Math.random() - 0.5) * 60,
+        vy: -20 - Math.random() * 40,
+        color: colors[Math.floor(Math.random() * colors.length)],
+      })
+    }
+
+    setScratchParticles(prev => [...prev, ...newParticles])
+
+    // Nettoyer après animation
+    setTimeout(() => {
+      setScratchParticles(prev => prev.filter(p => !newParticles.find(np => np.id === p.id)))
+    }, 1000)
+  }, [])
+
   const handleScratch = (e: React.MouseEvent | React.TouchEvent) => {
     if (disabled || isRevealed) return
 
@@ -207,6 +244,13 @@ export default function ScratchCard({
     const scaleY = CARD_HEIGHT / rect.height
     x *= scaleX
     y *= scaleY
+
+    // Émettre des particules de grattage à la position du curseur
+    if ('touches' in e) {
+      emitScratchParticles(e.touches[0].clientX, e.touches[0].clientY)
+    } else {
+      emitScratchParticles((e as React.MouseEvent).clientX, (e as React.MouseEvent).clientY)
+    }
 
     // Save current transform and apply DPR scale for this operation
     ctx.save()
@@ -362,6 +406,34 @@ export default function ScratchCard({
           onTouchEnd={() => setIsScratching(false)}
           onTouchMove={(e) => isScratching && handleScratch(e)}
         />
+
+        {/* Scratch Particles */}
+        <AnimatePresence>
+          {scratchParticles.map((particle) => (
+            <motion.div
+              key={particle.id}
+              initial={{
+                opacity: 1,
+                x: particle.x,
+                y: particle.y,
+                scale: 1,
+              }}
+              animate={{
+                opacity: 0,
+                x: particle.x + particle.vx,
+                y: particle.y + particle.vy,
+                scale: 0.3,
+              }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.8, ease: 'easeOut' }}
+              className="fixed w-1.5 h-1.5 rounded-full pointer-events-none z-50"
+              style={{
+                backgroundColor: particle.color,
+                boxShadow: `0 0 4px ${particle.color}`,
+              }}
+            />
+          ))}
+        </AnimatePresence>
 
         {/* Frame */}
         <div className={`absolute -inset-1 rounded-[20px] pointer-events-none z-30 transition-all duration-500 border-2 ${
