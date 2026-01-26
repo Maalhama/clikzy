@@ -86,26 +86,89 @@ export default function CoinFlip({
         />
       </div>
 
-      {/* Win Celebration Particles */}
+      {/* Win Celebration Particles - Enhanced */}
       <AnimatePresence>
         {showWinCelebration && (
           <>
-            {[...Array(20)].map((_, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 1, scale: 0, x: 0, y: 0 }}
-                animate={{
-                  opacity: [1, 1, 0],
-                  scale: [0, 1, 0.5],
-                  x: Math.cos((i / 20) * Math.PI * 2) * 150,
-                  y: Math.sin((i / 20) * Math.PI * 2) * 150,
-                }}
-                transition={{ duration: 1.5, delay: i * 0.03 }}
-                className="absolute top-1/2 left-1/2 pointer-events-none"
-              >
-                <Sparkles size={16} className={i % 2 === 0 ? 'text-[#FFB800]' : 'text-[#00FF88]'} />
-              </motion.div>
-            ))}
+            {/* Pièces dorées qui tombent */}
+            {[...Array(15)].map((_, i) => {
+              const xStart = (Math.random() - 0.5) * 300
+
+              return (
+                <motion.div
+                  key={`coin-${i}`}
+                  initial={{ opacity: 0, x: xStart, y: -100, rotate: 0 }}
+                  animate={{
+                    opacity: [0, 1, 1, 0],
+                    x: xStart + (Math.random() - 0.5) * 80,
+                    y: 250,
+                    rotate: [0, 180, 360, 540],
+                  }}
+                  transition={{ duration: 1.8 + Math.random() * 0.5, delay: i * 0.08, ease: 'easeIn' }}
+                  className="absolute top-1/2 left-1/2 pointer-events-none z-50"
+                >
+                  <div
+                    className="w-6 h-6 rounded-full"
+                    style={{
+                      background: 'linear-gradient(135deg, #FFD700, #FFB800, #FF8C00)',
+                      boxShadow: '0 0 12px rgba(255, 184, 0, 0.8)',
+                    }}
+                  />
+                </motion.div>
+              )
+            })}
+
+            {/* Explosion d'étoiles */}
+            {[...Array(20)].map((_, i) => {
+              const angle = (i / 20) * Math.PI * 2
+              const distance = 120 + Math.random() * 50
+              const colors = ['#FFB800', '#00FF88', '#3CCBFF']
+              const color = colors[i % colors.length]
+
+              return (
+                <motion.div
+                  key={`star-${i}`}
+                  initial={{ opacity: 0, scale: 0, x: 0, y: 0 }}
+                  animate={{
+                    opacity: [0, 1, 0],
+                    scale: [0, 1.2, 0.4],
+                    x: Math.cos(angle) * distance,
+                    y: Math.sin(angle) * distance,
+                  }}
+                  transition={{ duration: 1.3, delay: i * 0.03 }}
+                  className="absolute top-1/2 left-1/2 pointer-events-none z-50"
+                >
+                  <Sparkles size={16} className={`text-[${color}]`} style={{ color }} />
+                </motion.div>
+              )
+            })}
+
+            {/* Confetti */}
+            {[...Array(12)].map((_, i) => {
+              const xStart = (Math.random() - 0.5) * 200
+              const colors = ['#FFB800', '#FF4FD8', '#3CCBFF']
+              const color = colors[i % colors.length]
+
+              return (
+                <motion.div
+                  key={`confetti-${i}`}
+                  initial={{ opacity: 0, x: xStart, y: -50, rotate: 0 }}
+                  animate={{
+                    opacity: [0, 1, 0],
+                    x: xStart + (Math.random() - 0.5) * 60,
+                    y: 200,
+                    rotate: 360 * (Math.random() > 0.5 ? 1 : -1),
+                  }}
+                  transition={{ duration: 1.5 + Math.random(), delay: i * 0.06 }}
+                  className="absolute top-1/2 left-1/2 pointer-events-none z-50"
+                  style={{
+                    width: 5,
+                    height: 10,
+                    backgroundColor: color,
+                  }}
+                />
+              )
+            })}
           </>
         )}
       </AnimatePresence>

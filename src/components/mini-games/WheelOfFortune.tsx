@@ -135,26 +135,98 @@ export default function WheelOfFortune({
         />
       </div>
 
-      {/* Win Celebration Particles */}
+      {/* Win Celebration Particles - Enhanced */}
       <AnimatePresence>
         {showWinCelebration && (
           <>
-            {[...Array(16)].map((_, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 1, scale: 0, x: 0, y: 0 }}
-                animate={{
-                  opacity: [1, 1, 0],
-                  scale: [0, 1, 0.5],
-                  x: Math.cos((i / 16) * Math.PI * 2) * 180,
-                  y: Math.sin((i / 16) * Math.PI * 2) * 180,
-                }}
-                transition={{ duration: 1.5, delay: i * 0.05 }}
-                className="absolute top-1/2 left-1/2 pointer-events-none z-50"
-              >
-                <Sparkles size={16} className={isJackpot ? 'text-[#FFB800]' : i % 2 === 0 ? 'text-[#9B5CFF]' : 'text-[#00FF88]'} />
-              </motion.div>
-            ))}
+            {/* Explosion radiale principale - étoiles */}
+            {[...Array(24)].map((_, i) => {
+              const angle = (i / 24) * Math.PI * 2
+              const distance = 160 + Math.random() * 60
+              const colors = isJackpot
+                ? ['#FFB800', '#FFD700', '#FF8C00']
+                : ['#9B5CFF', '#FF4FD8', '#3CCBFF', '#00FF88']
+              const color = colors[i % colors.length]
+
+              return (
+                <motion.div
+                  key={`star-${i}`}
+                  initial={{ opacity: 0, scale: 0, x: 0, y: 0, rotate: 0 }}
+                  animate={{
+                    opacity: [0, 1, 1, 0],
+                    scale: [0, 1.2, 1, 0.4],
+                    x: Math.cos(angle) * distance,
+                    y: Math.sin(angle) * distance,
+                    rotate: 360,
+                  }}
+                  transition={{ duration: 1.8, delay: i * 0.03, ease: 'easeOut' }}
+                  className="absolute top-1/2 left-1/2 pointer-events-none z-50"
+                >
+                  <Sparkles size={18} className={`text-[${color}]`} style={{ color }} />
+                </motion.div>
+              )
+            })}
+
+            {/* Cercles secondaires */}
+            {[...Array(16)].map((_, i) => {
+              const angle = (i / 16) * Math.PI * 2 + 0.2
+              const distance = 100 + Math.random() * 40
+              const colors = isJackpot
+                ? ['#FFB800', '#FFA500']
+                : ['#9B5CFF', '#FF4FD8']
+              const color = colors[i % colors.length]
+
+              return (
+                <motion.div
+                  key={`circle-${i}`}
+                  initial={{ opacity: 0, scale: 0, x: 0, y: 0 }}
+                  animate={{
+                    opacity: [0, 1, 0],
+                    scale: [0, 1, 0],
+                    x: Math.cos(angle) * distance,
+                    y: Math.sin(angle) * distance,
+                  }}
+                  transition={{ duration: 1.2, delay: i * 0.04 + 0.2 }}
+                  className="absolute top-1/2 left-1/2 pointer-events-none z-50"
+                  style={{
+                    width: 8 + Math.random() * 6,
+                    height: 8 + Math.random() * 6,
+                    borderRadius: '50%',
+                    backgroundColor: color,
+                    boxShadow: `0 0 12px ${color}`,
+                  }}
+                />
+              )
+            })}
+
+            {/* Confetti tombant */}
+            {[...Array(20)].map((_, i) => {
+              const xStart = (Math.random() - 0.5) * 400
+              const colors = isJackpot
+                ? ['#FFB800', '#FFD700', '#FF8C00']
+                : ['#9B5CFF', '#FF4FD8', '#3CCBFF']
+              const color = colors[i % colors.length]
+
+              return (
+                <motion.div
+                  key={`confetti-${i}`}
+                  initial={{ opacity: 0, x: xStart, y: -100, rotate: 0 }}
+                  animate={{
+                    opacity: [0, 1, 1, 0],
+                    x: xStart + (Math.random() - 0.5) * 100,
+                    y: 300,
+                    rotate: 360 * (Math.random() > 0.5 ? 1 : -1),
+                  }}
+                  transition={{ duration: 2 + Math.random(), delay: i * 0.05 + 0.5, ease: 'easeIn' }}
+                  className="absolute top-1/2 left-1/2 pointer-events-none z-50"
+                  style={{
+                    width: 6,
+                    height: 12,
+                    backgroundColor: color,
+                  }}
+                />
+              )
+            })}
           </>
         )}
       </AnimatePresence>

@@ -466,6 +466,42 @@ export default function DiceRoll({
         )}
       </AnimatePresence>
 
+      {/* Victory Particles */}
+      <AnimatePresence>
+        {showConversion && prizeAmount >= 8 && (
+          <>
+            {/* Explosion d'étoiles pour gros gains */}
+            {[...Array(16)].map((_, i) => {
+              const angle = (i / 16) * Math.PI * 2
+              const distance = 80 + Math.random() * 40
+              const color = total === 12 ? '#FFB800' : i % 2 === 0 ? '#9B5CFF' : '#FF4FD8'
+
+              return (
+                <motion.div
+                  key={`star-${i}`}
+                  initial={{ opacity: 0, scale: 0, x: 0, y: -50 }}
+                  animate={{
+                    opacity: [0, 1, 0],
+                    scale: [0, 1, 0.4],
+                    x: Math.cos(angle) * distance,
+                    y: -50 + Math.sin(angle) * distance,
+                  }}
+                  transition={{ duration: 1.2, delay: i * 0.04 }}
+                  className="absolute top-1/2 left-1/2 pointer-events-none z-50"
+                  style={{
+                    width: 6,
+                    height: 6,
+                    borderRadius: '50%',
+                    backgroundColor: color,
+                    boxShadow: `0 0 8px ${color}`,
+                  }}
+                />
+              )
+            })}
+          </>
+        )}
+      </AnimatePresence>
+
       {/* Roll Button */}
       {!hasFinished && (
         <motion.button

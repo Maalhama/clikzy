@@ -263,18 +263,77 @@ export default function SlotMachine({
         )}
       </div>
 
-      {/* Win Particles */}
+      {/* Win Particles - Enhanced */}
       <AnimatePresence>
         {showParticles && (
           <>
+            {/* Sparkles existants */}
             {[...Array(12)].map((_, i) => (
               <SparkleParticle
-                key={i}
+                key={`sparkle-${i}`}
                 delay={i * 0.1}
                 x={(i - 6) * 25}
                 color={i % 2 === 0 ? 'text-[#FFB800]' : 'text-[#9B5CFF]'}
               />
             ))}
+
+            {/* Cascade de pièces pour jackpots */}
+            {(isJackpot || allMatch) && (
+              <>
+                {[...Array(20)].map((_, i) => {
+                  const xStart = (Math.random() - 0.5) * 300
+                  const delay = i * 0.1
+
+                  return (
+                    <motion.div
+                      key={`coin-${i}`}
+                      initial={{ opacity: 0, x: xStart, y: -150, rotate: 0, scale: 0 }}
+                      animate={{
+                        opacity: [0, 1, 1, 0],
+                        x: xStart + (Math.random() - 0.5) * 100,
+                        y: 300,
+                        rotate: [0, 180, 360, 540, 720],
+                        scale: [0, 1, 1, 0.5],
+                      }}
+                      transition={{ duration: 2 + Math.random(), delay, ease: 'easeIn' }}
+                      className="absolute top-1/2 left-1/2 pointer-events-none z-50"
+                    >
+                      <div
+                        className="w-8 h-8 rounded-full"
+                        style={{
+                          background: 'radial-gradient(circle at 30% 30%, #FFD700, #FFB800, #FF8C00)',
+                          boxShadow: '0 0 16px rgba(255, 184, 0, 0.9), inset 0 0 8px rgba(255, 255, 255, 0.5)',
+                          border: '2px solid #FFD700',
+                        }}
+                      />
+                    </motion.div>
+                  )
+                })}
+
+                {/* Explosion d'étoiles supplémentaires */}
+                {[...Array(16)].map((_, i) => {
+                  const angle = (i / 16) * Math.PI * 2
+                  const distance = 100 + Math.random() * 60
+
+                  return (
+                    <motion.div
+                      key={`extra-star-${i}`}
+                      initial={{ opacity: 0, scale: 0, x: 0, y: 0 }}
+                      animate={{
+                        opacity: [0, 1, 0],
+                        scale: [0, 1.5, 0.5],
+                        x: Math.cos(angle) * distance,
+                        y: Math.sin(angle) * distance,
+                      }}
+                      transition={{ duration: 1.5, delay: i * 0.05 + 0.3 }}
+                      className="absolute top-1/2 left-1/2 pointer-events-none z-50"
+                    >
+                      <Sparkles size={20} className="text-[#FFB800]" />
+                    </motion.div>
+                  )
+                })}
+              </>
+            )}
           </>
         )}
       </AnimatePresence>
