@@ -5,10 +5,16 @@
 
 'use client'
 
+import dynamic from 'next/dynamic'
 import { useCanUse3D } from '@/hooks/mini-games/use3DPerformance'
-import { Pachinko3D } from './3d/Pachinko3D'
 import Pachinko from './Pachinko'
 import { Suspense } from 'react'
+
+// Import dynamique pour eviter les erreurs SSR avec Three.js
+const Pachinko3D = dynamic(
+  () => import('./3d/Pachinko3D').then(mod => mod.Pachinko3D),
+  { ssr: false }
+)
 
 interface PachinkoWrapperProps {
   onComplete: (creditsWon: number) => void

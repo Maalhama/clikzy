@@ -5,10 +5,16 @@
 
 'use client'
 
+import dynamic from 'next/dynamic'
 import { useCanUse3D } from '@/hooks/mini-games/use3DPerformance'
-import { WheelOfFortune3D } from './3d/WheelOfFortune3D'
 import WheelOfFortune from './WheelOfFortune'
 import { Suspense } from 'react'
+
+// Import dynamique pour eviter les erreurs SSR avec Three.js
+const WheelOfFortune3D = dynamic(
+  () => import('./3d/WheelOfFortune3D').then(mod => mod.WheelOfFortune3D),
+  { ssr: false }
+)
 
 interface WheelOfFortuneWrapperProps {
   onComplete: (creditsWon: number) => void

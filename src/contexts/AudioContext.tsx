@@ -105,10 +105,19 @@ export function AudioProvider({ children }: { children: ReactNode }) {
   )
 }
 
-export function useAudioSettings() {
+export function useAudioSettings(): AudioContextType {
   const context = useContext(AudioContext)
+  // Return default values instead of throwing if context is not available
+  // This can happen during SSR or if component is rendered outside provider
   if (!context) {
-    throw new Error('useAudioSettings must be used within AudioProvider')
+    return {
+      settings: DEFAULT_SETTINGS,
+      setSfxEnabled: () => {},
+      setSfxVolume: () => {},
+      setMusicEnabled: () => {},
+      setMusicVolume: () => {},
+      resetSettings: () => {},
+    }
   }
   return context
 }

@@ -5,10 +5,16 @@
 
 'use client'
 
+import dynamic from 'next/dynamic'
 import { useCanUse3D } from '@/hooks/mini-games/use3DPerformance'
-import { CoinFlip3D } from './3d/CoinFlip3D'
 import CoinFlip from './CoinFlip'
 import { Suspense } from 'react'
+
+// Import dynamique pour eviter les erreurs SSR avec Three.js
+const CoinFlip3D = dynamic(
+  () => import('./3d/CoinFlip3D').then(mod => mod.CoinFlip3D),
+  { ssr: false }
+)
 
 interface CoinFlipWrapperProps {
   onComplete: (creditsWon: number) => void

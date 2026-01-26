@@ -5,10 +5,16 @@
 
 'use client'
 
+import dynamic from 'next/dynamic'
 import { useCanUse3D } from '@/hooks/mini-games/use3DPerformance'
-import { DiceRoll3D } from './3d/DiceRoll3D'
 import DiceRoll from './DiceRoll'
 import { Suspense } from 'react'
+
+// Import dynamique pour eviter les erreurs SSR avec Three.js
+const DiceRoll3D = dynamic(
+  () => import('./3d/DiceRoll3D').then(mod => mod.DiceRoll3D),
+  { ssr: false }
+)
 
 interface DiceRollWrapperProps {
   onComplete: (creditsWon: number) => void

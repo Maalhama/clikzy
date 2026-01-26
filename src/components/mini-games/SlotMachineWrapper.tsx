@@ -5,10 +5,16 @@
 
 'use client'
 
+import dynamic from 'next/dynamic'
 import { useCanUse3D } from '@/hooks/mini-games/use3DPerformance'
-import { SlotMachine3D } from './3d/SlotMachine3D'
 import SlotMachine from './SlotMachine'
 import { Suspense } from 'react'
+
+// Import dynamique pour eviter les erreurs SSR avec Three.js
+const SlotMachine3D = dynamic(
+  () => import('./3d/SlotMachine3D').then(mod => mod.SlotMachine3D),
+  { ssr: false }
+)
 
 interface SlotMachineWrapperProps {
   onComplete: (creditsWon: number) => void

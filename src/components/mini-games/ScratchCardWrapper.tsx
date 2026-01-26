@@ -5,10 +5,16 @@
 
 'use client'
 
+import dynamic from 'next/dynamic'
 import { useCanUse3D } from '@/hooks/mini-games/use3DPerformance'
-import { ScratchCard3D } from './3d/ScratchCard3D'
 import ScratchCard from './ScratchCard'
 import { Suspense } from 'react'
+
+// Import dynamique pour eviter les erreurs SSR avec Three.js
+const ScratchCard3D = dynamic(
+  () => import('./3d/ScratchCard3D').then(mod => mod.ScratchCard3D),
+  { ssr: false }
+)
 
 interface ScratchCardWrapperProps {
   onComplete: (creditsWon: number) => void

@@ -19,11 +19,12 @@ export interface PerformanceCapabilities {
  * Retourne false pour les devices qui ne supportent pas bien la 3D
  */
 export function use3DPerformance(): PerformanceCapabilities {
+  // Default to false for SSR - prevents Three.js from being rendered on server
   const [capabilities, setCapabilities] = useState<PerformanceCapabilities>({
-    canUse3D: true,
+    canUse3D: false, // Start with false, will be set to true after client-side check
     isLowEnd: false,
     isMobile: false,
-    supportsWebGL2: true,
+    supportsWebGL2: false, // Will be checked on client
     hardwareConcurrency: 4,
     devicePixelRatio: 1,
   })
