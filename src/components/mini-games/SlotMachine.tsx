@@ -4,6 +4,7 @@ import React, { useState, useCallback, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Trophy, Zap, Sparkles } from 'lucide-react'
 import { SLOTS_SYMBOLS } from '@/types/miniGames'
+import { useMiniGameSounds } from '@/hooks/mini-games/useMiniGameSounds'
 
 interface SlotMachineProps {
   onComplete: (creditsWon: number) => void
@@ -78,7 +79,12 @@ function SpinningReel({
   }, [isStopped, finalSymbol])
 
   return (
-    <div className="relative w-16 h-20 sm:w-20 sm:h-24 bg-gradient-to-b from-[#0B0F1A] to-[#141B2D] rounded-lg overflow-hidden border-2 border-[#2A3A5A] shadow-[inset_0_0_15px_rgba(0,0,0,0.5)]">
+    <div
+      className="relative w-16 h-20 sm:w-20 sm:h-24 bg-gradient-to-b from-[#0B0F1A] to-[#141B2D] rounded-lg overflow-hidden border-2 border-[#2A3A5A] shadow-[inset_0_0_15px_rgba(0,0,0,0.5)]"
+      style={{
+        willChange: isSpinning && !isStopped ? 'filter' : 'auto',
+      }}
+    >
       {/* Reel window highlight */}
       <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-transparent to-black/50 pointer-events-none z-10" />
 
@@ -91,6 +97,10 @@ function SpinningReel({
         className="absolute inset-0 flex flex-col items-center justify-center"
         animate={isSpinning && !isStopped ? { y: [0, -20, 0] } : {}}
         transition={isSpinning && !isStopped ? { duration: 0.08, repeat: Infinity, ease: 'linear' } : {}}
+        style={{
+          filter: isSpinning && !isStopped ? 'blur(2px)' : 'blur(0px)',
+          transition: 'filter 0.3s ease-out',
+        }}
       >
         {/* Top symbol (blurred) */}
         <span className="text-2xl sm:text-3xl opacity-30 blur-[1px] -mb-0.5">
@@ -143,11 +153,28 @@ export default function SlotMachine({
   const [stoppedReels, setStoppedReels] = useState([false, false, false])
   const [leverPulled, setLeverPulled] = useState(false)
   const [showParticles, setShowParticles] = useState(false)
+  const [screenShake, setScreenShake] = useState(false)
+
+  const { playTick, playWhoosh, playImpact, playWin, vibrate } = useMiniGameSounds()
+
+  // Effet de tick rapide pendant le spin
+  useEffect(() => {
+    if (isSpinning) {
+      const interval = setInterval(() => {
+        playTick(1.2 + Math.random() * 0.3)
+      }, 80)
+      return () => clearInterval(interval)
+    }
+  }, [isSpinning, playTick])
 
   const spin = useCallback(() => {
     if (isSpinning || disabled) return
 
     setLeverPulled(true)
+
+    // Son whoosh au début
+    playWhoosh(0.4)
+
     setTimeout(() => {
       setIsSpinning(true)
       setHasFinished(false)
@@ -158,6 +185,16 @@ export default function SlotMachine({
 
       stopTimes.forEach((time, reelIndex) => {
         setTimeout(() => {
+          // Son d'impact à l'arrêt de chaque reel
+          playImpact(0.4 + reelIndex * 0.1)
+
+          // Screen shake à chaque arrêt
+          setScreenShake(true)
+          setTimeout(() => setScreenShake(false), 200)
+
+          // Vibration à chaque arrêt
+          vibrate(40)
+
           setStoppedReels(prev => {
             const newStopped = [...prev]
             newStopped[reelIndex] = true
@@ -169,16 +206,33 @@ export default function SlotMachine({
               setIsSpinning(false)
               setHasFinished(true)
               setLeverPulled(false)
+
+              const allMatch = targetSymbols[0] === targetSymbols[1] && targetSymbols[1] === targetSymbols[2]
+              const isJackpot = prizeAmount >= 10
+
               if (prizeAmount > 0) {
                 setShowParticles(true)
+                playWin()
+
+                // Vibration selon le type de victoire
+                if (allMatch || isJackpot) {
+                  vibrate([100, 50, 100, 50, 100, 50, 100]) // Triple/Jackpot
+                  setScreenShake(true)
+                  setTimeout(() => setScreenShake(false), 400)
+                } else {
+                  vibrate([60, 40, 60]) // Victoire normale
+                }
+              } else {
+                vibrate(30)
               }
+
               onComplete(prizeAmount)
             }, 500)
           }
         }, time)
       })
     }, 300)
-  }, [isSpinning, disabled, prizeAmount, onComplete])
+  }, [isSpinning, disabled, prizeAmount, onComplete, targetSymbols, playWhoosh, playImpact, playWin, vibrate])
 
   const isJackpot = prizeAmount >= 10
   const isWin = prizeAmount > 0
@@ -187,7 +241,11 @@ export default function SlotMachine({
   const allMatch = targetSymbols[0] === targetSymbols[1] && targetSymbols[1] === targetSymbols[2]
 
   return (
-    <div className="relative flex flex-col items-center justify-center p-2 select-none">
+    <motion.div
+      animate={screenShake ? { x: [-2, 2, -2, 2, 0], y: [-1, 1, -1, 1, 0] } : {}}
+      transition={{ duration: 0.2 }}
+      className="relative flex flex-col items-center justify-center p-2 select-none"
+    >
       {/* Animated Background Glow */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <motion.div
@@ -356,6 +414,6 @@ export default function SlotMachine({
           )}
         </AnimatePresence>
       </div>
-    </div>
+    </motion.div>
   )
 }

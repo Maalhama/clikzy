@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Trophy } from 'lucide-react'
+import { useMiniGameSounds } from '@/hooks/mini-games/useMiniGameSounds'
 
 interface DiceRollProps {
   onComplete: (creditsWon: number) => void
@@ -274,6 +275,9 @@ export default function DiceRoll({
   const [hasFinished, setHasFinished] = useState(false)
   const [showDice, setShowDice] = useState(false)
   const [showConversion, setShowConversion] = useState(false)
+  const [screenShake, setScreenShake] = useState(false)
+
+  const { playImpact, playWhoosh, playWin, vibrate } = useMiniGameSounds()
 
   const roll = () => {
     if (isRolling || disabled) return
@@ -283,11 +287,48 @@ export default function DiceRoll({
     setShowDice(true)
     setShowConversion(false)
 
+    // Whoosh au lancer
+    playWhoosh(0.5)
+    vibrate(50)
+
+    // Impacts multiples pendant la rotation (simule les rebonds)
+    const impactTimes = [300, 600, 900, 1200, 1500, 1800]
+    impactTimes.forEach((time, i) => {
+      setTimeout(() => {
+        const intensity = 0.2 + (i * 0.05)
+        playImpact(intensity)
+        vibrate(20)
+      }, time)
+    })
+
     setTimeout(() => {
+      // Impact final au sol
+      playImpact(0.7)
+      vibrate([80, 30, 80])
+
+      // Screen shake à l'atterrissage
+      setScreenShake(true)
+      setTimeout(() => setScreenShake(false), 300)
+
       setIsRolling(false)
+
       // Show conversion animation
       setTimeout(() => {
         setShowConversion(true)
+
+        const total = diceResults[0] + diceResults[1]
+        const isDouble6 = total === 12
+
+        if (isDouble6) {
+          playWin()
+          vibrate([100, 50, 100, 50, 100])
+        } else if (prizeAmount >= 8) {
+          playWin()
+          vibrate([80, 40, 80])
+        } else {
+          vibrate(40)
+        }
+
         setTimeout(() => {
           setHasFinished(true)
           onComplete(prizeAmount)
@@ -300,7 +341,11 @@ export default function DiceRoll({
   const calculatedCredits = getCreditsFromSum(total)
 
   return (
-    <div className="relative flex flex-col items-center justify-center p-2 select-none">
+    <motion.div
+      animate={screenShake ? { x: [-3, 3, -3, 3, 0], y: [-2, 2, -2, 2, 0] } : {}}
+      transition={{ duration: 0.3 }}
+      className="relative flex flex-col items-center justify-center p-2 select-none"
+    >
       {/* Glow Atmosphere */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] bg-[#9B5CFF] opacity-10 blur-[80px] rounded-full" />
@@ -423,20 +468,22 @@ export default function DiceRoll({
 
       {/* Roll Button */}
       {!hasFinished && (
-        <button
+        <motion.button
           onClick={roll}
           disabled={isRolling || disabled}
+          whileHover={!isRolling && !disabled ? { scale: 1.05 } : {}}
+          whileTap={!isRolling && !disabled ? { scale: 0.95 } : {}}
           className={`
             px-6 py-2.5 rounded-xl font-bold text-sm uppercase tracking-wider
             transition-all duration-300
             ${isRolling || disabled
               ? 'bg-[#1E2942] text-[#4A5568] cursor-not-allowed'
-              : 'bg-gradient-to-r from-[#9B5CFF] to-[#FF4FD8] text-white hover:shadow-[0_0_20px_rgba(155,92,255,0.5)] active:scale-95'
+              : 'bg-gradient-to-r from-[#9B5CFF] to-[#FF4FD8] text-white hover:shadow-[0_0_20px_rgba(155,92,255,0.5)]'
             }
           `}
         >
           {isRolling ? 'Lancer...' : 'Lancer'}
-        </button>
+        </motion.button>
       )}
 
       {/* Result */}
@@ -460,6 +507,6 @@ export default function DiceRoll({
           )}
         </AnimatePresence>
       </div>
-    </div>
+    </motion.div>
   )
 }

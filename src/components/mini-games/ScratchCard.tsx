@@ -3,6 +3,7 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Sparkles, Trophy } from 'lucide-react'
+import { useMiniGameSounds } from '@/hooks/mini-games/useMiniGameSounds'
 
 interface ScratchCardProps {
   onComplete: (creditsWon: number) => void
@@ -23,6 +24,8 @@ export default function ScratchCard({
   const [isScratching, setIsScratching] = useState(false)
   const [isRevealed, setIsRevealed] = useState(false)
   const dprRef = useRef<number>(1)
+
+  const { playScratch, playWin, vibrate } = useMiniGameSounds()
 
   const initCanvas = useCallback(() => {
     const canvas = canvasRef.current
@@ -178,6 +181,10 @@ export default function ScratchCard({
   const handleScratch = (e: React.MouseEvent | React.TouchEvent) => {
     if (disabled || isRevealed) return
 
+    // Son de grattage et vibration légère
+    playScratch()
+    vibrate(10)
+
     const canvas = canvasRef.current
     if (!canvas) return
     const ctx = canvas.getContext('2d')
@@ -221,6 +228,20 @@ export default function ScratchCard({
 
   const completeReveal = () => {
     setIsRevealed(true)
+
+    // Son de victoire et vibration à la révélation
+    if (prizeAmount > 0) {
+      playWin()
+
+      if (prizeAmount >= 10) {
+        vibrate([100, 50, 100, 50, 100]) // Jackpot
+      } else {
+        vibrate([70, 40, 70]) // Victoire normale
+      }
+    } else {
+      vibrate(30)
+    }
+
     setTimeout(() => {
       onComplete(prizeAmount)
     }, 800)

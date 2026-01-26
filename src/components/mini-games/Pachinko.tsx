@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Trophy, Sparkles } from 'lucide-react'
+import { useMiniGameSounds } from '@/hooks/mini-games/useMiniGameSounds'
 
 interface PachinkoProps {
   onComplete: (creditsWon: number) => void
@@ -48,6 +49,8 @@ export default function Pachinko({
   const pegsRef = useRef<Peg[]>([])
   const ballRef = useRef<Ball | null>(null)
   const dprRef = useRef<number>(1)
+
+  const { playTick, playImpact, playWin, vibrate } = useMiniGameSounds()
 
   // Generate pegs in pyramid pattern
   const generatePegs = useCallback(() => {
@@ -373,6 +376,13 @@ export default function Pachinko({
       const minDist = BALL_RADIUS + PEG_RADIUS
 
       if (dist < minDist) {
+        // Son d'impact à chaque collision avec peg
+        if (!peg.hit) {
+          const pitch = 1 + (peg.y / BOARD_HEIGHT) * 0.5
+          playTick(pitch)
+          vibrate(15)
+        }
+
         peg.hit = true
 
         // Calculate collision response
@@ -408,12 +418,28 @@ export default function Pachinko({
       }
 
       const credits = SLOTS[slotIndex]
+
+      // Impact final dans le slot
+      playImpact(0.6)
+      vibrate(50)
+
       setResult(credits)
       setIsDropping(false)
       setHasFinished(true)
       ballRef.current = null
 
       setTimeout(() => {
+        // Son de victoire et vibration selon le gain
+        if (credits === 10) {
+          playWin()
+          vibrate([100, 50, 100, 50, 100])
+        } else if (credits > 0) {
+          playWin()
+          vibrate([70, 40, 70])
+        } else {
+          vibrate(30)
+        }
+
         onComplete(credits)
       }, 500)
 

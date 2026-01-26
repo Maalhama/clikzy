@@ -1,8 +1,9 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Trophy, Sparkles, Zap } from 'lucide-react'
+import { useMiniGameSounds } from '@/hooks/mini-games/useMiniGameSounds'
 
 interface CoinFlipProps {
   onComplete: (creditsWon: number) => void
@@ -22,6 +23,19 @@ export default function CoinFlip({
   const [showResult, setShowResult] = useState(false)
   const [showWinCelebration, setShowWinCelebration] = useState(false)
 
+  const { playTick, playWhoosh, playImpact, playWin, vibrate } = useMiniGameSounds()
+
+  // Tick à chaque rotation visible pendant le flip
+  useEffect(() => {
+    if (isFlipping) {
+      const tickInterval = setInterval(() => {
+        playTick(1.5 + Math.random() * 0.3)
+      }, 111) // ~9 ticks pendant 2s (180° rotation = 111ms)
+
+      return () => clearInterval(tickInterval)
+    }
+  }, [isFlipping, playTick])
+
   const flipCoin = () => {
     if (isFlipping || disabled) return
 
@@ -30,15 +44,30 @@ export default function CoinFlip({
     setShowResult(false)
     setShowWinCelebration(false)
 
+    // Whoosh au début du flip
+    playWhoosh(0.6)
+    vibrate(50)
+
     // Flip animation duration
     setTimeout(() => {
       setShowResult(true)
+
+      // Impact au sol
+      playImpact(0.5)
+      vibrate(60)
+
       setTimeout(() => {
         setIsFlipping(false)
         setHasFinished(true)
+
         if (prizeAmount > 0) {
           setShowWinCelebration(true)
+          playWin()
+          vibrate([100, 50, 100])
+        } else {
+          vibrate(30)
         }
+
         onComplete(prizeAmount)
       }, 500)
     }, 2000)

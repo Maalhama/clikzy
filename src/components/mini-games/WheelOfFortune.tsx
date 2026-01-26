@@ -1,8 +1,9 @@
 'use client'
 
-import React, { useState, useRef } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Trophy, Zap, Sparkles } from 'lucide-react'
+import { useMiniGameSounds } from '@/hooks/mini-games/useMiniGameSounds'
 
 interface WheelOfFortuneProps {
   onComplete: (creditsWon: number) => void
@@ -33,6 +34,49 @@ export default function WheelOfFortune({
   const [hasFinished, setHasFinished] = useState(false)
   const [showWinCelebration, setShowWinCelebration] = useState(false)
   const wheelRef = useRef<HTMLDivElement>(null)
+  const tickIntervalRef = useRef<NodeJS.Timeout | null>(null)
+  const currentSegmentRef = useRef<number>(0)
+
+  const { playTick, playWhoosh, playImpact, playWin, vibrate } = useMiniGameSounds()
+
+  // Effet de tick audio pendant la rotation
+  useEffect(() => {
+    if (isSpinning) {
+      // Whoosh au début
+      playWhoosh(0.5)
+
+      let tickSpeed = 50 // ms entre chaque tick
+      let lastSegment = currentSegmentRef.current
+
+      tickIntervalRef.current = setInterval(() => {
+        // Calculer le segment actuel basé sur la rotation
+        const currentRotation = rotation % 360
+        const segmentAngle = 360 / SEGMENTS.length
+        const currentSeg = Math.floor((360 - currentRotation) / segmentAngle) % SEGMENTS.length
+
+        if (currentSeg !== lastSegment) {
+          // Son tick à chaque changement de segment
+          const pitch = 0.8 + Math.random() * 0.4
+          playTick(pitch)
+          lastSegment = currentSeg
+        }
+
+        // Ralentir les ticks progressivement
+        tickSpeed *= 1.05
+      }, tickSpeed)
+    } else {
+      if (tickIntervalRef.current) {
+        clearInterval(tickIntervalRef.current)
+        tickIntervalRef.current = null
+      }
+    }
+
+    return () => {
+      if (tickIntervalRef.current) {
+        clearInterval(tickIntervalRef.current)
+      }
+    }
+  }, [isSpinning, playTick, playWhoosh, rotation])
 
   const spinWheel = () => {
     if (isSpinning || disabled) return
@@ -48,13 +92,32 @@ export default function WheelOfFortune({
 
     setRotation(finalRotation)
 
+    // Impact de ralentissement à 4.5s
+    setTimeout(() => {
+      playImpact(0.3)
+    }, 4500)
+
     setTimeout(() => {
       setIsSpinning(false)
       setHasFinished(true)
-      if (SEGMENTS[targetSegment].value > 0) {
+
+      const wonCredits = SEGMENTS[targetSegment].value
+
+      if (wonCredits > 0) {
         setShowWinCelebration(true)
+        playWin()
+
+        // Vibration selon le gain
+        if (SEGMENTS[targetSegment].isSpecial) {
+          vibrate([100, 50, 100, 50, 100]) // Jackpot
+        } else {
+          vibrate([50, 30, 50]) // Victoire normale
+        }
+      } else {
+        vibrate(30) // Petite vibration de fin
       }
-      onComplete(SEGMENTS[targetSegment].value)
+
+      onComplete(wonCredits)
     }, 5000)
   }
 
@@ -119,21 +182,41 @@ export default function WheelOfFortune({
         <div className="absolute inset-[-10px] rounded-full border-[4px] border-[#141B2D] shadow-[0_0_20px_rgba(0,0,0,0.5),inset_0_0_15px_rgba(155,92,255,0.2)]" />
         <div className="absolute inset-[-12px] rounded-full border-[2px] border-[#9B5CFF]/30" />
 
-        {/* Light Dots - Neon colors */}
+        {/* Light Dots - Neon colors with chase effect */}
         <div className="absolute inset-[-10px] rounded-full">
           {[...Array(12)].map((_, i) => {
             const colors = ['#9B5CFF', '#FF4FD8', '#3CCBFF', '#FFB800']
             const color = colors[i % colors.length]
             return (
-              <div
+              <motion.div
                 key={i}
-                className={`absolute w-2 h-2 rounded-full transition-all duration-300 ${isSpinning ? 'animate-pulse scale-125' : 'opacity-60'}`}
+                className="absolute w-2 h-2 rounded-full"
                 style={{
                   top: '50%',
                   left: '50%',
                   transform: `rotate(${i * 30}deg) translateY(-110px) translateX(-50%)`,
                   backgroundColor: color,
+                }}
+                animate={isSpinning ? {
+                  opacity: [0.3, 1, 0.3],
+                  scale: [1, 1.5, 1],
+                  boxShadow: [
+                    `0 0 4px ${color}, 0 0 8px ${color}40`,
+                    `0 0 12px ${color}, 0 0 24px ${color}80`,
+                    `0 0 4px ${color}, 0 0 8px ${color}40`
+                  ]
+                } : {
+                  opacity: 0.6,
+                  scale: 1,
                   boxShadow: `0 0 8px ${color}, 0 0 16px ${color}40`
+                }}
+                transition={isSpinning ? {
+                  duration: 0.15,
+                  repeat: Infinity,
+                  delay: i * 0.05, // Chase effect: chaque lumière avec délai
+                  ease: 'easeInOut'
+                } : {
+                  duration: 0.3
                 }}
               />
             )
@@ -236,12 +319,14 @@ export default function WheelOfFortune({
 
         {/* Center Button */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-30">
-          <button
+          <motion.button
             onClick={spinWheel}
             disabled={isSpinning || disabled}
+            whileHover={!isSpinning && !disabled ? { scale: 1.05 } : {}}
+            whileTap={!isSpinning && !disabled ? { scale: 0.9 } : {}}
             className={`
               relative w-16 h-16 rounded-full border-3 border-[#141B2D]
-              flex items-center justify-center transition-all duration-300 active:scale-90
+              flex items-center justify-center transition-all duration-300
               ${isSpinning || disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer hover:shadow-[0_0_20px_#9B5CFF]'}
               bg-gradient-to-br from-[#9B5CFF] to-[#FF4FD8]
             `}
@@ -252,7 +337,7 @@ export default function WheelOfFortune({
             <span className="text-white font-black text-xs tracking-widest uppercase">
               {isSpinning ? '...' : 'SPIN'}
             </span>
-          </button>
+          </motion.button>
         </div>
       </div>
 
