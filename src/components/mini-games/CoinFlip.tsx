@@ -260,7 +260,7 @@ export default function CoinFlip({
             🪙 La pièce tourne...
           </motion.p>
         )}
-        {game.isCompleted && (
+        {(game.isStopping || game.isCompleted) && (
           <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -274,7 +274,7 @@ export default function CoinFlip({
       </div>
 
       {/* Play Button - Compact */}
-      {!game.isPlaying && !game.isCompleted && (
+      {!game.isPlaying && !game.isStopping && !game.isCompleted && (
         <motion.button
           onClick={flipCoin}
           disabled={disabled}
@@ -296,7 +296,7 @@ export default function CoinFlip({
       {/* Result Card - Compact */}
       <div className="h-16 mt-3 flex items-center justify-center">
         <AnimatePresence mode="wait">
-          {game.isCompleted && (
+          {(game.isStopping || game.isCompleted) && (
             <motion.div
               initial={{ opacity: 0, y: 10, scale: 0.9 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -313,7 +313,7 @@ export default function CoinFlip({
                   {isWin ? 'Gagné' : 'Perdu'}
                 </span>
                 <span className={`text-lg sm:text-xl font-black ${isWin ? 'text-[#FFB800]' : 'text-white/60'}`}>
-                  {isWin ? '+10' : '0'}
+                  {isWin ? `+${prizeAmount}` : '0'}
                 </span>
               </div>
             </motion.div>
