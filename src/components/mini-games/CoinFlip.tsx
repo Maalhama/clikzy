@@ -185,6 +185,7 @@ export default function CoinFlip({
         {/* The Coin - Compact */}
         <motion.div
           className="relative w-28 h-28 sm:w-32 sm:h-32 cursor-pointer"
+          style={{ willChange: 'transform' }}
           onClick={flipCoin}
           animate={
             game.isPlaying

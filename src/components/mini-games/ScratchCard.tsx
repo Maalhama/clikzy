@@ -398,6 +398,7 @@ export default function ScratchCard({
           width={300}
           height={200}
           className={`absolute inset-0 rounded-2xl cursor-crosshair transition-opacity duration-700 z-20 shadow-2xl ${isRevealed ? 'opacity-0 pointer-events-none scale-105' : 'opacity-100'}`}
+          style={{ willChange: 'opacity, transform' }}
           onMouseDown={() => !disabled && setIsScratching(true)}
           onMouseUp={() => setIsScratching(false)}
           onMouseLeave={() => setIsScratching(false)}

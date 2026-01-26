@@ -327,6 +327,7 @@ export default function WheelOfFortune({
         <motion.div
           ref={wheelRef}
           className="relative w-52 h-52 sm:w-56 sm:h-56 rounded-full overflow-hidden border-[6px] border-[#141B2D] shadow-2xl bg-[#0B0F1A]"
+          style={{ willChange: 'transform' }}
           animate={{ rotate: rotation }}
           transition={{
             duration: 5,

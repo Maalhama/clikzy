@@ -567,7 +567,7 @@ export default function Pachinko({
           width={BOARD_WIDTH}
           height={BOARD_HEIGHT}
           className="rounded-lg border border-[#1E2942] max-w-full"
-          style={{ maxWidth: '100%', height: 'auto' }}
+          style={{ maxWidth: '100%', height: 'auto', willChange: 'transform' }}
         />
 
         {/* Drop button */}
@@ -578,8 +578,8 @@ export default function Pachinko({
             whileHover={!isDropping && !disabled ? { scale: 1.05 } : {}}
             whileTap={!isDropping && !disabled ? { scale: 0.95 } : {}}
             className={`
-              px-5 py-1.5 rounded-full font-bold text-xs uppercase tracking-wider
-              transition-all duration-300
+              px-6 py-2.5 sm:px-5 sm:py-1.5 rounded-full font-bold text-sm sm:text-xs uppercase tracking-wider
+              transition-all duration-300 min-h-[44px] sm:min-h-0
               ${isDropping || disabled
                 ? 'bg-[#1E2942] text-[#8B9BB4] cursor-not-allowed'
                 : 'bg-gradient-to-r from-[#9B5CFF] to-[#FF4FD8] text-white shadow-[0_0_15px_rgba(155,92,255,0.4)]'

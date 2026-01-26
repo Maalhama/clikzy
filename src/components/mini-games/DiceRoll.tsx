@@ -198,6 +198,7 @@ function Dice3D({
         className="w-14 h-14 sm:w-16 sm:h-16 relative"
         style={{
           transformStyle: 'preserve-3d',
+          willChange: 'transform',
         }}
         animate={
           animationPhase === 'tumbling'
