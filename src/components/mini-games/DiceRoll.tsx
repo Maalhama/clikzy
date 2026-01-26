@@ -686,7 +686,7 @@ export default function DiceRoll({
           whileTap={!isRolling && !disabled ? { scale: 0.95 } : {}}
           className={`
             px-6 py-2.5 rounded-xl font-bold text-sm uppercase tracking-wider
-            transition-all duration-300
+            transition-all duration-300 min-h-[44px]
             ${isRolling || disabled
               ? 'bg-[#1E2942] text-[#4A5568] cursor-not-allowed'
               : 'bg-gradient-to-r from-[#9B5CFF] to-[#FF4FD8] text-white hover:shadow-[0_0_20px_rgba(155,92,255,0.5)]'

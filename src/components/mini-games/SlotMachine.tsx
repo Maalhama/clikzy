@@ -523,7 +523,7 @@ export default function SlotMachine({
               whileTap={!isSpinning && !disabled ? { scale: 0.95 } : {}}
               className={`
                 relative px-8 py-2.5 rounded-lg font-bold text-sm uppercase tracking-wider
-                transition-all duration-300 overflow-hidden
+                transition-all duration-300 overflow-hidden min-h-[44px]
                 ${isSpinning || disabled
                   ? 'bg-[#1E2942] text-[#4A5568] cursor-not-allowed'
                   : 'bg-gradient-to-r from-[#9B5CFF] to-[#FF4FD8] text-white shadow-[0_0_20px_rgba(155,92,255,0.5)]'
