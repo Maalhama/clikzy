@@ -29,11 +29,6 @@ export interface MiniGameStateMachine {
   stop: () => boolean
   complete: () => boolean
   reset: () => void
-
-  // Lock mechanism for async operations
-  lock: () => boolean
-  unlock: () => void
-  isLocked: boolean
 }
 
 export interface UseMiniGameStateMachineOptions {
@@ -83,83 +78,113 @@ export function useMiniGameStateMachine(
     }
   }, [debug])
 
-  // Lock mechanism to prevent race conditions during async operations
-  const lock = useCallback((): boolean => {
-    if (lockRef.current) {
-      log('Already locked, transition rejected')
-      return false
-    }
-    lockRef.current = true
-    log('Locked')
-    return true
-  }, [log])
-
-  const unlock = useCallback(() => {
-    lockRef.current = false
-    log('Unlocked')
-  }, [log])
-
   // State transition: idle -> playing
   const start = useCallback((): boolean => {
-    if (state !== 'idle') {
-      log(`Cannot start from state: ${state}`)
-      return false
-    }
+    let success = false
 
-    if (!lock()) {
-      return false
-    }
+    setState(currentState => {
+      if (currentState !== 'idle') {
+        log(`Cannot start from state: ${currentState}`)
+        return currentState
+      }
 
-    log('Transition: idle -> playing')
-    setState('playing')
-    onStart?.()
-    unlock()
-    return true
-  }, [state, lock, unlock, onStart, log])
+      if (lockRef.current) {
+        log('Already locked, transition rejected')
+        return currentState
+      }
+
+      lockRef.current = true
+      log('Transition: idle -> playing')
+      success = true
+
+      // Call callbacks after state change
+      setTimeout(() => {
+        onStart?.()
+        lockRef.current = false
+      }, 0)
+
+      return 'playing'
+    })
+
+    return success
+  }, [onStart, log])
 
   // State transition: playing -> stopping
   const stop = useCallback((): boolean => {
-    if (state !== 'playing') {
-      log(`Cannot stop from state: ${state}`)
-      return false
-    }
+    let success = false
 
-    if (!lock()) {
-      return false
-    }
+    setState(currentState => {
+      if (currentState !== 'playing') {
+        log(`Cannot stop from state: ${currentState}`)
+        return currentState
+      }
 
-    log('Transition: playing -> stopping')
-    setState('stopping')
-    onStop?.()
-    unlock()
-    return true
-  }, [state, lock, unlock, onStop, log])
+      if (lockRef.current) {
+        log('Already locked, transition rejected')
+        return currentState
+      }
+
+      lockRef.current = true
+      log('Transition: playing -> stopping')
+      success = true
+
+      // Call callbacks after state change
+      setTimeout(() => {
+        onStop?.()
+        lockRef.current = false
+      }, 0)
+
+      return 'stopping'
+    })
+
+    return success
+  }, [onStop, log])
 
   // State transition: stopping -> completed
   const complete = useCallback((): boolean => {
-    if (state !== 'stopping' && state !== 'playing') {
-      log(`Cannot complete from state: ${state}`)
-      return false
-    }
+    let success = false
 
-    if (!lock()) {
-      return false
-    }
+    setState(currentState => {
+      if (currentState !== 'stopping' && currentState !== 'playing') {
+        log(`Cannot complete from state: ${currentState}`)
+        return currentState
+      }
 
-    log(`Transition: ${state} -> completed`)
-    setState('completed')
-    onComplete?.()
-    unlock()
-    return true
-  }, [state, lock, unlock, onComplete, log])
+      if (lockRef.current) {
+        log('Already locked, transition rejected')
+        return currentState
+      }
+
+      lockRef.current = true
+      log(`Transition: ${currentState} -> completed`)
+      success = true
+
+      // Call callbacks after state change
+      setTimeout(() => {
+        onComplete?.()
+        lockRef.current = false
+      }, 0)
+
+      return 'completed'
+    })
+
+    return success
+  }, [onComplete, log])
 
   // State transition: any -> idle (reset)
   const reset = useCallback(() => {
-    log(`Transition: ${state} -> idle (reset)`)
-    setState('idle')
-    lockRef.current = false
-    onReset?.()
-  }, [state, onReset, log])
+    setState(currentState => {
+      log(`Transition: ${currentState} -> idle (reset)`)
+      lockRef.current = false
+
+      // Call callback after state change
+      setTimeout(() => {
+        onReset?.()
+      }, 0)
+
+      return 'idle'
+    })
+  }, [onReset, log])
 
   return {
     // Current state
@@ -176,10 +201,5 @@ export function useMiniGameStateMachine(
     stop,
     complete,
     reset,
-
-    // Lock mechanism
-    lock,
-    unlock,
-    isLocked: lockRef.current,
   }
 }
