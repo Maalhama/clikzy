@@ -4,7 +4,6 @@ import { SkipLink } from '@/components/ui/SkipLink'
 import { CookieConsent } from '@/components/common/CookieConsent'
 import { Analytics } from '@/components/common/Analytics'
 import { WebVitalsReporter } from '@/components/analytics/WebVitalsReporter'
-import { AudioProvider } from '@/contexts/AudioContext'
 import './globals.css'
 
 const inter = Inter({
@@ -111,13 +110,11 @@ export default function RootLayout({
         />
       </head>
       <body className="font-sans antialiased bg-bg-primary text-text-primary min-h-screen">
-        <AudioProvider>
-          <SkipLink />
-          {children}
-          <CookieConsent />
-          <Analytics />
-          <WebVitalsReporter />
-        </AudioProvider>
+        <SkipLink />
+        {children}
+        <CookieConsent />
+        <Analytics />
+        <WebVitalsReporter />
       </body>
     </html>
   )
