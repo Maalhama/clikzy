@@ -185,7 +185,7 @@ export default function CoinFlip({
         {/* The Coin - Compact */}
         <motion.div
           className="relative w-28 h-28 sm:w-32 sm:h-32 cursor-pointer"
-          style={{ willChange: 'transform' }}
+          style={{ willChange: 'transform', transformStyle: 'preserve-3d' }}
           onClick={flipCoin}
           animate={
             game.isPlaying
@@ -199,9 +199,8 @@ export default function CoinFlip({
             duration: 2,
             ease: [0.45, 0, 0.55, 1],
           }}
-          style={{ transformStyle: 'preserve-3d' }}
-          whileHover={!isFlipping && !disabled && !game.isCompleted ? { scale: 1.05 } : {}}
-          whileTap={!isFlipping && !disabled && !game.isCompleted ? { scale: 0.95 } : {}}
+          whileHover={!game.isPlaying && !disabled && !game.isCompleted ? { scale: 1.05 } : {}}
+          whileTap={!game.isPlaying && !disabled && !game.isCompleted ? { scale: 0.95 } : {}}
         >
           {/* Front (Heads) */}
           <div
@@ -242,7 +241,7 @@ export default function CoinFlip({
 
       {/* Instructions or Result */}
       <div className="text-center mb-3">
-        {isFlipping && (
+        {game.isPlaying && (
           <motion.p
             animate={{ opacity: [1, 0.5, 1] }}
             transition={{ duration: 0.5, repeat: Infinity }}
@@ -265,7 +264,7 @@ export default function CoinFlip({
       </div>
 
       {/* Play Button - Compact */}
-      {!isFlipping && !game.isCompleted && (
+      {!game.isPlaying && !game.isCompleted && (
         <motion.button
           onClick={flipCoin}
           disabled={disabled}

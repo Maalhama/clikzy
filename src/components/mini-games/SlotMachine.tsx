@@ -49,7 +49,7 @@ function SpinningReel({
 }) {
   const [scrollOffset, setScrollOffset] = useState(0)
   const scrollSpeedRef = useRef(0)
-  const rafRef = useRef<number>()
+  const rafRef = useRef<number | undefined>(undefined)
   const lastTimeRef = useRef<number>(0)
   const targetOffsetRef = useRef(0)
   const isStoppingRef = useRef(false)
