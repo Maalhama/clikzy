@@ -46,6 +46,16 @@ export default function CoinFlip({
     },
   })
 
+  // Auto-reset après completion pour permettre de rejouer
+  useEffect(() => {
+    if (game.isCompleted) {
+      const timer = setTimeout(() => {
+        game.reset()
+      }, 3000)
+      return () => clearTimeout(timer)
+    }
+  }, [game.isCompleted, game.reset])
+
   // Tick à chaque rotation visible pendant le flip
   useEffect(() => {
     if (game.isPlaying) {
