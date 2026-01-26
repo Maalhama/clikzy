@@ -3,8 +3,10 @@
 import { useCallback, useRef } from 'react'
 
 // Type pour supporter webkitAudioContext (Safari)
-interface WindowWithWebkit extends Window {
-  webkitAudioContext?: typeof AudioContext
+declare global {
+  interface Window {
+    webkitAudioContext?: typeof AudioContext
+  }
 }
 
 /**
@@ -17,8 +19,7 @@ export function useMiniGameSounds() {
   // Obtenir ou créer le contexte audio
   const getAudioContext = useCallback((): AudioContext | null => {
     if (!audioContextRef.current) {
-      const win = window as WindowWithWebkit
-      const AudioCtx = win.AudioContext || win.webkitAudioContext
+      const AudioCtx = window.AudioContext || window.webkitAudioContext
       if (AudioCtx) {
         audioContextRef.current = new AudioCtx()
       }
