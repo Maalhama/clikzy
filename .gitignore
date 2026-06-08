@@ -45,3 +45,9 @@ next-env.d.ts
 
 # Claude Code local settings (sensitive)
 .claude/settings.local.json
+
+# Images temporaires (générées, non versionnées)
+temp-images/
+
+# Cache local du CLI Supabase
+supabase/.temp/
