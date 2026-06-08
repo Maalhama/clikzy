@@ -555,23 +555,14 @@ export function LandingClient({
       </section>
 
       {/* === DESKTOP HERO === */}
-      <section className="hidden md:flex relative min-h-screen items-center pt-20">
+      <section className="hidden md:flex relative min-h-screen items-center pt-[4.25rem]">
         {/* Click Pulse Effect */}
         <ClickPulse enabled={true} intensity="medium" />
 
         <div className="relative max-w-7xl mx-auto px-6 py-20 grid lg:grid-cols-2 gap-12 items-center">
           {/* Left content */}
           <div>
-            {/* Live badge */}
-            <div className="hero-badge inline-flex items-center gap-2 px-4 py-2 bg-neon-purple/10 border border-neon-purple/30 rounded mb-6 clip-angle-sm">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-500 opacity-75" />
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500" />
-              </span>
-              <span className="text-white text-sm font-bold uppercase tracking-wider">
-                <span className="text-green-400">{playerCount}</span> participants en ligne
-              </span>
-            </div>
+            {/* Badge live retiré du hero desktop (déjà présent dans le header) */}
 
             {/* Title - Escalating sizes effect */}
             <h1 className="hero-title font-black leading-[0.9] mb-6" style={{ perspective: '1000px' }}>
