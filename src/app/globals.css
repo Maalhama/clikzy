@@ -41,6 +41,39 @@ body {
 
 body {
   min-height: 100vh;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Typographie Cleekzy v2 : titres en police display (Unbounded), corps en Hanken.
+   Placé en @layer base pour rester surchargeable par les utilitaires Tailwind. */
+@layer base {
+  h1, h2 {
+    font-family: var(--font-display);
+    letter-spacing: -0.015em;
+    line-height: 1.05;
+  }
+  h3 {
+    font-family: var(--font-display);
+    letter-spacing: -0.01em;
+  }
+}
+
+/* Atmosphère globale : grain filmique subtil au-dessus de tout (texture premium,
+   non masqué par les fonds opaques des pages). pointer-events:none = n'intercepte rien. */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body::after { opacity: 0.02; }
 }
 
 /* Scrollbar styling */

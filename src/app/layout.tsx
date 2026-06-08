@@ -1,17 +1,27 @@
 import type { Metadata, Viewport } from 'next'
-import { Inter, JetBrains_Mono } from 'next/font/google'
+import { Hanken_Grotesk, Unbounded, JetBrains_Mono } from 'next/font/google'
 import { SkipLink } from '@/components/ui/SkipLink'
 import { CookieConsent } from '@/components/common/CookieConsent'
 import { Analytics } from '@/components/common/Analytics'
 import { WebVitalsReporter } from '@/components/analytics/WebVitalsReporter'
 import './globals.css'
 
-const inter = Inter({
+// Body : grotesque moderne et lisible (remplace Inter)
+const sans = Hanken_Grotesk({
   subsets: ['latin'],
-  variable: '--font-inter',
+  variable: '--font-sans',
   display: 'swap',
   preload: true,
   fallback: ['system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+})
+
+// Display : géométrique et énergique pour les titres, le wordmark et les gros chiffres
+const display = Unbounded({
+  subsets: ['latin'],
+  variable: '--font-display',
+  display: 'swap',
+  preload: true,
+  fallback: ['var(--font-sans)', 'system-ui', 'sans-serif'],
 })
 
 const jetbrainsMono = JetBrains_Mono({
@@ -102,7 +112,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="fr" className={`${inter.variable} ${jetbrainsMono.variable}`}>
+    <html lang="fr" className={`${sans.variable} ${display.variable} ${jetbrainsMono.variable}`}>
       <head>
         <script
           type="application/ld+json"
