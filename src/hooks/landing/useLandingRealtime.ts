@@ -50,8 +50,9 @@ export function useLandingRealtime(
   initialWinners: Winner[] = [],
   initialGame: FeaturedGame | null = null
 ): LandingRealtimeData {
-  // Initialize with deterministic value based on time (same for all users)
-  const [playerCount, setPlayerCount] = useState(() => getTimeBasedPlayerCount())
+  // Valeur initiale DÉTERMINISTE (constante, identique serveur/client) pour éviter
+  // tout mismatch d'hydratation. La vraie valeur time-based est posée au montage (useEffect ci-dessous).
+  const [playerCount, setPlayerCount] = useState(Math.floor((MIN_PARTICIPANTS + MAX_PARTICIPANTS) / 2))
   const [recentWinners, setRecentWinners] = useState<Winner[]>(initialWinners)
   const [featuredGame, setFeaturedGame] = useState<FeaturedGame | null>(initialGame)
   const [isConnected, setIsConnected] = useState(false)
