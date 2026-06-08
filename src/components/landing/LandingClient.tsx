@@ -555,11 +555,19 @@ export function LandingClient({
       </section>
 
       {/* === DESKTOP HERO === */}
-      <section className="hidden md:flex relative min-h-screen items-center pt-20">
+      <section className="hidden md:flex relative min-h-screen items-center pt-20 overflow-hidden">
+        {/* Aurora animée — atmosphère vivante */}
+        <div aria-hidden className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
+          <div className="aurora-blob bg-neon-purple" style={{ width: '44rem', height: '44rem', top: '-12rem', left: '-10rem' }} />
+          <div className="aurora-blob bg-neon-blue" style={{ width: '36rem', height: '36rem', top: '18%', right: '-8rem', animationDelay: '-7s' }} />
+          <div className="aurora-blob bg-neon-pink" style={{ width: '32rem', height: '32rem', bottom: '-10rem', left: '28%', animationDelay: '-13s' }} />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_30%,rgba(11,15,26,0.72)_100%)]" />
+        </div>
+
         {/* Click Pulse Effect */}
         <ClickPulse enabled={true} intensity="medium" />
 
-        <div className="relative max-w-7xl mx-auto px-6 py-20 grid lg:grid-cols-2 gap-12 items-center">
+        <div className="relative z-10 max-w-7xl mx-auto px-6 py-20 grid lg:grid-cols-2 gap-12 items-center">
           {/* Left content */}
           <div className="relative">
             {/* Glow pools — profondeur atmosphérique derrière le titre */}
@@ -577,18 +585,18 @@ export function LandingClient({
               </span>
             </div>
 
-            {/* Title — gradient + glow, échelle dramatique */}
-            <h1 className="hero-title relative font-display font-black tracking-tight leading-[0.8] mb-7" style={{ perspective: '1000px' }}>
-              <span className="block text-5xl lg:text-6xl">
-                <span className="bg-gradient-to-br from-[#D9C4FF] via-neon-purple to-[#6E34D6] bg-clip-text text-transparent drop-shadow-[0_0_28px_rgba(155,92,255,0.35)]">CLIQUE</span>
-                <span className="text-white">.</span>
-              </span>
+            {/* Title — gradient ANIMÉ, échelle dramatique */}
+            <h1 className="hero-title relative font-display font-black tracking-tight leading-[0.78] mb-7" style={{ perspective: '1000px' }}>
               <span className="block text-6xl lg:text-7xl">
-                <span className="bg-gradient-to-br from-[#B6EEFF] via-neon-blue to-[#1C82BE] bg-clip-text text-transparent drop-shadow-[0_0_28px_rgba(60,203,255,0.35)]">JOUE</span>
+                <span className="title-animated bg-gradient-to-r from-[#E4D4FF] via-neon-purple to-neon-pink drop-shadow-[0_0_30px_rgba(155,92,255,0.45)]">CLIQUE</span>
                 <span className="text-white">.</span>
               </span>
               <span className="block text-7xl lg:text-8xl">
-                <span className="bg-gradient-to-br from-[#FFB6F0] via-neon-pink to-[#C42FA0] bg-clip-text text-transparent drop-shadow-[0_0_42px_rgba(255,79,216,0.5)]">GAGNE</span>
+                <span className="title-animated bg-gradient-to-r from-[#C4F0FF] via-neon-blue to-neon-purple drop-shadow-[0_0_30px_rgba(60,203,255,0.45)]">JOUE</span>
+                <span className="text-white">.</span>
+              </span>
+              <span className="block text-8xl lg:text-[7rem]">
+                <span className="title-animated bg-gradient-to-r from-[#FFC4F2] via-neon-pink to-neon-purple drop-shadow-[0_0_55px_rgba(255,79,216,0.6)]">GAGNE</span>
                 <span className="text-white">.</span>
               </span>
             </h1>
