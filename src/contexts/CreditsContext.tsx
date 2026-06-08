@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react'
+import { createContext, useContext, useState, useEffect, useCallback, useMemo, ReactNode } from 'react'
 import { createClient } from '@/lib/supabase/client'
 
 interface CreditsContextType {
@@ -79,8 +79,13 @@ export function CreditsProvider({ children, initialCredits, userId }: CreditsPro
     }
   }, [userId])
 
+  const value = useMemo(
+    () => ({ credits, updateCredits, decrementCredits, refreshCredits }),
+    [credits, updateCredits, decrementCredits, refreshCredits]
+  )
+
   return (
-    <CreditsContext.Provider value={{ credits, updateCredits, decrementCredits, refreshCredits }}>
+    <CreditsContext.Provider value={value}>
       {children}
     </CreditsContext.Provider>
   )

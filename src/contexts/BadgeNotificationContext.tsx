@@ -1,6 +1,6 @@
 'use client'
 
-import React, { createContext, useContext, useState, useCallback, ReactNode } from 'react'
+import React, { createContext, useContext, useState, useCallback, useMemo, ReactNode } from 'react'
 import type { Badge } from '@/actions/badges'
 
 interface BadgeNotification {
@@ -43,15 +43,18 @@ export function BadgeNotificationProvider({ children }: { children: ReactNode })
     setNotifications(prev => prev.filter(n => n.id !== id))
   }, [])
 
+  const value = useMemo(
+    () => ({
+      notifications,
+      showBadgeNotification,
+      showBadgeNotifications,
+      dismissNotification,
+    }),
+    [notifications, showBadgeNotification, showBadgeNotifications, dismissNotification]
+  )
+
   return (
-    <BadgeNotificationContext.Provider
-      value={{
-        notifications,
-        showBadgeNotification,
-        showBadgeNotifications,
-        dismissNotification,
-      }}
-    >
+    <BadgeNotificationContext.Provider value={value}>
       {children}
     </BadgeNotificationContext.Provider>
   )

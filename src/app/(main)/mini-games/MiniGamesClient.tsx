@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useCallback } from 'react';
+import dynamic from 'next/dynamic';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Trophy, Clock, Zap, ChevronRight, X, Sparkles, Coins } from 'lucide-react';
 import confetti from 'canvas-confetti';
@@ -13,13 +14,20 @@ import { useCountdown } from '@/hooks/useCountdown';
 import { playMiniGame, playMiniGamePaid } from '@/actions/miniGames';
 import { MiniGameType, MiniGameEligibility, WHEEL_SEGMENTS, PACHINKO_SLOTS } from '@/types/miniGames';
 
-import WheelOfFortune from '@/components/mini-games/WheelOfFortune';
-import ScratchCard from '@/components/mini-games/ScratchCard';
-import Pachinko from '@/components/mini-games/Pachinko';
-import SlotMachine from '@/components/mini-games/SlotMachine';
-import CoinFlip from '@/components/mini-games/CoinFlip';
-import DiceRoll from '@/components/mini-games/DiceRoll';
 import { trackMiniGame } from '@/lib/analytics';
+
+// Mini-jeux chargés à la demande (un seul se joue à la fois) — sortis du bundle initial de /mini-games
+const GameLoader = () => (
+  <div className="flex items-center justify-center py-20">
+    <div className="h-8 w-8 animate-spin rounded-full border-2 border-white/20 border-t-white/80" />
+  </div>
+);
+const WheelOfFortune = dynamic(() => import('@/components/mini-games/WheelOfFortune'), { ssr: false, loading: GameLoader });
+const ScratchCard = dynamic(() => import('@/components/mini-games/ScratchCard'), { ssr: false, loading: GameLoader });
+const Pachinko = dynamic(() => import('@/components/mini-games/Pachinko'), { ssr: false, loading: GameLoader });
+const SlotMachine = dynamic(() => import('@/components/mini-games/SlotMachine'), { ssr: false, loading: GameLoader });
+const CoinFlip = dynamic(() => import('@/components/mini-games/CoinFlip'), { ssr: false, loading: GameLoader });
+const DiceRoll = dynamic(() => import('@/components/mini-games/DiceRoll'), { ssr: false, loading: GameLoader });
 
 // Coût en crédits par type de jeu
 const PLAY_COSTS: Record<MiniGameType, number> = {
