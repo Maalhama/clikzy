@@ -178,7 +178,7 @@ export function FloatingPrizes() {
                     {prize.name}
                   </h4>
                   <div
-                    className={`font-display font-black ${colors.text} ${isMain ? 'text-2xl' : 'text-sm'}`}
+                    className={`font-black ${colors.text} ${isMain ? 'text-2xl' : 'text-sm'}`}
                     style={{
                       textShadow: `0 0 15px ${colors.hex}60`,
                     }}
