@@ -561,30 +561,34 @@ export function LandingClient({
 
         <div className="relative max-w-7xl mx-auto px-6 py-20 grid lg:grid-cols-2 gap-12 items-center">
           {/* Left content */}
-          <div>
+          <div className="relative">
+            {/* Glow pools — profondeur atmosphérique derrière le titre */}
+            <div aria-hidden className="pointer-events-none absolute -left-32 -top-28 h-[30rem] w-[30rem] rounded-full bg-neon-purple/20 blur-[130px]" />
+            <div aria-hidden className="pointer-events-none absolute left-1/4 top-40 h-80 w-80 rounded-full bg-neon-pink/15 blur-[120px]" />
+
             {/* Live badge */}
-            <div className="hero-badge inline-flex items-center gap-2 px-4 py-2 bg-neon-purple/10 border border-neon-purple/30 rounded mb-6 clip-angle-sm">
+            <div className="hero-badge relative inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-white/[0.04] border border-white/10 backdrop-blur-md mb-7 shadow-[0_0_40px_-14px_rgba(155,92,255,0.7)]">
               <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-500 opacity-75" />
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500" />
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-green-400" />
               </span>
-              <span className="text-white text-sm font-bold uppercase tracking-wider">
-                <span className="text-green-400">{playerCount}</span> participants en ligne
+              <span className="text-white/90 text-[13px] font-bold uppercase tracking-[0.18em]">
+                <span className="text-green-400">{playerCount}</span> en ligne maintenant
               </span>
             </div>
 
-            {/* Title - Escalating sizes effect */}
-            <h1 className="hero-title font-black leading-[0.9] mb-6" style={{ perspective: '1000px' }}>
-              <span className="block text-3xl lg:text-4xl">
-                <span className="text-neon-purple neon-text">CLIQUE</span>
-                <span className="text-white">.</span>
-              </span>
+            {/* Title — gradient + glow, échelle dramatique */}
+            <h1 className="hero-title relative font-display font-black tracking-tight leading-[0.8] mb-7" style={{ perspective: '1000px' }}>
               <span className="block text-5xl lg:text-6xl">
-                <span className="text-neon-blue neon-text">JOUE</span>
+                <span className="bg-gradient-to-br from-[#D9C4FF] via-neon-purple to-[#6E34D6] bg-clip-text text-transparent drop-shadow-[0_0_28px_rgba(155,92,255,0.35)]">CLIQUE</span>
                 <span className="text-white">.</span>
               </span>
-              <span className="block text-6xl lg:text-7xl glitch-text" data-text="GAGNE.">
-                <span className="text-neon-pink neon-text-pink">GAGNE</span>
+              <span className="block text-6xl lg:text-7xl">
+                <span className="bg-gradient-to-br from-[#B6EEFF] via-neon-blue to-[#1C82BE] bg-clip-text text-transparent drop-shadow-[0_0_28px_rgba(60,203,255,0.35)]">JOUE</span>
+                <span className="text-white">.</span>
+              </span>
+              <span className="block text-7xl lg:text-8xl">
+                <span className="bg-gradient-to-br from-[#FFB6F0] via-neon-pink to-[#C42FA0] bg-clip-text text-transparent drop-shadow-[0_0_42px_rgba(255,79,216,0.5)]">GAGNE</span>
                 <span className="text-white">.</span>
               </span>
             </h1>
@@ -636,19 +640,19 @@ export function LandingClient({
               </p>
             </div>
 
-            {/* Stats */}
-            <div className="hero-stats grid grid-cols-3 gap-6">
-              <div className="stat-box p-4 rounded-xl bg-bg-secondary/40 border border-neon-blue/20">
-                <div className="text-3xl font-black text-neon-blue">+{stats.totalWinningsValue.toLocaleString()}€</div>
-                <div className="text-xs text-white/40 uppercase tracking-wider">Récompenses</div>
+            {/* Stats — chiffres en gradient, cartes glassy avec hover */}
+            <div className="hero-stats grid grid-cols-3 gap-4">
+              <div className="stat-box relative p-4 rounded-2xl bg-white/[0.03] border border-white/10 transition-all duration-300 hover:-translate-y-1 hover:border-neon-blue/40 hover:bg-white/[0.05]">
+                <div className="font-display text-3xl font-black bg-gradient-to-br from-white to-neon-blue bg-clip-text text-transparent">+{stats.totalWinningsValue.toLocaleString()}€</div>
+                <div className="mt-1 text-[11px] text-white/45 uppercase tracking-[0.12em]">Récompenses</div>
               </div>
-              <div className="stat-box p-4 rounded-xl bg-bg-secondary/40 border border-neon-purple/20">
-                <div className="text-3xl font-black text-neon-purple">+100</div>
-                <div className="text-xs text-white/40 uppercase tracking-wider">Lots</div>
+              <div className="stat-box relative p-4 rounded-2xl bg-white/[0.03] border border-white/10 transition-all duration-300 hover:-translate-y-1 hover:border-neon-purple/40 hover:bg-white/[0.05]">
+                <div className="font-display text-3xl font-black bg-gradient-to-br from-white to-neon-purple bg-clip-text text-transparent">+100</div>
+                <div className="mt-1 text-[11px] text-white/45 uppercase tracking-[0.12em]">Lots</div>
               </div>
-              <div className="stat-box p-4 rounded-xl bg-bg-secondary/40 border border-neon-pink/20">
-                <div className="text-3xl font-black text-neon-pink">10</div>
-                <div className="text-xs text-white/40 uppercase tracking-wider">Clics gratuits/jour</div>
+              <div className="stat-box relative p-4 rounded-2xl bg-white/[0.03] border border-white/10 transition-all duration-300 hover:-translate-y-1 hover:border-neon-pink/40 hover:bg-white/[0.05]">
+                <div className="font-display text-3xl font-black bg-gradient-to-br from-white to-neon-pink bg-clip-text text-transparent">10</div>
+                <div className="mt-1 text-[11px] text-white/45 uppercase tracking-[0.12em]">Clics gratuits/jour</div>
               </div>
             </div>
           </div>
