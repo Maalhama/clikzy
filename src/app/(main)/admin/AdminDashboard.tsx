@@ -203,13 +203,13 @@ function UsersTab({ users }: { users: AdminUser[] }) {
                   </button>
                 </td>
                 <td className="px-4 py-3 text-white/40 text-sm">
-                  {new Date(user.created_at).toLocaleDateString('fr-FR')}
+                  {new Date(user.created_at ?? 0).toLocaleDateString('fr-FR')}
                 </td>
                 <td className="px-4 py-3 text-right">
                   <button
                     onClick={() => {
                       setEditingCredits(user.id)
-                      setCreditsValue(user.credits)
+                      setCreditsValue(user.credits ?? 0)
                     }}
                     className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/60 hover:text-white transition-colors"
                   >
@@ -263,14 +263,14 @@ function GamesTab({ games }: { games: AdminGame[] }) {
                   <span className="text-white font-medium">{game.item?.name || '-'}</span>
                 </td>
                 <td className="px-4 py-3">
-                  <span className={`px-2 py-1 rounded text-xs font-medium ${statusColors[game.status]}`}>
-                    {statusLabels[game.status]}
+                  <span className={`px-2 py-1 rounded text-xs font-medium ${statusColors[game.status ?? '']}`}>
+                    {statusLabels[game.status ?? '']}
                   </span>
                 </td>
                 <td className="px-4 py-3 text-neon-pink font-bold">{game.total_clicks}</td>
                 <td className="px-4 py-3 text-white/60 text-sm">{game.last_click_username || '-'}</td>
                 <td className="px-4 py-3 text-white/40 text-sm">
-                  {new Date(game.created_at).toLocaleDateString('fr-FR')}
+                  {new Date(game.created_at ?? 0).toLocaleDateString('fr-FR')}
                 </td>
               </tr>
             ))}
@@ -323,7 +323,7 @@ function ItemsTab({ items }: { items: Item[] }) {
                   </span>
                 </td>
                 <td className="px-4 py-3 text-white/40 text-sm">
-                  {new Date(item.created_at).toLocaleDateString('fr-FR')}
+                  {new Date(item.created_at ?? 0).toLocaleDateString('fr-FR')}
                 </td>
               </tr>
             ))}
@@ -393,14 +393,14 @@ function WinnersTab({ winners }: { winners: Winner[] }) {
                   {winner.item_value ? `${winner.item_value}€` : '-'}
                 </td>
                 <td className="px-4 py-3 text-white/40 text-sm">
-                  {new Date(winner.won_at).toLocaleDateString('fr-FR')}
+                  {new Date(winner.won_at ?? 0).toLocaleDateString('fr-FR')}
                 </td>
                 <td className="px-4 py-3">
                   <select
-                    value={winner.shipping_status}
+                    value={winner.shipping_status ?? ''}
                     onChange={(e) => handleStatusChange(winner.id, e.target.value as typeof statusOptions[number])}
-                    disabled={updatingStatus === winner.id || winner.is_bot}
-                    className={`px-2 py-1 rounded text-xs font-medium border-0 cursor-pointer ${statusColors[winner.shipping_status]} disabled:opacity-50`}
+                    disabled={updatingStatus === winner.id || !!winner.is_bot}
+                    className={`px-2 py-1 rounded text-xs font-medium border-0 cursor-pointer ${statusColors[winner.shipping_status ?? '']} disabled:opacity-50`}
                   >
                     {statusOptions.map((status) => (
                       <option key={status} value={status}>{statusLabels[status]}</option>

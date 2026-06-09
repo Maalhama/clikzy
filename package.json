@@ -9,6 +9,7 @@
     "start": "next start",
     "lint": "eslint src",
     "type-check": "tsc --noEmit",
+    "db:types": "supabase gen types typescript --project-id wloyztidhbgumtdirdya --schema public > src/lib/supabase/database.types.ts",
     "test": "vitest",
     "test:run": "vitest run",
     "test:coverage": "vitest run --coverage",

@@ -43,7 +43,7 @@ export const GameCard = memo(function GameCard({ game, index = 0, isFavorite = f
   const [timeLeft, setTimeLeft] = useState(() =>
     game.end_time ? calculateTimeLeft(game.end_time) : 0
   )
-  const [prevClicks, setPrevClicks] = useState(game.total_clicks)
+  const [prevClicks, setPrevClicks] = useState(game.total_clicks ?? 0)
   const [imgError, setImgError] = useState(false)
   const cardRef = useRef<HTMLAnchorElement>(null)
 
@@ -70,7 +70,7 @@ export const GameCard = memo(function GameCard({ game, index = 0, isFavorite = f
     const updateTimer = (timestamp: number) => {
       // Update every 100ms for smooth countdown
       if (timestamp - lastUpdate >= 100) {
-        setTimeLeft(calculateTimeLeft(game.end_time))
+        setTimeLeft(calculateTimeLeft(game.end_time ?? 0))
         lastUpdate = timestamp
       }
       animationId = requestAnimationFrame(updateTimer)
@@ -82,8 +82,8 @@ export const GameCard = memo(function GameCard({ game, index = 0, isFavorite = f
 
   // Click count sync
   useEffect(() => {
-    if (game.total_clicks > prevClicks) {
-      setPrevClicks(game.total_clicks)
+    if ((game.total_clicks ?? 0) > prevClicks) {
+      setPrevClicks(game.total_clicks ?? 0)
     }
   }, [game.total_clicks, prevClicks])
 
@@ -141,7 +141,7 @@ export const GameCard = memo(function GameCard({ game, index = 0, isFavorite = f
 
     // If game has clicks but no username, generate a deterministic one
     // This ensures server and client render the same name
-    if (game.total_clicks > 0) {
+    if ((game.total_clicks ?? 0) > 0) {
       return generateDeterministicUsername(game.id)
     }
 
@@ -606,7 +606,7 @@ export const GameCard = memo(function GameCard({ game, index = 0, isFavorite = f
                 <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                {formatDuration((game.ended_at ? new Date(game.ended_at).getTime() : game.end_time) - new Date(game.start_time).getTime())}
+                {formatDuration((game.ended_at ? new Date(game.ended_at).getTime() : (game.end_time ?? 0)) - new Date(game.start_time).getTime())}
               </span>
             )}
           </div>

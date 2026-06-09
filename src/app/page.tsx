@@ -116,8 +116,8 @@ async function getLandingData() {
       username: w.username || profile?.username || 'Anonyme',
       item_name: w.item_name,
       item_value: w.item_value || 0,
-      won_at: w.won_at,
-      avatar_url: profile?.avatar_url || undefined,
+      won_at: w.won_at ?? new Date(0).toISOString(),
+      avatar_url: profile?.avatar_url ?? undefined,
     }
   })
 
@@ -142,8 +142,8 @@ async function getLandingData() {
         item_name: typedItem.name,
         item_image_url: typedItem.image_url,
         item_value: typedItem.retail_value || 0,
-        end_time: typedGame.end_time,
-        total_clicks: typedGame.total_clicks,
+        end_time: typedGame.end_time ?? 0,
+        total_clicks: typedGame.total_clicks ?? 0,
         last_click_username: typedGame.last_click_username,
         status: typedGame.status as FeaturedGame['status'],
       }

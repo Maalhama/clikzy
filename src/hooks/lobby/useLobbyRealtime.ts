@@ -113,7 +113,7 @@ export function useLobbyRealtime(
     // Process initial games and track final phase entry
     const gamesWithTracking: GameWithFinalPhaseTracking[] = initialGames.map((game) => {
       // Check if game is in final phase
-      const timeLeft = game.end_time - now
+      const timeLeft = (game.end_time ?? 0) - now
       const inFinalPhase = timeLeft > 0 && timeLeft <= GAME_CONSTANTS.FINAL_PHASE_THRESHOLD
 
       // Track when game entered final phase
@@ -247,7 +247,7 @@ export function useLobbyRealtime(
               if (game.id === updated.id) {
                 // Check if this is a new click (total_clicks increased)
                 if (
-                  updated.total_clicks > game.total_clicks &&
+                  updated.total_clicks > (game.total_clicks ?? 0) &&
                   updated.last_click_username
                 ) {
                   addClickNotification(

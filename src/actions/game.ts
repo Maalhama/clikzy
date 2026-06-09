@@ -84,7 +84,7 @@ export async function clickGame(gameId: string): Promise<ActionResult<{ newEndTi
   // Calculate new end time if in final phase
   let newEndTime: number | undefined
   const now = Date.now()
-  const timeLeft = game.end_time - now
+  const timeLeft = (game.end_time ?? 0) - now
 
   // If less than 1 minute remaining, reset to 1 minute
   if (timeLeft <= GAME_CONSTANTS.FINAL_PHASE_THRESHOLD) {
@@ -131,7 +131,7 @@ export async function clickGame(gameId: string): Promise<ActionResult<{ newEndTi
   auditLog('game.click', {
     gameId,
     newEndTime,
-    totalClicks: game.total_clicks + 1,
+    totalClicks: (game.total_clicks ?? 0) + 1,
     inFinalPhase: !!newEndTime,
   }, { userId: user.id, username: profile.username })
 

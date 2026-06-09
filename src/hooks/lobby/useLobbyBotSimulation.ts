@@ -105,7 +105,7 @@ export function useLobbyBotSimulation({
   // Fonction pour simuler un clic sur un jeu
   const simulateClick = useCallback((game: GameWithItem) => {
     const now = Date.now()
-    const timeLeft = game.end_time - now
+    const timeLeft = (game.end_time ?? 0) - now
 
     if (timeLeft <= 0) return
 
@@ -122,7 +122,7 @@ export function useLobbyBotSimulation({
     onGameUpdateRef.current(game.id, {
       total_clicks: (game.total_clicks || 0) + 1,
       last_click_username: username,
-      end_time: shouldResetTimer ? now + 90000 : game.end_time,
+      end_time: shouldResetTimer ? now + 90000 : (game.end_time ?? undefined),
     })
 
     // Mettre à jour le temps du dernier clic
@@ -149,7 +149,7 @@ export function useLobbyBotSimulation({
         // Seulement les jeux actifs
         if (game.status !== 'active' && game.status !== 'final_phase') return
 
-        const timeLeft = game.end_time - now
+        const timeLeft = (game.end_time ?? 0) - now
         if (timeLeft <= 0) return
 
         const isInFinalPhase = game.status === 'final_phase' || timeLeft <= 90000

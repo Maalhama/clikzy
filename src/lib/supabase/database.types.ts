@@ -22,10 +22,12 @@ export type Database = {
           description: string
           icon: string
           id: string
+          is_hidden: boolean
           name: string
           rarity: string
           requirement_type: string
           requirement_value: number
+          xp_reward: number
         }
         Insert: {
           category?: string
@@ -34,10 +36,12 @@ export type Database = {
           description: string
           icon: string
           id: string
+          is_hidden?: boolean
           name: string
           rarity?: string
           requirement_type: string
           requirement_value?: number
+          xp_reward?: number
         }
         Update: {
           category?: string
@@ -46,10 +50,12 @@ export type Database = {
           description?: string
           icon?: string
           id?: string
+          is_hidden?: boolean
           name?: string
           rarity?: string
           requirement_type?: string
           requirement_value?: number
+          xp_reward?: number
         }
         Relationships: []
       }
@@ -103,6 +109,42 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      daily_quests: {
+        Row: {
+          active: boolean
+          credits_reward: number
+          description: string | null
+          key: string
+          metric: string
+          sort_order: number
+          target: number
+          title: string
+          xp_reward: number
+        }
+        Insert: {
+          active?: boolean
+          credits_reward?: number
+          description?: string | null
+          key: string
+          metric: string
+          sort_order?: number
+          target: number
+          title: string
+          xp_reward?: number
+        }
+        Update: {
+          active?: boolean
+          credits_reward?: number
+          description?: string | null
+          key?: string
+          metric?: string
+          sort_order?: number
+          target?: number
+          title?: string
+          xp_reward?: number
+        }
+        Relationships: []
       }
       games: {
         Row: {
@@ -219,6 +261,7 @@ export type Database = {
           game_type: string
           id: string
           is_free_play: boolean
+          play_day: string | null
           played_at: string | null
           user_id: string
         }
@@ -227,6 +270,7 @@ export type Database = {
           game_type: string
           id?: string
           is_free_play?: boolean
+          play_day?: string | null
           played_at?: string | null
           user_id: string
         }
@@ -235,6 +279,7 @@ export type Database = {
           game_type?: string
           id?: string
           is_free_play?: boolean
+          play_day?: string | null
           played_at?: string | null
           user_id?: string
         }
@@ -292,6 +337,7 @@ export type Database = {
           is_vip: boolean | null
           last_credits_reset: string | null
           last_vip_bonus_at: string | null
+          level: number
           referral_code: string | null
           referral_count: number | null
           referral_credits_earned: number | null
@@ -304,12 +350,15 @@ export type Database = {
           shipping_lastname: string | null
           shipping_phone: string | null
           shipping_postal_code: string | null
+          streak_count: number
+          streak_last_day: string | null
           total_clicks: number | null
           total_wins: number | null
           updated_at: string | null
           username: string
           vip_expires_at: string | null
           vip_subscription_id: string | null
+          xp: number
         }
         Insert: {
           avatar_url?: string | null
@@ -322,6 +371,7 @@ export type Database = {
           is_vip?: boolean | null
           last_credits_reset?: string | null
           last_vip_bonus_at?: string | null
+          level?: number
           referral_code?: string | null
           referral_count?: number | null
           referral_credits_earned?: number | null
@@ -334,12 +384,15 @@ export type Database = {
           shipping_lastname?: string | null
           shipping_phone?: string | null
           shipping_postal_code?: string | null
+          streak_count?: number
+          streak_last_day?: string | null
           total_clicks?: number | null
           total_wins?: number | null
           updated_at?: string | null
           username: string
           vip_expires_at?: string | null
           vip_subscription_id?: string | null
+          xp?: number
         }
         Update: {
           avatar_url?: string | null
@@ -352,6 +405,7 @@ export type Database = {
           is_vip?: boolean | null
           last_credits_reset?: string | null
           last_vip_bonus_at?: string | null
+          level?: number
           referral_code?: string | null
           referral_count?: number | null
           referral_credits_earned?: number | null
@@ -364,12 +418,15 @@ export type Database = {
           shipping_lastname?: string | null
           shipping_phone?: string | null
           shipping_postal_code?: string | null
+          streak_count?: number
+          streak_last_day?: string | null
           total_clicks?: number | null
           total_wins?: number | null
           updated_at?: string | null
           username?: string
           vip_expires_at?: string | null
           vip_subscription_id?: string | null
+          xp?: number
         }
         Relationships: [
           {
@@ -428,6 +485,42 @@ export type Database = {
           },
           {
             foreignKeyName: "user_badges_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_quest_claims: {
+        Row: {
+          claimed_at: string
+          quest_day: string
+          quest_key: string
+          user_id: string
+        }
+        Insert: {
+          claimed_at?: string
+          quest_day: string
+          quest_key: string
+          user_id: string
+        }
+        Update: {
+          claimed_at?: string
+          quest_day?: string
+          quest_key?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_quest_claims_quest_key_fkey"
+            columns: ["quest_key"]
+            isOneToOne: false
+            referencedRelation: "daily_quests"
+            referencedColumns: ["key"]
+          },
+          {
+            foreignKeyName: "user_quest_claims_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
@@ -533,15 +626,41 @@ export type Database = {
           reason: string
         }[]
       }
+      award_xp: {
+        Args: { p_amount: number; p_user_id: string }
+        Returns: {
+          leveled_up: boolean
+          new_level: number
+          new_xp: number
+        }[]
+      }
       can_play_mini_game: {
         Args: { p_game_type: string; p_user_id: string }
         Returns: boolean
+      }
+      claim_daily_login: {
+        Args: { p_user_id: string }
+        Returns: {
+          already: boolean
+          credits_gained: number
+          streak: number
+          xp_gained: number
+        }[]
       }
       claim_eligible_badges: {
         Args: never
         Returns: {
           badge_id: string
           credits_reward: number
+        }[]
+      }
+      claim_quest: {
+        Args: { p_quest_key: string }
+        Returns: {
+          credits_reward: number
+          ok: boolean
+          reason: string
+          xp_reward: number
         }[]
       }
       collect_vip_bonus: {
@@ -552,17 +671,11 @@ export type Database = {
           reason: string
         }[]
       }
-      decrement_credits: {
-        Args: { p_amount?: number; p_user_id: string }
-        Returns: number
-      }
       deduct_credits: {
         Args: { p_amount: number; p_user_id: string }
         Returns: number
       }
-      generate_bot_username: { Args: { seed: string }; Returns: string }
-      get_next_sequence: { Args: { p_game_id: string }; Returns: number }
-      get_total_credits: { Args: { p_user_id: string }; Returns: number }
+      increment_total_wins: { Args: { p_user_id: string }; Returns: number }
       log_player_event: {
         Args: { p_action: string; p_details?: Json; p_user_id: string }
         Returns: undefined
@@ -582,10 +695,6 @@ export type Database = {
           reason: string
         }[]
       }
-      refund_credits: {
-        Args: { p_amount: number; p_user_id: string }
-        Returns: number
-      }
       reset_daily_credits: {
         Args: { p_user_id: string }
         Returns: {
@@ -594,7 +703,7 @@ export type Database = {
           was_reset: boolean
         }[]
       }
-      simulate_bot_clicks: { Args: never; Returns: undefined }
+      xp_to_level: { Args: { p_xp: number }; Returns: number }
     }
     Enums: {
       game_status: "waiting" | "active" | "final_phase" | "ended"

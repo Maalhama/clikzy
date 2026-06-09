@@ -122,7 +122,7 @@ export function LobbyClient({
 
     // Get all active final phase games (< 60s remaining)
     const finalPhaseGames = games.filter(
-      (g) => g.status !== 'ended' && g.end_time > now && (g.end_time - now) <= 60000
+      (g) => g.status !== 'ended' && (g.end_time ?? 0) > now && ((g.end_time ?? 0) - now) <= 60000
     )
 
     // If we have a sticky game, check if it's still valid
@@ -144,7 +144,7 @@ export function LobbyClient({
       const aEntry = a.enteredFinalPhaseAt || 0
       const bEntry = b.enteredFinalPhaseAt || 0
       if (aEntry !== bEntry) return bEntry - aEntry // Newest entry first
-      return a.end_time - b.end_time // Fallback: soonest end time
+      return (a.end_time ?? 0) - (b.end_time ?? 0) // Fallback: soonest end time
     })
 
     // Set the new sticky game
@@ -167,7 +167,7 @@ export function LobbyClient({
         enabled={true}
         isLoggedIn={true}
         gameId={urgentGame?.id}
-        initialEndTime={urgentGame?.end_time}
+        initialEndTime={urgentGame?.end_time ?? undefined}
         itemName={urgentGame?.item.name}
       />
 

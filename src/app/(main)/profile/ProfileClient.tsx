@@ -478,7 +478,7 @@ function WinCard({ win, index }: { win: WinnerWithItem; index: number }) {
       <div className="flex-1 min-w-0">
         <h3 className="font-semibold text-white text-sm truncate">{win.item_name}</h3>
         <p className="text-white/40 text-xs">
-          {new Date(win.won_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' })}
+          {new Date(win.won_at ?? new Date(0).toISOString()).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' })}
         </p>
       </div>
       {(win.item_value || win.item?.retail_value) && (

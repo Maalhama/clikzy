@@ -121,7 +121,7 @@ export function useLobbyFilters(games: GameWithFinalPhaseTracking[], options: Us
       case 'all':
         // "Toutes" = only active games (NOT waiting, NOT ended)
         filtered = filtered.filter((game) => {
-          return game.status !== 'waiting' && game.status !== 'ended' && game.end_time > sortTime
+          return game.status !== 'waiting' && game.status !== 'ended' && (game.end_time ?? 0) > sortTime
         })
         break
       case 'favorites':
@@ -153,7 +153,7 @@ export function useLobbyFilters(games: GameWithFinalPhaseTracking[], options: Us
         break
       case 'ended':
         filtered = filtered.filter((game) => {
-          return game.status === 'ended' || game.end_time <= sortTime
+          return game.status === 'ended' || (game.end_time ?? 0) <= sortTime
         })
         break
     }
@@ -163,12 +163,12 @@ export function useLobbyFilters(games: GameWithFinalPhaseTracking[], options: Us
     // 1. DB status is 'ended', OR
     // 2. Timer has expired (end_time <= sortTime)
     const isGameEndedForSort = (game: GameWithFinalPhaseTracking) => {
-      return game.status === 'ended' || game.end_time <= sortTime
+      return game.status === 'ended' || (game.end_time ?? 0) <= sortTime
     }
 
     // Helper: check if game is in final phase (< 60s remaining)
     const isInFinalPhase = (game: GameWithFinalPhaseTracking) => {
-      const timeLeft = game.end_time - sortTime
+      const timeLeft = (game.end_time ?? 0) - sortTime
       return timeLeft > 0 && timeLeft <= FINAL_PHASE_THRESHOLD
     }
 
@@ -186,7 +186,7 @@ export function useLobbyFilters(games: GameWithFinalPhaseTracking[], options: Us
 
           // Both ended: sort by end_time descending (most recently ended first)
           if (aEnded && bEnded) {
-            return b.end_time - a.end_time
+            return (b.end_time ?? 0) - (a.end_time ?? 0)
           }
 
           // Check if in final phase
@@ -207,7 +207,7 @@ export function useLobbyFilters(games: GameWithFinalPhaseTracking[], options: Us
           }
 
           // Both NOT in final phase: sort by end_time ascending (soonest first)
-          return a.end_time - b.end_time
+          return (a.end_time ?? 0) - (b.end_time ?? 0)
         })
         break
       case 'newest':
@@ -221,7 +221,7 @@ export function useLobbyFilters(games: GameWithFinalPhaseTracking[], options: Us
             if (!aEnded && bEnded) return -1
           }
 
-          return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+          return new Date(b.created_at ?? 0).getTime() - new Date(a.created_at ?? 0).getTime()
         })
         break
       case 'most_clicks':
@@ -235,7 +235,7 @@ export function useLobbyFilters(games: GameWithFinalPhaseTracking[], options: Us
             if (!aEnded && bEnded) return -1
           }
 
-          return b.total_clicks - a.total_clicks
+          return (b.total_clicks ?? 0) - (a.total_clicks ?? 0)
         })
         break
       case 'highest_value':

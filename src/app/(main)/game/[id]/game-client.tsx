@@ -71,7 +71,7 @@ export function GameClient({
   const [clickAnimation, setClickAnimation] = useState(false)
   const [creditsAnimation, setCreditsAnimation] = useState(false)
 
-  const { timeLeft, isUrgent, isEnded } = useTimer({ endTime: game.end_time })
+  const { timeLeft, isUrgent, isEnded } = useTimer({ endTime: game.end_time ?? 0 })
 
   // Display actual time (everything resets to 60s)
   const displayTimeLeft = timeLeft
@@ -80,8 +80,8 @@ export function GameClient({
   // Simulation pour expérience visuelle fluide
   useBotSimulation({
     gameId: game.id,
-    endTime: game.end_time,
-    status: game.status,
+    endTime: game.end_time ?? 0,
+    status: game.status ?? '',
     battleStartTime: game.battle_start_time,
     lastClickUsername: game.last_click_username,
     lastClickUserId: game.last_click_user_id,
@@ -110,7 +110,7 @@ export function GameClient({
   // Get leader name (real or bot-generated for consistency)
   const leaderName = useMemo(() => {
     if (game.last_click_username) return game.last_click_username
-    if (game.total_clicks > 0) return generateDeterministicUsername(game.id)
+    if ((game.total_clicks ?? 0) > 0) return generateDeterministicUsername(game.id)
     return null
   }, [game.id, game.last_click_username, game.total_clicks])
 
@@ -184,13 +184,13 @@ export function GameClient({
     const newClick = { id: generateId(), username, clickedAt: now, isBot: false }
     addClick(newClick)
 
-    const currentTimeLeft = game.end_time - Date.now()
-    let newEndTime = game.end_time
+    const currentTimeLeft = (game.end_time ?? 0) - Date.now()
+    let newEndTime = game.end_time ?? 0
     if (currentTimeLeft <= GAME_CONSTANTS.FINAL_PHASE_THRESHOLD) {
       newEndTime = Date.now() + GAME_CONSTANTS.TIMER_RESET_VALUE
     }
 
-    const newTotalClicks = game.total_clicks + 1
+    const newTotalClicks = (game.total_clicks ?? 0) + 1
 
     optimisticUpdate({
       last_click_username: username,
