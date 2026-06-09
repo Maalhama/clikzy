@@ -366,10 +366,11 @@ export async function GET(request: NextRequest) {
             const clickThreshold = 65000 + (clickThresholdSeed % 20000) // 65s à 85s par jeu
 
             if (timeLeft <= clickThreshold) {
-              // Timer sous le seuil de ce jeu - bot clique
+              // Timer sous le seuil de ce jeu - bot clique (simule plusieurs bots qui se battent)
               updates.last_click_username = botUsername
               updates.last_click_user_id = null
               updates.end_time = now + 90000 // Reset à 90s
+              updates.total_clicks = (game.total_clicks || 0) + Math.floor(Math.random() * 5) + 2 // +2 à +6 : bataille intense
               action = `bot_click_final (${botUsername}) SAVED at ${Math.floor(timeLeft/1000)}s! (threshold: ${Math.floor(clickThreshold/1000)}s) [battle: ${Math.round(battleProgress * 100)}%/${battleDurationMin}min]`
             } else {
               // Timer > seuil - laisser descendre
@@ -380,9 +381,10 @@ export async function GET(request: NextRequest) {
             action = `battle_ended (${Math.round(battleProgress * 100)}%) - no real player, letting timer run down`
           }
         } else {
-          // Phase normale - les bots cliquent comme des vrais joueurs
+          // Phase normale - les bots cliquent comme des vrais joueurs (activité simulée)
           updates.last_click_username = botUsername
           updates.last_click_user_id = null // Bot prend le lead
+          updates.total_clicks = (game.total_clicks || 0) + Math.floor(Math.random() * 3) + 1 // +1 à +3
           action = hasRealPlayer
             ? `bot_took_lead (${botUsername}) from ${game.last_click_username}`
             : `bot_click (${botUsername})`
