@@ -91,79 +91,32 @@ export async function clickGame(gameId: string): Promise<ActionResult<{ newEndTi
     newEndTime = now + GAME_CONSTANTS.TIMER_RESET_VALUE
   }
 
-  // Get next sequence number for this game
+  // Clic ATOMIQUE via la RPC perform_click : déduction (daily puis earned) + insertion du clic
+  // + maj de la partie (last_click, total_clicks, timer en phase finale, battle_start_time)
+  // + maj total_clicks du profil, le tout dans UNE transaction verrouillée (FOR UPDATE → règle
+  // les races de séquence/dernier-clic). SECURITY DEFINER → fonctionne avec la RLS games fermée (C1).
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data: seqData } = await (supabase.rpc as any)('get_next_sequence', { p_game_id: gameId })
-
-  const sequence = (seqData as number) ?? 1
-
-  // Start transaction-like operations
-  // 1. Deduct credit (uses daily credits first, then earned credits)
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data: deductResult, error: creditError } = await (supabase.rpc as any)('deduct_credits', { p_user_id: user.id, p_amount: GAME_CONSTANTS.CREDIT_COST_PER_CLICK })
-
-  if (creditError || deductResult === -1) {
-    return { success: false, error: 'Crédits insuffisants' }
-  }
-
-  // 2. Record click (with username and item_name for the live feed)
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { error: clickError } = await (supabase as any)
-    .from('clicks')
-    .insert({
-      game_id: gameId,
-      user_id: user.id,
-      username: profile.username,
-      item_name: game.item?.name || 'Produit',
-      is_bot: false,
-      sequence_number: sequence,
-      credits_spent: GAME_CONSTANTS.CREDIT_COST_PER_CLICK,
-    })
+  const { data: clickResult, error: clickError } = await (supabase.rpc as any)('perform_click', {
+    p_game_id: gameId,
+    p_user_id: user.id,
+    p_username: profile.username,
+    p_item_name: game.item?.name || 'Produit',
+  })
 
   if (clickError) {
-    // Refund du clic échoué via refund_credits : re-crédite SANS gonfler total_clicks
-    // (contrairement à l'ancien decrement_credits(-1) qui incrémentait total_clicks, compteur permanent)
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await (supabase.rpc as any)('refund_credits', { p_user_id: user.id, p_amount: GAME_CONSTANTS.CREDIT_COST_PER_CLICK })
-    return { success: false, error: 'Erreur lors de l\'enregistrement du clic' }
+    return { success: false, error: 'Erreur lors du clic' }
   }
-
-  // 3. Update game
-  const updateData: Partial<Game> = {
-    last_click_user_id: user.id,
-    last_click_username: profile.username,
-    last_click_at: new Date(now).toISOString(),
-    total_clicks: game.total_clicks + 1,
-  }
-
-  if (newEndTime) {
-    updateData.end_time = newEndTime
-    updateData.status = 'final_phase'
-    // Set battle_start_time if entering final phase for the first time
-    // This is critical for bots to maintain the battle for 30-119 minutes
-    if (game.status === 'active') {
-      updateData.battle_start_time = new Date(now).toISOString()
+  const result = Array.isArray(clickResult) ? clickResult[0] : clickResult
+  if (!result?.ok) {
+    return {
+      success: false,
+      error: result?.reason === 'insufficient_credits'
+        ? 'Crédits insuffisants'
+        : result?.reason === 'game_not_active'
+        ? 'Cette partie n\'accepte plus de clics'
+        : 'Erreur lors du clic',
     }
   }
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { error: updateError } = await (supabase as any)
-    .from('games')
-    .update(updateData)
-    .eq('id', gameId)
-
-  if (updateError) {
-    return { success: false, error: 'Erreur lors de la mise à jour de la partie' }
-  }
-
-  // 4. Update user stats
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  await (supabase as any)
-    .from('profiles')
-    .update({
-      total_clicks: (profile.total_clicks ?? 0) + 1,
-    })
-    .eq('id', user.id)
 
   // 5. Check for new badges and return them
   let newBadges: Badge[] = []
