@@ -11,6 +11,7 @@ import {
   PullToRefreshIndicator,
 } from '@/components/lobby'
 import { PaymentSuccessModal } from '@/components/lobby/PaymentSuccessModal'
+import { LobbyGamificationBar } from '@/components/progression/LobbyGamificationBar'
 import type { WinnerData } from '@/actions/winners'
 import { FloatingTimer } from '@/components/landing/widgets/FloatingTimer'
 import { useLobbyFilters } from '@/hooks/lobby/useLobbyFilters'
@@ -192,6 +193,9 @@ export function LobbyClient({
         wasReset={wasReset}
       />
 
+      {/* Bandeau gamification (rappel coffres/progression) — masqué si non connecté */}
+      <LobbyGamificationBar />
+
       {/* Filters */}
       <div className="px-4 md:px-6 mb-6">
         <div className="max-w-7xl mx-auto">
@@ -222,13 +226,13 @@ export function LobbyClient({
             <div className="flex-1">
               {filteredGames.length > 0 ? (
                 <>
-                  {/* Mobile: Horizontal scroll */}
+                  {/* Mobile: Horizontal scroll, snap centré (espaces égaux G/D) */}
                   <div className="sm:hidden">
-                    <div className="flex gap-4 overflow-x-auto pb-4 -mx-4 px-4 scrollbar-hide snap-x snap-mandatory">
+                    <div className="flex gap-3 overflow-x-auto pb-4 -mx-4 px-[10vw] scrollbar-hide snap-x snap-mandatory">
                       {filteredGames.map((game, index) => (
                         <div
                           key={game.id}
-                          className="flex-shrink-0 w-[85vw] max-w-[320px] snap-start"
+                          className="flex-shrink-0 w-[80vw] snap-center"
                         >
                           <GameCard
                             game={game}

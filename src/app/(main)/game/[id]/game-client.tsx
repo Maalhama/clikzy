@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useCallback, useTransition, useEffect, useMemo, useRef } from 'react'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useGame } from '@/hooks/useGame'
@@ -46,7 +47,7 @@ type GameClientProps = {
   initialGame: GameWithItem
   initialCredits: number
   username: string
-  userId: string
+  userId: string | null
   recentClicks: RecentClick[]
 }
 
@@ -57,6 +58,7 @@ export function GameClient({
   userId,
   recentClicks: _initialClicks,
 }: GameClientProps) {
+  const router = useRouter()
   // useGame now provides recentClicks from DB (synced with lobby)
   const { game, isConnected, optimisticUpdate, addClick, removeClick } = useGame(initialGame)
   const { credits, decrementCredits } = useCredits()
@@ -160,6 +162,12 @@ export function GameClient({
   }, [])
 
   const handleClick = useCallback(() => {
+    // Visiteur non connecté : on l'invite à créer un compte / se connecter
+    if (!userId) {
+      router.push('/register')
+      return
+    }
+
     if (isPending || !hasCredits || !canClick) return
 
     // Check VIP for premium products
@@ -212,7 +220,7 @@ export function GameClient({
         showBadgeNotifications(result.data.newBadges)
       }
     })
-  }, [isPending, hasCredits, canClick, isPremiumProduct, isVip, playClick, triggerHaptic, username, game, optimisticUpdate, decrementCredits, addClick, removeClick, showBadgeNotifications])
+  }, [userId, router, isPending, hasCredits, canClick, isPremiumProduct, isVip, playClick, triggerHaptic, username, game, optimisticUpdate, decrementCredits, addClick, removeClick, showBadgeNotifications])
 
   // Border gradient style (same as lobby cards)
   const borderStyle = useMemo(() => {

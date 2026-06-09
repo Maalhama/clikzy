@@ -1,4 +1,3 @@
-import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { Header } from '@/components/layout/Header'
 import { BackgroundEffects } from '@/components/ui/BackgroundEffects'
@@ -13,29 +12,27 @@ export default async function MainLayout({
 }) {
   const supabase = await createClient()
 
-  // Get authenticated user
+  // Auth OPTIONNELLE : le lobby et les pages de jeu sont consultables sans compte
+  // (rétention). Les pages personnelles (profil, collection, vip, mini-jeux, shop)
+  // se protègent elles-mêmes via leur propre redirect.
   const { data: { user } } = await supabase.auth.getUser()
 
-  if (!user) {
-    redirect('/login')
+  let profile: Profile | null = null
+  let totalCredits = 0
+  if (user) {
+    const { data: profileData } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', user.id)
+      .single()
+    profile = profileData as Profile | null
+    totalCredits = (profile?.credits ?? 0) + (profile?.earned_credits ?? 0)
   }
-
-  // Get user profile
-  const { data: profileData } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('id', user.id)
-    .single()
-
-  const profile = profileData as Profile | null
-
-  // Total credits = daily credits + earned credits (from mini-games/purchases)
-  const totalCredits = (profile?.credits ?? 0) + (profile?.earned_credits ?? 0)
 
   return (
     <ClientProviders
       initialCredits={totalCredits}
-      userId={user.id}
+      userId={user?.id ?? null}
     >
       <div className="min-h-screen flex flex-col bg-bg-primary">
         {/* Mobile lightweight background */}

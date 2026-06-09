@@ -16,32 +16,19 @@ export default async function GamePage({ params }: PageProps) {
   const { id } = await params
   const supabase = await createClient()
 
-  // Get current user first (needed for other queries)
+  // Auth OPTIONNELLE : la page de jeu est consultable sans compte (rétention).
+  // Le clic « Jouer » redirige vers l'inscription côté client si non connecté.
   const { data: { user } } = await supabase.auth.getUser()
 
-  if (!user) {
-    notFound()
-  }
-
-  // Run all queries in parallel for faster loading
-  const [gameResult, creditsResult, profileResult, clicksResult] = await Promise.all([
-    supabase
-      .from('games')
-      .select('*, item:items(*)')
-      .eq('id', id)
-      .single(),
-    checkAndResetDailyCredits(),
-    supabase
-      .from('profiles')
-      .select('username')
-      .eq('id', user.id)
-      .single(),
+  // Jeu + clics récents (publics) — pas besoin d'être connecté pour voir
+  const [gameResult, clicksResult] = await Promise.all([
+    supabase.from('games').select('*, item:items(*)').eq('id', id).single(),
     supabase
       .from('clicks')
       .select('*, profile:profiles(username)')
       .eq('game_id', id)
       .order('clicked_at', { ascending: false })
-      .limit(10)
+      .limit(10),
   ])
 
   const gameData = gameResult.data
@@ -50,10 +37,19 @@ export default async function GamePage({ params }: PageProps) {
   }
 
   const game = gameData as GameWithItem
-  // Use totalCredits (daily + earned) for display
-  const credits = creditsResult.success ? (creditsResult.data?.totalCredits ?? 0) : 0
-  const profile = profileResult.data as { username: string } | null
-  const username = profile?.username ?? 'Joueur'
+
+  // Données personnelles uniquement si connecté
+  let credits = 0
+  let username = 'Joueur'
+  if (user) {
+    const [creditsResult, profileResult] = await Promise.all([
+      checkAndResetDailyCredits(),
+      supabase.from('profiles').select('username').eq('id', user.id).single(),
+    ])
+    credits = creditsResult.success ? (creditsResult.data?.totalCredits ?? 0) : 0
+    const profile = profileResult.data as { username: string } | null
+    username = profile?.username ?? 'Joueur'
+  }
 
   type ClickWithProfile = {
     id: string
@@ -75,7 +71,7 @@ export default async function GamePage({ params }: PageProps) {
       initialGame={game}
       initialCredits={credits}
       username={username}
-      userId={user.id}
+      userId={user?.id ?? null}
       recentClicks={recentClicks}
     />
   )

@@ -1,6 +1,8 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+import { createClient as createBrowserClient } from '@/lib/supabase/client'
 import { motion } from 'framer-motion'
 import { VIPDashboard } from '@/components/vip/VIPDashboard'
 import VIPSubscriptionModal from '@/components/modals/VIPSubscriptionModal'
@@ -148,6 +150,14 @@ export default function VIPPage() {
   const [isCollectingBonus, setIsCollectingBonus] = useState(false)
   const [actionError, setActionError] = useState<string | null>(null)
   const { updateCredits } = useCredits()
+  const router = useRouter()
+
+  // Page personnelle : rediriger les visiteurs non connectés
+  useEffect(() => {
+    createBrowserClient().auth.getUser().then(({ data }) => {
+      if (!data.user) router.replace('/login')
+    })
+  }, [router])
 
   // Check VIP status on mount
   useEffect(() => {
