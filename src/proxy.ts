@@ -84,8 +84,10 @@ export async function proxy(request: NextRequest) {
   // IMPORTANT: Use getUser() not getSession() for security
   const { data: { user } } = await supabase.auth.getUser()
 
-  // Protected routes - redirect to login if not authenticated
-  const protectedPaths = ['/game', '/profile', '/lobby']
+  // Protected routes - redirect to login if not authenticated.
+  // /lobby et /game sont VOLONTAIREMENT ouverts (consultables sans compte, rétention) ;
+  // le clic « Jouer » redirige vers l'inscription côté client.
+  const protectedPaths = ['/profile', '/collection', '/mini-games', '/shop', '/vip']
   const isProtectedRoute = protectedPaths.some(path =>
     request.nextUrl.pathname.startsWith(path)
   )
