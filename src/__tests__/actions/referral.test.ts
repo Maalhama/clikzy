@@ -6,6 +6,7 @@ const mockSupabase = {
     getUser: vi.fn(),
   },
   from: vi.fn(),
+  rpc: vi.fn(),
 }
 
 vi.mock('@/lib/supabase/server', () => ({
@@ -25,6 +26,12 @@ describe('Referral System', () => {
   })
 
   describe('applyReferralCode', () => {
+    // NOTE : depuis le durcissement C3, toute la logique de parrainage (vérifs +
+    // crédit du parrain) vit dans la RPC SECURITY DEFINER `apply_referral_code`.
+    // Le code TS valide le format + l'auth, puis mappe le `reason` renvoyé par la
+    // RPC vers un message. La garantie "earned_credits et non credits" est assurée
+    // en SQL et couverte par le test E2E scripts/test-c3-trigger.mjs.
+
     it('should reject invalid referral codes', async () => {
       const result = await applyReferralCode('')
       expect(result.success).toBe(false)
@@ -45,56 +52,24 @@ describe('Referral System', () => {
     })
 
     it('should reject if user already has a referrer', async () => {
-      mockSupabase.auth.getUser.mockResolvedValue({
-        data: { user: { id: 'user-1' } },
-      })
-
-      const mockSelect = vi.fn().mockReturnThis()
-      const mockEq = vi.fn().mockReturnThis()
-      const mockSingle = vi.fn().mockResolvedValue({
-        data: { referred_by: 'EXISTING_CODE' },
-      })
-
-      mockSupabase.from.mockReturnValue({
-        select: mockSelect,
-      })
-
-      mockSelect.mockReturnValue({
-        eq: mockEq,
-      })
-
-      mockEq.mockReturnValue({
-        single: mockSingle,
+      mockSupabase.auth.getUser.mockResolvedValue({ data: { user: { id: 'user-1' } } })
+      mockSupabase.rpc.mockResolvedValue({
+        data: [{ ok: false, reason: 'already_referred', credits_awarded: 0 }],
+        error: null,
       })
 
       const result = await applyReferralCode('NEWCODE')
 
+      expect(mockSupabase.rpc).toHaveBeenCalledWith('apply_referral_code', { p_code: 'NEWCODE' })
       expect(result.success).toBe(false)
       expect(result.error).toBe('Tu as déjà utilisé un code de parrainage')
     })
 
     it('should reject using own referral code', async () => {
-      mockSupabase.auth.getUser.mockResolvedValue({
-        data: { user: { id: 'user-1' } },
-      })
-
-      const mockSelect = vi.fn().mockReturnThis()
-      const mockEq = vi.fn().mockReturnThis()
-      const mockSingle = vi.fn()
-        .mockResolvedValueOnce({
-          data: { referred_by: null, referral_code: 'MYCODE' },
-        })
-
-      mockSupabase.from.mockReturnValue({
-        select: mockSelect,
-      })
-
-      mockSelect.mockReturnValue({
-        eq: mockEq,
-      })
-
-      mockEq.mockReturnValue({
-        single: mockSingle,
+      mockSupabase.auth.getUser.mockResolvedValue({ data: { user: { id: 'user-1' } } })
+      mockSupabase.rpc.mockResolvedValue({
+        data: [{ ok: false, reason: 'own_code', credits_awarded: 0 }],
+        error: null,
       })
 
       const result = await applyReferralCode('MYCODE')
@@ -104,30 +79,10 @@ describe('Referral System', () => {
     })
 
     it('should reject non-existent referral codes', async () => {
-      mockSupabase.auth.getUser.mockResolvedValue({
-        data: { user: { id: 'user-1' } },
-      })
-
-      const mockSelect = vi.fn().mockReturnThis()
-      const mockEq = vi.fn().mockReturnThis()
-      const mockSingle = vi.fn()
-        .mockResolvedValueOnce({
-          data: { referred_by: null, referral_code: 'MYCODE' },
-        })
-        .mockResolvedValueOnce({
-          data: null,
-        })
-
-      mockSupabase.from.mockReturnValue({
-        select: mockSelect,
-      })
-
-      mockSelect.mockReturnValue({
-        eq: mockEq,
-      })
-
-      mockEq.mockReturnValue({
-        single: mockSingle,
+      mockSupabase.auth.getUser.mockResolvedValue({ data: { user: { id: 'user-1' } } })
+      mockSupabase.rpc.mockResolvedValue({
+        data: [{ ok: false, reason: 'not_found', credits_awarded: 0 }],
+        error: null,
       })
 
       const result = await applyReferralCode('INVALID')
@@ -136,67 +91,18 @@ describe('Referral System', () => {
       expect(result.error).toBe('Code de parrainage introuvable')
     })
 
-    it('should add bonus to earned_credits (permanent), not daily credits', async () => {
-      mockSupabase.auth.getUser.mockResolvedValue({
-        data: { user: { id: 'user-1' } },
-      })
-
-      const mockSelect = vi.fn().mockReturnThis()
-      const mockEq = vi.fn().mockReturnThis()
-      const mockSingle = vi.fn()
-        .mockResolvedValueOnce({
-          data: { referred_by: null, referral_code: 'MYCODE' },
-        })
-        .mockResolvedValueOnce({
-          data: {
-            id: 'referrer-id',
-            referral_code: 'VALIDCODE',
-            referral_count: 5,
-            referral_credits_earned: 50,
-            credits: 20,
-            earned_credits: 100,
-          },
-        })
-
-      const mockUpdate = vi.fn().mockReturnThis()
-
-      mockSupabase.from.mockReturnValue({
-        select: mockSelect,
-        update: mockUpdate,
-      })
-
-      mockSelect.mockReturnValue({
-        eq: mockEq,
-      })
-
-      mockEq.mockReturnValue({
-        single: mockSingle,
-      })
-
-      mockUpdate.mockReturnValue({
-        eq: vi.fn().mockResolvedValue({ error: null }),
+    it('should succeed and award bonus credits when code is valid', async () => {
+      mockSupabase.auth.getUser.mockResolvedValue({ data: { user: { id: 'user-1' } } })
+      mockSupabase.rpc.mockResolvedValue({
+        data: [{ ok: true, reason: 'ok', credits_awarded: 10 }],
+        error: null,
       })
 
       const result = await applyReferralCode('VALIDCODE')
 
+      expect(mockSupabase.rpc).toHaveBeenCalledWith('apply_referral_code', { p_code: 'VALIDCODE' })
       expect(result.success).toBe(true)
       expect(result.creditsAwarded).toBe(10)
-
-      // Vérifier que earned_credits est bien mis à jour (CRITIQUE - bug fix)
-      expect(mockUpdate).toHaveBeenCalledWith(
-        expect.objectContaining({
-          earned_credits: 110, // 100 + 10 bonus
-          referral_count: 6,
-          referral_credits_earned: 60,
-        })
-      )
-
-      // Vérifier que credits (daily reset) n'est PAS modifié
-      expect(mockUpdate).toHaveBeenCalledWith(
-        expect.not.objectContaining({
-          credits: expect.any(Number),
-        })
-      )
     })
   })
 })

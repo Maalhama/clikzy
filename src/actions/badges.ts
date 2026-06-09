@@ -101,89 +101,29 @@ export async function checkAndAwardBadges(): Promise<BadgeCheckResult> {
     return { newBadges: [], totalCreditsEarned: 0 }
   }
 
-  // Get user's current stats
+  // Attribution AUTORITATIVE côté serveur via RPC SECURITY DEFINER :
+  // toute la validation des stats + le crédit (earned_credits) se font en SQL,
+  // plus aucune confiance dans le client (qui ne peut plus écrire ces colonnes,
+  // verrouillées par le trigger protect_profile_sensitive_columns).
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data: profile } = await (supabase as any)
-    .from('profiles')
-    .select('total_clicks, total_wins, referral_count')
-    .eq('id', user.id)
-    .single()
+  const { data: awarded, error } = await (supabase.rpc as any)('claim_eligible_badges')
 
-  if (!profile) {
+  if (error || !awarded || awarded.length === 0) {
     return { newBadges: [], totalCreditsEarned: 0 }
   }
 
-  // Count games played
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data: clicks } = await (supabase as any)
-    .from('clicks')
-    .select('game_id')
-    .eq('user_id', user.id)
+  const awardedRows = awarded as { badge_id: string; credits_reward: number }[]
+  const awardedIds = awardedRows.map((a) => a.badge_id)
+  const totalCreditsEarned = awardedRows.reduce((sum, a) => sum + (a.credits_reward || 0), 0)
 
-  const gamesPlayed = new Set(clicks?.map((c: { game_id: string }) => c.game_id) || []).size
-
-  // Get all badges user doesn't have yet
+  // Récupère les badges complets pour l'affichage (nom, icône, rareté...)
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data: allBadges } = await (supabase as any)
+  const { data: badgeRows } = await (supabase as any)
     .from('badges')
     .select('*')
+    .in('id', awardedIds)
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data: earnedBadges } = await (supabase as any)
-    .from('user_badges')
-    .select('badge_id')
-    .eq('user_id', user.id)
-
-  const earnedBadgeIds = new Set(earnedBadges?.map((b: { badge_id: string }) => b.badge_id) || [])
-
-  const stats = {
-    clicks: profile.total_clicks || 0,
-    wins: profile.total_wins || 0,
-    games: gamesPlayed,
-    referrals: profile.referral_count || 0,
-  }
-
-  const newBadges: Badge[] = []
-  let totalCreditsEarned = 0
-
-  // Check each badge
-  for (const badge of (allBadges || []) as Badge[]) {
-    if (earnedBadgeIds.has(badge.id)) continue
-
-    const statValue = stats[badge.requirement_type as keyof typeof stats] || 0
-
-    if (statValue >= badge.requirement_value) {
-      // Award badge
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { error } = await (supabase as any)
-        .from('user_badges')
-        .insert({ user_id: user.id, badge_id: badge.id })
-
-      if (!error) {
-        newBadges.push(badge)
-        totalCreditsEarned += badge.credits_reward
-      }
-    }
-  }
-
-  // Award all credits at once to EARNED_CREDITS (permanent, never reset)
-  if (totalCreditsEarned > 0) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data: currentProfile } = await (supabase as any)
-      .from('profiles')
-      .select('earned_credits')
-      .eq('id', user.id)
-      .single()
-
-    if (currentProfile) {
-      // IMPORTANT: Add to earned_credits (permanent), NOT credits (resets daily)
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      await (supabase as any)
-        .from('profiles')
-        .update({ earned_credits: (currentProfile.earned_credits || 0) + totalCreditsEarned })
-        .eq('id', user.id)
-    }
-  }
+  const newBadges = (badgeRows || []) as Badge[]
 
   if (newBadges.length > 0) {
     revalidatePath('/profile')

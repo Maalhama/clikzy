@@ -66,65 +66,31 @@ export async function applyReferralCode(code: string): Promise<ReferralResult> {
     return { success: false, error: 'Non authentifié' }
   }
 
-  // Check if user already has a referrer
+  // Application AUTORITATIVE via RPC SECURITY DEFINER : vérifie l'éligibilité
+  // (pas déjà parrainé, pas son propre code, code existant) et crédite le PARRAIN
+  // atomiquement. earned_credits/referral_count étant verrouillés par le trigger,
+  // le client ne peut plus s'auto-créditer.
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data: currentProfile } = await (supabase as any)
-    .from('profiles')
-    .select('referred_by, referral_code')
-    .eq('id', user.id)
-    .single()
+  const { data, error } = await (supabase.rpc as any)('apply_referral_code', { p_code: code })
 
-  if (currentProfile?.referred_by) {
-    return { success: false, error: 'Tu as déjà utilisé un code de parrainage' }
-  }
-
-  // Can't use your own code
-  if (currentProfile?.referral_code?.toUpperCase() === code.toUpperCase()) {
-    return { success: false, error: 'Tu ne peux pas utiliser ton propre code' }
-  }
-
-  // Find the referrer
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data: referrer } = await (supabase as any)
-    .from('profiles')
-    .select('id, referral_code, referral_count, referral_credits_earned, credits, earned_credits')
-    .eq('referral_code', code.toUpperCase())
-    .single()
-
-  if (!referrer) {
-    return { success: false, error: 'Code de parrainage introuvable' }
-  }
-
-  // Update current user with referrer
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { error: updateUserError } = await (supabase as any)
-    .from('profiles')
-    .update({ referred_by: referrer.referral_code })
-    .eq('id', user.id)
-
-  if (updateUserError) {
-    console.error('Error updating referred_by:', updateUserError)
+  if (error) {
+    console.error('Error applying referral code:', error)
     return { success: false, error: 'Erreur lors de l\'application du code' }
   }
 
-  // Give bonus credits to referrer
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { error: updateReferrerError } = await (supabase as any)
-    .from('profiles')
-    .update({
-      earned_credits: (referrer.earned_credits || 0) + REFERRAL_BONUS,
-      referral_count: (referrer.referral_count || 0) + 1,
-      referral_credits_earned: (referrer.referral_credits_earned || 0) + REFERRAL_BONUS,
-    })
-    .eq('id', referrer.id)
+  const result = Array.isArray(data) ? data[0] : data
 
-  if (updateReferrerError) {
-    console.error('Error updating referrer:', updateReferrerError)
-    // Don't return error - the referral was recorded even if bonus failed
+  if (!result?.ok) {
+    const message =
+      result?.reason === 'already_referred' ? 'Tu as déjà utilisé un code de parrainage'
+      : result?.reason === 'own_code' ? 'Tu ne peux pas utiliser ton propre code'
+      : result?.reason === 'not_found' ? 'Code de parrainage introuvable'
+      : 'Erreur lors de l\'application du code'
+    return { success: false, error: message }
   }
 
   revalidatePath('/profile')
-  return { success: true, creditsAwarded: REFERRAL_BONUS }
+  return { success: true, creditsAwarded: result.credits_awarded ?? REFERRAL_BONUS }
 }
 
 /**

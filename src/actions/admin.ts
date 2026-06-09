@@ -139,11 +139,10 @@ export async function updateUserCredits(userId: string, credits: number): Promis
 
   const supabase = await createClient()
 
+  // credits est verrouillé par le trigger : RPC DEFINER qui re-vérifie is_admin
+  // du caller (auth.uid()) côté serveur.
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { error } = await (supabase as any)
-    .from('profiles')
-    .update({ credits })
-    .eq('id', userId)
+  const { error } = await (supabase.rpc as any)('admin_set_credits', { p_user_id: userId, p_credits: credits })
 
   if (error) {
     return { success: false, error: error.message }
@@ -160,11 +159,10 @@ export async function toggleUserAdmin(userId: string, isAdmin: boolean): Promise
 
   const supabase = await createClient()
 
+  // is_admin est verrouillé par le trigger : RPC DEFINER qui re-vérifie is_admin
+  // du caller (auth.uid()) côté serveur.
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { error } = await (supabase as any)
-    .from('profiles')
-    .update({ is_admin: isAdmin })
-    .eq('id', userId)
+  const { error } = await (supabase.rpc as any)('admin_set_admin', { p_user_id: userId, p_is_admin: isAdmin })
 
   if (error) {
     return { success: false, error: error.message }

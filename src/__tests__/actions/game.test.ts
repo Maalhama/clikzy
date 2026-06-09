@@ -118,7 +118,9 @@ describe('Game Actions', () => {
       expect(result.error).toBe('Cette partie n\'accepte plus de clics')
     })
 
-    it('should successfully process click and deduct credits', async () => {
+    it('should successfully process a click via the perform_click RPC', async () => {
+      // Depuis I5, le clic est ATOMIQUE : un seul appel RPC perform_click
+      // (déduction + insertion + maj partie). Plus d'insert/update côté TS.
       mockSupabase.auth.getUser.mockResolvedValue({
         data: { user: { id: 'user-1' } },
       })
@@ -144,53 +146,25 @@ describe('Game Actions', () => {
           },
         })
 
-      const mockInsert = vi.fn().mockResolvedValue({ error: null })
-      const mockUpdate = vi.fn().mockReturnThis()
+      mockSupabase.from.mockReturnValue({ select: mockSelect })
+      mockSelect.mockReturnValue({ eq: mockEq })
+      mockEq.mockReturnValue({ single: mockSingle })
 
-      mockSupabase.from.mockReturnValue({
-        select: mockSelect,
-        insert: mockInsert,
-        update: mockUpdate,
+      mockSupabase.rpc.mockResolvedValue({
+        data: [{ ok: true, new_total: 14, new_end_time: Date.now() + 90000, reason: 'ok' }],
+        error: null,
       })
-
-      mockSelect.mockReturnValue({
-        eq: mockEq,
-      })
-
-      mockEq.mockReturnValue({
-        single: mockSingle,
-      })
-
-      mockUpdate.mockReturnValue({
-        eq: vi.fn().mockResolvedValue({ error: null }),
-      })
-
-      // Mock RPC calls
-      mockSupabase.rpc
-        .mockResolvedValueOnce({ data: 123, error: null }) // get_next_sequence
-        .mockResolvedValueOnce({ data: 1, error: null }) // deduct_credits
 
       const result = await clickGame('game-1')
 
       expect(result.success).toBe(true)
-
-      // Vérifier que deduct_credits a été appelé
       expect(mockSupabase.rpc).toHaveBeenCalledWith(
-        'deduct_credits',
+        'perform_click',
         expect.objectContaining({
+          p_game_id: 'game-1',
           p_user_id: 'user-1',
-          p_amount: 1,
-        })
-      )
-
-      // Vérifier que le clic a été enregistré
-      expect(mockInsert).toHaveBeenCalledWith(
-        expect.objectContaining({
-          game_id: 'game-1',
-          user_id: 'user-1',
-          username: 'testuser',
-          is_bot: false,
-          credits_spent: 1,
+          p_username: 'testuser',
+          p_item_name: 'iPhone',
         })
       )
     })
@@ -224,30 +198,14 @@ describe('Game Actions', () => {
           },
         })
 
-      const mockInsert = vi.fn().mockResolvedValue({ error: null })
-      const mockUpdate = vi.fn().mockReturnThis()
+      mockSupabase.from.mockReturnValue({ select: mockSelect })
+      mockSelect.mockReturnValue({ eq: mockEq })
+      mockEq.mockReturnValue({ single: mockSingle })
 
-      mockSupabase.from.mockReturnValue({
-        select: mockSelect,
-        insert: mockInsert,
-        update: mockUpdate,
+      mockSupabase.rpc.mockResolvedValue({
+        data: [{ ok: true, new_total: 14, new_end_time: now + 90000, reason: 'ok' }],
+        error: null,
       })
-
-      mockSelect.mockReturnValue({
-        eq: mockEq,
-      })
-
-      mockEq.mockReturnValue({
-        single: mockSingle,
-      })
-
-      mockUpdate.mockReturnValue({
-        eq: vi.fn().mockResolvedValue({ error: null }),
-      })
-
-      mockSupabase.rpc
-        .mockResolvedValueOnce({ data: 123, error: null })
-        .mockResolvedValueOnce({ data: 1, error: null })
 
       const result = await clickGame('game-1')
 
