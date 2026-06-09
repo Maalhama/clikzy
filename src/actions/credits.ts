@@ -1,7 +1,6 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
-import { INITIAL_CREDITS } from '@/lib/constants'
 
 type ActionResult<T = void> = {
   success: boolean
@@ -9,11 +8,17 @@ type ActionResult<T = void> = {
   error?: string
 }
 
+// Compare deux instants sur le jour calendaire Europe/Paris (DST-safe via Intl).
+function isSameParisDay(a: Date, b: Date): boolean {
+  const fmt = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Paris' })
+  return fmt.format(a) === fmt.format(b)
+}
+
 /**
- * Check and reset daily credits if needed
- * Credits reset to 10 every day at midnight (00:00)
- * ONLY for users who haven't purchased credits
- * Returns total credits (daily + earned)
+ * Reset quotidien des crédits si nécessaire (10 crédits à minuit PARIS),
+ * SAUF pour les utilisateurs ayant acheté des crédits.
+ * Délègue à la RPC SECURITY DEFINER `reset_daily_credits` : ATOMIQUE et alignée Paris,
+ * ce qui élimine le double-reset client/cron (un seul reset par jour Paris garanti par le WHERE).
  */
 export async function checkAndResetDailyCredits(): Promise<ActionResult<{ credits: number; earnedCredits: number; totalCredits: number; wasReset: boolean }>> {
   const supabase = await createClient()
@@ -23,83 +28,27 @@ export async function checkAndResetDailyCredits(): Promise<ActionResult<{ credit
     return { success: false, error: 'Non authentifié' }
   }
 
-  // Get user's profile with last reset time and purchase status
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data: profileData } = await (supabase as any)
-    .from('profiles')
-    .select('credits, earned_credits, last_credits_reset, has_purchased_credits')
-    .eq('id', user.id)
-    .single()
+  const { data, error } = await (supabase.rpc as any)('reset_daily_credits', { p_user_id: user.id })
+  if (error) {
+    return { success: false, error: 'Erreur lors du reset des crédits' }
+  }
 
-  const profile = profileData as {
-    credits: number
-    earned_credits: number
-    last_credits_reset: string
-    has_purchased_credits: boolean
-  } | null
-
-  if (!profile) {
+  const row = Array.isArray(data) ? data[0] : data
+  if (!row) {
     return { success: false, error: 'Profil non trouvé' }
   }
 
-  const earnedCredits = profile.earned_credits ?? 0
-
-  // Skip reset for users who have purchased credits
-  if (profile.has_purchased_credits) {
-    return {
-      success: true,
-      data: {
-        credits: profile.credits,
-        earnedCredits,
-        totalCredits: profile.credits + earnedCredits,
-        wasReset: false
-      }
-    }
-  }
-
-  // Check if reset is needed
-  const lastReset = new Date(profile.last_credits_reset)
-  const now = new Date()
-
-  // Get today's midnight
-  const todayMidnight = new Date(now)
-  todayMidnight.setHours(0, 0, 0, 0)
-
-  // If last reset was before today's midnight, reset credits
-  if (lastReset < todayMidnight) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { error } = await (supabase as any)
-      .from('profiles')
-      .update({
-        credits: INITIAL_CREDITS,
-        last_credits_reset: now.toISOString(),
-      })
-      .eq('id', user.id)
-
-    if (error) {
-      return { success: false, error: 'Erreur lors du reset des crédits' }
-    }
-
-    return {
-      success: true,
-      data: {
-        credits: INITIAL_CREDITS,
-        earnedCredits,
-        totalCredits: INITIAL_CREDITS + earnedCredits,
-        wasReset: true
-      }
-    }
-  }
-
-  // No reset needed
+  const credits = row.daily_credits ?? 0
+  const earnedCredits = row.earned ?? 0
   return {
     success: true,
     data: {
-      credits: profile.credits,
+      credits,
       earnedCredits,
-      totalCredits: profile.credits + earnedCredits,
-      wasReset: false
-    }
+      totalCredits: credits + earnedCredits,
+      wasReset: !!row.was_reset,
+    },
   }
 }
 
@@ -119,9 +68,9 @@ export async function getCreditsWithReset(): Promise<ActionResult<number>> {
 const VIP_DAILY_BONUS = 10
 
 /**
- * Collect VIP daily bonus (+10 credits)
- * VIP users can collect this once per day
- * Credits are added to earned_credits (permanent, never reset)
+ * Récupère le bonus VIP quotidien (+10 crédits sur earned_credits, permanent).
+ * Délègue à la RPC SECURITY DEFINER `collect_vip_bonus` : ATOMIQUE, basée sur
+ * `last_vip_bonus_at` (colonne dédiée, plus de conflit avec le reset quotidien), alignée Paris.
  */
 export async function collectVIPDailyBonus(): Promise<ActionResult<{ creditsAdded: number; newTotal: number; canCollectAgainAt: string }>> {
   const supabase = await createClient()
@@ -131,87 +80,44 @@ export async function collectVIPDailyBonus(): Promise<ActionResult<{ creditsAdde
     return { success: false, error: 'Non authentifié' }
   }
 
-  // Get user's profile
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data: profileData } = await (supabase as any)
-    .from('profiles')
-    .select('credits, earned_credits, is_vip, vip_expires_at, last_credits_reset')
-    .eq('id', user.id)
-    .single()
-
-  const profile = profileData as {
-    credits: number
-    earned_credits: number
-    is_vip: boolean
-    vip_expires_at: string | null
-    last_credits_reset: string | null
-  } | null
-
-  if (!profile) {
-    return { success: false, error: 'Profil non trouvé' }
-  }
-
-  // Verify user is VIP
-  if (!profile.is_vip) {
-    return { success: false, error: 'Réservé aux membres V.I.P' }
-  }
-
-  // Check VIP expiration
-  if (profile.vip_expires_at && new Date(profile.vip_expires_at) < new Date()) {
-    return { success: false, error: 'Ton abonnement V.I.P a expiré' }
-  }
-
-  // Check if already collected today
-  const now = new Date()
-  const todayMidnight = new Date(now)
-  todayMidnight.setHours(0, 0, 0, 0)
-
-  const lastCollect = profile.last_credits_reset ? new Date(profile.last_credits_reset) : null
-
-  if (lastCollect && lastCollect >= todayMidnight) {
-    // Already collected today
-    const tomorrowMidnight = new Date(todayMidnight)
-    tomorrowMidnight.setDate(tomorrowMidnight.getDate() + 1)
-
-    return {
-      success: false,
-      error: 'Tu as déjà récupéré ton bonus aujourd\'hui. Reviens demain !',
-    }
-  }
-
-  // Add bonus to earned_credits (permanent)
-  const newEarnedCredits = (profile.earned_credits || 0) + VIP_DAILY_BONUS
-  const newTotal = profile.credits + newEarnedCredits
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { error } = await (supabase as any)
-    .from('profiles')
-    .update({
-      earned_credits: newEarnedCredits,
-      last_credits_reset: now.toISOString(),
-    })
-    .eq('id', user.id)
-
+  const { data, error } = await (supabase.rpc as any)('collect_vip_bonus', { p_user_id: user.id, p_amount: VIP_DAILY_BONUS })
   if (error) {
     return { success: false, error: 'Erreur lors de la récupération du bonus' }
   }
 
-  // Calculate next collection time
-  const tomorrowMidnight = new Date(todayMidnight)
-  tomorrowMidnight.setDate(tomorrowMidnight.getDate() + 1)
+  const row = Array.isArray(data) ? data[0] : data
+  if (!row?.ok) {
+    const reason = row?.reason
+    const message =
+      reason === 'not_vip' ? 'Réservé aux membres V.I.P'
+      : reason === 'expired' ? 'Ton abonnement V.I.P a expiré'
+      : 'Tu as déjà récupéré ton bonus aujourd\'hui. Reviens demain !'
+    return { success: false, error: message }
+  }
+
+  // Solde courant pour la réponse (l'UI se resynchronise aussi via le realtime crédits)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: p } = await (supabase as any)
+    .from('profiles')
+    .select('credits, earned_credits')
+    .eq('id', user.id)
+    .single()
+  const newTotal = (p?.credits ?? 0) + (p?.earned_credits ?? (row.earned ?? 0))
 
   return {
     success: true,
     data: {
       creditsAdded: VIP_DAILY_BONUS,
       newTotal,
-      canCollectAgainAt: tomorrowMidnight.toISOString(),
+      canCollectAgainAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
     },
   }
 }
 
 /**
- * Check if VIP user can collect daily bonus
+ * Indique si l'utilisateur VIP peut récupérer son bonus du jour (helper UI).
+ * La frontière de jour est calculée en Europe/Paris (cohérent avec la RPC).
  */
 export async function canCollectVIPBonus(): Promise<ActionResult<{ canCollect: boolean; nextCollectTime: string | null }>> {
   const supabase = await createClient()
@@ -224,45 +130,32 @@ export async function canCollectVIPBonus(): Promise<ActionResult<{ canCollect: b
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { data: profileData } = await (supabase as any)
     .from('profiles')
-    .select('is_vip, vip_expires_at, last_credits_reset')
+    .select('is_vip, vip_expires_at, last_vip_bonus_at')
     .eq('id', user.id)
     .single()
 
   const profile = profileData as {
     is_vip: boolean
     vip_expires_at: string | null
-    last_credits_reset: string | null
+    last_vip_bonus_at: string | null
   } | null
 
   if (!profile || !profile.is_vip) {
     return { success: true, data: { canCollect: false, nextCollectTime: null } }
   }
 
-  // Check VIP expiration
   if (profile.vip_expires_at && new Date(profile.vip_expires_at) < new Date()) {
     return { success: true, data: { canCollect: false, nextCollectTime: null } }
   }
 
-  const now = new Date()
-  const todayMidnight = new Date(now)
-  todayMidnight.setHours(0, 0, 0, 0)
-
-  const lastCollect = profile.last_credits_reset ? new Date(profile.last_credits_reset) : null
-
-  if (!lastCollect || lastCollect < todayMidnight) {
-    // Can collect now
-    return { success: true, data: { canCollect: true, nextCollectTime: null } }
-  }
-
-  // Already collected, return next time
-  const tomorrowMidnight = new Date(todayMidnight)
-  tomorrowMidnight.setDate(tomorrowMidnight.getDate() + 1)
+  const last = profile.last_vip_bonus_at ? new Date(profile.last_vip_bonus_at) : null
+  const canCollect = !last || !isSameParisDay(last, new Date())
 
   return {
     success: true,
     data: {
-      canCollect: false,
-      nextCollectTime: tomorrowMidnight.toISOString(),
+      canCollect,
+      nextCollectTime: canCollect ? null : new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
     },
   }
 }

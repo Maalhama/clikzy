@@ -23,17 +23,14 @@ type ActionResult<T = void> = {
  * Get midnight of today in French timezone (Europe/Paris)
  */
 function getTodayMidnightFrench(): Date {
-  // Get current time in French timezone
   const now = new Date()
-  const frenchTime = new Date(now.toLocaleString('en-US', { timeZone: 'Europe/Paris' }))
-
-  // Set to midnight
-  frenchTime.setHours(0, 0, 0, 0)
-
-  // Calculate the offset and return UTC equivalent
-  const offsetMs = now.getTime() - new Date(now.toLocaleString('en-US', { timeZone: 'Europe/Paris' })).getTime()
-
-  return new Date(frenchTime.getTime() + offsetMs)
+  // Heure murale Europe/Paris au format ISO-like (sv-SE) : "YYYY-MM-DD HH:mm:ss"
+  const parisStr = now.toLocaleString('sv-SE', { timeZone: 'Europe/Paris' })
+  const parisDay = parisStr.slice(0, 10) // "YYYY-MM-DD" (jour calendaire Paris)
+  // Offset Paris (ms) à cet instant : (heure murale Paris interprétée comme UTC) - UTC réel
+  const offsetMs = new Date(parisStr.replace(' ', 'T') + 'Z').getTime() - now.getTime()
+  // Minuit Paris = (00:00 du jour Paris interprété UTC) - offset → instant UTC correct (DST-safe)
+  return new Date(new Date(parisDay + 'T00:00:00Z').getTime() - offsetMs)
 }
 
 /**

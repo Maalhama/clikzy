@@ -121,9 +121,10 @@ export async function clickGame(gameId: string): Promise<ActionResult<{ newEndTi
     })
 
   if (clickError) {
-    // Try to refund credit on failure
+    // Refund du clic échoué via refund_credits : re-crédite SANS gonfler total_clicks
+    // (contrairement à l'ancien decrement_credits(-1) qui incrémentait total_clicks, compteur permanent)
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await (supabase.rpc as any)('decrement_credits', { p_user_id: user.id, p_amount: -GAME_CONSTANTS.CREDIT_COST_PER_CLICK })
+    await (supabase.rpc as any)('refund_credits', { p_user_id: user.id, p_amount: GAME_CONSTANTS.CREDIT_COST_PER_CLICK })
     return { success: false, error: 'Erreur lors de l\'enregistrement du clic' }
   }
 
