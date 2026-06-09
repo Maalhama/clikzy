@@ -243,77 +243,8 @@ export async function getGameClicks(
   return { success: true, data: clicks as (Click & { username: string })[] }
 }
 
-/**
- * End a game and determine the winner
- * This would typically be called by a server-side cron job or edge function
- */
-export async function endGame(gameId: string): Promise<ActionResult<{ winnerId: string | null }>> {
-  const supabase = await createClient()
-
-  // Get the game
-  const { data: gameData } = await supabase
-    .from('games')
-    .select('*, item:items(*)')
-    .eq('id', gameId)
-    .single()
-
-  const game = gameData as GameWithItem | null
-
-  if (!game) {
-    return { success: false, error: 'Partie non trouvée' }
-  }
-
-  if (game.status === 'ended') {
-    return { success: false, error: 'Partie déjà terminée' }
-  }
-
-  // Determine winner (last clicker)
-  const winnerId = game.last_click_user_id
-
-  // Update game status
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { error: updateError } = await (supabase as any)
-    .from('games')
-    .update({
-      status: 'ended',
-      winner_id: winnerId,
-    })
-    .eq('id', gameId)
-
-  if (updateError) {
-    return { success: false, error: 'Erreur lors de la fin de partie' }
-  }
-
-  // If there's a winner, record the win
-  if (winnerId) {
-    // Create winner record
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await (supabase as any).from('winners').insert({
-      game_id: gameId,
-      user_id: winnerId,
-      item_id: game.item.id,
-      item_name: game.item.name,
-      item_value: game.item.retail_value,
-    })
-
-    // Update winner's stats
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data: profileData } = await (supabase as any)
-      .from('profiles')
-      .select('total_wins')
-      .eq('id', winnerId)
-      .single()
-
-    const profile = profileData as { total_wins: number | null } | null
-
-    if (profile) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      await (supabase as any)
-        .from('profiles')
-        .update({ total_wins: (profile.total_wins ?? 0) + 1 })
-        .eq('id', winnerId)
-    }
-  }
-
-  return { success: true, data: { winnerId } }
-}
+// NOTE : l'ancienne Server Action `endGame` (clôture d'une partie côté client session) a été
+// SUPPRIMÉE — c'était du code MORT (jamais appelée) et un vecteur d'exploit (insertion arbitraire
+// d'un winner + fin de partie forcée + total_wins). La clôture est gérée EXCLUSIVEMENT par le cron
+// `bot-clicks` (service_role). Les policies RLS games UPDATE / winners INSERT sont restreintes
+// au service_role (migration de durcissement).
