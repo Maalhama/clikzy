@@ -15,7 +15,7 @@ const DAILY_FREE_CREDITS = 10
 export async function GET(request: NextRequest) {
   // Verify authentication
   const authHeader = request.headers.get('authorization')
-  if (CRON_SECRET && authHeader !== `Bearer ${CRON_SECRET}`) {
+  if (!CRON_SECRET || authHeader !== `Bearer ${CRON_SECRET}`) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 

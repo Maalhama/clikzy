@@ -167,11 +167,10 @@ async function executeWithRetry(
 }
 
 export async function GET(request: NextRequest) {
-  // Vérifier l'authentification (Vercel Cron envoie un header spécial)
+  // Auth fail-closed : CRON_SECRET obligatoire. Le header x-vercel-cron est forgeable → on ne s'y fie pas.
   const authHeader = request.headers.get('authorization')
-  const isVercelCron = request.headers.get('x-vercel-cron') === '1'
 
-  if (!isVercelCron && CRON_SECRET && authHeader !== `Bearer ${CRON_SECRET}`) {
+  if (!CRON_SECRET || authHeader !== `Bearer ${CRON_SECRET}`) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 

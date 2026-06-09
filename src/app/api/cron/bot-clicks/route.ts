@@ -252,7 +252,7 @@ function getItemName(item: GameData['item']): string {
 
 export async function GET(request: NextRequest) {
   const authHeader = request.headers.get('authorization')
-  if (CRON_SECRET && authHeader !== `Bearer ${CRON_SECRET}`) {
+  if (!CRON_SECRET || authHeader !== `Bearer ${CRON_SECRET}`) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
@@ -369,7 +369,9 @@ export async function GET(request: NextRequest) {
               // Timer sous le seuil de ce jeu - bot clique (simule plusieurs bots qui se battent)
               updates.last_click_username = botUsername
               updates.last_click_user_id = null
-              updates.end_time = now + 90000 // Reset à 90s
+              // Reset 90s + jitter DÉTERMINISTE par partie (0-30s) : sinon toutes les parties
+              // traitées dans le même tick reçoivent le même end_time et leurs fins se regroupent.
+              updates.end_time = now + 90000 + (hashString(game.id) % 30000)
               updates.total_clicks = (game.total_clicks || 0) + Math.floor(Math.random() * 5) + 2 // +2 à +6 : bataille intense
               action = `bot_click_final (${botUsername}) SAVED at ${Math.floor(timeLeft/1000)}s! (threshold: ${Math.floor(clickThreshold/1000)}s) [battle: ${Math.round(battleProgress * 100)}%/${battleDurationMin}min]`
             } else {
@@ -395,6 +397,20 @@ export async function GET(request: NextRequest) {
             .from('games')
             .update(updates)
             .eq('id', game.id)
+        }
+
+        // Si un bot a pris le lead ce tick, enregistrer le clic dans `clicks`
+        // (alimente le feed live /api/clicks/recent — sinon la table reste vide pour les bots)
+        if (updates.last_click_username === botUsername) {
+          await supabase.from('clicks').insert({
+            game_id: game.id,
+            user_id: null,
+            username: botUsername,
+            item_name: getItemName(game.item),
+            is_bot: true,
+            sequence_number: typeof updates.total_clicks === 'number' ? updates.total_clicks : (game.total_clicks || 0) + 1,
+            credits_spent: 0,
+          })
         }
 
         results.push({

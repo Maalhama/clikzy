@@ -235,10 +235,13 @@ export function GameClient({
     }
   }, [game.status, isCritical, isUrgent])
 
-  const { primary: productImage } = useMemo(
+  const { primary: productImagePrimary, fallback: productImageFallback } = useMemo(
     () => getProductImageWithFallback(game.item.name, game.item.image_url),
     [game.item.name, game.item.image_url]
   )
+  const [imgError, setImgError] = useState(false)
+  // Si l'image produit 404 (ex: asset manquant), bascule sur le fallback au lieu d'une image cassée
+  const productImage = imgError ? productImageFallback : productImagePrimary
 
   return (
     <div className="min-h-screen pb-20 lg:pb-8">
@@ -296,6 +299,7 @@ export function GameClient({
                     }`}
                     priority
                     unoptimized
+                    onError={() => !imgError && setImgError(true)}
                   />
                 </div>
               </div>
@@ -651,6 +655,7 @@ export function GameClient({
                       }`}
                       priority
                       unoptimized
+                      onError={() => !imgError && setImgError(true)}
                     />
                   </div>
                 </div>

@@ -19,18 +19,11 @@ import type { GameClick } from './useGame'
  * - >100%: bots arrêtent, timer descend à 0
  */
 
-// Sync bot click to database (fire and forget)
-async function syncBotClickToDb(gameId: string, username: string) {
-  try {
-    await fetch('/api/games/bot-click', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ gameId, username }),
-    })
-  } catch (error) {
-    console.error('[BOT SIM] Failed to sync to DB:', error)
-  }
-}
+// NOTE : la simulation est désormais PUREMENT VISUELLE (optimisticUpdate local uniquement).
+// Plus aucune écriture en base depuis le frontend — le cron backend `bot-clicks` est SEUL
+// maître de l'état du jeu (leader, timer, bataille, clôture). Cela supprime la faille de
+// l'endpoint /api/games/bot-click (public, sans auth) et garantit un cycle de vie identique
+// que quelqu'un regarde ou non.
 
 interface UseBotSimulationProps {
   gameId: string
@@ -201,7 +194,6 @@ export function useBotSimulation({
             last_click_username: username,
             last_click_user_id: null,
           })
-          syncBotClickToDb(gameId, username)
 
           lastClickTimeRef.current = now
           lastUsernameRef.current = username
@@ -227,8 +219,6 @@ export function useBotSimulation({
               last_click_username: username,
               last_click_user_id: null,
             })
-            syncBotClickToDb(gameId, username)
-
             lastClickTimeRef.current = now
             console.log(`[BOT SIM] SNIPE! ${username} at ${Math.floor(timeLeft/1000)}s (threshold: ${Math.floor(snipeThreshold/1000)}s)`)
             return
@@ -303,7 +293,6 @@ export function useBotSimulation({
           last_click_username: username,
         })
       }
-      syncBotClickToDb(gameId, username) // Sync to DB for lobby
 
       lastClickTimeRef.current = now
       lastUsernameRef.current = username
