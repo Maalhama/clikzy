@@ -255,6 +255,45 @@ export type Database = {
         }
         Relationships: []
       }
+      items_catalog: {
+        Row: {
+          bonus_kind: string
+          bonus_value: number
+          credit_bonus_pct: number
+          emoji: string
+          id: string
+          name: string
+          rarity: string
+          slot: string
+          sort_order: number
+          xp_bonus_pct: number
+        }
+        Insert: {
+          bonus_kind: string
+          bonus_value?: number
+          credit_bonus_pct?: number
+          emoji?: string
+          id: string
+          name: string
+          rarity: string
+          slot: string
+          sort_order?: number
+          xp_bonus_pct?: number
+        }
+        Update: {
+          bonus_kind?: string
+          bonus_value?: number
+          credit_bonus_pct?: number
+          emoji?: string
+          id?: string
+          name?: string
+          rarity?: string
+          slot?: string
+          sort_order?: number
+          xp_bonus_pct?: number
+        }
+        Relationships: []
+      }
       mini_game_plays: {
         Row: {
           credits_won: number
@@ -331,6 +370,10 @@ export type Database = {
           created_at: string | null
           credits: number | null
           earned_credits: number
+          equip_bonus_pct: number
+          equip_chest_luck: number
+          equip_credit_bonus_pct: number
+          equip_daily_clicks: number
           has_purchased_credits: boolean | null
           id: string
           is_admin: boolean | null
@@ -365,6 +408,10 @@ export type Database = {
           created_at?: string | null
           credits?: number | null
           earned_credits?: number
+          equip_bonus_pct?: number
+          equip_chest_luck?: number
+          equip_credit_bonus_pct?: number
+          equip_daily_clicks?: number
           has_purchased_credits?: boolean | null
           id: string
           is_admin?: boolean | null
@@ -399,6 +446,10 @@ export type Database = {
           created_at?: string | null
           credits?: number | null
           earned_credits?: number
+          equip_bonus_pct?: number
+          equip_chest_luck?: number
+          equip_credit_bonus_pct?: number
+          equip_daily_clicks?: number
           has_purchased_credits?: boolean | null
           id?: string
           is_admin?: boolean | null
@@ -485,6 +536,142 @@ export type Database = {
           },
           {
             foreignKeyName: "user_badges_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_chests: {
+        Row: {
+          created_at: string
+          dropped_credits: number | null
+          dropped_item_id: string | null
+          id: string
+          opened: boolean
+          opened_at: string | null
+          rarity: string
+          source: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          dropped_credits?: number | null
+          dropped_item_id?: string | null
+          id?: string
+          opened?: boolean
+          opened_at?: string | null
+          rarity: string
+          source?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          dropped_credits?: number | null
+          dropped_item_id?: string | null
+          id?: string
+          opened?: boolean
+          opened_at?: string | null
+          rarity?: string
+          source?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_chests_dropped_item_id_fkey"
+            columns: ["dropped_item_id"]
+            isOneToOne: false
+            referencedRelation: "items_catalog"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_chests_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_equipment: {
+        Row: {
+          equipped_at: string
+          inventory_id: string
+          item_id: string
+          slot: string
+          user_id: string
+        }
+        Insert: {
+          equipped_at?: string
+          inventory_id: string
+          item_id: string
+          slot: string
+          user_id: string
+        }
+        Update: {
+          equipped_at?: string
+          inventory_id?: string
+          item_id?: string
+          slot?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_equipment_inventory_id_fkey"
+            columns: ["inventory_id"]
+            isOneToOne: false
+            referencedRelation: "user_inventory"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_equipment_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "items_catalog"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_equipment_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_inventory: {
+        Row: {
+          acquired_at: string
+          id: string
+          item_id: string
+          source: string | null
+          user_id: string
+        }
+        Insert: {
+          acquired_at?: string
+          id?: string
+          item_id: string
+          source?: string | null
+          user_id: string
+        }
+        Update: {
+          acquired_at?: string
+          id?: string
+          item_id?: string
+          source?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_inventory_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "items_catalog"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_inventory_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
@@ -693,10 +880,56 @@ export type Database = {
         Args: { p_amount: number; p_user_id: string }
         Returns: number
       }
+      equip_item: {
+        Args: { p_inventory_id: string }
+        Returns: {
+          ok: boolean
+          reason: string
+          slot: string
+        }[]
+      }
+      get_leaderboard: {
+        Args: { p_limit?: number }
+        Returns: {
+          avatar_url: string
+          level: number
+          rank: number
+          total_wins: number
+          user_id: string
+          username: string
+          xp: number
+        }[]
+      }
+      get_my_rank: {
+        Args: never
+        Returns: {
+          my_rank: number
+          total_players: number
+        }[]
+      }
       increment_total_wins: { Args: { p_user_id: string }; Returns: number }
       log_player_event: {
         Args: { p_action: string; p_details?: Json; p_user_id: string }
         Returns: undefined
+      }
+      open_chest: {
+        Args: { p_chest_id: string }
+        Returns: {
+          bonus_kind: string
+          bonus_value: number
+          credit_bonus_pct: number
+          credits: number
+          emoji: string
+          item_id: string
+          item_name: string
+          item_rarity: string
+          ok: boolean
+          reason: string
+          reward_kind: string
+          slot: string
+          xp: number
+          xp_bonus_pct: number
+        }[]
       }
       paris_midnight: { Args: never; Returns: string }
       perform_click: {
@@ -713,12 +946,19 @@ export type Database = {
           reason: string
         }[]
       }
+      recompute_equip_bonus: { Args: { p_user_id: string }; Returns: undefined }
       reset_daily_credits: {
         Args: { p_user_id: string }
         Returns: {
           daily_credits: number
           earned: number
           was_reset: boolean
+        }[]
+      }
+      unequip_slot: {
+        Args: { p_slot: string }
+        Returns: {
+          ok: boolean
         }[]
       }
       xp_to_level: { Args: { p_xp: number }; Returns: number }
