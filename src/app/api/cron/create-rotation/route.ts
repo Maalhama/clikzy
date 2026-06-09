@@ -52,8 +52,9 @@ async function executeWithRetry(
     // Obtenir la prochaine rotation (utilise la fonction utilitaire)
     const utcStartTime = getNextRotationTime()
 
-    // Calculer end_time (1h après start_time)
-    const endTime = utcStartTime.getTime() + DEFAULT_GAME_DURATION
+    // end_time est calculé PAR PARTIE plus bas (échelonné aléatoirement) pour
+    // désynchroniser les fins — sinon toutes les parties d'une rotation se terminent
+    // au même instant et les victoires se groupent.
 
     // Récupérer des items disponibles
     const { data: availableItems, error: itemsError } = await supabase
@@ -91,11 +92,16 @@ async function executeWithRetry(
     const selectedItems = shuffled.slice(0, Math.min(GAMES_PER_ROTATION, shuffled.length))
 
     // Créer les jeux en status 'waiting' (seront activés par activate-games)
+    // end_time ÉCHELONNÉ par partie : durée de base (1h) + décalage aléatoire de 0 à 90 min.
+    // Les 18 parties d'une rotation se terminent ainsi à des moments différents
+    // (~1 toutes les 5 min) au lieu de toutes ensemble. La bataille finale (30min-1h59)
+    // ajoute encore de la dispersion par-dessus.
+    const STAGGER_MAX_MS = 90 * 60 * 1000 // 90 min
     const games = selectedItems.map((item: { id: string }) => ({
       item_id: item.id,
       status: 'waiting' as const,
       start_time: utcStartTime.toISOString(),
-      end_time: endTime,
+      end_time: utcStartTime.getTime() + DEFAULT_GAME_DURATION + Math.floor(Math.random() * STAGGER_MAX_MS),
       initial_duration: DEFAULT_GAME_DURATION,
       total_clicks: 0,
     }))
@@ -140,7 +146,7 @@ async function executeWithRetry(
       })),
       rotation: {
         startTime: utcStartTime.toISOString(),
-        endTime: new Date(endTime).toISOString(),
+        endTime: 'échelonné par partie (base 1h + 0 à 90 min aléatoire)',
         parisTime: parisFormatter.format(utcStartTime),
       }
     })
