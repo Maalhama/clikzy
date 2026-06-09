@@ -114,11 +114,11 @@ export function ReferralSection({ referralCode, referralCount, creditsEarned, ha
       <div className="grid grid-cols-2 gap-3 mb-4">
         <div className="p-3 rounded-xl bg-white/5">
           <div className="text-2xl font-bold text-neon-purple">{referralCount}</div>
-          <div className="text-white/40 text-xs">Filleul{referralCount > 1 ? 's' : ''}</div>
+          <div className="text-white/50 text-xs">Filleul{referralCount > 1 ? 's' : ''}</div>
         </div>
         <div className="p-3 rounded-xl bg-white/5">
           <div className="text-2xl font-bold text-success">+{creditsEarned}</div>
-          <div className="text-white/40 text-xs">Crédits gagnés</div>
+          <div className="text-white/50 text-xs">Crédits gagnés</div>
         </div>
       </div>
 
@@ -174,7 +174,7 @@ export function ReferralSection({ referralCode, referralCount, creditsEarned, ha
                     onChange={(e) => setInputCode(e.target.value.toUpperCase())}
                     placeholder="CODE"
                     maxLength={10}
-                    className="flex-1 px-4 py-2.5 rounded-xl bg-bg-primary border border-white/20 text-white font-mono uppercase tracking-wider placeholder:text-white/30 focus:outline-none focus:border-neon-purple transition-colors"
+                    className="flex-1 px-4 py-2.5 rounded-xl bg-bg-primary border border-white/20 text-white font-mono uppercase tracking-wider placeholder:text-white/50 focus:outline-none focus:border-neon-purple transition-colors"
                   />
                   <button
                     onClick={handleApplyCode}
@@ -191,7 +191,7 @@ export function ReferralSection({ referralCode, referralCount, creditsEarned, ha
                 {error && <p className="text-danger text-xs">{error}</p>}
                 <button
                   onClick={() => { setShowApplyCode(false); setError(null); setInputCode('') }}
-                  className="text-white/40 hover:text-white text-xs transition-colors"
+                  className="text-white/50 hover:text-white text-xs transition-colors"
                 >
                   Annuler
                 </button>

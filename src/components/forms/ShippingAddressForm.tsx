@@ -51,7 +51,7 @@ export function ShippingAddressForm({ initialData, onSuccess, compact = false }:
     setIsSubmitting(false)
   }
 
-  const inputClass = `w-full px-4 py-3 rounded-xl bg-bg-primary border border-white/10 text-white placeholder-white/30 focus:outline-none focus:border-neon-purple transition-colors ${compact ? 'text-sm py-2.5' : ''}`
+  const inputClass = `w-full px-4 py-3 rounded-xl bg-bg-primary border border-white/10 text-white placeholder-white/50 focus:outline-none focus:border-neon-purple transition-colors ${compact ? 'text-sm py-2.5' : ''}`
   const labelClass = `block text-white/60 text-sm mb-1.5 ${compact ? 'text-xs mb-1' : ''}`
 
   return (
@@ -68,6 +68,7 @@ export function ShippingAddressForm({ initialData, onSuccess, compact = false }:
             onChange={handleChange}
             className={inputClass}
             placeholder="Jean"
+            autoComplete="given-name"
             required
           />
         </div>
@@ -81,6 +82,7 @@ export function ShippingAddressForm({ initialData, onSuccess, compact = false }:
             onChange={handleChange}
             className={inputClass}
             placeholder="Dupont"
+            autoComplete="family-name"
             required
           />
         </div>
@@ -97,6 +99,7 @@ export function ShippingAddressForm({ initialData, onSuccess, compact = false }:
           onChange={handleChange}
           className={inputClass}
           placeholder="123 Rue de la Paix"
+          autoComplete="address-line1"
           required
         />
       </div>
@@ -112,6 +115,7 @@ export function ShippingAddressForm({ initialData, onSuccess, compact = false }:
           onChange={handleChange}
           className={inputClass}
           placeholder="Appartement, bâtiment, étage..."
+          autoComplete="address-line2"
         />
       </div>
 
@@ -128,6 +132,7 @@ export function ShippingAddressForm({ initialData, onSuccess, compact = false }:
             className={inputClass}
             placeholder="75001"
             maxLength={5}
+            autoComplete="postal-code"
             required
           />
         </div>
@@ -141,6 +146,7 @@ export function ShippingAddressForm({ initialData, onSuccess, compact = false }:
             onChange={handleChange}
             className={inputClass}
             placeholder="Paris"
+            autoComplete="address-level2"
             required
           />
         </div>
@@ -155,9 +161,10 @@ export function ShippingAddressForm({ initialData, onSuccess, compact = false }:
           name="country"
           value={formData.country}
           className={`${inputClass} bg-white/5 cursor-not-allowed`}
+          autoComplete="country-name"
           disabled
         />
-        <p className="text-white/30 text-xs mt-1">Livraison en France métropolitaine uniquement</p>
+        <p className="text-white/50 text-xs mt-1">Livraison en France métropolitaine uniquement</p>
       </div>
 
       {/* Phone */}
@@ -171,9 +178,10 @@ export function ShippingAddressForm({ initialData, onSuccess, compact = false }:
           onChange={handleChange}
           className={inputClass}
           placeholder="06 12 34 56 78"
+          autoComplete="tel"
           required
         />
-        <p className="text-white/30 text-xs mt-1">Pour la livraison</p>
+        <p className="text-white/50 text-xs mt-1">Pour la livraison</p>
       </div>
 
       {/* Error message */}

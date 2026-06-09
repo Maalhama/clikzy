@@ -162,6 +162,7 @@ export default function LoginPage() {
                 type="email"
                 id="email"
                 name="email"
+                autoComplete="email"
                 placeholder="ton@email.com"
                 value={formData.email}
                 onChange={handleChange}
@@ -184,6 +185,7 @@ export default function LoginPage() {
                 type="password"
                 id="password"
                 name="password"
+                autoComplete="current-password"
                 placeholder="Ton mot de passe"
                 value={formData.password}
                 onChange={handleChange}

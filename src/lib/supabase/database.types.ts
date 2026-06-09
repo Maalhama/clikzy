@@ -610,6 +610,10 @@ export type Database = {
         Args: { p_amount: number; p_user_id: string }
         Returns: number
       }
+      add_purchased_credits: {
+        Args: { p_amount: number; p_user_id: string }
+        Returns: number
+      }
       admin_set_admin: {
         Args: { p_is_admin: boolean; p_user_id: string }
         Returns: boolean

@@ -554,7 +554,7 @@ export function GameClient({
                       </svg>
                     </div>
                     <div>
-                      <div className="text-white/40 text-xs uppercase">Mes crédits</div>
+                      <div className="text-white/50 text-xs uppercase">Mes crédits</div>
                       <div className="text-white font-medium">Solde disponible</div>
                     </div>
                   </div>

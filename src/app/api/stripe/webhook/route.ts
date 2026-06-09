@@ -117,29 +117,16 @@ async function handleStripeEvent(event: Stripe.Event): Promise<HandlerResult> {
     try {
       const supabase = getSupabaseAdmin()
 
-      // Get current user credits
-      const { data: profile, error: fetchError } = await supabase
-        .from('profiles')
-        .select('credits')
-        .eq('id', userId)
-        .single()
+      // Crédit ATOMIQUE (incrément côté SQL) -> pas de lost-update entre deux
+      // paiements concurrents. RPC DEFINER réservée au service_role.
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { error: rpcError } = await (supabase.rpc as any)('add_purchased_credits', {
+        p_user_id: userId,
+        p_amount: credits,
+      })
 
-      if (fetchError || !profile) {
-        console.error('Error fetching profile:', fetchError)
-        return { status: 404, body: { error: 'User not found' } }
-      }
-
-      // Update credits and mark as purchased
-      const { error: updateError } = await supabase
-        .from('profiles')
-        .update({
-          credits: (profile.credits || 0) + credits,
-          has_purchased_credits: true,
-        })
-        .eq('id', userId)
-
-      if (updateError) {
-        console.error('Error updating credits:', updateError)
+      if (rpcError) {
+        console.error('Error crediting account:', rpcError)
         return { status: 500, body: { error: 'Failed to credit account' } }
       }
 

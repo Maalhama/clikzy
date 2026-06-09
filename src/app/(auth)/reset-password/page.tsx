@@ -186,6 +186,7 @@ export default function ResetPasswordPage() {
                 type="password"
                 id="password"
                 name="password"
+                autoComplete="new-password"
                 placeholder="Minimum 6 caractères"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -239,6 +240,7 @@ export default function ResetPasswordPage() {
                 type="password"
                 id="confirmPassword"
                 name="confirmPassword"
+                autoComplete="new-password"
                 placeholder="Répète ton mot de passe"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}

@@ -185,7 +185,7 @@ export const GameFilters = memo(function GameFilters({
                   value={searchQuery}
                   onChange={handleSearchChange}
                   placeholder="Rechercher..."
-                  className="flex-1 py-1.5 bg-transparent text-white text-sm placeholder:text-white/30 focus:outline-none"
+                  className="flex-1 py-1.5 bg-transparent text-white text-sm placeholder:text-white/50 focus:outline-none"
                   autoFocus
                 />
                 {searchQuery && (
@@ -340,7 +340,7 @@ export const GameFilters = memo(function GameFilters({
                     value={searchQuery}
                     onChange={handleSearchChange}
                     placeholder="Rechercher..."
-                    className="flex-1 bg-transparent text-white text-sm placeholder:text-white/30 focus:outline-none min-w-[120px]"
+                    className="flex-1 bg-transparent text-white text-sm placeholder:text-white/50 focus:outline-none min-w-[120px]"
                     autoFocus
                   />
                   {searchQuery && (

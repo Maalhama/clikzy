@@ -171,8 +171,8 @@ export default function SupportPage() {
                   {method.icon}
                 </div>
                 <h3 className="font-bold text-white/50 text-lg mb-1">{method.title}</h3>
-                <p className="text-white/30 text-sm mb-3">{method.description}</p>
-                <span className="inline-flex items-center gap-1 text-sm font-medium text-white/30">
+                <p className="text-white/50 text-sm mb-3">{method.description}</p>
+                <span className="inline-flex items-center gap-1 text-sm font-medium text-white/50">
                   {method.action}
                 </span>
               </div>
@@ -253,7 +253,7 @@ export default function SupportPage() {
                         onChange={handleChange}
                         required
                         disabled={isLoading}
-                        className="w-full px-4 py-3 rounded-xl bg-bg-primary/50 border border-white/10 text-sm text-white placeholder-white/30 transition-colors focus:outline-none focus:border-neon-purple focus:ring-2 focus:ring-neon-purple/20 disabled:opacity-50"
+                        className="w-full px-4 py-3 rounded-xl bg-bg-primary/50 border border-white/10 text-sm text-white placeholder-white/50 transition-colors focus:outline-none focus:border-neon-purple focus:ring-2 focus:ring-neon-purple/20 disabled:opacity-50"
                       />
                     </div>
                     <div>
@@ -269,7 +269,7 @@ export default function SupportPage() {
                         onChange={handleChange}
                         required
                         disabled={isLoading}
-                        className="w-full px-4 py-3 rounded-xl bg-bg-primary/50 border border-white/10 text-sm text-white placeholder-white/30 transition-colors focus:outline-none focus:border-neon-purple focus:ring-2 focus:ring-neon-purple/20 disabled:opacity-50"
+                        className="w-full px-4 py-3 rounded-xl bg-bg-primary/50 border border-white/10 text-sm text-white placeholder-white/50 transition-colors focus:outline-none focus:border-neon-purple focus:ring-2 focus:ring-neon-purple/20 disabled:opacity-50"
                       />
                     </div>
                   </div>
@@ -312,7 +312,7 @@ export default function SupportPage() {
                       required
                       disabled={isLoading}
                       rows={5}
-                      className="w-full px-4 py-3 rounded-xl bg-bg-primary/50 border border-white/10 text-sm text-white placeholder-white/30 transition-colors focus:outline-none focus:border-neon-purple focus:ring-2 focus:ring-neon-purple/20 disabled:opacity-50 resize-none"
+                      className="w-full px-4 py-3 rounded-xl bg-bg-primary/50 border border-white/10 text-sm text-white placeholder-white/50 transition-colors focus:outline-none focus:border-neon-purple focus:ring-2 focus:ring-neon-purple/20 disabled:opacity-50 resize-none"
                     />
                   </div>
 

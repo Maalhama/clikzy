@@ -115,7 +115,7 @@ export function SearchBar({ onSearch, placeholder = 'Rechercher un produit...' }
               value={query}
               onChange={handleChange}
               placeholder={placeholder}
-              className="flex-1 bg-transparent text-white text-sm placeholder:text-white/30 focus:outline-none min-w-0"
+              className="flex-1 bg-transparent text-white text-sm placeholder:text-white/50 focus:outline-none min-w-0"
             />
             {query && (
               <button

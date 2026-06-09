@@ -248,6 +248,7 @@ export default function RegisterPage() {
                 type="text"
                 id="username"
                 name="username"
+                autoComplete="username"
                 placeholder="ton_pseudo"
                 value={formData.username}
                 onChange={handleChange}
@@ -268,6 +269,7 @@ export default function RegisterPage() {
                 type="email"
                 id="email"
                 name="email"
+                autoComplete="email"
                 placeholder="ton@email.com"
                 value={formData.email}
                 onChange={handleChange}
@@ -285,6 +287,7 @@ export default function RegisterPage() {
                 type="password"
                 id="password"
                 name="password"
+                autoComplete="new-password"
                 placeholder="Minimum 6 caractères"
                 value={formData.password}
                 onChange={handleChange}
