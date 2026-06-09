@@ -9,6 +9,7 @@ import { CreditPacksModal } from '@/components/modals/CreditPacksModal'
 import { GameHistorySection } from '@/components/profile/GameHistorySection'
 import { ReferralSection } from '@/components/profile/ReferralSection'
 import { BadgesSection } from '@/components/profile/BadgesSection'
+import { ProgressionCard } from '@/components/progression/ProgressionCard'
 import { getProductSvg } from '@/lib/utils/productImages'
 import type { Badge } from '@/actions/badges'
 import {
@@ -396,6 +397,11 @@ export function ProfileClient({ profile, wins, gamesPlayed, totalValueWon, gameH
             <EmptyWinsState />
           )}
         </motion.div>
+
+        {/* Progression : niveau/XP, streak, quêtes du jour */}
+        <div className="mt-8">
+          <ProgressionCard />
+        </div>
 
         {/* Badges Section */}
         <BadgesSection badges={badges} stats={badgeStats} />

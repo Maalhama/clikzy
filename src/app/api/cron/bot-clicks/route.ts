@@ -360,6 +360,9 @@ async function endGame(
     if (winnerId) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       await (supabase.rpc as any)('increment_total_wins', { p_user_id: winnerId })
+      // Gamification : +200 XP pour une victoire (progression, n'affecte pas les tirages)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await (supabase.rpc as any)('award_xp', { p_user_id: winnerId, p_amount: 200 })
 
       // Envoyer l'email de victoire (non-bloquant)
       if (winnerEmail) {

@@ -671,6 +671,20 @@ export type Database = {
           reason: string
         }[]
       }
+      daily_quests_status: {
+        Args: never
+        Returns: {
+          claimed: boolean
+          credits_reward: number
+          description: string
+          key: string
+          progress: number
+          sort_order: number
+          target: number
+          title: string
+          xp_reward: number
+        }[]
+      }
       deduct_credits: {
         Args: { p_amount: number; p_user_id: string }
         Returns: number
