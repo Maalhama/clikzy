@@ -341,13 +341,18 @@ Le flag `has_purchased_credits = true` désactive le reset quotidien pour cet ut
 
 Les crons sont configurés sur **cron-job.org** (pas GitHub Actions) :
 
-| Cron | Fréquence | URL |
-|------|-----------|-----|
-| Bot Clicks | 1 min | `/api/cron/bot-clicks` |
-| Activate Games | 1 min | `/api/cron/activate-games` |
-| Create Rotation | :45 aux heures 23,2,5,8,11,14,17,20 | `/api/cron/create-rotation` |
+| Cron | Planning (cron-job.org) | URL |
+|------|-------------------------|-----|
+| Bot Clicks (**cron combiné**) | `* * * * *` (chaque minute) | `/api/cron/bot-clicks` |
+| Create Rotation | `45 1,4,7,10,13,16,19,22 * * *` (toutes les 3 h à :45) | `/api/cron/create-rotation` |
+| Reset Credits | `0 0 * * *` (minuit Europe/Paris) | `/api/cron/reset-credits` |
 
-Header requis : `Authorization: Bearer [CRON_SECRET]`
+> **Bot Clicks** est le cron unifié : il fait l'activation (waiting → active) +
+> les bots + la bataille finale + la fin de partie. Il n'y a donc **pas** de cron
+> `activate-games` planifié séparément (l'endpoint existe mais n'est pas appelé).
+
+Header requis : `Authorization: Bearer [CRON_SECRET]` (les routes sont fail-closed :
+elles refusent si le secret est absent ou ne correspond pas).
 
 ## TODO - À faire
 

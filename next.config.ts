@@ -5,6 +5,11 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: __dirname,
   },
+  // M7 — retire les console.log/info/debug du build de PRODUCTION (garde
+  // error/warn pour le diagnostic). Évite le bruit et toute fuite d'info en prod.
+  compiler: {
+    removeConsole: process.env.NODE_ENV === 'production' ? { exclude: ['error', 'warn'] } : false,
+  },
   images: {
     qualities: [75, 90, 95],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920],
