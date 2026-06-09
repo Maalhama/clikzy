@@ -1,6 +1,7 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
+import { createServiceClient } from '@/lib/supabase/service'
 import {
   MiniGameType,
   MiniGameEligibility,
@@ -183,7 +184,10 @@ export async function playMiniGame(gameType: MiniGameType): Promise<ActionResult
       creditsWon = 0
   }
 
-  // Insert play record (free play)
+  // Enregistrement ATOMIQUE de la partie gratuite : l'index unique partiel
+  // (user_id, game_type, play_day) WHERE is_free_play sérialise les requêtes
+  // parallèles (TOCTOU) -> un conflit 23505 = déjà joué aujourd'hui. C'est ce
+  // gate, pas le check JS d'éligibilité ci-dessus, qui fait autorité.
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { error: insertError } = await (supabase as any)
     .from('mini_game_plays')
@@ -195,14 +199,18 @@ export async function playMiniGame(gameType: MiniGameType): Promise<ActionResult
     })
 
   if (insertError) {
+    if ((insertError as { code?: string }).code === '23505') {
+      return { success: false, error: 'Vous avez déjà joué à ce jeu aujourd\'hui. Revenez demain !' }
+    }
     return { success: false, error: 'Erreur lors de l\'enregistrement de la partie' }
   }
 
-  // Add credits to user profile if won
+  // Crédit des gains via service_role : add_mini_game_credits est révoquée de
+  // `authenticated` pour empêcher tout mint direct via PostgREST.
   let newTotalCredits = 0
   if (creditsWon > 0) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data: rpcData, error: rpcError } = await (supabase as any)
+    const admin = createServiceClient()
+    const { data: rpcData, error: rpcError } = await admin
       .rpc('add_mini_game_credits', {
         p_user_id: user.id,
         p_amount: creditsWon,
@@ -213,7 +221,7 @@ export async function playMiniGame(gameType: MiniGameType): Promise<ActionResult
       // Still return success since play was recorded
     }
 
-    newTotalCredits = rpcData || 0
+    newTotalCredits = (rpcData as number) || 0
   } else {
     // Get current credits
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -365,16 +373,17 @@ export async function playMiniGamePaid(gameType: MiniGameType): Promise<ActionRe
       is_free_play: false,
     })
 
-  // Add winnings to earned_credits (permanent)
+  // Add winnings to earned_credits (permanent) via service_role
+  // (add_mini_game_credits révoquée de `authenticated`).
   let newTotalCredits = newTotal as number
   if (creditsWon > 0) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data: rpcData } = await (supabase as any)
+    const admin = createServiceClient()
+    const { data: rpcData } = await admin
       .rpc('add_mini_game_credits', {
         p_user_id: user.id,
         p_amount: creditsWon,
       })
-    newTotalCredits = rpcData || newTotalCredits + creditsWon
+    newTotalCredits = (rpcData as number) || newTotalCredits + creditsWon
   }
 
   return {

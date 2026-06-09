@@ -1,6 +1,7 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
+import { createServiceClient } from '@/lib/supabase/service'
 import { checkAdminStatus } from '@/lib/auth/adminCheck'
 import { revalidatePath } from 'next/cache'
 import type { Profile, Game, Item, Winner } from '@/types/database'
@@ -190,7 +191,9 @@ export async function createItem(data: {
     return { success: false, error: 'Image URL requise' }
   }
 
-  const supabase = await createClient()
+  // items n'a pas de policy INSERT (RLS default-deny) : écriture via service_role
+  // APRÈS la vérification admin ci-dessus.
+  const supabase = createServiceClient()
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { data: item, error } = await (supabase as any)
@@ -222,7 +225,9 @@ export async function updateShippingStatus(
   const { isAdmin } = await checkAdminStatus()
   if (!isAdmin) return { success: false, error: 'Non autorisé' }
 
-  const supabase = await createClient()
+  // winners n'a pas de policy UPDATE (RLS default-deny, durcie en C2) :
+  // écriture via service_role APRÈS la vérification admin.
+  const supabase = createServiceClient()
 
   const updateData: Record<string, unknown> = { shipping_status: status }
 

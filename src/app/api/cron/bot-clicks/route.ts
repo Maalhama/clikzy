@@ -248,13 +248,22 @@ export async function GET(request: NextRequest) {
         // Si un bot a pris le lead ce tick, enregistrer le clic dans `clicks`
         // (alimente le feed live /api/clicks/recent — sinon la table reste vide pour les bots)
         if (updates.last_click_username === botUsername) {
+          // sequence_number = MAX+1 (cohérent avec perform_click, pas un compteur fabriqué)
+          const { data: maxRow } = await supabase
+            .from('clicks')
+            .select('sequence_number')
+            .eq('game_id', game.id)
+            .order('sequence_number', { ascending: false })
+            .limit(1)
+            .maybeSingle()
+          const nextSeq = ((maxRow?.sequence_number as number | null) ?? 0) + 1
           await supabase.from('clicks').insert({
             game_id: game.id,
             user_id: null,
             username: botUsername,
             item_name: getItemName(game.item),
             is_bot: true,
-            sequence_number: typeof updates.total_clicks === 'number' ? updates.total_clicks : (game.total_clicks || 0) + 1,
+            sequence_number: nextSeq,
             credits_spent: 0,
           })
         }
@@ -316,13 +325,15 @@ async function endGame(
   let finalUsername = winnerUsername
   let winnerEmail: string | null = null
   if (winnerId) {
+    // username vit dans profiles ; l'email vit dans auth.users (pas profiles.email).
     const { data: profile } = await supabase
       .from('profiles')
-      .select('username, email')
+      .select('username')
       .eq('id', winnerId)
       .single()
     finalUsername = profile?.username || winnerUsername
-    winnerEmail = profile?.email || null
+    const { data: authUser } = await supabase.auth.admin.getUserById(winnerId)
+    winnerEmail = authUser?.user?.email ?? null
   }
 
   // Récupérer la valeur de l'item
@@ -345,20 +356,10 @@ async function endGame(
       is_bot: isBot,
     })
 
-    // Incrémenter les wins si joueur réel
+    // Incrémenter les wins si joueur réel (incrément ATOMIQUE, donnée permanente)
     if (winnerId) {
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('total_wins')
-        .eq('id', winnerId)
-        .single()
-
-      if (profile) {
-        await supabase
-          .from('profiles')
-          .update({ total_wins: (profile.total_wins ?? 0) + 1 })
-          .eq('id', winnerId)
-      }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await (supabase.rpc as any)('increment_total_wins', { p_user_id: winnerId })
 
       // Envoyer l'email de victoire (non-bloquant)
       if (winnerEmail) {
