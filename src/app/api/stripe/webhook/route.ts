@@ -34,6 +34,8 @@ function getSupabaseAdmin() {
   })
 }
 
+type HandlerResult = { status: number; body: Record<string, unknown> }
+
 export async function POST(request: NextRequest) {
   const body = await request.text()
   const signature = request.headers.get('stripe-signature')
@@ -58,6 +60,48 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Invalid signature' }, { status: 400 })
   }
 
+  // C5 — Idempotence : on "réclame" l'event via son id (clé primaire). Un conflit
+  // signifie qu'il a DÉJÀ été traité avec succès -> on l'ignore (évite le double
+  // crédit en cas de retry Stripe). En cas d'échec de traitement, la réclamation
+  // est relâchée plus bas pour permettre un nouveau retry.
+  let idemDb: ReturnType<typeof getSupabaseAdmin>
+  try {
+    idemDb = getSupabaseAdmin()
+  } catch (err) {
+    console.error('Supabase admin init failed:', err)
+    return NextResponse.json({ error: 'Server misconfigured' }, { status: 500 })
+  }
+
+  const { error: claimError } = await idemDb
+    .from('stripe_events')
+    .insert({ id: event.id, type: event.type })
+
+  if (claimError) {
+    if (claimError.code === '23505') {
+      // Déjà traité : acquittement idempotent
+      return NextResponse.json({ received: true, duplicate: true })
+    }
+    console.error('Stripe idempotency claim failed:', claimError)
+    return NextResponse.json({ error: 'Idempotency error' }, { status: 500 })
+  }
+
+  let result: HandlerResult
+  try {
+    result = await handleStripeEvent(event)
+  } catch (error) {
+    console.error('Unhandled error processing Stripe event:', error)
+    result = { status: 500, body: { error: 'Processing failed' } }
+  }
+
+  // Échec -> on relâche la réclamation pour que Stripe puisse réessayer
+  if (result.status >= 400) {
+    await idemDb.from('stripe_events').delete().eq('id', event.id)
+  }
+
+  return NextResponse.json(result.body, { status: result.status })
+}
+
+async function handleStripeEvent(event: Stripe.Event): Promise<HandlerResult> {
   // Handle the checkout.session.completed event
   if (event.type === 'checkout.session.completed') {
     const session = event.data.object as Stripe.Checkout.Session
@@ -67,7 +111,7 @@ export async function POST(request: NextRequest) {
 
     if (!userId || credits <= 0) {
       console.error('Invalid metadata in checkout session:', session.metadata)
-      return NextResponse.json({ error: 'Invalid metadata' }, { status: 400 })
+      return { status: 400, body: { error: 'Invalid metadata' } }
     }
 
     try {
@@ -82,7 +126,7 @@ export async function POST(request: NextRequest) {
 
       if (fetchError || !profile) {
         console.error('Error fetching profile:', fetchError)
-        return NextResponse.json({ error: 'User not found' }, { status: 404 })
+        return { status: 404, body: { error: 'User not found' } }
       }
 
       // Update credits and mark as purchased
@@ -96,13 +140,13 @@ export async function POST(request: NextRequest) {
 
       if (updateError) {
         console.error('Error updating credits:', updateError)
-        return NextResponse.json({ error: 'Failed to credit account' }, { status: 500 })
+        return { status: 500, body: { error: 'Failed to credit account' } }
       }
 
       console.log(`Successfully credited ${credits} to user ${userId}`)
     } catch (error) {
       console.error('Error processing payment:', error)
-      return NextResponse.json({ error: 'Payment processing failed' }, { status: 500 })
+      return { status: 500, body: { error: 'Payment processing failed' } }
     }
   }
 
@@ -112,18 +156,18 @@ export async function POST(request: NextRequest) {
 
     // Only process VIP subscriptions
     if (subscription.metadata?.type !== 'vip_subscription') {
-      return NextResponse.json({ received: true })
+      return { status: 200, body: { received: true } }
     }
 
     const userId = subscription.metadata?.userId
     if (!userId) {
       console.error('Missing userId in subscription metadata:', subscription.metadata)
-      return NextResponse.json({ error: 'Missing userId' }, { status: 400 })
+      return { status: 400, body: { error: 'Missing userId' } }
     }
 
     // Only activate if subscription is active
     if (subscription.status !== 'active') {
-      return NextResponse.json({ received: true })
+      return { status: 200, body: { received: true } }
     }
 
     try {
@@ -143,13 +187,13 @@ export async function POST(request: NextRequest) {
 
       if (updateError) {
         console.error('Error updating VIP status:', updateError)
-        return NextResponse.json({ error: 'Failed to activate VIP' }, { status: 500 })
+        return { status: 500, body: { error: 'Failed to activate VIP' } }
       }
 
       console.log(`VIP activated for user ${userId} until ${expiresAt}`)
     } catch (error) {
       console.error('Error processing VIP subscription:', error)
-      return NextResponse.json({ error: 'VIP processing failed' }, { status: 500 })
+      return { status: 500, body: { error: 'VIP processing failed' } }
     }
   }
 
@@ -159,13 +203,13 @@ export async function POST(request: NextRequest) {
 
     // Only process VIP subscriptions
     if (subscription.metadata?.type !== 'vip_subscription') {
-      return NextResponse.json({ received: true })
+      return { status: 200, body: { received: true } }
     }
 
     const userId = subscription.metadata?.userId
     if (!userId) {
       console.error('Missing userId in subscription metadata:', subscription.metadata)
-      return NextResponse.json({ error: 'Missing userId' }, { status: 400 })
+      return { status: 400, body: { error: 'Missing userId' } }
     }
 
     try {
@@ -182,15 +226,15 @@ export async function POST(request: NextRequest) {
 
       if (updateError) {
         console.error('Error deactivating VIP status:', updateError)
-        return NextResponse.json({ error: 'Failed to deactivate VIP' }, { status: 500 })
+        return { status: 500, body: { error: 'Failed to deactivate VIP' } }
       }
 
       console.log(`VIP deactivated for user ${userId}`)
     } catch (error) {
       console.error('Error processing VIP cancellation:', error)
-      return NextResponse.json({ error: 'VIP cancellation processing failed' }, { status: 500 })
+      return { status: 500, body: { error: 'VIP cancellation processing failed' } }
     }
   }
 
-  return NextResponse.json({ received: true })
+  return { status: 200, body: { received: true } }
 }
