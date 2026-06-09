@@ -2,8 +2,15 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 
 /**
- * API pour enregistrer un clic de bot dans la DB
- * Appelé par la simulation frontend pour synchroniser avec le lobby
+ * API de mise à jour du LEADER affiché (simulation frontend, flair visuel).
+ *
+ * IMPORTANT : cette route NE contrôle PAS le timer ni la fin de partie.
+ * Le cron backend (`/api/cron/bot-clicks`, toutes les minutes) est le SEUL
+ * maître du cycle de vie : maintien du timer en phase finale, durée de la
+ * bataille (aléatoire par partie) et clôture. Ainsi une partie vit et se
+ * termine de la même façon que quelqu'un regarde ou non — avant, le frontend
+ * resetait le timer chaque seconde, ce qui maintenait les parties en vie tant
+ * qu'un joueur regardait, puis elles se cloturaient quand il quittait.
  */
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
@@ -19,29 +26,13 @@ export async function POST(request: NextRequest) {
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
-    // Vérifier si le jeu est en phase finale pour étendre le timer
-    const { data: game } = await supabase
-      .from('games')
-      .select('status, end_time')
-      .eq('id', gameId)
-      .single()
-
-    const now = Date.now()
-    const isInFinalPhase = game?.status === 'final_phase' || (game?.end_time && game.end_time - now <= 90000)
-
-    // Mettre à jour le leader du jeu et étendre le timer si en phase finale
-    const updateData: Record<string, unknown> = {
-      last_click_username: username,
-      last_click_user_id: null, // Bot, pas un vrai joueur
-    }
-
-    if (isInFinalPhase) {
-      updateData.end_time = now + 90000 // Étendre le timer à 90s
-    }
-
+    // Met à jour UNIQUEMENT le leader affiché — pas le timer (géré par le cron backend)
     const { error } = await supabase
       .from('games')
-      .update(updateData)
+      .update({
+        last_click_username: username,
+        last_click_user_id: null, // Bot, pas un vrai joueur
+      })
       .eq('id', gameId)
       .in('status', ['active', 'final_phase'])
 
