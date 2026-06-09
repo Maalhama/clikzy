@@ -1,5 +1,9 @@
 export async function register() {
   if (process.env.NEXT_RUNTIME === "nodejs") {
+    // Fail-fast : vérifie la présence des variables d'environnement requises au boot.
+    const { validateEnvOnStartup } = await import("@/lib/security/envValidation");
+    validateEnvOnStartup();
+
     await import("./sentry.server.config");
   }
 

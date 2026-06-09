@@ -329,7 +329,7 @@ export function FloatingTimer({
                     <span className={`relative rounded-full h-2 w-2 ${isCritical ? 'bg-red-500' : isUrgent ? 'bg-neon-pink' : 'bg-neon-purple'}`} />
                   </span>
                   <span className="text-xs font-bold uppercase tracking-wider text-white/60">
-                    {isLoggedIn ? 'En cours' : 'Se termine bientot'}
+                    {isLoggedIn ? 'En cours' : 'Se termine bientôt'}
                   </span>
                 </div>
                 {isCritical ? (

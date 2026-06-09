@@ -109,6 +109,9 @@ jobs:
           node-version: '20'
           cache: 'npm'
 
-      - name: Run npm audit
-        run: npm audit --audit-level=high
+      - name: Run npm audit (périmètre runtime prod)
+        # --omit=dev : on ne bloque que sur les vulnérabilités des dépendances de
+        # PRODUCTION. Les CVE des outils de dev (vitest/vite/rollup, Remotion) ne
+        # touchent pas le runtime déployé et ne doivent pas bloquer la CI.
+        run: npm audit --omit=dev --audit-level=high
         continue-on-error: false
