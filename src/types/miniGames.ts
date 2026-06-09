@@ -60,12 +60,6 @@ export const PACHINKO_SLOTS = [0, 0, 1, 3, 10, 3, 1, 0, 0] as const
 export const SLOTS_SYMBOLS = ['🍒', '🍋', '🍊', '🍇', '💎', '7️⃣'] as const
 export const SLOTS_PAYOUTS = [0, 0, 1, 1, 2, 2, 3, 3, 5, 10] as const
 
-// Coin flip payouts (moyenne: 2.0 crédits)
-export const COINFLIP_PAYOUTS = [0, 0, 1, 2, 3, 4, 5, 10] as const
-
-// Dice roll payouts based on sum (moyenne: 2.2 crédits)
-export const DICE_PAYOUTS = [0, 0, 1, 1, 2, 2, 3, 3, 5, 10] as const
-
 // Game info for display
 export interface MiniGameInfo {
   type: MiniGameType

@@ -225,8 +225,8 @@ export default function SupportPage() {
                       <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                     </svg>
                   </div>
-                  <h3 className="text-xl font-bold text-white mb-2">Message envoyé !</h3>
-                  <p className="text-white/60 mb-4">Nous te répondrons sous 2 heures maximum.</p>
+                  <h3 className="text-xl font-bold text-white mb-2">Ton client mail s&apos;est ouvert</h3>
+                  <p className="text-white/60 mb-4">Vérifie ta messagerie et envoie le message pré-rempli à support@cleekzy.com — nous te répondrons sous 2 heures maximum.</p>
                   <button
                     onClick={() => {
                       setSuccess(false)

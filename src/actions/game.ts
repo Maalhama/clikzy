@@ -183,32 +183,6 @@ export async function getGame(gameId: string): Promise<ActionResult<GameWithItem
 }
 
 /**
- * Get user's current credits
- */
-export async function getUserCredits(): Promise<ActionResult<number>> {
-  const supabase = await createClient()
-
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) {
-    return { success: false, error: 'Non authentifié' }
-  }
-
-  const { data: profileData } = await supabase
-    .from('profiles')
-    .select('credits')
-    .eq('id', user.id)
-    .single()
-
-  const profile = profileData as { credits: number } | null
-
-  if (!profile) {
-    return { success: false, error: 'Profil non trouvé' }
-  }
-
-  return { success: true, data: profile.credits }
-}
-
-/**
  * Get recent clicks for a game
  */
 export async function getGameClicks(

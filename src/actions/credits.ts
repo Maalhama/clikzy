@@ -52,19 +52,6 @@ export async function checkAndResetDailyCredits(): Promise<ActionResult<{ credit
   }
 }
 
-/**
- * Get user's current credits (with daily reset check)
- */
-export async function getCreditsWithReset(): Promise<ActionResult<number>> {
-  const result = await checkAndResetDailyCredits()
-
-  if (!result.success) {
-    return { success: false, error: result.error }
-  }
-
-  return { success: true, data: result.data?.credits }
-}
-
 const VIP_DAILY_BONUS = 10
 
 /**
