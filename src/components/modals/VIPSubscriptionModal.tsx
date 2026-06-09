@@ -57,6 +57,7 @@ export default function VIPSubscriptionModal({
             {/* Close button */}
             <button
               onClick={onClose}
+              aria-label="Fermer"
               className="absolute top-2 right-2 p-1.5 text-white/40 hover:text-white/80 transition-colors z-10"
             >
               <X size={16} />

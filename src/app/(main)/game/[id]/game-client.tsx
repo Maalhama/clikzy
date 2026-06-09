@@ -536,7 +536,7 @@ export function GameClient({
               )}
 
               {error && (
-                <div className="mt-4 text-center text-danger bg-danger/10 border border-danger/30 px-4 py-3 rounded-xl text-sm flex items-center justify-center gap-2">
+                <div role="alert" className="mt-4 text-center text-danger bg-danger/10 border border-danger/30 px-4 py-3 rounded-xl text-sm flex items-center justify-center gap-2">
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
@@ -899,7 +899,7 @@ export function GameClient({
               )}
 
               {error && (
-                <div className="text-center text-danger bg-danger/10 border border-danger/30 px-3 py-2 rounded-lg text-sm flex items-center justify-center gap-2">
+                <div role="alert" className="text-center text-danger bg-danger/10 border border-danger/30 px-3 py-2 rounded-lg text-sm flex items-center justify-center gap-2">
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>

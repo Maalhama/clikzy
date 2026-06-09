@@ -52,6 +52,7 @@ export function CreditPacksModal({ isOpen, onClose }: CreditPacksModalProps) {
             {/* Close button */}
             <button
               onClick={onClose}
+              aria-label="Fermer"
               className="absolute top-3 right-3 z-10 w-8 h-8 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 transition-colors"
             >
               <svg className="w-4 h-4 text-white/60" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>

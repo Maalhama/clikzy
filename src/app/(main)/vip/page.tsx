@@ -146,6 +146,7 @@ export default function VIPPage() {
   const [vipDetails, setVipDetails] = useState<VIPDetailsState>(null)
   const [canCollect, setCanCollect] = useState(false)
   const [isCollectingBonus, setIsCollectingBonus] = useState(false)
+  const [actionError, setActionError] = useState<string | null>(null)
   const { updateCredits } = useCredits()
 
   // Check VIP status on mount
@@ -198,7 +199,7 @@ export default function VIPPage() {
         window.location.href = result.data.url
       } else {
         // Fallback: show message if no billing portal available
-        alert('Pour gérer ton abonnement, contacte le support.')
+        setActionError('Pour gérer ton abonnement, contacte le support.')
         setIsLoading(false)
       }
     } catch (error) {
@@ -226,11 +227,11 @@ export default function VIPPage() {
         updateCredits(result.data.newTotal)
       } else {
         console.error('Failed to collect bonus:', result.error)
-        alert(result.error || 'Erreur lors de la récupération du bonus')
+        setActionError(result.error || 'Erreur lors de la récupération du bonus')
       }
     } catch (error) {
       console.error('Error collecting bonus:', error)
-      alert('Erreur lors de la récupération du bonus')
+      setActionError('Erreur lors de la récupération du bonus')
     } finally {
       setIsCollectingBonus(false)
     }
@@ -272,6 +273,15 @@ export default function VIPPage() {
   // Non-VIP User: Subscription Page
   return (
     <>
+      {actionError && (
+        <div
+          role="alert"
+          className="fixed top-4 left-1/2 z-50 -translate-x-1/2 max-w-sm rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-200 backdrop-blur-md"
+          onClick={() => setActionError(null)}
+        >
+          {actionError}
+        </div>
+      )}
       <div className="min-h-screen pb-20">
         {/* Hero Section */}
         <section className="relative py-16 px-4 overflow-hidden">
