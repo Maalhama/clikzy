@@ -509,15 +509,13 @@ export const GameCard = memo(function GameCard({ game, index = 0, isFavorite = f
 
             {/* Progress bar */}
             {!isWaiting && (
-              <div className="mt-2 h-1 bg-white/10 rounded-full overflow-hidden">
+              <div className="meter-track mt-2 !h-1">
                 <div
                   suppressHydrationWarning
-                  className={`
-                    h-full rounded-full transition-all duration-300
-                    ${isUrgent ? 'bg-danger' : 'bg-neon-blue'}
-                  `}
+                  className="meter-fill"
                   style={{
                     width: `${Math.min(100, (displayTimeLeft / FINAL_PHASE_THRESHOLD) * 100)}%`,
+                    background: isUrgent ? 'linear-gradient(90deg, #FF4757, #FF4FD8)' : undefined,
                   }}
                 />
               </div>
@@ -620,15 +618,16 @@ export const GameCard = memo(function GameCard({ game, index = 0, isFavorite = f
         ) : (
           <div
             className={`
-              py-3 rounded-xl text-center font-display font-semibold uppercase tracking-wider text-sm transition-all flex items-center justify-center gap-2
+              py-3 text-center font-display font-semibold uppercase tracking-wider text-sm transition-all flex items-center justify-center gap-2
+              [clip-path:polygon(0_0,100%_0,100%_calc(100%-10px),calc(100%-10px)_100%,0_100%)]
               ${
                 (game.item?.retail_value ?? 0) >= 1000
                   ? isUrgent
-                    ? 'bg-gradient-to-r from-[#FFB800] via-[#FF8C00] to-[#FFD700] text-[#0B0F1A] group-hover:opacity-90 shadow-[0_0_20px_rgba(255,184,0,0.5)] animate-pulse'
-                    : 'bg-gradient-to-r from-[#FFB800] via-[#FFD700] to-[#FF8C00] text-[#0B0F1A] group-hover:opacity-90 shadow-[0_0_15px_rgba(255,184,0,0.4)]'
+                    ? 'bg-gradient-to-r from-[#FFB800] via-[#FF8C00] to-[#FFD700] text-[#0B0F1A] group-hover:brightness-110 drop-shadow-[0_0_14px_rgba(255,184,0,0.5)] animate-pulse'
+                    : 'bg-gradient-to-r from-[#FFB800] via-[#FFD700] to-[#FF8C00] text-[#0B0F1A] group-hover:brightness-110 drop-shadow-[0_0_12px_rgba(255,184,0,0.45)]'
                   : isUrgent
-                  ? 'bg-danger text-white group-hover:bg-danger/90 shadow-neon-danger'
-                  : 'bg-gradient-to-r from-neon-purple to-neon-pink text-white group-hover:opacity-90 shadow-neon-purple'
+                  ? 'bg-danger text-white group-hover:brightness-110 drop-shadow-[0_0_14px_rgba(255,71,87,0.55)]'
+                  : 'bg-gradient-to-r from-neon-purple to-neon-pink text-white group-hover:brightness-110 drop-shadow-[0_0_12px_rgba(155,92,255,0.5)]'
               }
             `}
           >

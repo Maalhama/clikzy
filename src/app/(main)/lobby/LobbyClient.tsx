@@ -10,6 +10,7 @@ import {
   Pagination,
   PullToRefreshIndicator,
 } from '@/components/lobby'
+import { LobbyFeatured } from '@/components/lobby/LobbyFeatured'
 import { PaymentSuccessModal } from '@/components/lobby/PaymentSuccessModal'
 import { LobbyGamificationBar } from '@/components/progression/LobbyGamificationBar'
 import type { WinnerData } from '@/actions/winners'
@@ -113,6 +114,18 @@ export function LobbyClient({
     prevPage,
     itemsPerPage,
   } = useLobbyFilters(games, { searchQuery, favorites })
+
+  // Carte « À la une » : la partie active dont la fin est la plus imminente
+  // (uniquement sur le filtre par défaut, page 1, desktop)
+  const featuredLobbyGame = useMemo(() => {
+    if (currentFilter !== 'all' || currentPage !== 1) return null
+    const now = Date.now()
+    const live = filteredGames.filter(
+      (g) => g.status !== 'ended' && g.status !== 'waiting' && (g.end_time ?? 0) > now
+    )
+    if (live.length === 0) return null
+    return [...live].sort((a, b) => (a.end_time ?? 0) - (b.end_time ?? 0))[0]
+  }, [filteredGames, currentFilter, currentPage])
 
   // Sticky urgent game - stays on same game until it ends
   const stickyGameIdRef = useRef<string | null>(null)
@@ -282,9 +295,18 @@ export function LobbyClient({
                     )}
                   </div>
 
+                  {/* Desktop: carte « À la une » (partie la plus imminente) */}
+                  {featuredLobbyGame && (
+                    <div className="hidden sm:block mb-6">
+                      <LobbyFeatured game={featuredLobbyGame} />
+                    </div>
+                  )}
+
                   {/* Desktop/Tablet: Grid */}
                   <div className="hidden sm:grid sm:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-6">
-                    {filteredGames.map((game, index) => (
+                    {filteredGames
+                      .filter((game) => game.id !== featuredLobbyGame?.id)
+                      .map((game, index) => (
                       <GameCard
                         key={game.id}
                         game={game}
