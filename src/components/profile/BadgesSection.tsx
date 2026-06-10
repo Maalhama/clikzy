@@ -264,7 +264,9 @@ export function BadgesSection({ badges, stats }: BadgesSectionProps) {
                     : 'bg-white/5 border-white/10 opacity-40 grayscale'
                 }`}
               >
-                {getBadgeIcon(badge.id, `w-full h-full ${earned ? colors.text : 'text-white/40'}`)}
+                {badge.is_hidden && !earned
+                  ? <span className="flex h-full w-full items-center justify-center text-2xl font-black text-white/40">?</span>
+                  : getBadgeIcon(badge.id, `w-full h-full ${earned ? colors.text : 'text-white/40'}`)}
               </motion.button>
             )
           })}
@@ -291,16 +293,19 @@ export function BadgesSection({ badges, stats }: BadgesSectionProps) {
               {(() => {
                 const { badge, earned, earnedAt } = selectedBadge
                 const colors = rarityColors[badge.rarity]
+                const hidden = !!badge.is_hidden && !earned
                 return (
                   <>
                     <div className={`w-20 h-20 mx-auto mb-4 rounded-2xl ${colors.bg} ${colors.border} border-2 flex items-center justify-center p-4 ${
                       earned ? `shadow-lg ${colors.glow}` : 'opacity-40 grayscale'
                     }`}>
-                      {getBadgeIcon(badge.id, `w-full h-full ${earned ? colors.text : 'text-white/40'}`)}
+                      {hidden
+                        ? <span className="text-3xl font-black text-white/40">?</span>
+                        : getBadgeIcon(badge.id, `w-full h-full ${earned ? colors.text : 'text-white/40'}`)}
                     </div>
 
                     <h3 className="text-xl font-bold text-white text-center mb-1">
-                      {badge.name}
+                      {hidden ? 'Succès caché' : badge.name}
                     </h3>
 
                     <p className={`text-center text-xs font-medium mb-3 ${colors.text}`}>
@@ -308,14 +313,17 @@ export function BadgesSection({ badges, stats }: BadgesSectionProps) {
                     </p>
 
                     <p className="text-white/60 text-sm text-center mb-4">
-                      {badge.description}
+                      {hidden ? 'Continue de jouer pour le découvrir…' : badge.description}
                     </p>
 
-                    {badge.credits_reward > 0 && (
-                      <div className="text-center mb-4">
-                        <span className="px-3 py-1 rounded-lg bg-success/20 text-success text-sm font-bold">
-                          +{badge.credits_reward} crédits
-                        </span>
+                    {!hidden && (badge.credits_reward > 0 || (badge.xp_reward ?? 0) > 0) && (
+                      <div className="flex justify-center gap-2 mb-4">
+                        {badge.credits_reward > 0 && (
+                          <span className="px-3 py-1 rounded-lg bg-success/20 text-success text-sm font-bold">+{badge.credits_reward} crédits</span>
+                        )}
+                        {(badge.xp_reward ?? 0) > 0 && (
+                          <span className="px-3 py-1 rounded-lg bg-neon-purple/20 text-neon-purple text-sm font-bold">+{badge.xp_reward} XP</span>
+                        )}
                       </div>
                     )}
 

@@ -13,6 +13,8 @@ export interface Badge {
   requirement_value: number
   rarity: 'common' | 'rare' | 'epic' | 'legendary'
   credits_reward: number
+  is_hidden?: boolean
+  xp_reward?: number
 }
 
 export interface UserBadge {
