@@ -577,7 +577,7 @@ export function LandingClient({
 
         {/* Mot géant fantôme en fond */}
         <div
-          className="pointer-events-none absolute left-1/2 top-[12%] -translate-x-1/2 select-none whitespace-nowrap title-giant text-outline text-[11rem] opacity-[0.07]"
+          className="pointer-events-none absolute left-1/2 top-[12%] -translate-x-1/2 select-none whitespace-nowrap title-giant text-[11rem] opacity-[0.045] text-white"
           aria-hidden="true"
         >
           GAGNE
@@ -873,7 +873,7 @@ export function LandingClient({
       {/* === DESKTOP PRIZES === */}
       <section id="lots-desktop" className="hidden md:block relative py-20 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-neon-pink/5 to-transparent" />
-        <div aria-hidden="true" className="pointer-events-none select-none absolute left-1/2 top-6 -translate-x-1/2 whitespace-nowrap title-giant text-[10rem] text-outline opacity-[0.06]">LOTS</div>
+        <div aria-hidden="true" className="pointer-events-none select-none absolute left-1/2 top-6 -translate-x-1/2 whitespace-nowrap title-giant text-[10rem] opacity-[0.05] text-neon-pink">LOTS</div>
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-neon-pink/10 rounded-full blur-[150px]" />
         </div>
@@ -969,7 +969,7 @@ export function LandingClient({
 
       {/* === DESKTOP WINNERS === */}
       <section id="gagnants" className="hidden md:block winners-section relative py-20 overflow-hidden">
-        <div aria-hidden="true" className="pointer-events-none select-none absolute left-1/2 top-4 -translate-x-1/2 whitespace-nowrap title-giant text-[9rem] text-outline opacity-[0.06]">GAGNANTS</div>
+        <div aria-hidden="true" className="pointer-events-none select-none absolute left-1/2 top-4 -translate-x-1/2 whitespace-nowrap title-giant text-[9rem] opacity-[0.05] text-success">GAGNANTS</div>
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-success/5 rounded-full blur-[120px]" />
         </div>
@@ -1144,7 +1144,7 @@ export function LandingClient({
       {/* === DESKTOP FINAL CTA === */}
       <section className="hidden md:block final-cta relative py-24 overflow-hidden">
         <div className="hero-stage-floor" aria-hidden="true" />
-        <div aria-hidden="true" className="pointer-events-none select-none absolute left-1/2 top-2 -translate-x-1/2 whitespace-nowrap title-giant text-outline text-[10rem] opacity-[0.07]">JOUER</div>
+        <div aria-hidden="true" className="pointer-events-none select-none absolute left-1/2 top-2 -translate-x-1/2 whitespace-nowrap title-giant text-[10rem] opacity-[0.05] text-neon-purple">JOUER</div>
         <div className="absolute inset-0">
           <div className="absolute inset-0 bg-gradient-to-t from-neon-purple/20 via-transparent to-transparent" />
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-neon-purple/10 rounded-full blur-[150px]" />
@@ -1281,7 +1281,7 @@ export function LandingClient({
       <footer className="hidden md:block relative border-t border-white/10">
         <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-neon-purple/50 to-transparent" style={{ boxShadow: '0 0 10px rgba(155, 92, 255, 0.3)' }} />
         <div className="relative overflow-hidden pt-12 -mb-6" aria-hidden="true">
-          <div className="text-center title-giant text-[8.5rem] leading-none text-outline opacity-[0.07] select-none pointer-events-none whitespace-nowrap">CLEEKZY</div>
+          <div className="text-center title-giant text-[8.5rem] leading-none opacity-[0.045] text-white select-none pointer-events-none whitespace-nowrap">CLEEKZY</div>
         </div>
 
         <div className="max-w-7xl mx-auto px-6 py-16">

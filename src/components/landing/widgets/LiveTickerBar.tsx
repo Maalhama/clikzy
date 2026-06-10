@@ -24,7 +24,7 @@ export function LiveTickerBar({ winners }: LiveTickerBarProps) {
   ]
 
   const Track = () => (
-    <div className="marquee-content !gap-0">
+    <div className="flex w-max shrink-0 items-center">
       {items.map((w) => (
         <span key={w.id} className="inline-flex items-center gap-2 px-6 whitespace-nowrap">
           <svg className="h-3.5 w-3.5 text-success" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
