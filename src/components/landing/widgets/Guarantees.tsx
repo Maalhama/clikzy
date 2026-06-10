@@ -134,7 +134,7 @@ export function Guarantees({ className = '' }: GuaranteesProps) {
                 `}
                 style={{ transitionDelay: isMobile ? '0ms' : `${(index + 4) * 100}ms` }}
               >
-                <div className="aspect-square relative">
+                <div className="aspect-square relative overflow-hidden rounded-2xl" style={{ transform: 'translateZ(0)' }}>
                   {imageErrors[proof.id] ? (
                     <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-neon-purple/20 to-neon-pink/20 p-3">
                       <svg className="w-8 h-8 text-success mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -253,7 +253,7 @@ export function Guarantees({ className = '' }: GuaranteesProps) {
                   `}
                   style={{ transitionDelay: `${(index + 4) * 100}ms` }}
                 >
-                  <div className="aspect-square relative">
+                  <div className="aspect-square relative overflow-hidden rounded-2xl" style={{ transform: 'translateZ(0)' }}>
                     {imageErrors[proof.id] ? (
                       <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-neon-purple/20 to-neon-pink/20 p-4">
                         <svg className="w-10 h-10 text-success mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
