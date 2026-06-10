@@ -368,3 +368,57 @@ export async function createBillingPortalSession(): Promise<ActionResult<{ url: 
     return { success: false, error: `Erreur: ${errorMessage}` }
   }
 }
+
+/**
+ * Create a Stripe Checkout session for the monthly Passe d'Arène (one-shot 4,99 €)
+ */
+export async function createPassCheckoutSession(): Promise<ActionResult<{ url: string }>> {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { success: false, error: 'Non authentifié' }
+
+  try {
+    const stripeInstance = getStripeInstance()
+    if (!stripeInstance) {
+      return { success: false, error: 'Service de paiement non configuré' }
+    }
+
+    const monthLabel = new Intl.DateTimeFormat('fr-FR', {
+      month: 'long', year: 'numeric', timeZone: 'Europe/Paris',
+    }).format(new Date())
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
+
+    const session = await stripeInstance.checkout.sessions.create({
+      payment_method_types: ['card'],
+      line_items: [
+        {
+          price_data: {
+            currency: 'eur',
+            product_data: {
+              name: `Passe d'Arène — ${monthLabel}`,
+              description: 'Piste premium du mois : coffres rares à légendaires, 25 crédits et artefact exclusif',
+            },
+            unit_amount: 499,
+          },
+          quantity: 1,
+        },
+      ],
+      mode: 'payment',
+      success_url: `${baseUrl}/lobby?pass=success`,
+      cancel_url: `${baseUrl}/lobby?pass=cancelled`,
+      customer_email: user.email,
+      metadata: {
+        userId: user.id,
+        type: 'battle_pass',
+      },
+    })
+
+    if (!session.url) {
+      return { success: false, error: 'Erreur lors de la création de la session' }
+    }
+    return { success: true, data: { url: session.url } }
+  } catch (error) {
+    console.error('Pass checkout session error:', error)
+    return { success: false, error: 'Erreur Stripe' }
+  }
+}

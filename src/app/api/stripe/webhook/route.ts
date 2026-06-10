@@ -107,6 +107,27 @@ async function handleStripeEvent(event: Stripe.Event): Promise<HandlerResult> {
     const session = event.data.object as Stripe.Checkout.Session
 
     const userId = session.metadata?.userId
+
+    // Passe d'Arène (one-shot mensuel) : activation idempotente
+    if (session.metadata?.type === 'battle_pass') {
+      if (!userId) {
+        console.error('Missing userId in battle pass session:', session.metadata)
+        return { status: 400, body: { error: 'Invalid metadata' } }
+      }
+      const supabase = getSupabaseAdmin()
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { error: passError } = await (supabase.rpc as any)('grant_battle_pass', {
+        p_user_id: userId,
+        p_session: session.id,
+      })
+      if (passError) {
+        console.error('Error granting battle pass:', passError)
+        return { status: 500, body: { error: 'Failed to grant pass' } }
+      }
+      console.log(`Battle pass granted to user ${userId}`)
+      return { status: 200, body: { received: true } }
+    }
+
     const credits = parseInt(session.metadata?.credits || '0', 10)
 
     if (!userId || credits <= 0) {

@@ -1,6 +1,6 @@
 # Spec — Passe d'Arène (battle pass mensuel Cleekzy)
 
-> Statut : SPEC à valider par Mehdi avant implémentation (touche Stripe + économie).
+> Statut : IMPLÉMENTÉ (2026-06-10) — validé par Mehdi (« fais tout »). Migration `20260611010001_battle_pass.sql`, actions `src/actions/battlePass.ts`, UI `BattlePassRail` dans le modal calendrier, checkout `createPassCheckoutSession`, webhook `type: battle_pass`.
 
 ## Concept
 Une piste de récompenses mensuelle adossée au calendrier existant (`calendar_claims`)

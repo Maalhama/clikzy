@@ -6,6 +6,7 @@ import { X, Zap, Coins, Check } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { claimCalendarDay, type CalendarDay } from '@/actions/calendar'
 import { NeonChest, CHEST_THEME, type ChestRarityKey } from '@/components/collection/NeonChest'
+import { BattlePassRail } from '@/components/progression/BattlePassRail'
 
 const DOW_LABELS = ['L', 'M', 'M', 'J', 'V', 'S', 'D']
 
@@ -70,7 +71,7 @@ export function RewardsCalendarModal({
         initial={{ opacity: 0, y: 24, scale: 0.96 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ type: 'spring', stiffness: 260, damping: 22 }}
-        className="relative w-full max-w-lg overflow-hidden rounded-2xl border border-white/10 bg-bg-secondary p-6"
+        className="relative max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-white/10 bg-bg-secondary p-6"
       >
         <button onClick={onClose} aria-label="Fermer" className="absolute top-3 right-3 z-10 text-white/40 hover:text-white">
           <X size={20} />
@@ -122,6 +123,9 @@ export function RewardsCalendarModal({
             )
           })}
         </div>
+
+        {/* Passe d'Arène premium */}
+        <BattlePassRail />
 
         {/* CTA du jour */}
         <div className="mt-5 text-center">

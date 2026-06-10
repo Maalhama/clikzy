@@ -21,6 +21,8 @@ import {
 } from '@/components/ui/GamingIcons'
 import type { Profile, Winner, Item } from '@/types/database'
 import type { GameHistoryItem } from '@/actions/gameHistory'
+import type { ShippingAddress } from '@/actions/shipping'
+import { ShippingAddressForm } from '@/components/forms/ShippingAddressForm'
 
 type WinnerWithItem = Winner & {
   item: Item
@@ -29,6 +31,7 @@ type WinnerWithItem = Winner & {
 interface ProfileClientProps {
   profile: Profile
   wins: WinnerWithItem[]
+  shippingAddress?: ShippingAddress | null
   gamesPlayed: number
   totalValueWon: number
   gameHistory: GameHistoryItem[]
@@ -57,7 +60,7 @@ interface ProfileClientProps {
 }
 
 // Calculate player level based on stats
-export function ProfileClient({ profile, wins, gamesPlayed, totalValueWon, gameHistory, historyStats, referralStats, badges, badgeStats }: ProfileClientProps) {
+export function ProfileClient({ profile, wins, gamesPlayed, totalValueWon, gameHistory, historyStats, referralStats, badges, badgeStats, shippingAddress }: ProfileClientProps) {
   const [isEditingUsername, setIsEditingUsername] = useState(false)
   const [newUsername, setNewUsername] = useState(profile.username || '')
   const [usernameError, setUsernameError] = useState<string | null>(null)
@@ -341,6 +344,8 @@ export function ProfileClient({ profile, wins, gamesPlayed, totalValueWon, gameH
           </motion.div>
         )}
 
+        <div className="mb-6"><NotificationsCard /></div>
+
         {/* Wins Section */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -349,7 +354,6 @@ export function ProfileClient({ profile, wins, gamesPlayed, totalValueWon, gameH
         >
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-bold text-white flex items-center gap-2">
-        <div className="mb-6"><NotificationsCard /></div>
               <GiftIcon className="w-5 h-5 text-neon-purple" />
               Mes victoires
             </h2>
@@ -370,6 +374,9 @@ export function ProfileClient({ profile, wins, gamesPlayed, totalValueWon, gameH
             <EmptyWinsState />
           )}
         </motion.div>
+
+        {/* Adresse de livraison (réception des lots) */}
+        <ShippingSection initial={shippingAddress ?? null} hasWins={wins.length > 0} />
 
         {/* Progression : niveau/XP, streak, quêtes du jour */}
         <div className="mt-8">
@@ -438,32 +445,84 @@ function StatItem({ value, label, color }: { value: number | string; label: stri
 }
 
 // Win card component
+const SHIPPING_STEPS = ['processing', 'shipped', 'delivered'] as const
+
+const SHIPPING_LABEL: Record<string, { label: string; cls: string }> = {
+  pending: { label: 'En préparation', cls: 'bg-white/10 text-white/60' },
+  address_needed: { label: 'Adresse requise', cls: 'bg-yellow-400/15 text-yellow-300' },
+  processing: { label: 'En préparation', cls: 'bg-neon-purple/15 text-neon-purple' },
+  shipped: { label: 'Expédié', cls: 'bg-cyan-400/15 text-cyan-300' },
+  delivered: { label: 'Livré', cls: 'bg-success/15 text-success' },
+}
+
 function WinCard({ win, index }: { win: WinnerWithItem; index: number }) {
+  const status = win.shipping_status ?? 'pending'
+  const badge = SHIPPING_LABEL[status] ?? SHIPPING_LABEL.pending
+  const stepIndex = status === 'delivered' ? 3 : status === 'shipped' ? 2 : 1
   return (
     <motion.div
       initial={{ opacity: 0, x: -20 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ delay: 0.3 + index * 0.05 }}
-      className="flex items-center gap-3 p-3 rounded-xl bg-bg-secondary/50 border border-white/10 hover:border-success/30 transition-colors"
+      className="p-3 rounded-xl bg-bg-secondary/50 border border-white/10 hover:border-success/30 transition-colors"
     >
-      <div className="relative w-14 h-14 rounded-lg bg-bg-primary/50 flex-shrink-0 overflow-hidden">
-        <Image
-          src={getProductSvg(win.item_name, win.item_id)}
-          alt={win.item_name}
-          fill
-          className="object-contain p-1.5"
-        />
+      <div className="flex items-center gap-3">
+        <div className="relative w-14 h-14 rounded-lg bg-bg-primary/50 flex-shrink-0 overflow-hidden">
+          <Image
+            src={getProductSvg(win.item_name, win.item_id)}
+            alt={win.item_name}
+            fill
+            className="object-contain p-1.5"
+          />
+        </div>
+        <div className="flex-1 min-w-0">
+          <h3 className="font-semibold text-white text-sm truncate">{win.item_name}</h3>
+          <p className="text-white/40 text-xs">
+            {new Date(win.won_at ?? new Date(0).toISOString()).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' })}
+          </p>
+        </div>
+        <div className="flex flex-col items-end gap-1.5">
+          {(win.item_value || win.item?.retail_value) && (
+            <span className="px-2.5 py-1 rounded-lg bg-success/20 text-success font-bold text-sm">
+              {(win.item_value || win.item?.retail_value || 0).toFixed(0)}€
+            </span>
+          )}
+          <span className={`px-2 py-0.5 rounded-md text-[0.65rem] font-semibold ${badge.cls}`}>
+            {badge.label}
+          </span>
+        </div>
       </div>
-      <div className="flex-1 min-w-0">
-        <h3 className="font-semibold text-white text-sm truncate">{win.item_name}</h3>
-        <p className="text-white/40 text-xs">
-          {new Date(win.won_at ?? new Date(0).toISOString()).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' })}
-        </p>
+
+      {/* Suivi de livraison */}
+      <div className="mt-3 flex items-center gap-1.5">
+        {SHIPPING_STEPS.map((step, i) => (
+          <div key={step} className="flex flex-1 items-center gap-1.5">
+            <span
+              className={`h-1.5 flex-1 rounded-full transition-colors ${
+                i < stepIndex ? 'bg-success' : 'bg-white/10'
+              }`}
+            />
+          </div>
+        ))}
       </div>
-      {(win.item_value || win.item?.retail_value) && (
-        <span className="px-2.5 py-1 rounded-lg bg-success/20 text-success font-bold text-sm">
-          {(win.item_value || win.item?.retail_value || 0).toFixed(0)}€
+      <div className="mt-1 flex items-center justify-between text-[0.6rem] text-white/35">
+        <span className={stepIndex >= 1 ? 'text-success' : ''}>Préparation</span>
+        <span className={stepIndex >= 2 ? 'text-success' : ''}>
+          Expédié{win.shipped_at ? ` · ${new Date(win.shipped_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })}` : ''}
         </span>
+        <span className={stepIndex >= 3 ? 'text-success' : ''}>
+          Livré{win.delivered_at ? ` · ${new Date(win.delivered_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })}` : ''}
+        </span>
+      </div>
+      {win.tracking_number && (
+        <p className="mt-1.5 text-[0.65rem] text-white/45">
+          N° de suivi : <span className="stat-numeral text-white/70">{win.tracking_number}</span>
+        </p>
+      )}
+      {status === 'address_needed' && (
+        <p className="mt-1.5 text-[0.65rem] font-semibold text-yellow-300">
+          Renseigne ton adresse de livraison ci-dessous pour recevoir ton lot.
+        </p>
       )}
     </motion.div>
   )
@@ -487,6 +546,36 @@ function EmptyWinsState() {
         <GamepadIcon className="w-4 h-4" />
         Commencer à jouer
       </Link>
+    </div>
+  )
+}
+
+
+function ShippingSection({ initial, hasWins }: { initial: ShippingAddress | null; hasWins: boolean }) {
+  const [open, setOpen] = useState(hasWins && !initial?.address)
+  const filled = !!initial?.address
+  return (
+    <div className="mt-8 panel p-4">
+      <button onClick={() => setOpen((o) => !o)} className="flex w-full items-center justify-between gap-3 text-left">
+        <div>
+          <p className="font-display text-sm font-semibold text-white">Adresse de livraison</p>
+          <p className="text-xs text-white/50">
+            {filled
+              ? `${initial?.address}, ${initial?.postalCode} ${initial?.city}`
+              : 'Renseigne ton adresse pour recevoir tes lots'}
+          </p>
+        </div>
+        <span className={`px-2 py-0.5 rounded-md text-[0.65rem] font-semibold ${
+          filled ? 'bg-success/15 text-success' : 'bg-yellow-400/15 text-yellow-300'
+        }`}>
+          {filled ? 'Complète' : 'À compléter'}
+        </span>
+      </button>
+      {open && (
+        <div className="mt-4">
+          <ShippingAddressForm initialData={initial} compact onSuccess={() => setOpen(false)} />
+        </div>
+      )}
     </div>
   )
 }
