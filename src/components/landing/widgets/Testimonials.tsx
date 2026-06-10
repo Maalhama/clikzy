@@ -113,7 +113,7 @@ export function Testimonials({
 
   return (
     <div
-      className={`relative bg-bg-secondary/50 backdrop-blur-sm rounded-xl overflow-hidden group/testimonials ${className}`}
+      className={`relative h-full flex flex-col bg-bg-secondary/50 backdrop-blur-sm rounded-xl overflow-hidden group/testimonials ${className}`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -139,7 +139,7 @@ export function Testimonials({
       </div>
 
       {/* Testimonial content */}
-      <div className="relative p-6 min-h-[200px]">
+      <div className="relative flex-1 p-6 pt-8 min-h-[230px]">
         <AnimatePresence mode="wait">
           <motion.div
             key={currentIndex}
@@ -169,12 +169,13 @@ export function Testimonials({
             <div className="relative">
               {/* Opening quote mark */}
               <span
-                className="absolute -top-2 -left-2 text-4xl text-neon-pink/30 font-serif"
-                style={{ textShadow: '0 0 10px rgba(255, 79, 216, 0.3)' }}
+                aria-hidden="true"
+                className="pointer-events-none select-none absolute -top-9 -left-1 font-serif text-8xl leading-none text-neon-pink/15"
+                style={{ textShadow: '0 0 24px rgba(255, 79, 216, 0.25)' }}
               >
-                "
+                “
               </span>
-              <blockquote className="text-lg text-white/80 mb-6 leading-relaxed pl-4">
+              <blockquote className="relative text-xl text-white/85 mb-6 leading-relaxed pl-5">
                 {currentTestimonial.text}
               </blockquote>
             </div>
@@ -190,13 +191,13 @@ export function Testimonials({
               </div>
               <div>
                 <div className="font-bold">{currentTestimonial.username}</div>
-                <div
-                  className="text-sm text-neon-blue font-medium"
-                  style={{ textShadow: '0 0 10px rgba(60, 203, 255, 0.4)' }}
-                >
-                  A remporté : {currentTestimonial.itemWon}
+                <div className="mt-0.5 flex flex-wrap items-center gap-2">
+                  <span className="inline-flex items-center gap-1.5 rounded-full border border-neon-blue/30 bg-neon-blue/10 px-2.5 py-0.5 text-xs font-semibold text-neon-blue">
+                    <svg className="h-3 w-3" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M5 16L3 5l5.5 5L12 4l3.5 6L21 5l-2 11H5zm14 3c0 .6-.4 1-1 1H6c-.6 0-1-.4-1-1v-1h14v1z" /></svg>
+                    {currentTestimonial.itemWon}
+                  </span>
+                  <span className="text-xs text-white/40">{currentTestimonial.date}</span>
                 </div>
-                <div className="text-xs text-white/40">{currentTestimonial.date}</div>
               </div>
             </div>
           </motion.div>

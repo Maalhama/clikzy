@@ -890,8 +890,24 @@ export function LandingClient({
             <h2 className="title-giant text-4xl lg:text-5xl mt-3">
               <span className="text-white">Ils jouent,</span> <span className="text-neon-pink neon-text-pink">ils gagnent</span>
             </h2>
+            <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+              <div className="panel flex items-center gap-2.5 px-5 py-2.5">
+                <span className="live-dot" aria-hidden="true" />
+                <span className="stat-numeral text-base text-success">{playerCount.toLocaleString()}</span>
+                <span className="text-xs text-white/50 uppercase tracking-wider">joueurs en ligne</span>
+              </div>
+              <div className="panel flex items-center gap-2.5 px-5 py-2.5">
+                <svg className="h-4 w-4 text-yellow-400" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M5 16L3 5l5.5 5L12 4l3.5 6L21 5l-2 11H5zm14 3c0 .6-.4 1-1 1H6c-.6 0-1-.4-1-1v-1h14v1z" /></svg>
+                <span className="stat-numeral text-base text-yellow-400">{stats.totalGames}+</span>
+                <span className="text-xs text-white/50 uppercase tracking-wider">gagnants</span>
+              </div>
+              <div className="panel flex items-center gap-2.5 px-5 py-2.5">
+                <svg className="h-4 w-4 text-neon-blue" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                <span className="text-xs text-white/50 uppercase tracking-wider">Support <span className="stat-numeral text-neon-blue text-sm">24/7</span></span>
+              </div>
+            </div>
           </div>
-          <div className="grid lg:grid-cols-2 gap-8">
+          <div className="grid lg:grid-cols-2 gap-6 items-stretch">
             <Leaderboard realWinners={recentWinners} />
             <Testimonials />
           </div>

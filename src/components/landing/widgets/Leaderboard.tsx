@@ -232,7 +232,7 @@ export function Leaderboard({
   return (
     <div
       ref={containerRef}
-      className={`relative bg-bg-secondary/50 backdrop-blur-sm rounded-xl overflow-hidden group/leaderboard ${className}`}
+      className={`relative h-full bg-bg-secondary/50 backdrop-blur-sm rounded-xl overflow-hidden group/leaderboard ${className}`}
     >
       {/* Neon border glow */}
       <div className="absolute inset-0 rounded-xl border border-white/10 group-hover/leaderboard:border-yellow-500/30 transition-colors duration-500" />
