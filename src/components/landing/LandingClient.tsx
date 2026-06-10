@@ -1299,7 +1299,11 @@ export function LandingClient({
               <div className="mb-4">
                 <Logo size="lg" animated={true} href="/" />
               </div>
-              <p className="text-white/70 text-sm mb-6">La plateforme de jeu où le dernier clic gagne.</p>
+              <p className="text-white/60 text-sm mb-4 leading-relaxed">La plateforme de jeu où le dernier clic gagne.</p>
+              <div className="mb-6 flex items-center gap-2">
+                <span className="live-dot" aria-hidden="true" />
+                <span className="text-xs text-white/50"><span className="stat-numeral text-success">{playerCount.toLocaleString()}</span> joueurs en ligne</span>
+              </div>
               <nav className="flex gap-3" aria-label="Réseaux sociaux">
                 <a href="#" className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:border-neon-purple/50 hover:bg-neon-purple/10 transition-all group" aria-label="Twitter">
                   <svg className="w-5 h-5 text-white/60 group-hover:text-neon-purple" fill="currentColor" viewBox="0 0 24 24"><path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"/></svg>
@@ -1318,7 +1322,7 @@ export function LandingClient({
 
             {/* Navigation */}
             <div>
-              <h4 className="text-white font-bold mb-5 text-sm uppercase tracking-wider">Navigation</h4>
+              <h4 className="mb-5 flex items-center gap-2 font-display text-xs font-semibold uppercase tracking-[0.25em] text-neon-purple"><span className="h-px w-5 bg-neon-purple/60" />Navigation</h4>
               <ul className="space-y-3">
                 <li><Link href="/lobby" className="text-white/50 hover:text-neon-purple transition-colors text-sm">Voir les lots</Link></li>
                 <li><a href="#how-it-works-desktop" className="text-white/50 hover:text-neon-purple transition-colors text-sm">Comment ça marche</a></li>
@@ -1329,7 +1333,7 @@ export function LandingClient({
 
             {/* Legal */}
             <div>
-              <h4 className="text-white font-bold mb-5 text-sm uppercase tracking-wider">Légal</h4>
+              <h4 className="mb-5 flex items-center gap-2 font-display text-xs font-semibold uppercase tracking-[0.25em] text-neon-blue"><span className="h-px w-5 bg-neon-blue/60" />Légal</h4>
               <ul className="space-y-3">
                 <li><Link href="/terms" className="text-white/50 hover:text-neon-blue transition-colors text-sm">Conditions générales</Link></li>
                 <li><Link href="/privacy" className="text-white/50 hover:text-neon-blue transition-colors text-sm">Politique de confidentialité</Link></li>
@@ -1340,7 +1344,7 @@ export function LandingClient({
 
             {/* Contact */}
             <div>
-              <h4 className="text-white font-bold mb-5 text-sm uppercase tracking-wider">Contact</h4>
+              <h4 className="mb-5 flex items-center gap-2 font-display text-xs font-semibold uppercase tracking-[0.25em] text-neon-pink"><span className="h-px w-5 bg-neon-pink/60" />Contact</h4>
               <ul className="space-y-3 mb-6">
                 <li><a href="mailto:contact@cleekzy.com" className="text-white/50 hover:text-neon-pink transition-colors text-sm">contact@cleekzy.com</a></li>
                 <li><span className="text-white/50 text-sm">Support 24h/24 - 7j/7</span></li>
@@ -1362,11 +1366,11 @@ export function LandingClient({
         <div className="border-t border-white/5">
           <div className="max-w-7xl mx-auto px-6 py-6 flex items-center justify-between">
             <p className="text-white/30 text-sm">© 2026 CLEEKZY. Tous droits réservés.</p>
-            <p className="text-white/20 text-xs flex items-center gap-1">
-              <svg className="w-3 h-3 text-neon-purple" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <p className="flex items-center gap-2 font-display text-[0.65rem] font-semibold uppercase tracking-[0.3em]">
+              <svg className="w-3.5 h-3.5 text-neon-purple" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122" />
               </svg>
-              Clique. Joue. Gagne.
+              <span className="text-neon-purple">Clique.</span> <span className="text-neon-blue">Joue.</span> <span className="text-neon-pink">Gagne.</span>
             </p>
           </div>
         </div>
