@@ -85,8 +85,8 @@ export function WinnersPodium({ winners }: WinnersPodiumProps) {
             >
               <div className="absolute inset-x-0 top-0 h-[2px]" style={{ background: color, boxShadow: `0 0 14px ${color}` }} />
               <span
-                className="absolute inset-0 flex items-center justify-center title-giant text-4xl opacity-40"
-                style={{ color: 'transparent', WebkitTextStroke: `1.5px ${color}` }}
+                className="absolute inset-0 flex items-center justify-center title-giant text-4xl opacity-60"
+                style={{ color, textShadow: `0 0 18px ${color}99` }}
                 aria-hidden="true"
               >
                 {rank}
