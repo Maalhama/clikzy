@@ -136,14 +136,9 @@ export default function SupportPage() {
       <main className="relative z-10 max-w-6xl mx-auto px-6 py-12 md:py-20">
         {/* Hero */}
         <div className="text-center mb-12 md:mb-16">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-neon-purple/10 border border-neon-purple/30 rounded-full text-neon-purple text-sm font-medium mb-4">
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z" />
-            </svg>
-            Support 24/7
-          </div>
-          <h1 className="text-3xl md:text-5xl font-black mb-4">
-            COMMENT POUVONS-NOUS <span className="text-neon-purple">T'AIDER</span> ?
+          <span className="kicker mb-4">Support 24/7</span>
+          <h1 className="title-giant text-3xl md:text-5xl mb-4 mt-3">
+            <span className="text-white">Comment pouvons-nous</span> <span className="text-neon-purple neon-text">t'aider</span> <span className="text-neon-pink">?</span>
           </h1>
           <p className="text-white/60 text-lg max-w-xl mx-auto">
             Notre équipe est là pour répondre à toutes tes questions. Temps de réponse moyen : moins de 2 heures.

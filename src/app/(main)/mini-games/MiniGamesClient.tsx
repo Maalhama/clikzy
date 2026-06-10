@@ -331,10 +331,9 @@ export default function MiniGamesClient({ initialEligibility }: MiniGamesClientP
           <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass border border-[var(--bg-tertiary)] text-[var(--neon-purple)] text-sm font-bold tracking-wider uppercase mb-4"
+            className="kicker mb-4"
           >
-            <Zap size={16} fill="currentColor" />
-            Bonus Quotidiens
+            Bonus quotidiens
           </motion.div>
 
           <motion.h1
