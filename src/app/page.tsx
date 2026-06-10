@@ -78,7 +78,7 @@ async function getLandingData() {
     // Fetch active games with items for prizes carousel
     supabase
       .from('games')
-      .select('id, end_time, status, item:items(id, name, image_url, retail_value)')
+      .select('id, end_time, status, total_clicks, last_click_username, item:items(id, name, image_url, retail_value)')
       .in('status', ['active', 'final_phase'])
       .gt('end_time', now)
       .order('end_time', { ascending: true })
@@ -182,8 +182,24 @@ async function getLandingData() {
     id: string
     end_time: number
     status: string
+    total_clicks: number | null
+    last_click_username: string | null
     item: { id: string; name: string; image_url: string; retail_value: number } | null
   }> | null
+
+  // File de parties pour la carte hero « en direct » (rotation quand une partie se termine)
+  const liveGames: FeaturedGame[] = (activeGames || [])
+    .filter(g => g.item)
+    .map(g => ({
+      id: g.id,
+      item_name: g.item!.name,
+      item_image_url: g.item!.image_url,
+      item_value: g.item!.retail_value || 0,
+      end_time: g.end_time,
+      total_clicks: g.total_clicks ?? 0,
+      last_click_username: g.last_click_username,
+      status: g.status as FeaturedGame['status'],
+    }))
 
   const prizes: Prize[] = (activeGames || [])
     .filter(g => g.item)
@@ -201,6 +217,7 @@ async function getLandingData() {
 
   return {
     winners,
+    liveGames,
     featuredGame,
     featuredItem,
     prizes,
@@ -215,13 +232,14 @@ export default async function LandingPage() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
-  const { winners, featuredGame, featuredItem, prizes, stats } = await getLandingData()
+  const { winners, liveGames, featuredGame, featuredItem, prizes, stats } = await getLandingData()
 
   return (
     <LandingClient
       isLoggedIn={!!user}
       initialWinners={winners}
       initialFeaturedGame={featuredGame}
+      liveGames={liveGames}
       featuredItem={featuredItem}
       prizes={prizes}
       stats={stats}

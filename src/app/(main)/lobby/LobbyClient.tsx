@@ -363,8 +363,8 @@ function EmptyState({ filter }: { filter: string }) {
   const { title, description } = messages[filter] || messages.all
 
   return (
-    <div className="text-center py-20">
-      <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-neon-purple/10 border border-neon-purple/30 flex items-center justify-center">
+    <div className="panel text-center py-20 px-6">
+      <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-neon-purple/10 border border-neon-purple/30 flex items-center justify-center shadow-[0_0_30px_rgba(155,92,255,0.15)]">
         <svg
           className="w-10 h-10 text-neon-purple"
           fill="none"

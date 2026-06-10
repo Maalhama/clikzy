@@ -35,9 +35,11 @@ export default async function MainLayout({
       userId={user?.id ?? null}
     >
       <div className="min-h-screen flex flex-col bg-bg-primary">
+        {/* Atmosphère aurora commune (CSS pur, aucun coût JS) */}
+        <div className="arcade-atmosphere -z-10" aria-hidden="true" />
+
         {/* Mobile lightweight background */}
         <div className="md:hidden fixed inset-0 -z-10">
-          <div className="mobile-grid-bg" />
           <div className="mobile-glow-spot mobile-glow-spot-1" />
           <div className="mobile-glow-spot mobile-glow-spot-2" />
         </div>

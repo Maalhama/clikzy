@@ -312,7 +312,7 @@ export default function VIPPage() {
                 <CrownIcon className="w-10 h-10 text-[#0B0F1A] drop-shadow-[0_0_10px_rgba(234,179,8,0.8)]" />
               </div>
 
-              <h1 className="text-4xl md:text-5xl font-bold mb-4">
+              <h1 className="title-giant text-4xl md:text-5xl mb-4">
                 <span className="bg-gradient-to-r from-yellow-400 via-amber-500 to-yellow-600 bg-clip-text text-transparent">
                   Deviens V.I.P
                 </span>

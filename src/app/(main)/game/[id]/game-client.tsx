@@ -398,7 +398,7 @@ export function GameClient({
                     </span>
                     <span
                       suppressHydrationWarning
-                      className={`font-mono font-bold text-3xl tracking-tight ${
+                      className={`stat-numeral text-3xl ${
                         isCritical ? 'text-danger animate-pulse' : isUrgent ? 'text-danger' : 'text-neon-blue'
                       }`}
                     >
@@ -475,7 +475,7 @@ export function GameClient({
               {game.status !== 'ended' && !hasCredits && (
                 <button
                   onClick={() => setShowCreditModal(true)}
-                  className="w-full py-4 rounded-xl font-bold text-lg transition-all flex items-center justify-center gap-2 bg-gradient-to-r from-neon-purple to-neon-pink text-white shadow-[0_0_25px_rgba(155,92,255,0.4)] hover:shadow-[0_0_35px_rgba(155,92,255,0.6)] active:scale-[0.98]"
+                  className="w-full py-4 rounded-xl font-display font-semibold uppercase tracking-wide text-base transition-all flex items-center justify-center gap-2 bg-gradient-to-r from-neon-purple to-neon-pink text-white shadow-[0_0_25px_rgba(155,92,255,0.4)] hover:shadow-[0_0_35px_rgba(155,92,255,0.6)] active:scale-[0.98]"
                 >
                   <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -488,7 +488,7 @@ export function GameClient({
                   onClick={handleClick}
                   disabled={!canClick || isPending}
                   className={`
-                    w-full py-4 rounded-xl font-bold text-lg transition-all flex items-center justify-center gap-2
+                    w-full py-4 rounded-xl font-display font-semibold uppercase tracking-wide text-base transition-all flex items-center justify-center gap-2
                     ${!canClick
                       ? 'bg-bg-secondary/50 text-white/30 cursor-not-allowed'
                       : (game.item?.retail_value ?? 0) >= 1000
@@ -566,7 +566,7 @@ export function GameClient({
                       <div className="text-white font-medium">Solde disponible</div>
                     </div>
                   </div>
-                  <div className={`text-3xl font-black transition-all duration-200 ${creditsAnimation ? 'scale-125 text-neon-pink' : 'scale-100 text-neon-blue'}`}>
+                  <div className={`text-3xl stat-numeral transition-all duration-200 ${creditsAnimation ? 'scale-125 text-neon-pink' : 'scale-100 text-neon-blue'}`}>
                     {credits}
                   </div>
                 </div>
@@ -575,13 +575,13 @@ export function GameClient({
           </div>
 
           {/* Mobile: Game Rules */}
-          <div className="mt-6 rounded-2xl bg-bg-secondary/30 border border-white/10 overflow-hidden">
+          <div className="mt-6 panel overflow-hidden">
             <div className="px-4 py-3 border-b border-white/10">
               <div className="flex items-center gap-2">
                 <svg className="w-4 h-4 text-neon-purple" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
-                <span className="text-white font-bold text-sm">RÈGLES DU JEU</span>
+                <span className="text-white font-display font-semibold text-xs uppercase tracking-[0.18em]">Règles du jeu</span>
               </div>
             </div>
             <div className="p-4 space-y-3">
@@ -758,7 +758,7 @@ export function GameClient({
                     </span>
                     <div
                       suppressHydrationWarning
-                      className={`font-mono font-black text-4xl tracking-tight ${
+                      className={`stat-numeral text-4xl ${
                         isCritical ? 'text-danger animate-pulse' : isUrgent ? 'text-danger' : 'text-neon-blue'
                       }`}
                     >
@@ -838,7 +838,7 @@ export function GameClient({
               {game.status !== 'ended' && !hasCredits && (
                 <button
                   onClick={() => setShowCreditModal(true)}
-                  className="w-full py-4 rounded-xl font-bold text-lg transition-all flex items-center justify-center gap-2 bg-gradient-to-r from-neon-purple to-neon-pink text-white shadow-[0_0_25px_rgba(155,92,255,0.4)] hover:shadow-[0_0_35px_rgba(155,92,255,0.6)] hover:scale-[1.01] active:scale-[0.98]"
+                  className="w-full py-4 rounded-xl font-display font-semibold uppercase tracking-wide text-base transition-all flex items-center justify-center gap-2 bg-gradient-to-r from-neon-purple to-neon-pink text-white shadow-[0_0_25px_rgba(155,92,255,0.4)] hover:shadow-[0_0_35px_rgba(155,92,255,0.6)] hover:scale-[1.01] active:scale-[0.98]"
                 >
                   <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -851,7 +851,7 @@ export function GameClient({
                   onClick={handleClick}
                   disabled={!canClick || isPending}
                   className={`
-                    w-full py-4 rounded-xl font-bold text-lg transition-all flex items-center justify-center gap-2
+                    w-full py-4 rounded-xl font-display font-semibold uppercase tracking-wide text-base transition-all flex items-center justify-center gap-2
                     ${!canClick
                       ? 'bg-bg-secondary/50 text-white/30 cursor-not-allowed'
                       : (game.item?.retail_value ?? 0) >= 1000
@@ -922,7 +922,7 @@ export function GameClient({
                     <svg className="w-4 h-4 text-neon-purple" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                     </svg>
-                    <span className="text-white font-bold text-sm">RÈGLES DU JEU</span>
+                    <span className="text-white font-display font-semibold text-xs uppercase tracking-[0.18em]">Règles du jeu</span>
                   </div>
                 </div>
                 <div className="p-4 space-y-3">

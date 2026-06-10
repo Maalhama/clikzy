@@ -174,7 +174,7 @@ export function ProfileClient({ profile, wins, gamesPlayed, totalValueWon, gameH
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="rounded-2xl bg-bg-secondary/50 border border-white/10 overflow-hidden mb-6"
+          className="panel overflow-hidden mb-6"
         >
           {/* Profile Header */}
           <div className="p-5 border-b border-white/10">
@@ -336,7 +336,7 @@ export function ProfileClient({ profile, wins, gamesPlayed, totalValueWon, gameH
             <div className="text-left">
               <div className="text-white font-bold">Mes crédits</div>
               <div className="flex items-center gap-2">
-                <span className="text-2xl font-black text-neon-purple">{(profile.credits || 0) + (profile.earned_credits || 0)}</span>
+                <span className="text-2xl stat-numeral text-neon-purple">{(profile.credits || 0) + (profile.earned_credits || 0)}</span>
                 <span className="text-white/40 text-sm">disponibles</span>
               </div>
             </div>
@@ -363,7 +363,7 @@ export function ProfileClient({ profile, wins, gamesPlayed, totalValueWon, gameH
               </div>
               <div>
                 <div className="text-white/50 text-xs">Valeur totale gagnée</div>
-                <div className="text-2xl font-black text-success">{totalValueWon.toLocaleString()}€</div>
+                <div className="text-2xl stat-numeral text-success">{totalValueWon.toLocaleString()}€</div>
               </div>
             </div>
           </motion.div>
@@ -499,7 +499,7 @@ function WinCard({ win, index }: { win: WinnerWithItem; index: number }) {
 // Empty state component
 function EmptyWinsState() {
   return (
-    <div className="rounded-2xl bg-bg-secondary/30 border border-white/10 p-8 text-center">
+    <div className="panel p-8 text-center">
       <div className="w-14 h-14 mx-auto mb-4 rounded-xl bg-neon-purple/10 border border-neon-purple/30 flex items-center justify-center">
         <SparklesIcon className="w-7 h-7 text-neon-purple" />
       </div>

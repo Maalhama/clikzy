@@ -50,14 +50,17 @@ export const LobbyHeader = memo(function LobbyHeader({
         )}
 
         {/* Header row with stats */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 reveal reveal-1">
           {/* Title */}
           <div>
-            <h1 className="text-2xl md:text-3xl font-black text-white">
-              LOBBY
+            <div className="flex items-center gap-2.5 mb-1.5">
+              <span className="live-dot" aria-hidden="true" />
+              <span className="kicker !text-[0.625rem]">Arène en direct</span>
+            </div>
+            <h1 className="title-giant text-4xl md:text-5xl text-white">              LOBBY
             </h1>
-            <p className="text-white/50 text-sm mt-1">
-              Dernier clic = Gagnant. Choisis ta cible.
+            <p className="text-white/50 text-sm mt-1.5">
+              Dernier clic = gagnant. Choisis ta cible.
             </p>
             <div className="flex items-center gap-2 mt-2">
               <svg
@@ -78,17 +81,17 @@ export const LobbyHeader = memo(function LobbyHeader({
           {/* Stats pills */}
           <div className="flex flex-wrap gap-2">
             {/* Active games */}
-            <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-bg-secondary/50 border border-neon-purple/20">
+            <div className="panel flex items-center gap-2 px-3.5 py-2">
               <span className="relative flex h-2 w-2">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-neon-purple opacity-75" />
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-neon-purple" />
               </span>
-              <span className="text-white font-bold text-sm">{activeCount}</span>
+              <span className="text-white stat-numeral text-sm">{activeCount}</span>
               <span className="text-white/50 text-xs">en jeu</span>
             </div>
 
             {/* Ended/Won count */}
-            <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-success/10 border border-success/20">
+            <div className="panel flex items-center gap-2 px-3.5 py-2">
               <svg
                 className="w-4 h-4 text-success"
                 fill="none"
@@ -98,12 +101,12 @@ export const LobbyHeader = memo(function LobbyHeader({
               >
                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
-              <span className="text-success font-bold text-sm">{endedCount}</span>
+              <span className="text-success stat-numeral text-sm">{endedCount}</span>
               <span className="text-white/50 text-xs">remportés</span>
             </div>
 
             {/* Urgent count */}
-            <div className={`flex items-center gap-2 px-3 py-2 rounded-xl bg-danger/10 border border-danger/30 ${urgentCount > 0 ? 'animate-pulse' : ''}`}>
+            <div className={`panel flex items-center gap-2 px-3.5 py-2 ${urgentCount > 0 ? 'animate-pulse' : ''}`}>
               <svg
                 className="w-4 h-4 text-danger"
                 fill="none"
@@ -113,14 +116,14 @@ export const LobbyHeader = memo(function LobbyHeader({
               >
                 <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
               </svg>
-              <span className="text-danger font-bold text-sm">
+              <span className="text-danger stat-numeral text-sm">
                 {urgentCount}
               </span>
               <span className="text-white/50 text-xs">phase finale</span>
             </div>
 
             {/* Credits */}
-            <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-neon-blue/10 border border-neon-blue/20">
+            <div className="panel flex items-center gap-2 px-3.5 py-2">
               <svg
                 className="w-4 h-4 text-neon-blue"
                 fill="none"
@@ -134,8 +137,8 @@ export const LobbyHeader = memo(function LobbyHeader({
                   d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
                 />
               </svg>
-              <span className="text-neon-blue font-bold text-sm">{credits}</span>
-              <span className="text-white/50 text-xs">credits</span>
+              <span className="text-neon-blue stat-numeral text-sm">{credits}</span>
+              <span className="text-white/50 text-xs">crédits</span>
             </div>
           </div>
         </div>

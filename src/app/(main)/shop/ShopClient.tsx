@@ -39,15 +39,15 @@ export function ShopClient({ currentCredits }: ShopClientProps) {
             <span className="text-neon-purple text-sm font-semibold">BOUTIQUE</span>
           </div>
 
-          <h1 className="text-3xl md:text-4xl font-black text-white mb-3">
-            Achète des <span className="gradient-text">crédits</span>
+          <h1 className="title-giant text-4xl md:text-5xl text-white mb-3">
+            Achète des <span className="text-electric">crédits</span>
           </h1>
           <p className="text-white/50 max-w-md mx-auto">
-            Plus de crédits = plus de chances de gagner des produits tech premium.
+            Plus de crédits = plus de temps de jeu. Les crédits n'augmentent pas tes chances : seul le timing compte.
           </p>
 
           {/* Current credits */}
-          <div className="mt-6 inline-flex items-center gap-3 px-5 py-3 rounded-2xl bg-bg-secondary border border-white/10">
+          <div className="mt-6 inline-flex items-center gap-3 px-5 py-3 panel rounded-2xl">
             <div className="w-10 h-10 rounded-xl bg-neon-blue/20 flex items-center justify-center">
               <svg className="w-5 h-5 text-neon-blue" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -55,7 +55,7 @@ export function ShopClient({ currentCredits }: ShopClientProps) {
             </div>
             <div className="text-left">
               <div className="text-xs text-white/50">Ton solde actuel</div>
-              <div className="text-xl font-bold text-neon-blue">{currentCredits} crédits</div>
+              <div className="text-xl stat-numeral text-neon-blue">{currentCredits} crédits</div>
             </div>
           </div>
         </div>
@@ -72,7 +72,7 @@ export function ShopClient({ currentCredits }: ShopClientProps) {
                   relative rounded-2xl p-6 transition-all
                   ${pack.popular
                     ? 'bg-gradient-to-br from-neon-purple/20 to-neon-pink/20 border-2 border-neon-purple/40 shadow-[0_0_40px_rgba(155,92,255,0.2)]'
-                    : 'bg-bg-secondary border border-white/10 hover:border-white/20'
+                    : 'panel panel-hover'
                   }
                 `}
               >
@@ -95,7 +95,7 @@ export function ShopClient({ currentCredits }: ShopClientProps) {
                       : 'bg-gradient-to-br from-neon-blue/20 to-neon-purple/20 border border-white/10'
                     }
                   `}>
-                    <span className="text-white font-black text-2xl leading-none">{pack.credits}</span>
+                    <span className="text-white stat-numeral text-2xl leading-none">{pack.credits}</span>
                     <span className="text-white/70 text-xs uppercase">crédits</span>
                   </div>
 
@@ -112,7 +112,7 @@ export function ShopClient({ currentCredits }: ShopClientProps) {
                   </div>
 
                   {/* Price */}
-                  <div className="text-3xl font-black text-white mb-6">
+                  <div className="text-3xl stat-numeral text-white mb-6">
                     {pack.price.toFixed(2)}€
                   </div>
 
@@ -121,7 +121,7 @@ export function ShopClient({ currentCredits }: ShopClientProps) {
                     onClick={() => handlePurchase(pack.id)}
                     disabled={loadingPack !== null}
                     className={`
-                      w-full py-3 rounded-xl font-bold transition-all
+                      w-full py-3 rounded-xl font-display font-semibold uppercase tracking-wide text-sm transition-all
                       ${pack.popular
                         ? 'bg-gradient-to-r from-neon-purple to-neon-pink text-white hover:opacity-90'
                         : 'bg-white/10 text-white hover:bg-white/20'

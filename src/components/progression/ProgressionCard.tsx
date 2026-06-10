@@ -59,7 +59,7 @@ export function ProgressionCard({ compact = false }: Props) {
   const doneQuests = data.quests.filter((q) => q.claimed).length
 
   return (
-    <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-bg-secondary p-5">
+    <div className="panel relative overflow-hidden p-5">
       {/* glow d'ambiance */}
       <div className="pointer-events-none absolute -top-16 -right-10 h-40 w-40 rounded-full bg-neon-purple/20 blur-[80px]" />
 

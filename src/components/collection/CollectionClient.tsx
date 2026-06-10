@@ -57,10 +57,10 @@ export function CollectionClient() {
       )}
 
       {/* Coffres */}
-      <section className="rounded-2xl border border-white/10 bg-bg-secondary p-5">
+      <section className="panel p-5">
         <div className="mb-4 flex items-center gap-2">
           <Gift className="h-5 w-5 text-neon-purple" />
-          <h2 className="text-lg font-black text-white">Coffres</h2>
+          <h2 className="text-lg font-display font-semibold text-white">Coffres</h2>
           <span className="ml-auto text-sm text-white/40">{data.chests.length} à ouvrir</span>
         </div>
         {data.chests.length === 0 ? (
@@ -85,10 +85,10 @@ export function CollectionClient() {
       </section>
 
       {/* Personnage + bonus */}
-      <section className="rounded-2xl border border-white/10 bg-bg-secondary p-5">
+      <section className="panel p-5">
         <div className="mb-4 flex items-center gap-2">
           <Sparkles className="h-5 w-5 text-yellow-400" />
-          <h2 className="text-lg font-black text-white">Ton personnage</h2>
+          <h2 className="text-lg font-display font-semibold text-white">Ton personnage</h2>
         </div>
 
         <div className="mb-4 flex flex-wrap gap-2">
@@ -127,8 +127,8 @@ export function CollectionClient() {
       </section>
 
       {/* Inventaire */}
-      <section className="rounded-2xl border border-white/10 bg-bg-secondary p-5">
-        <h2 className="mb-4 text-lg font-black text-white">Inventaire <span className="text-sm font-normal text-white/40">({data.inventory.length})</span></h2>
+      <section className="panel p-5">
+        <h2 className="mb-4 text-lg font-display font-semibold text-white">Inventaire <span className="text-sm font-normal text-white/40">({data.inventory.length})</span></h2>
         {data.inventory.length === 0 ? (
           <p className="py-6 text-center text-sm text-white/40">Ouvre des coffres pour récupérer des pièces d&apos;équipement.</p>
         ) : (

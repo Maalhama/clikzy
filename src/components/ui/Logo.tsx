@@ -26,7 +26,7 @@ export function Logo({ size = 'md', animated = true, href = '/' }: LogoProps) {
   const logoContent = (
     <div className="relative inline-flex items-center">
       {/* Logo text */}
-      <span className={`${sizeClasses[size]} font-black tracking-tighter relative`}>
+      <span className={`${sizeClasses[size]} font-display font-bold tracking-tight relative`}>
         {/* Glow layer */}
         <span className="absolute inset-0 blur-sm opacity-70">
           <span className="text-neon-purple">CLEEK</span>

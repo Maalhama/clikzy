@@ -59,18 +59,18 @@ function LeaderboardBody({ loading, rows, me, period }: { loading: boolean; rows
   return (
     <div className="space-y-4">
       {me && me.total > 0 && (
-        <div className="rounded-2xl border border-neon-purple/30 bg-neon-purple/10 px-5 py-4 text-center">
+        <div className="panel rounded-2xl px-5 py-4 text-center">
           <p className="text-sm text-white/60">Ton classement</p>
-          <p className="text-2xl font-black text-white">
+          <p className="text-2xl stat-numeral text-white">
             {me.rank}<span className="text-base font-semibold text-white/50"> e sur {me.total.toLocaleString('fr-FR')} joueurs</span>
           </p>
         </div>
       )}
 
-      <div className="overflow-hidden rounded-2xl border border-white/10 bg-bg-secondary">
+      <div className="panel overflow-hidden">
         <div className="flex items-center gap-2 border-b border-white/10 px-4 py-3">
           <Trophy className="h-5 w-5 text-yellow-400" />
-          <h2 className="font-black text-white">Top joueurs</h2>
+          <h2 className="font-display font-semibold text-white">Top joueurs</h2>
           <span className="ml-auto text-xs text-white/40">
             {period === 'all' ? 'all-time' : period === 'day' ? "aujourd'hui" : period === 'week' ? 'cette semaine' : 'ce mois'}
           </span>

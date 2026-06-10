@@ -16,14 +16,14 @@ export function Card({
   ...props
 }: CardProps) {
   const variantStyles = {
-    default: 'bg-bg-secondary border-bg-tertiary',
-    glass: 'bg-bg-secondary/50 backdrop-blur-md border-bg-tertiary/50',
-    neon: 'bg-bg-secondary border-neon-purple/30 shadow-neon-purple/10',
+    default: 'panel border-transparent',
+    glass: 'panel border-transparent backdrop-blur-md',
+    neon: 'bg-bg-secondary border-neon-purple/40 shadow-[0_0_30px_-10px_rgba(155,92,255,0.35)]',
     gradient: 'bg-gradient-to-br from-bg-secondary to-bg-tertiary border-neon-purple/20',
   }
 
   const hoverStyles = hover
-    ? 'transition-all duration-300 hover:border-neon-purple/50 hover:shadow-lg hover:shadow-neon-purple/10 hover:-translate-y-1'
+    ? 'panel-hover hover:border-neon-purple/50'
     : ''
 
   const glowStyles = glow ? 'shadow-neon-purple animate-glow' : ''

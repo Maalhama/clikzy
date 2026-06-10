@@ -97,13 +97,19 @@ const nextConfig: NextConfig = {
           { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
         ],
       },
-      // Cache JS/CSS for 1 year (Next.js adds hash to filenames)
-      {
-        source: '/_next/static/(.*)',
-        headers: [
-          { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
-        ],
-      },
+      // Cache JS/CSS for 1 year (Next.js adds hash to filenames).
+      // PROD UNIQUEMENT : en dev les chunks Turbopack ne sont pas hashés par contenu,
+      // un header immutable fait servir au navigateur des bundles périmés (CSS/JS stale).
+      ...(process.env.NODE_ENV === 'production'
+        ? [
+            {
+              source: '/_next/static/(.*)',
+              headers: [
+                { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
+              ],
+            },
+          ]
+        : []),
     ]
   },
 }

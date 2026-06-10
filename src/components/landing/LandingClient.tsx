@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useState, useEffect } from 'react'
+import { useRef, useState, useEffect, useMemo } from 'react'
 import { createPortal } from 'react-dom'
 import Link from 'next/link'
 import Image from 'next/image'
@@ -20,7 +20,6 @@ import {
   ClickPulse,
   TrustBadges,
   Testimonials,
-  FloatingPrizes,
   FAQ,
   BrandMarquee,
   Guarantees,
@@ -31,6 +30,7 @@ import { TargetIcon, CursorClickIcon, TrophyIcon, GiftIcon } from '@/components/
 
 // Widgets - PrizeCarousel
 import { PrizeCarousel } from './widgets/PrizeCarousel'
+import { HeroLiveCard } from './widgets/HeroLiveCard'
 
 // Background Effects - Lazy loaded (heavy 3D component)
 const BackgroundEffects = dynamic(
@@ -85,6 +85,7 @@ interface LandingClientProps {
   isLoggedIn: boolean
   initialWinners: Winner[]
   initialFeaturedGame: FeaturedGame | null
+  liveGames?: FeaturedGame[]
   featuredItem: FeaturedItem | null
   prizes?: Prize[]
   stats: {
@@ -125,7 +126,7 @@ function WinnerCard({ winner }: { winner: Winner }) {
   const isRecent = timeLabel === 'À l\'instant' || timeLabel.includes('min')
 
   return (
-    <div className="w-[220px] sm:w-[280px] min-h-[150px] sm:min-h-[180px] p-3 sm:p-5 rounded-xl sm:rounded-2xl bg-bg-secondary/80 border border-white/10">
+    <div className="panel w-[220px] sm:w-[280px] min-h-[150px] sm:min-h-[180px] p-3 sm:p-5">
       {/* Time badge */}
       <div className="inline-flex items-center gap-1.5 px-2 py-1 rounded-full bg-white/5 border border-white/10 mb-2 sm:mb-3 text-[10px] sm:text-xs">
         {isRecent && <span className="w-1.5 h-1.5 rounded-full bg-success animate-pulse" />}
@@ -146,7 +147,7 @@ function WinnerCard({ winner }: { winner: Winner }) {
       {/* Item won */}
       <div>
         <div className="font-bold text-white text-sm sm:text-base mb-1 truncate">{winner.item_name}</div>
-        <div className="font-black text-xl sm:text-2xl text-success">{winner.item_value.toLocaleString()}€</div>
+        <div className="stat-numeral text-xl sm:text-2xl text-success">{winner.item_value.toLocaleString()}€</div>
       </div>
     </div>
   )
@@ -156,10 +157,16 @@ export function LandingClient({
   isLoggedIn,
   initialWinners,
   initialFeaturedGame,
+  liveGames,
   featuredItem,
   prizes,
   stats,
 }: LandingClientProps) {
+  // File de parties pour la carte hero : la sélection serveur d'abord, puis le reste
+  const heroGames = useMemo(() => {
+    const list = [...(initialFeaturedGame ? [initialFeaturedGame] : []), ...(liveGames ?? [])]
+    return list.filter((g, i) => list.findIndex(x => x.id === g.id) === i)
+  }, [initialFeaturedGame, liveGames])
   const mainRef = useRef<HTMLElement>(null)
   const router = useRouter()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -363,7 +370,7 @@ export function LandingClient({
                 <>
                   <Link
                     href="/lobby"
-                    className="neon-btn-primary px-6 py-2.5 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-neon-purple/50"
+                    className="btn-arena px-6 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-neon-purple/50"
                   >
                     PARTICIPER
                   </Link>
@@ -387,7 +394,7 @@ export function LandingClient({
                   </Link>
                   <Link
                     href="/register"
-                    className="neon-btn-primary px-6 py-2.5 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-neon-purple/50"
+                    className="btn-arena px-6 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-neon-purple/50"
                   >
                     S'inscrire
                   </Link>
@@ -401,7 +408,7 @@ export function LandingClient({
 
       {/* HERO SECTION */}
       {/* === MOBILE HERO === */}
-      <section className="md:hidden relative min-h-[100svh] flex flex-col justify-center pt-16 pb-6 px-4">
+      <section className="md:hidden relative min-h-[100svh] flex flex-col justify-center pt-10 pb-6 px-4">
         {/* Mobile Hero Content - Centered & Compact */}
         <div className="flex-1 flex flex-col justify-center">
           {/* Live badge */}
@@ -415,28 +422,27 @@ export function LandingClient({
             </span>
           </div>
 
-          {/* Title - Escalating sizes effect */}
-          <h1 className="hero-title leading-[0.9] font-black mb-4">
-            <span className="block text-xl">
-              <span className="text-neon-purple neon-text">CLIQUE</span>
-              <span className="text-white">.</span>
-            </span>
-            <span className="block text-4xl">
-              <span className="text-neon-blue neon-text">JOUE</span>
-              <span className="text-white">.</span>
-            </span>
-            <span className="block text-[2.75rem]">
-              <span className="text-neon-pink neon-text-pink">GAGNE</span>
-              <span className="text-white">.</span>
+          {/* Titre massif */}
+          <h1 className="hero-title reveal reveal-1 title-giant mb-4 text-[2.4rem]">
+            <span className="block text-white">Le dernier</span>
+            <span className="block">
+              <span className="text-click text-neon-purple neon-text">clic</span>{' '}
+              <span className="text-electric">gagne</span>
+              <span className="text-neon-pink">.</span>
             </span>
           </h1>
 
           {/* Subtitle - Short */}
-          <p className="hero-subtitle text-sm text-white/60 mb-4 max-w-[300px]">
-            Le dernier clic remporte le lot. Rejoins des milliers de joueurs et tente de remporter ta récompense.
+          <p className="hero-subtitle reveal reveal-2 text-sm text-white/60 mb-4 max-w-[300px]">
+            Des lots réels, un timer, des milliers de joueurs. Le dernier clic repart avec le lot.
             <span className="block text-neon-blue font-semibold mt-1">10 clics gratuits chaque jour.</span>
             <span className="block text-neon-purple text-xs mt-1">Nouveaux produits toutes les 3 heures.</span>
           </p>
+
+          {/* Partie en direct (si disponible) */}
+          <div className="reveal reveal-3 mb-5">
+            <HeroLiveCard games={heroGames} compact />
+          </div>
 
           {/* Mini Prize Showcase - Mobile - Infinite Marquee (reduced for performance) */}
           <div className="hero-prize mb-6 -mx-4 overflow-hidden">
@@ -514,7 +520,7 @@ export function LandingClient({
           <button
             onClick={(e) => handleCtaClick(e, '/lobby')}
             disabled={isNavigating}
-            className="hero-cta w-full py-4 bg-gradient-to-r from-neon-purple to-neon-pink text-white font-black text-base rounded-xl text-center mb-3 block active:scale-95 active:opacity-90 transition-all disabled:opacity-80"
+            className="hero-cta btn-arena w-full py-4 text-base text-center mb-3 disabled:opacity-80"
             style={{ boxShadow: '0 0 30px rgba(155, 92, 255, 0.4)' }}
           >
             {isNavigating ? (
@@ -536,17 +542,17 @@ export function LandingClient({
           </p>
 
           {/* Stats - Horizontal compact */}
-          <div className="hero-stats flex justify-between gap-2">
-            <div className="flex-1 py-3 px-2 rounded-lg bg-bg-secondary/60 border border-neon-blue/20 text-center">
-              <div className="text-lg font-black text-neon-blue">+{stats.totalWinningsValue.toLocaleString()}€</div>
+          <div className="hero-stats reveal reveal-4 flex justify-between gap-2">
+            <div className="panel flex-1 py-3 px-2 text-center">
+              <div className="text-lg stat-numeral text-neon-blue">+{stats.totalWinningsValue.toLocaleString()}€</div>
               <div className="text-[9px] text-white/40 uppercase">Récompenses</div>
             </div>
-            <div className="flex-1 py-3 px-2 rounded-lg bg-bg-secondary/60 border border-neon-purple/20 text-center">
-              <div className="text-lg font-black text-neon-purple">+100</div>
+            <div className="panel flex-1 py-3 px-2 text-center">
+              <div className="text-lg stat-numeral text-neon-purple">+100</div>
               <div className="text-[9px] text-white/40 uppercase">Lots</div>
             </div>
-            <div className="flex-1 py-3 px-2 rounded-lg bg-bg-secondary/60 border border-neon-pink/20 text-center">
-              <div className="text-lg font-black text-neon-pink">10c</div>
+            <div className="panel flex-1 py-3 px-2 text-center">
+              <div className="text-lg stat-numeral text-neon-pink">10c</div>
               <div className="text-[9px] text-white/40 uppercase">Gratuits/jour</div>
             </div>
           </div>
@@ -555,47 +561,59 @@ export function LandingClient({
       </section>
 
       {/* === DESKTOP HERO === */}
-      <section className="hidden md:flex relative min-h-screen items-center pt-[4.25rem]">
+      <section className="hidden md:flex relative min-h-[92vh] items-center pt-12 overflow-hidden">
         {/* Click Pulse Effect */}
         <ClickPulse enabled={true} intensity="medium" />
 
-        <div className="relative max-w-7xl mx-auto px-6 py-20 grid lg:grid-cols-2 gap-12 items-center">
+        {/* Sol de scène en perspective */}
+        <div className="hero-stage-floor" aria-hidden="true" />
+
+        {/* Mot géant fantôme en fond */}
+        <div
+          className="pointer-events-none absolute left-1/2 top-[12%] -translate-x-1/2 select-none whitespace-nowrap title-giant text-outline text-[11rem] opacity-[0.07]"
+          aria-hidden="true"
+        >
+          GAGNE
+        </div>
+
+        <div className="relative max-w-7xl mx-auto px-6 py-10 grid lg:grid-cols-[1.15fr,0.85fr] gap-16 items-center w-full">
           {/* Left content */}
           <div>
-            {/* Badge live retiré du hero desktop (déjà présent dans le header) */}
+            {/* Kicker */}
+            <div className="reveal reveal-1 mb-6">
+              <span className="kicker">L&apos;arène est ouverte</span>
+            </div>
 
-            {/* Title - Escalating sizes effect */}
-            <h1 className="hero-title font-black leading-[0.9] mb-6" style={{ perspective: '1000px' }}>
-              <span className="block text-3xl lg:text-4xl">
-                <span className="text-neon-purple neon-text">CLIQUE</span>
-                <span className="text-white">.</span>
-              </span>
-              <span className="block text-5xl lg:text-6xl">
-                <span className="text-neon-blue neon-text">JOUE</span>
-                <span className="text-white">.</span>
-              </span>
-              <span className="block text-6xl lg:text-7xl glitch-text" data-text="GAGNE.">
-                <span className="text-neon-pink neon-text-pink">GAGNE</span>
-                <span className="text-white">.</span>
+            {/* Titre massif */}
+            <h1 className="hero-title reveal reveal-1 title-giant mb-8 text-[3.4rem] lg:text-[4.6rem] xl:text-[5.2rem]">
+              <span className="block text-white">Le dernier</span>
+              <span className="block">
+                <span className="text-click text-neon-purple neon-text">clic</span>{' '}
+                <span className="text-electric">gagne</span>
+                <span className="text-neon-pink">.</span>
               </span>
             </h1>
 
             {/* Subtitle */}
-            <p className="hero-subtitle text-lg text-white/70 max-w-lg mb-8">
-              Le dernier clic remporte le lot. Rejoins des milliers de joueurs et tente de remporter ta récompense.
-              <span className="block text-neon-blue font-semibold mt-2">10 clics gratuits chaque jour.</span>
-              <span className="block text-neon-purple text-sm mt-1">Nouveaux produits toutes les 3 heures.</span>
+            <p className="hero-subtitle reveal reveal-2 text-lg text-white/65 max-w-lg mb-10 leading-relaxed">
+              Des lots réels, un timer, des milliers de joueurs.
+              Celui qui clique en dernier repart avec le lot — livré chez lui.
+              <span className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
+                <span className="font-semibold text-neon-blue">10 clics gratuits chaque jour</span>
+                <span className="text-white/25">•</span>
+                <span className="text-neon-purple">Nouveaux produits toutes les 3 h</span>
+              </span>
             </p>
 
             {/* CTA */}
-            <div className="hero-cta flex flex-col gap-3 mb-12">
+            <div className="hero-cta reveal reveal-3 flex flex-col gap-4 mb-12">
               <div className="flex gap-4">
                 <button
                   onClick={(e) => handleCtaClick(e, '/lobby')}
                   disabled={isNavigating}
-                  className="gaming-btn-large group text-center disabled:opacity-80"
+                  className="btn-arena group px-10 py-5 text-base disabled:opacity-80"
                 >
-                  <span className="relative z-10 flex items-center justify-center gap-2">
+                  <span className="relative z-10 flex items-center justify-center gap-2.5">
                     {isNavigating ? (
                       <>
                         <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
@@ -606,7 +624,7 @@ export function LandingClient({
                       </>
                     ) : (
                       <>
-                        {isLoggedIn ? 'VOIR LES LOTS' : 'JOUER GRATUITEMENT'}
+                        {isLoggedIn ? 'ENTRER DANS L’ARÈNE' : 'JOUER GRATUITEMENT'}
                         <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                         </svg>
@@ -616,37 +634,37 @@ export function LandingClient({
                 </button>
                 <a
                   href="#how-it-works-desktop"
-                  className="px-8 py-4 border-2 border-white/20 text-white font-bold hover:border-neon-blue/50 hover:text-neon-blue transition-all text-center focus:outline-none focus:ring-2 focus:ring-neon-blue/50"
+                  className="btn-arena-ghost px-8 py-5 text-base text-center focus:outline-none focus:ring-2 focus:ring-neon-blue/50"
                 >
                   COMMENT ÇA MARCHE
                 </a>
               </div>
               {/* Reassurance message */}
-              <p className="text-sm text-white/50">
+              <p className="text-sm text-white/45">
                 Jeu 100% gratuit • Aucun paiement requis • Lots réels livrés chez toi
               </p>
             </div>
 
-            {/* Stats */}
-            <div className="hero-stats grid grid-cols-3 gap-6">
-              <div className="stat-box p-4 rounded-xl bg-bg-secondary/40 border border-neon-blue/20">
-                <div className="text-3xl font-black text-neon-blue">+{stats.totalWinningsValue.toLocaleString()}€</div>
-                <div className="text-xs text-white/40 uppercase tracking-wider">Récompenses</div>
+            {/* Stats — ruban horizontal */}
+            <div className="hero-stats reveal reveal-4 flex items-stretch divide-x divide-white/10 border-y border-white/10 py-4">
+              <div className="pr-8">
+                <div className="text-2xl lg:text-3xl stat-numeral text-neon-blue">+{stats.totalWinningsValue.toLocaleString()}€</div>
+                <div className="text-[0.65rem] text-white/40 uppercase tracking-[0.2em] mt-1">Récompenses</div>
               </div>
-              <div className="stat-box p-4 rounded-xl bg-bg-secondary/40 border border-neon-purple/20">
-                <div className="text-3xl font-black text-neon-purple">+100</div>
-                <div className="text-xs text-white/40 uppercase tracking-wider">Lots</div>
+              <div className="px-8">
+                <div className="text-2xl lg:text-3xl stat-numeral text-neon-purple">+100</div>
+                <div className="text-[0.65rem] text-white/40 uppercase tracking-[0.2em] mt-1">Lots</div>
               </div>
-              <div className="stat-box p-4 rounded-xl bg-bg-secondary/40 border border-neon-pink/20">
-                <div className="text-3xl font-black text-neon-pink">10</div>
-                <div className="text-xs text-white/40 uppercase tracking-wider">Clics gratuits/jour</div>
+              <div className="pl-8">
+                <div className="text-2xl lg:text-3xl stat-numeral text-neon-pink">10<span className="text-base text-white/40">/jour</span></div>
+                <div className="text-[0.65rem] text-white/40 uppercase tracking-[0.2em] mt-1">Clics gratuits</div>
               </div>
             </div>
           </div>
 
-          {/* Right - Floating prizes */}
-          <div className="hero-prize relative hidden lg:block">
-            <FloatingPrizes />
+          {/* Right — la vraie partie en direct (fallback : lots flottants) */}
+          <div className="hero-prize reveal reveal-3 relative hidden lg:block">
+            <HeroLiveCard games={heroGames} />
           </div>
         </div>
 
@@ -666,8 +684,8 @@ export function LandingClient({
         <div className="relative">
           {/* Header */}
           <div className="text-center mb-4">
-            <h2 className="text-2xl font-black">
-              COMMENT <span className="text-neon-purple">ÇA MARCHE</span>
+            <h2 className="title-giant text-2xl">
+              <span className="text-white">Comment</span> <span className="text-neon-purple neon-text">ça marche</span>
             </h2>
             <p className="text-white/50 text-sm mt-1">Un jeu simple, transparent, ouvert à tous</p>
           </div>
@@ -727,8 +745,9 @@ export function LandingClient({
 
         <div className="relative max-w-7xl mx-auto px-6">
           <div className="text-center mb-16">
-            <h2 className="section-title text-6xl font-black mb-4">
-              COMMENT <span className="text-neon-purple">ÇA MARCHE</span>
+            <span className="kicker mb-4">Le principe</span>
+            <h2 className="section-title title-giant text-5xl lg:text-6xl mb-4 mt-3">
+              <span className="text-white">Comment</span> <span className="text-neon-purple neon-text">ça marche</span>
             </h2>
             <p className="text-white/60 text-lg max-w-2xl mx-auto">
               Un jeu simple, transparent, et ouvert à tous
@@ -759,7 +778,8 @@ export function LandingClient({
                     </div>
                   </div>
 
-                  <div className="relative p-6 rounded-lg bg-bg-secondary/50 border h-full" style={{ borderColor: `${step.hex}30` }}>
+                  <div className="relative p-6 rounded-2xl bg-bg-secondary/50 border h-full panel-hover overflow-hidden" style={{ borderColor: `${step.hex}30` }}>
+                    <span aria-hidden="true" className="pointer-events-none select-none absolute -right-3 -top-7 title-giant text-[7rem] text-outline opacity-25">{step.num}</span>
                     <div className="mb-4">
                       <step.Icon className="w-12 h-12" style={{ color: step.hex }} />
                     </div>
@@ -800,8 +820,8 @@ export function LandingClient({
                 <GiftIcon className="w-3 h-3" />
                 Premium
               </div>
-              <h2 className="text-xl font-black">
-                LOTS <span className="text-neon-pink">À GAGNER</span>
+              <h2 className="title-giant text-xl">
+                <span className="text-white">Lots</span> <span className="text-neon-pink neon-text-pink">à gagner</span>
               </h2>
             </div>
             <Link
@@ -833,10 +853,11 @@ export function LandingClient({
               <GiftIcon className="w-5 h-5" />
               Premium
             </div>
-            <h2 className="text-5xl font-black mb-4">
-              LOTS <span className="text-neon-pink">À REMPORTER</span>
+            <h2 className="title-giant text-5xl lg:text-6xl mb-4">
+              <span className="text-white">Lots</span> <span className="text-neon-pink neon-text-pink">à remporter</span>
             </h2>
             <p className="text-white/60 text-lg">Produits premium quotidiens</p>
+            <div className="mx-auto mt-6 h-[2px] w-24 bg-gradient-to-r from-transparent via-neon-pink to-transparent" />
           </div>
           {prizes && prizes.length > 0 ? <PrizeCarousel prizes={prizes} /> : <PrizeCarousel />}
         </div>
@@ -866,8 +887,8 @@ export function LandingClient({
                 </span>
                 Live
               </div>
-              <h2 className="text-xl font-black">
-                DERNIERS <span className="text-success">GAGNANTS</span>
+              <h2 className="title-giant text-xl">
+                <span className="text-white">Derniers</span> <span className="text-success neon-text-success">gagnants</span>
               </h2>
             </div>
             {/* Mini stats */}
@@ -934,8 +955,8 @@ export function LandingClient({
                 </span>
                 Live
               </div>
-              <h2 className="text-6xl font-black">
-                DERNIERS <span className="text-success">GAGNANTS</span>
+              <h2 className="title-giant text-5xl lg:text-6xl">
+                <span className="text-white">Derniers</span> <span className="text-success neon-text-success">gagnants</span>
               </h2>
               <p className="text-white/70 mt-3 max-w-md">
                 Des gagnants remportent des objets chaque jour.
@@ -943,12 +964,12 @@ export function LandingClient({
             </div>
 
             <div className="flex gap-4">
-              <div className="flex flex-col items-center justify-center px-6 py-4 rounded-2xl bg-bg-secondary/60 border border-neon-purple/30">
-                <span className="text-3xl font-black text-neon-purple">{stats.totalWinningsValue.toLocaleString()}€</span>
+              <div className="panel panel-cut flex flex-col items-center justify-center px-6 py-4">
+                <span className="text-3xl stat-numeral text-neon-purple">{stats.totalWinningsValue.toLocaleString()}€</span>
                 <span className="text-xs text-white/40 uppercase tracking-wider mt-1">Distribué</span>
               </div>
-              <div className="flex flex-col items-center justify-center px-6 py-4 rounded-2xl bg-bg-secondary/60 border border-success/30">
-                <span className="text-3xl font-black text-success">{stats.totalGames}+</span>
+              <div className="panel panel-cut flex flex-col items-center justify-center px-6 py-4">
+                <span className="text-3xl stat-numeral text-success">{stats.totalGames}+</span>
                 <span className="text-xs text-white/40 uppercase tracking-wider mt-1">Gagnants</span>
               </div>
             </div>
@@ -1037,10 +1058,10 @@ export function LandingClient({
             <span className="text-white text-xs font-bold">REJOINS LA PARTIE</span>
           </div>
 
-          <h2 className="text-2xl font-black mb-3">
-            PRÊT À{' '}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-neon-purple to-neon-pink">JOUER</span>
-            {' '}?
+          <h2 className="title-giant text-3xl mb-3">
+            <span className="text-white">Prêt à</span>{' '}
+            <span className="text-electric">jouer</span>
+            <span className="text-neon-pink"> ?</span>
           </h2>
 
           <p className="text-sm text-white/60 mb-5">
@@ -1051,7 +1072,7 @@ export function LandingClient({
           <button
             onClick={(e) => handleCtaClick(e, '/lobby')}
             disabled={isNavigating}
-            className="w-full py-4 bg-gradient-to-r from-neon-purple to-neon-pink text-white font-black text-base rounded-xl text-center block mb-3 active:scale-95 active:opacity-90 transition-all disabled:opacity-80"
+            className="btn-arena w-full py-4 text-base text-center mb-3 disabled:opacity-80"
             style={{ boxShadow: '0 0 30px rgba(155, 92, 255, 0.4)' }}
           >
             {isNavigating ? (
@@ -1113,10 +1134,10 @@ export function LandingClient({
             <span className="text-white text-sm font-bold tracking-wide">REJOINS LA PARTIE</span>
           </div>
 
-          <h2 className="text-6xl lg:text-7xl font-black mb-6">
-            PRÊT À{' '}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-neon-purple via-neon-pink to-neon-purple">JOUER</span>
-            {' '}?
+          <h2 className="title-giant text-6xl lg:text-7xl mb-6">
+            <span className="text-white">Prêt à</span>{' '}
+            <span className="text-electric">jouer</span>
+            <span className="text-neon-pink"> ?</span>
           </h2>
 
           <p className="text-xl text-white/70 mb-6 max-w-2xl mx-auto">
@@ -1130,12 +1151,11 @@ export function LandingClient({
           </p>
 
           <div className="relative inline-block">
-            <div className="absolute inset-0 bg-neon-purple rounded-full blur-xl animate-pulse opacity-60" style={{ transform: 'scale(1.1)' }} />
+            <div className="absolute inset-0 bg-neon-purple rounded-full blur-xl animate-pulse opacity-50" style={{ transform: 'scale(1.05)' }} />
             <button
               onClick={(e) => handleCtaClick(e, '/lobby')}
               disabled={isNavigating}
-              className="relative gaming-btn-large inline-flex items-center gap-3 group disabled:opacity-80"
-              style={{ boxShadow: '0 0 40px rgba(155, 92, 255, 0.5), inset 0 0 20px rgba(255, 255, 255, 0.1)' }}
+              className="relative btn-arena px-12 py-5 text-lg inline-flex items-center gap-3 group disabled:opacity-80"
             >
               <span className="relative z-10 font-black tracking-wide">
                 {isNavigating ? (

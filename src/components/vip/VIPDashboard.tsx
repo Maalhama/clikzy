@@ -226,7 +226,7 @@ export function VIPDashboard({
       {/* Header Section */}
       <motion.section
         variants={itemVariants}
-        className="relative overflow-hidden rounded-2xl bg-bg-secondary/50 border border-white/10 p-6 md:p-8"
+        className="panel relative overflow-hidden p-6 md:p-8"
       >
         {/* Background glow */}
         <div className="absolute inset-0 pointer-events-none">

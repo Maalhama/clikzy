@@ -491,7 +491,7 @@ export const GameCard = memo(function GameCard({ game, index = 0, isFavorite = f
               <span
                 suppressHydrationWarning
                 className={`
-                  font-mono font-bold text-2xl tracking-tight
+                  stat-numeral text-2xl
                   ${
                     isWaiting
                       ? 'text-neon-purple'
@@ -620,7 +620,7 @@ export const GameCard = memo(function GameCard({ game, index = 0, isFavorite = f
         ) : (
           <div
             className={`
-              py-3 rounded-xl text-center font-bold text-sm transition-all flex items-center justify-center gap-2
+              py-3 rounded-xl text-center font-display font-semibold uppercase tracking-wider text-sm transition-all flex items-center justify-center gap-2
               ${
                 (game.item?.retail_value ?? 0) >= 1000
                   ? isUrgent

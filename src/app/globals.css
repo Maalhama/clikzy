@@ -1543,3 +1543,541 @@ body::after {
   }
 }
 
+/* ========================================================
+   REFONTE 2026 — « NÉON ARCADE PREMIUM »
+   Langage visuel unifié : panneaux chanfreinés edge-lit,
+   aurora de fond en couches, kickers display, reveals en
+   cascade. Les utilitaires historiques ci-dessus restent
+   valides ; tout le neuf vit dans ce bloc.
+   ======================================================== */
+
+/* ---- Atmosphère : aurora multi-couches (CSS pur, pas de JS) ---- */
+.arcade-atmosphere {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 80% 50% at 15% -10%, rgba(155, 92, 255, 0.13), transparent 60%),
+    radial-gradient(ellipse 60% 45% at 85% 0%, rgba(60, 203, 255, 0.08), transparent 55%),
+    radial-gradient(ellipse 70% 60% at 50% 110%, rgba(255, 79, 216, 0.07), transparent 60%);
+}
+
+.arcade-atmosphere::before {
+  /* Grille de salle d'arcade, fondue vers le bas */
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(155, 92, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(155, 92, 255, 0.05) 1px, transparent 1px);
+  background-size: 56px 56px;
+  -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,0.9), transparent 70%);
+  mask-image: linear-gradient(to bottom, rgba(0,0,0,0.9), transparent 70%);
+}
+
+/* ---- Panneau signature : surface + liseré dégradé chanfreiné ---- */
+.panel {
+  position: relative;
+  background:
+    linear-gradient(160deg, rgba(30, 41, 66, 0.55), rgba(20, 27, 45, 0.85)) padding-box;
+  border: 1px solid transparent;
+  border-radius: 1rem;
+}
+
+.panel::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(165deg,
+    rgba(155, 92, 255, 0.45),
+    rgba(255, 255, 255, 0.08) 30%,
+    rgba(255, 255, 255, 0.04) 60%,
+    rgba(60, 203, 255, 0.25));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+.panel-hover {
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.3s ease;
+}
+
+@media (hover: hover) {
+  .panel-hover:hover {
+    transform: translateY(-3px);
+    box-shadow:
+      0 18px 50px -18px rgba(155, 92, 255, 0.35),
+      0 0 0 1px rgba(155, 92, 255, 0.15);
+  }
+}
+
+/* Variante chanfreinée (coin bas-droit coupé) — le « cut » signature */
+.panel-cut {
+  border-radius: 1rem;
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 16px), calc(100% - 16px) 100%, 0 100%);
+}
+
+/* ---- Kicker : sur-titre display, signature des sections ---- */
+.kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.625rem;
+  font-family: var(--font-display);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--neon-purple);
+}
+
+.kicker::before {
+  content: '';
+  width: 1.75rem;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--neon-purple));
+}
+
+.kicker::after {
+  content: '';
+  width: 1.75rem;
+  height: 1px;
+  background: linear-gradient(90deg, var(--neon-purple), transparent);
+}
+
+/* ---- CTA arène : chanfrein + sheen balayé ---- */
+.btn-arena {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-family: var(--font-display);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #fff;
+  background: linear-gradient(135deg, #9B5CFF 0%, #7B3FDF 55%, #B14CE8 100%);
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%);
+  transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.25s ease, filter 0.25s ease;
+  overflow: hidden;
+}
+
+.btn-arena::after {
+  /* sheen */
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -60%;
+  width: 40%;
+  background: linear-gradient(105deg, transparent, rgba(255, 255, 255, 0.35), transparent);
+  transform: skewX(-20deg);
+  transition: left 0.5s ease;
+  pointer-events: none;
+}
+
+@media (hover: hover) {
+  .btn-arena:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.08);
+    box-shadow: 0 14px 40px -12px rgba(155, 92, 255, 0.65);
+  }
+  .btn-arena:hover::after {
+    left: 120%;
+  }
+}
+
+.btn-arena:active {
+  transform: translateY(0) scale(0.97);
+}
+
+.btn-arena:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* CTA fantôme assorti */
+.btn-arena-ghost {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-family: var(--font-display);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: rgba(255, 255, 255, 0.75);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%);
+  transition: all 0.25s ease;
+}
+
+@media (hover: hover) {
+  .btn-arena-ghost:hover {
+    color: #fff;
+    border-color: rgba(155, 92, 255, 0.6);
+    background: rgba(155, 92, 255, 0.08);
+    box-shadow: 0 0 24px rgba(155, 92, 255, 0.2);
+  }
+}
+
+/* ---- Reveals en cascade (entrée de page) ---- */
+@keyframes arcade-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.reveal {
+  opacity: 0;
+  animation: arcade-reveal 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.reveal-1 { animation-delay: 0.05s; }
+.reveal-2 { animation-delay: 0.15s; }
+.reveal-3 { animation-delay: 0.25s; }
+.reveal-4 { animation-delay: 0.35s; }
+.reveal-5 { animation-delay: 0.45s; }
+.reveal-6 { animation-delay: 0.55s; }
+
+/* Cascade automatique pour les grilles (enfants directs) */
+.reveal-stagger > * {
+  opacity: 0;
+  animation: arcade-reveal 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.reveal-stagger > *:nth-child(1) { animation-delay: 0.05s; }
+.reveal-stagger > *:nth-child(2) { animation-delay: 0.12s; }
+.reveal-stagger > *:nth-child(3) { animation-delay: 0.19s; }
+.reveal-stagger > *:nth-child(4) { animation-delay: 0.26s; }
+.reveal-stagger > *:nth-child(5) { animation-delay: 0.33s; }
+.reveal-stagger > *:nth-child(6) { animation-delay: 0.40s; }
+.reveal-stagger > *:nth-child(7) { animation-delay: 0.47s; }
+.reveal-stagger > *:nth-child(8) { animation-delay: 0.54s; }
+.reveal-stagger > *:nth-child(n+9) { animation-delay: 0.6s; }
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal,
+  .reveal-stagger > * {
+    opacity: 1 !important;
+    animation: none !important;
+  }
+}
+
+/* ---- Anneau holo (avatars, timers, raretés) ---- */
+@keyframes holo-spin {
+  to { transform: rotate(360deg); }
+}
+
+.holo-ring {
+  position: relative;
+}
+
+.holo-ring::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: inherit;
+  background: conic-gradient(from 0deg, #9B5CFF, #3CCBFF, #FF4FD8, #9B5CFF);
+  z-index: -1;
+  animation: holo-spin 4s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .holo-ring::before { animation: none; }
+}
+
+/* ---- Chiffres d'affichage (timers, compteurs, stats) ---- */
+.stat-numeral {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+/* ---- Pastille LIVE ---- */
+.live-dot {
+  position: relative;
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 9999px;
+  background: var(--success);
+  box-shadow: 0 0 8px var(--success);
+}
+
+.live-dot::after {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: inherit;
+  border: 1px solid var(--success);
+  opacity: 0.6;
+  animation: live-ping 1.6s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+@keyframes live-ping {
+  0% { transform: scale(0.6); opacity: 0.7; }
+  80%, 100% { transform: scale(1.8); opacity: 0; }
+}
+
+/* ---- Titre géant hero (Unbounded, échelle fluide) ---- */
+.title-giant {
+  font-family: var(--font-display);
+  font-weight: 800;
+  line-height: 0.92;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+}
+
+/* Mot fantôme : contour seul, sans background-clip (sûr en contexte transform) */
+.text-outline {
+  color: transparent;
+  -webkit-text-stroke: 1.5px rgba(237, 237, 237, 0.35);
+}
+
+.text-outline-purple {
+  color: transparent;
+  -webkit-text-stroke: 1.5px rgba(155, 92, 255, 0.7);
+}
+
+/* ---- Effet électrique (tube néon qui grésille) — pour « gagne » ---- */
+@keyframes elec-flicker {
+  0%, 100% {
+    opacity: 1;
+    text-shadow:
+      0 0 8px var(--neon-blue),
+      0 0 24px rgba(60, 203, 255, 0.65),
+      0 0 56px rgba(60, 203, 255, 0.35);
+  }
+  2% { opacity: 0.45; text-shadow: 0 0 4px rgba(60, 203, 255, 0.25); }
+  4% {
+    opacity: 1;
+    text-shadow:
+      0 0 10px var(--neon-blue),
+      0 0 30px rgba(60, 203, 255, 0.8),
+      0 0 70px rgba(60, 203, 255, 0.45);
+  }
+  7% { opacity: 0.65; text-shadow: 0 0 6px rgba(60, 203, 255, 0.35); }
+  8%, 48% {
+    opacity: 1;
+    text-shadow:
+      0 0 8px var(--neon-blue),
+      0 0 24px rgba(60, 203, 255, 0.65),
+      0 0 56px rgba(60, 203, 255, 0.35);
+  }
+  50% { opacity: 0.55; text-shadow: 0 0 4px rgba(60, 203, 255, 0.25); }
+  51% {
+    opacity: 1;
+    text-shadow:
+      0 0 12px var(--neon-blue),
+      0 0 34px rgba(60, 203, 255, 0.85),
+      0 0 80px rgba(60, 203, 255, 0.5);
+  }
+  53%, 96% {
+    opacity: 1;
+    text-shadow:
+      0 0 8px var(--neon-blue),
+      0 0 24px rgba(60, 203, 255, 0.65),
+      0 0 56px rgba(60, 203, 255, 0.35);
+  }
+  97% { opacity: 0.7; text-shadow: 0 0 6px rgba(60, 203, 255, 0.35); }
+}
+
+.text-electric {
+  color: var(--neon-blue);
+  animation: elec-flicker 4.2s linear infinite;
+}
+
+/* ---- Effet « pression de clic » — pour « clic » ---- */
+@keyframes word-click {
+  0%, 82%, 100% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+  86% {
+    transform: scale(0.93);
+    filter: brightness(1.45) drop-shadow(0 0 22px rgba(155, 92, 255, 0.9));
+  }
+  90% {
+    transform: scale(1.04);
+    filter: brightness(1.15) drop-shadow(0 0 14px rgba(155, 92, 255, 0.6));
+  }
+  94% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+}
+
+.text-click {
+  display: inline-block;
+  transform-origin: 50% 60%;
+  animation: word-click 3.6s cubic-bezier(0.34, 1.56, 0.64, 1) infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .text-electric,
+  .text-click {
+    animation: none;
+  }
+}
+
+/* ---- Carte hero « jeu en direct » ---- */
+.hero-live-card {
+  position: relative;
+  background:
+    linear-gradient(170deg, rgba(30, 41, 66, 0.7), rgba(11, 15, 26, 0.92)) padding-box;
+  border: 1px solid transparent;
+  border-radius: 1.5rem;
+}
+
+.hero-live-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1.5px;
+  background: linear-gradient(160deg, #9B5CFF, rgba(255, 79, 216, 0.65) 45%, rgba(60, 203, 255, 0.5));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+.hero-live-card::after {
+  /* halo de scène derrière la carte */
+  content: '';
+  position: absolute;
+  inset: -40px;
+  z-index: -1;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, rgba(155, 92, 255, 0.28), rgba(255, 79, 216, 0.12) 50%, transparent 75%);
+  filter: blur(30px);
+  pointer-events: none;
+}
+
+/* ---- Warp swap : matérialisation de la nouvelle partie dans la carte hero ---- */
+@keyframes card-warp-in {
+  0% {
+    opacity: 0;
+    transform: perspective(800px) rotateX(28deg) scale(0.82);
+    filter: blur(16px) saturate(3) hue-rotate(50deg);
+    clip-path: inset(46% 0 46% 0);
+  }
+  35% {
+    opacity: 1;
+    clip-path: inset(0 0 0 0);
+    transform: perspective(800px) rotateX(-5deg) scale(1.05);
+    filter: blur(3px) saturate(1.8) hue-rotate(15deg);
+  }
+  60% {
+    transform: perspective(800px) rotateX(2deg) scale(0.985);
+    filter: blur(0) saturate(1) hue-rotate(0deg);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+    filter: none;
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+@keyframes warp-scan {
+  0% { transform: translateY(-130%); opacity: 1; }
+  100% { transform: translateY(130%); opacity: 0; }
+}
+
+.warp-in {
+  position: relative;
+  animation: card-warp-in 0.85s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.warp-in::after {
+  content: '';
+  position: absolute;
+  inset: -8px;
+  pointer-events: none;
+  background: linear-gradient(180deg,
+    transparent 20%,
+    rgba(60, 203, 255, 0.4) 48%,
+    rgba(255, 255, 255, 0.55) 50%,
+    rgba(155, 92, 255, 0.4) 52%,
+    transparent 80%);
+  transform: translateY(-130%);
+  animation: warp-scan 0.65s ease-out 0.1s forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .warp-in { animation: none; }
+  .warp-in::after { display: none; }
+}
+
+@keyframes hero-card-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+.hero-live-card-float {
+  animation: hero-card-float 7s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-live-card-float { animation: none; }
+}
+
+/* Sol de scène sous le hero : grille en perspective (CSS pur, sûr) */
+.hero-stage-floor {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 38%;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(155, 92, 255, 0.18) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(155, 92, 255, 0.18) 1px, transparent 1px);
+  background-size: 48px 48px;
+  transform: perspective(420px) rotateX(58deg);
+  transform-origin: bottom center;
+  -webkit-mask-image: linear-gradient(to top, rgba(0,0,0,0.55), transparent 85%);
+  mask-image: linear-gradient(to top, rgba(0,0,0,0.55), transparent 85%);
+}
+
+/* ---- Barre de progression néon ---- */
+.meter-track {
+  position: relative;
+  height: 8px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.06);
+  overflow: hidden;
+}
+
+.meter-fill {
+  position: relative;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #9B5CFF, #FF4FD8);
+  box-shadow: 0 0 12px rgba(155, 92, 255, 0.5);
+  transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.meter-fill::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35), transparent);
+  background-size: 200% 100%;
+  animation: shine 2.5s ease-in-out infinite;
+}
+

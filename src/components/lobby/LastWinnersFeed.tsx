@@ -106,14 +106,14 @@ export const LastWinnersFeed = memo(function LastWinnersFeed({
   const emptySlots = Math.max(0, VISIBLE_SLOTS - visibleWinners.length)
 
   return (
-    <div className="rounded-2xl bg-bg-secondary/30 border border-white/10 overflow-hidden">
+    <div className="panel overflow-hidden">
       {/* Header */}
       <div className="px-4 py-3 border-b border-white/10 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <svg className="w-4 h-4 text-success" viewBox="0 0 24 24" fill="currentColor">
             <path d="M5 16L3 5l5.5 5L12 4l3.5 6L21 5l-2 11H5zm14 3c0 .6-.4 1-1 1H6c-.6 0-1-.4-1-1v-1h14v1z"/>
           </svg>
-          <span className="text-white font-bold text-sm">DERNIERS GAGNANTS</span>
+          <span className="text-white font-display font-semibold text-xs uppercase tracking-[0.18em]">Derniers gagnants</span>
         </div>
         <span className="text-white/40 text-xs">
           {winners.length > 0 ? `${winners.length} récent${winners.length > 1 ? 's' : ''}` : ''}

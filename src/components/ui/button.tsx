@@ -12,19 +12,19 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const variantStyles: Record<ButtonVariant, string> = {
   primary:
-    'bg-neon-purple [@media(hover:hover)]:hover:bg-neon-purple/90 text-white [@media(hover:hover)]:hover:shadow-neon-purple [@media(hover:hover)]:hover:scale-[1.02] active:scale-[0.98]',
+    'bg-gradient-to-br from-neon-purple via-[#7B3FDF] to-[#B14CE8] text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.2),0_8px_24px_-10px_rgba(155,92,255,0.6)] [@media(hover:hover)]:hover:brightness-110 [@media(hover:hover)]:hover:-translate-y-0.5 [@media(hover:hover)]:hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.25),0_14px_36px_-12px_rgba(155,92,255,0.75)] active:translate-y-0 active:scale-[0.98]',
   secondary:
-    'bg-neon-blue [@media(hover:hover)]:hover:bg-neon-blue/90 text-white [@media(hover:hover)]:hover:shadow-neon-blue [@media(hover:hover)]:hover:scale-[1.02] active:scale-[0.98]',
+    'bg-gradient-to-br from-neon-blue to-[#1E9FD4] text-bg-primary shadow-[inset_0_1px_0_rgba(255,255,255,0.3),0_8px_24px_-10px_rgba(60,203,255,0.6)] [@media(hover:hover)]:hover:brightness-110 [@media(hover:hover)]:hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98]',
   outline:
-    'border-2 border-neon-purple text-neon-purple [@media(hover:hover)]:hover:bg-neon-purple/10 [@media(hover:hover)]:hover:shadow-neon-purple/50',
+    'border border-neon-purple/60 text-neon-purple bg-neon-purple/[0.06] [@media(hover:hover)]:hover:bg-neon-purple/15 [@media(hover:hover)]:hover:border-neon-purple [@media(hover:hover)]:hover:shadow-[0_0_24px_rgba(155,92,255,0.25)]',
   ghost:
-    'text-text-secondary [@media(hover:hover)]:hover:text-text-primary [@media(hover:hover)]:hover:bg-bg-tertiary',
+    'text-text-secondary [@media(hover:hover)]:hover:text-text-primary [@media(hover:hover)]:hover:bg-white/[0.06]',
   danger:
-    'bg-danger [@media(hover:hover)]:hover:bg-danger/90 text-white [@media(hover:hover)]:hover:shadow-neon-danger [@media(hover:hover)]:hover:scale-[1.02] active:scale-[0.98]',
+    'bg-gradient-to-br from-danger to-[#D63447] text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.2),0_8px_24px_-10px_rgba(255,71,87,0.6)] [@media(hover:hover)]:hover:brightness-110 [@media(hover:hover)]:hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98]',
   neon:
-    'bg-gradient-to-r from-neon-purple to-neon-blue text-white [@media(hover:hover)]:hover:shadow-neon-purple [@media(hover:hover)]:hover:scale-[1.02] active:scale-[0.98]',
+    'bg-gradient-to-r from-neon-purple to-neon-blue text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.2),0_8px_24px_-10px_rgba(155,92,255,0.6)] [@media(hover:hover)]:hover:brightness-110 [@media(hover:hover)]:hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98]',
   'neon-pink':
-    'bg-gradient-to-r from-neon-purple to-neon-pink text-white [@media(hover:hover)]:hover:brightness-110 [@media(hover:hover)]:hover:scale-[1.02] active:scale-[0.98]',
+    'bg-gradient-to-r from-neon-purple to-neon-pink text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.2),0_8px_24px_-10px_rgba(255,79,216,0.5)] [@media(hover:hover)]:hover:brightness-110 [@media(hover:hover)]:hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98]',
 }
 
 const sizeStyles: Record<ButtonSize, string> = {

@@ -24,7 +24,7 @@ export function LobbyGamificationBar() {
 
   return (
     <div className="mx-auto mb-5 max-w-7xl px-4 md:px-6">
-      <div className="flex items-center gap-2.5 overflow-x-auto rounded-2xl border border-white/10 bg-bg-secondary/80 p-2.5 backdrop-blur-md scrollbar-hide">
+      <div className="flex items-center gap-2.5 overflow-x-auto panel p-2.5 backdrop-blur-md scrollbar-hide">
         {/* Niveau + XP */}
         <Link href="/profile" className="flex shrink-0 items-center gap-2.5 rounded-xl px-1.5 py-1 transition-colors hover:bg-white/5">
           <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-neon-purple to-cyan-500 text-sm font-black text-white shadow-[0_0_14px_rgba(155,92,255,0.4)]">
