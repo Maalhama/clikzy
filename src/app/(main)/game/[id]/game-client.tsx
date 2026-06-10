@@ -388,7 +388,7 @@ export function GameClient({
                       </svg>
                     )}
                   </div>
-                  {isWinner && <ShareWinButtons itemName={game.item.name} itemValue={game.item.retail_value ?? 0} />}
+                  {isWinner && <ShareWinButtons itemName={game.item.name} itemValue={game.item.retail_value ?? 0} username={username} />}
                 </div>
               ) : (
                 <div className={`p-4 rounded-xl mb-5 transition-all ${isUrgent ? 'bg-danger/20 border border-danger/30' : 'hero-live-card'}`}>
@@ -754,7 +754,7 @@ export function GameClient({
                       </svg>
                     )}
                   </div>
-                  {isWinner && <ShareWinButtons itemName={game.item.name} itemValue={game.item.retail_value ?? 0} />}
+                  {isWinner && <ShareWinButtons itemName={game.item.name} itemValue={game.item.retail_value ?? 0} username={username} />}
                 </div>
               ) : (
                 <div className={`p-5 rounded-2xl transition-all ${isUrgent ? 'bg-danger/20 border border-danger/40' : 'hero-live-card'}`}>

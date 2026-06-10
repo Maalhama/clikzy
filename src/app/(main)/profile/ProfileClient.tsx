@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import { updateUsername, uploadAvatar } from '@/actions/profile'
 import { CreditPacksModal } from '@/components/modals/CreditPacksModal'
+import { NotificationsCard } from '@/components/profile/NotificationsCard'
 import { GameHistorySection } from '@/components/profile/GameHistorySection'
 import { ReferralSection } from '@/components/profile/ReferralSection'
 import { BadgesSection } from '@/components/profile/BadgesSection'
@@ -348,6 +349,7 @@ export function ProfileClient({ profile, wins, gamesPlayed, totalValueWon, gameH
         >
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-bold text-white flex items-center gap-2">
+        <div className="mb-6"><NotificationsCard /></div>
               <GiftIcon className="w-5 h-5 text-neon-purple" />
               Mes victoires
             </h2>

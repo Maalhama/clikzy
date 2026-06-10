@@ -31,7 +31,7 @@ export function ProgressionCard({ compact = false }: Props) {
     setBusy('login')
     const res = await claimDailyLogin()
     if (res.success && res.data && !res.data.already) {
-      showFlash(`+${res.data.creditsGained} crédits · +${res.data.xpGained} XP · série ${res.data.streak} 🔥`)
+      showFlash(`+${res.data.creditsGained} crédits · +${res.data.xpGained} XP · série ${res.data.streak} j`)
     }
     await load()
     setBusy(null)

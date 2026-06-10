@@ -575,7 +575,7 @@ export default function Pachinko({
               }
             `}
           >
-            {isDropping ? '🔵 ...' : '🔵 Lancer'}
+            <span className="inline-flex items-center gap-2"><span className="h-2.5 w-2.5 rounded-full bg-[#3CCBFF] shadow-[0_0_8px_#3CCBFF]" />{isDropping ? '…' : 'Lancer'}</span>
           </motion.button>
         </div>
       </div>

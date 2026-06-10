@@ -28,13 +28,13 @@ export function LobbyGamificationBar({ initialProg = null, initialChests = 0 }: 
 
   return (
     <div className="mx-auto mb-5 max-w-7xl px-4 md:px-6">
-      <div className="flex w-full items-center gap-2.5 overflow-x-auto panel p-2.5 backdrop-blur-md scrollbar-hide">
+      <div className="panel flex w-full flex-col gap-2.5 p-3 backdrop-blur-md sm:flex-row sm:items-center sm:gap-2.5 sm:p-2.5">
         {/* Niveau + XP */}
-        <Link href="/profile" className="flex shrink-0 items-center gap-2.5 rounded-xl px-1.5 py-1 transition-colors hover:bg-white/5">
+        <Link href="/profile" className="flex w-full items-center gap-2.5 rounded-xl px-1.5 py-1 transition-colors hover:bg-white/5 sm:w-auto sm:shrink-0">
           <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-neon-purple to-cyan-500 text-sm font-black text-white shadow-[0_0_14px_rgba(155,92,255,0.4)]">
             {prog.level}
           </span>
-          <span className="block w-14 sm:w-24">
+          <span className="block min-w-0 flex-1 sm:flex-none sm:w-24">
             <span className="flex items-center gap-1 text-[10px] text-white/50"><Zap className="h-3 w-3 text-cyan-400" />{prog.xpIntoLevel}/{prog.xpForLevel}</span>
             <span className="mt-0.5 block h-1.5 w-full overflow-hidden rounded-full bg-white/10">
               <span className="block h-full rounded-full bg-gradient-to-r from-neon-purple to-cyan-400" style={{ width: `${pct}%` }} />
@@ -42,8 +42,9 @@ export function LobbyGamificationBar({ initialProg = null, initialChests = 0 }: 
           </span>
         </Link>
 
+        <div className="flex flex-wrap items-center gap-2 sm:contents">
         {/* Streak */}
-        <div className="flex shrink-0 items-center gap-1 rounded-full border border-orange-400/30 bg-orange-400/10 px-2.5 py-1.5">
+        <div className="flex items-center gap-1 rounded-full border border-orange-400/30 bg-orange-400/10 px-2.5 py-1.5">
           <Flame className="h-4 w-4 text-orange-400" />
           <span className="text-sm font-bold text-orange-300">{prog.streak}</span>
         </div>
@@ -72,6 +73,7 @@ export function LobbyGamificationBar({ initialProg = null, initialChests = 0 }: 
             {claimable} quête{claimable > 1 ? 's' : ''} <ChevronRight className="h-3.5 w-3.5" />
           </Link>
         )}
+      </div>
       </div>
     </div>
   )

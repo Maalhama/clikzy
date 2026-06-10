@@ -75,7 +75,7 @@ export function CaseOpeningModal({
 
   if (typeof window === 'undefined') return null
   return createPortal(
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/85 backdrop-blur-sm p-4">
+    <div className="fixed inset-0 max-sm:min-h-[100lvh] z-[100] flex items-center justify-center bg-black/85 backdrop-blur-sm p-4">
       {/* Flash plein écran à l'ouverture */}
       <AnimatePresence>
         {phase === 'revealed' && (
@@ -84,7 +84,7 @@ export function CaseOpeningModal({
             initial={{ opacity: 0.9 }}
             animate={{ opacity: 0 }}
             transition={{ duration: 0.8, ease: 'easeOut' }}
-            className="pointer-events-none fixed inset-0 z-[101]"
+            className="pointer-events-none fixed inset-0 max-sm:min-h-[100lvh] z-[101]"
             style={{ background: `radial-gradient(ellipse at center, ${burst}66, transparent 60%)` }}
           />
         )}

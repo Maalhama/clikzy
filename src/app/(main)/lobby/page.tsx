@@ -100,7 +100,8 @@ async function getLobbyData() {
     getRecentWinners(10)
   ])
 
-  const credits = creditsResult.success ? (creditsResult.data?.credits ?? 0) : 0
+  // Total affiché = quotidiens + earned (cohérent avec le header)
+  const credits = creditsResult.success ? (creditsResult.data?.totalCredits ?? 0) : 0
   const wasReset = creditsResult.success ? (creditsResult.data?.wasReset ?? false) : false
 
   // Combine all games

@@ -315,8 +315,8 @@ export function SlotsIcon({ className = '', animate = false }: IconProps) {
               animate={animate ? { y: [0, -3, 0, 3, 0] } : {}}
               transition={animate ? { duration: 0.3, repeat: Infinity, delay: i * 0.1 } : {}}
             >
-              <text x={x} y="56" textAnchor="middle" fontSize="16">
-                {['🍒', '💎', '7️⃣'][i]}
+              <text x={x} y="55" textAnchor="middle" fontSize="13" fontWeight="800" fill={['#FF4FD8', '#3CCBFF', '#FFD700'][i]}>
+                {['C', 'K', '7'][i]}
               </text>
             </motion.g>
           </g>

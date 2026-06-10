@@ -4,6 +4,7 @@ import React, { useState, useCallback, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Trophy, Zap, Sparkles } from 'lucide-react'
 import { SLOTS_SYMBOLS } from '@/types/miniGames'
+import { SlotGlyph } from './SlotGlyph'
 import { useMiniGameSounds } from '@/hooks/mini-games/useMiniGameSounds'
 
 interface SlotMachineProps {
@@ -103,16 +104,16 @@ function SpinningReel({
         }}
       >
         {/* Top symbol (blurred) */}
-        <span className="text-2xl sm:text-3xl opacity-30 blur-[1px] -mb-0.5">
-          {REEL_ITEMS[displaySymbols[0]]}
+        <span className="opacity-30 blur-[1px] -mb-0.5">
+          <SlotGlyph index={displaySymbols[0]} size={28} />
         </span>
         {/* Center symbol (main) */}
-        <span className="text-4xl sm:text-5xl drop-shadow-[0_0_8px_rgba(255,255,255,0.3)]">
-          {REEL_ITEMS[displaySymbols[1]]}
+        <span>
+          <SlotGlyph index={displaySymbols[1]} size={44} />
         </span>
         {/* Bottom symbol (blurred) */}
-        <span className="text-2xl sm:text-3xl opacity-30 blur-[1px] -mt-0.5">
-          {REEL_ITEMS[displaySymbols[2]]}
+        <span className="opacity-30 blur-[1px] -mt-0.5">
+          <SlotGlyph index={displaySymbols[2]} size={28} />
         </span>
       </motion.div>
 

@@ -50,7 +50,7 @@ export function LobbyChestsModal({ onClose }: { onClose: () => void }) {
   if (typeof window === 'undefined') return null
   return createPortal(
     <>
-      <div className="fixed inset-0 z-[90] flex items-center justify-center bg-black/85 p-4 backdrop-blur-sm">
+      <div className="fixed inset-0 max-sm:min-h-[100lvh] z-[90] flex items-center justify-center bg-black/85 p-4 backdrop-blur-sm">
         <motion.div
           initial={{ opacity: 0, y: 24, scale: 0.96 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}

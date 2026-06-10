@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient, SupabaseClient } from '@supabase/supabase-js'
 import { sendWinnerEmail } from '@/lib/email'
+import { sendPushToUser } from '@/lib/push'
 // M6 — générateur de pseudos partagé (plus de copie locale dupliquée ; aligné
 // avec la simulation visuelle frontend qui utilise déjà cette même source).
 import { generateDeterministicUsername } from '@/lib/bots/usernameGenerator'
@@ -363,6 +364,14 @@ async function endGame(
       // Gamification : +200 XP pour une victoire (progression, n'affecte pas les tirages)
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       await (supabase.rpc as any)('award_xp', { p_user_id: winnerId, p_amount: 200 })
+
+      // Notification push de victoire (non-bloquant)
+      sendPushToUser(winnerId, {
+        title: 'Victoire !',
+        body: `Tu as remporté ${itemName} (${itemValue}€) — bravo !`,
+        url: '/profile',
+        tag: 'win',
+      }).catch((err) => console.error('[CRON] Failed to send winner push:', err))
 
       // Envoyer l'email de victoire (non-bloquant)
       if (winnerEmail) {

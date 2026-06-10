@@ -32,7 +32,7 @@ export default function VIPSubscriptionModal({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          className="fixed inset-0 max-sm:min-h-[100lvh] z-50 flex items-center justify-center p-4"
         >
           {/* Backdrop */}
           <motion.div

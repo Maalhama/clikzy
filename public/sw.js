@@ -20,8 +20,8 @@ self.addEventListener('push', (event) => {
   let data = {
     title: 'CLIKZY',
     body: 'Nouvelle notification',
-    icon: '/logo.png',
-    badge: '/logo.png',
+    icon: '/icon',
+    badge: '/icon',
     tag: 'clikzy-notification',
     data: { url: '/lobby' }
   }
@@ -37,8 +37,8 @@ self.addEventListener('push', (event) => {
 
   const options = {
     body: data.body,
-    icon: data.icon || '/logo.png',
-    badge: data.badge || '/logo.png',
+    icon: data.icon || '/icon',
+    badge: data.badge || '/icon',
     tag: data.tag || 'clikzy-notification',
     vibrate: [200, 100, 200],
     requireInteraction: false,

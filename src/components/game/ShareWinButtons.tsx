@@ -8,10 +8,10 @@ import { Share2, Link2, Check, UserPlus } from 'lucide-react'
  * Partage de victoire + relais parrainage : le moment le plus chaud pour
  * l'acquisition. Web Share API si dispo, sinon X/WhatsApp + copie de lien.
  */
-export function ShareWinButtons({ itemName, itemValue }: { itemName: string; itemValue: number }) {
+export function ShareWinButtons({ itemName, itemValue, username }: { itemName: string; itemValue: number; username?: string }) {
   const [copied, setCopied] = useState(false)
 
-  const url = 'https://www.cleekzy.com'
+  const url = username ? `https://www.cleekzy.com/joueur/${encodeURIComponent(username)}` : 'https://www.cleekzy.com'
   const text = `Je viens de gagner ${itemName} (${itemValue.toLocaleString()}€) sur Cleekzy — le dernier clic gagne !`
 
   const nativeShare = async () => {

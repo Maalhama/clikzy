@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { Lock } from 'lucide-react'
 import type { Badge } from '@/actions/badges'
 
 interface BadgeWithStatus {
@@ -280,7 +281,7 @@ export function BadgesSection({ badges, stats }: BadgesSectionProps) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
+            className="fixed inset-0 max-sm:min-h-[100lvh] z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
             onClick={() => setSelectedBadge(null)}
           >
             <motion.div
@@ -333,7 +334,7 @@ export function BadgesSection({ badges, stats }: BadgesSectionProps) {
                       </div>
                     ) : (
                       <div className="text-center text-white/40 text-sm">
-                        🔒 Non débloqué
+                        <Lock className="mr-1.5 inline h-3.5 w-3.5 align-[-2px]" />Non débloqué
                       </div>
                     )}
 
