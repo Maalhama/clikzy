@@ -48,17 +48,19 @@ export interface MiniGameResult {
 }
 
 // Wheel segments configuration (8 segments, moyenne: 2.25 crédits)
-export const WHEEL_SEGMENTS = [0, 0, 1, 1, 2, 3, 3, 10] as const
+// Barèmes resserrés (2026-06) : espérance ~1,2-1,5 crédit < coût replay (3)
+// -> les crédits restent rares, les packs restent la vraie source.
+export const WHEEL_SEGMENTS = [0, 0, 0, 1, 1, 2, 2, 5] as const
 
 // Scratch card possible values weighted (10 valeurs, moyenne: 2.2 crédits)
-export const SCRATCH_VALUES = [0, 0, 1, 1, 1, 2, 2, 3, 3, 10] as const
+export const SCRATCH_VALUES = [0, 0, 0, 0, 1, 1, 1, 2, 2, 5] as const
 
 // Pachinko slots configuration (9 slots, moyenne: 2.0 crédits)
-export const PACHINKO_SLOTS = [0, 0, 1, 3, 10, 3, 1, 0, 0] as const
+export const PACHINKO_SLOTS = [0, 0, 1, 2, 5, 2, 1, 0, 0] as const
 
 // Slot machine symbols and payouts (moyenne: 2.1 crédits)
 export const SLOTS_SYMBOLS = ['🍒', '🍋', '🍊', '🍇', '💎', '7️⃣'] as const
-export const SLOTS_PAYOUTS = [0, 0, 1, 1, 2, 2, 3, 3, 5, 10] as const
+export const SLOTS_PAYOUTS = [0, 0, 0, 1, 1, 1, 2, 2, 3, 5] as const
 
 // Game info for display
 export interface MiniGameInfo {
@@ -73,43 +75,43 @@ export const MINI_GAMES_INFO: MiniGameInfo[] = [
   {
     type: 'wheel',
     name: 'Roue de la Fortune',
-    description: 'Faites tourner la roue et tentez de gagner jusqu\'à 10 crédits !',
+    description: 'Faites tourner la roue et tentez de gagner jusqu\'à 5 crédits !',
     icon: '🎡',
-    maxWin: 10,
+    maxWin: 5,
   },
   {
     type: 'scratch',
     name: 'Carte à Gratter',
     description: 'Grattez la carte pour révéler votre gain !',
     icon: '🎴',
-    maxWin: 10,
+    maxWin: 5,
   },
   {
     type: 'pachinko',
     name: 'Pachinko',
     description: 'Lancez la bille et regardez-la tomber vers votre récompense !',
     icon: '🎰',
-    maxWin: 10,
+    maxWin: 5,
   },
   {
     type: 'slots',
     name: 'Machine à Sous',
     description: 'Alignez les symboles et décrochez le jackpot !',
     icon: '🎰',
-    maxWin: 10,
+    maxWin: 5,
   },
   {
     type: 'coinflip',
     name: 'Pile ou Face',
     description: 'Lancez la pièce et tentez votre chance !',
     icon: '🪙',
-    maxWin: 10,
+    maxWin: 5,
   },
   {
     type: 'dice',
     name: 'Lancer de Dés',
     description: 'Lancez les dés et voyez ce que le destin vous réserve !',
     icon: '🎲',
-    maxWin: 10,
+    maxWin: 5,
   },
 ]

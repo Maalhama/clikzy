@@ -159,7 +159,7 @@ export async function playMiniGame(gameType: MiniGameType): Promise<ActionResult
       // 10% chance to win (heads), 90% chance to lose (tails)
       const isWin = Math.random() < 0.1
       coinResult = isWin ? 'heads' : 'tails'
-      creditsWon = isWin ? 10 : 0
+      creditsWon = isWin ? 5 : 0
       break
     }
     case 'dice': {
@@ -172,12 +172,12 @@ export async function playMiniGame(gameType: MiniGameType): Promise<ActionResult
       const diceSum = diceResults[0] + diceResults[1]
       // Map sum (2-12) to credits (2-10)
       // 2-3: 2, 4-5: 3, 6-7: 4, 8-9: 6, 10-11: 8, 12: 10
-      if (diceSum <= 3) creditsWon = 2
-      else if (diceSum <= 5) creditsWon = 3
-      else if (diceSum <= 7) creditsWon = 4
-      else if (diceSum <= 9) creditsWon = 6
-      else if (diceSum <= 11) creditsWon = 8
-      else creditsWon = 10 // Double 6!
+      if (diceSum <= 3) creditsWon = 0
+      else if (diceSum <= 5) creditsWon = 1
+      else if (diceSum <= 7) creditsWon = 1
+      else if (diceSum <= 9) creditsWon = 2
+      else if (diceSum <= 11) creditsWon = 3
+      else creditsWon = 5 // Double 6 !
       break
     }
     default:
@@ -337,7 +337,7 @@ export async function playMiniGamePaid(gameType: MiniGameType): Promise<ActionRe
       // 10% chance to win (heads), 90% chance to lose (tails)
       const isWin = Math.random() < 0.1
       coinResult = isWin ? 'heads' : 'tails'
-      creditsWon = isWin ? 10 : 0
+      creditsWon = isWin ? 5 : 0
       break
     }
     case 'dice': {
@@ -350,12 +350,12 @@ export async function playMiniGamePaid(gameType: MiniGameType): Promise<ActionRe
       const diceSumPaid = diceResults[0] + diceResults[1]
       // Map sum (2-12) to credits (2-10)
       // 2-3: 2, 4-5: 3, 6-7: 4, 8-9: 6, 10-11: 8, 12: 10
-      if (diceSumPaid <= 3) creditsWon = 2
-      else if (diceSumPaid <= 5) creditsWon = 3
-      else if (diceSumPaid <= 7) creditsWon = 4
-      else if (diceSumPaid <= 9) creditsWon = 6
-      else if (diceSumPaid <= 11) creditsWon = 8
-      else creditsWon = 10 // Double 6!
+      if (diceSumPaid <= 3) creditsWon = 0
+      else if (diceSumPaid <= 5) creditsWon = 1
+      else if (diceSumPaid <= 7) creditsWon = 1
+      else if (diceSumPaid <= 9) creditsWon = 2
+      else if (diceSumPaid <= 11) creditsWon = 3
+      else creditsWon = 5 // Double 6!
       break
     }
     default:

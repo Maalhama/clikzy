@@ -19,8 +19,16 @@ export type ChestDrop = {
   xp: number
   item: CatalogItem | null
 }
+export type DropHistoryRow = {
+  id: string
+  openedAt: string
+  rarity: string
+  credits: number | null
+  item: CatalogItem | null
+}
 export type Collection = {
   chests: ChestRow[]
+  history: DropHistoryRow[]
   inventory: InventoryItem[]
   equipment: Partial<Record<CatalogItem['slot'], InventoryItem>>
   bonuses: { xpPct: number; creditPct: number; dailyClicks: number; chestLuck: number }
@@ -41,11 +49,12 @@ export async function getCollection(): Promise<Res<Collection>> {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const sb = supabase as any
-  const [{ data: chests }, { data: inv }, { data: equip }, { data: prof }] = await Promise.all([
+  const [{ data: chests }, { data: inv }, { data: equip }, { data: prof }, { data: hist }] = await Promise.all([
     sb.from('user_chests').select('id, rarity, source').eq('user_id', user.id).eq('opened', false).order('created_at', { ascending: false }),
     sb.from('user_inventory').select('id, item:items_catalog(*)').eq('user_id', user.id).order('acquired_at', { ascending: false }),
     sb.from('user_equipment').select('slot, inventory_id, item:items_catalog(*)').eq('user_id', user.id),
     sb.from('profiles').select('equip_bonus_pct, equip_credit_bonus_pct, equip_daily_clicks, equip_chest_luck, chest_last_claim_day').eq('id', user.id).single(),
+    sb.from('user_chests').select('id, rarity, opened_at, dropped_credits, item:items_catalog(*)').eq('user_id', user.id).eq('opened', true).order('opened_at', { ascending: false }).limit(10),
   ])
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -61,6 +70,14 @@ export async function getCollection(): Promise<Res<Collection>> {
     data: {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       chests: ((chests as any[]) || []).map((c) => ({ id: c.id, rarity: c.rarity, source: c.source })),
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      history: ((hist as any[]) || []).map((h) => ({
+        id: h.id,
+        openedAt: h.opened_at,
+        rarity: h.rarity,
+        credits: h.dropped_credits ?? null,
+        item: h.item ? toItem(h.item) : null,
+      })),
       inventory,
       equipment,
       bonuses: {

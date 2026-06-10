@@ -5,6 +5,7 @@ import { createPortal } from 'react-dom'
 import { X, Coins, Zap } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { openChest, type ChestDrop } from '@/actions/collection'
+import { useSounds } from '@/hooks/useSounds'
 import { RARITY, bonusLabel, type Rarity } from './rarity'
 import { NeonChest } from './NeonChest'
 import { ItemIcon } from './ItemIcon'
@@ -44,6 +45,7 @@ export function CaseOpeningModal({
   const [drop, setDrop] = useState<ChestDrop | null>(null)
   const [unlocked, setUnlocked] = useState(false)
   const startedRef = useRef(false)
+  const { playClick, playWin } = useSounds(true)
 
   const cr = CHEST_RARITY[chestRarity] ?? 'common'
   const burst = BURST[cr]
@@ -62,11 +64,12 @@ export function CaseOpeningModal({
   useEffect(() => {
     if (phase !== 'opening' || !drop || !unlocked) return
     const t = setTimeout(() => {
+      playWin()
       onReward(drop)
       setPhase('revealed')
     }, 650)
     return () => clearTimeout(t)
-  }, [phase, drop, unlocked, onReward])
+  }, [phase, drop, unlocked, onReward, playWin])
 
   const lidOpen = phase === 'revealed' || (phase === 'opening' && drop !== null && unlocked)
 
@@ -239,7 +242,7 @@ export function CaseOpeningModal({
                     }}
                     exit={{ opacity: 0 }}
                     transition={{ duration: 1.4, times: [0, 0.38, 0.48, 0.58, 1], ease: [0.22, 1, 0.36, 1] }}
-                    onAnimationComplete={() => setUnlocked(true)}
+                    onAnimationComplete={() => { playClick(); setUnlocked(true) }}
                     style={{ left: 90, top: 62, transformOrigin: '0px 0px' }}
                   >
                     {/* tip de la clé = (0,0) du conteneur = trou de serrure */}

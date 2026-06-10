@@ -91,7 +91,7 @@ const GAME_CONFIG = {
     id: 'wheel' as MiniGameType,
     title: 'Roue de la Fortune',
     IconComponent: WheelIcon,
-    description: 'Faites tourner la roue et tentez de gagner jusqu\'à 10 crédits !',
+    description: 'Faites tourner la roue et tentez de gagner jusqu\'à 5 crédits !',
     color: 'var(--neon-purple)',
     glowClass: 'neon-glow',
     textClass: 'neon-text',

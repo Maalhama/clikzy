@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState, useCallback } from 'react'
-import { Loader2, Gift, Sparkles, Zap, Coins, MousePointerClick, Clover } from 'lucide-react'
+import { Loader2, Gift, Sparkles, Zap, Coins, MousePointerClick, Clover, History } from 'lucide-react'
 import { getCollection, equipItem, unequipSlot, claimDailyChest, type Collection, type ChestDrop } from '@/actions/collection'
 import { RARITY, SLOT_LABEL, SLOT_EMOJI, bonusLabel, type Rarity } from './rarity'
 import { CaseOpeningModal } from './CaseOpeningModal'
@@ -196,6 +196,44 @@ export function CollectionClient() {
           </div>
         )}
       </section>
+
+
+      {/* Derniers drops */}
+      {data.history.length > 0 && (
+        <section className="panel p-5">
+          <div className="mb-4 flex items-center gap-2">
+            <History className="h-5 w-5 text-neon-blue" />
+            <h2 className="text-lg font-display font-semibold text-white">Derniers drops</h2>
+          </div>
+          <ul className="divide-y divide-white/5">
+            {data.history.map((h) => {
+              const r = CHEST_LABEL[h.rarity] ?? 'common'
+              return (
+                <li key={h.id} className="flex items-center gap-3 py-2.5">
+                  <span className="shrink-0">
+                    {h.item ? (
+                      <ItemIcon itemId={h.item.id} slot={h.item.slot} rarity={h.item.rarity} size={26} />
+                    ) : h.credits != null && h.credits > 0 ? (
+                      <Coins className="h-6 w-6 text-yellow-300" />
+                    ) : (
+                      <Zap className="h-6 w-6 text-cyan-300" />
+                    )}
+                  </span>
+                  <span className="min-w-0 flex-1 truncate text-sm text-white/80">
+                    {h.item ? h.item.name : h.credits != null && h.credits > 0 ? `+${h.credits} crédit${h.credits > 1 ? 's' : ''}` : 'Bonus XP'}
+                  </span>
+                  <span className={`shrink-0 text-[10px] font-bold uppercase tracking-wider ${RARITY[r].text}`}>
+                    Coffre {RARITY[r].label}
+                  </span>
+                  <span className="shrink-0 text-xs text-white/35">
+                    {new Date(h.openedAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })}
+                  </span>
+                </li>
+              )
+            })}
+          </ul>
+        </section>
+      )}
 
       {opening && (
         <CaseOpeningModal
