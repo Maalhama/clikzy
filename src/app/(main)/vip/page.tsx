@@ -66,6 +66,7 @@ const VIP_TIERS = [
   {
     name: 'Bronze',
     icon: BronzeMedalIcon,
+    hex: '#CD7F32',
     duration: 'Dès le 1er mois',
     color: 'from-amber-600 to-amber-800',
     borderColor: 'border-amber-500/30',
@@ -81,6 +82,7 @@ const VIP_TIERS = [
   {
     name: 'Silver',
     icon: SilverMedalIcon,
+    hex: '#C0C8D8',
     duration: 'Après 3 mois',
     color: 'from-slate-300 to-slate-500',
     borderColor: 'border-slate-400/30',
@@ -96,6 +98,7 @@ const VIP_TIERS = [
   {
     name: 'Gold',
     icon: GoldMedalIcon,
+    hex: '#FFD700',
     duration: 'Après 6 mois',
     color: 'from-yellow-400 to-amber-500',
     borderColor: 'border-yellow-500/30',
@@ -362,7 +365,10 @@ export default function VIPPage() {
                 >
                   {/* Tier header */}
                   <div className="flex items-center gap-3 mb-4">
-                    <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${tier.color} flex items-center justify-center`}>
+                    <div
+                      className="flex h-14 w-14 items-center justify-center rounded-full border-2 bg-bg-primary"
+                      style={{ borderColor: tier.hex, boxShadow: `0 0 18px -2px ${tier.hex}` }}
+                    >
                       <tier.icon />
                     </div>
                     <div>

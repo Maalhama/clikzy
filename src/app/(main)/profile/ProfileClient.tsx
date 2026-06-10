@@ -56,43 +56,6 @@ interface ProfileClientProps {
 }
 
 // Calculate player level based on stats
-function getPlayerLevel(wins: number, clicks: number, gamesPlayed: number): { level: number; title: string; progress: number; nextLevel: number } {
-  const xp = wins * 1000 + clicks + gamesPlayed * 10
-
-  const levels = [
-    { level: 1, title: 'Débutant', xp: 0 },
-    { level: 2, title: 'Apprenti', xp: 100 },
-    { level: 3, title: 'Joueur', xp: 500 },
-    { level: 4, title: 'Compétiteur', xp: 1500 },
-    { level: 5, title: 'Expert', xp: 3000 },
-    { level: 6, title: 'Maître', xp: 6000 },
-    { level: 7, title: 'Champion', xp: 10000 },
-    { level: 8, title: 'Légende', xp: 20000 },
-    { level: 9, title: 'Élite', xp: 50000 },
-    { level: 10, title: 'Mythique', xp: 100000 },
-  ]
-
-  let currentLevel = levels[0]
-  let nextLevelXp = levels[1].xp
-
-  for (let i = levels.length - 1; i >= 0; i--) {
-    if (xp >= levels[i].xp) {
-      currentLevel = levels[i]
-      nextLevelXp = levels[i + 1]?.xp || levels[i].xp * 2
-      break
-    }
-  }
-
-  const progress = Math.min(((xp - currentLevel.xp) / (nextLevelXp - currentLevel.xp)) * 100, 100)
-
-  return {
-    level: currentLevel.level,
-    title: currentLevel.title,
-    progress,
-    nextLevel: nextLevelXp - xp
-  }
-}
-
 export function ProfileClient({ profile, wins, gamesPlayed, totalValueWon, gameHistory, historyStats, referralStats, badges, badgeStats }: ProfileClientProps) {
   const [isEditingUsername, setIsEditingUsername] = useState(false)
   const [newUsername, setNewUsername] = useState(profile.username || '')
@@ -105,7 +68,15 @@ export function ProfileClient({ profile, wins, gamesPlayed, totalValueWon, gameH
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
   const [showCreditModal, setShowCreditModal] = useState(false)
 
-  const playerLevel = getPlayerLevel(wins.length, profile.total_clicks || 0, gamesPlayed)
+  // Courbe XP serveur (xp_to_level) : niveau L atteint à 50·L·(L-1), 100·L XP par palier
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const xpTotal = Number((profile as any).xp ?? 0)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const level = Number((profile as any).level ?? 1) || 1
+  const xpIntoLevel = Math.max(0, xpTotal - 50 * level * (level - 1))
+  const xpForLevel = 100 * level
+  const levelProgress = Math.min(100, Math.round((xpIntoLevel / xpForLevel) * 100))
+  const levelTitle = level >= 20 ? 'Légende' : level >= 10 ? 'Expert' : level >= 5 ? 'Confirmé' : 'Débutant'
   const winRate = gamesPlayed > 0 ? ((wins.length / gamesPlayed) * 100).toFixed(1) : '0'
 
   async function handleSaveUsername() {
@@ -219,7 +190,7 @@ export function ProfileClient({ profile, wins, gamesPlayed, totalValueWon, gameH
 
                 {/* Level badge */}
                 <div className="absolute -bottom-1 -right-1 px-2 py-0.5 rounded-md bg-neon-purple text-white text-xs font-bold">
-                  {playerLevel.level}
+                  {level}
                 </div>
 
                 {avatarError && (
@@ -290,10 +261,10 @@ export function ProfileClient({ profile, wins, gamesPlayed, totalValueWon, gameH
                 {/* Level & title */}
                 <div className="flex items-center gap-2 mb-2">
                   <span className="px-2 py-0.5 rounded bg-neon-purple/20 text-neon-purple text-xs font-medium">
-                    {playerLevel.title}
+                    {levelTitle}
                   </span>
                   <span className="text-white/40 text-xs">
-                    {playerLevel.nextLevel.toLocaleString()} XP → Niv. {playerLevel.level + 1}
+                    {xpIntoLevel}/{xpForLevel} XP → Niv. {level + 1}
                   </span>
                 </div>
 
@@ -301,7 +272,7 @@ export function ProfileClient({ profile, wins, gamesPlayed, totalValueWon, gameH
                 <div className="h-1.5 rounded-full bg-white/10 overflow-hidden">
                   <motion.div
                     initial={{ width: 0 }}
-                    animate={{ width: `${playerLevel.progress}%` }}
+                    animate={{ width: `${levelProgress}%` }}
                     transition={{ duration: 0.8, delay: 0.2 }}
                     className="h-full rounded-full bg-gradient-to-r from-neon-purple to-neon-pink"
                   />

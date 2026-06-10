@@ -136,6 +136,9 @@ export function ProgressionCard({ compact = false }: Props) {
                     <div className="min-w-0">
                       <p className="truncate text-sm font-semibold text-white">{q.title}</p>
                       <p className="truncate text-xs text-white/50">{q.description}</p>
+                      <p className="mt-0.5 text-[10px] font-semibold text-cyan-300/80">
+                        +{q.xpReward} XP{q.creditsReward > 0 ? ` · +${q.creditsReward} crédit${q.creditsReward > 1 ? 's' : ''}` : ''}
+                      </p>
                     </div>
                     {q.claimed ? (
                       <span className="flex shrink-0 items-center gap-1 text-xs font-semibold text-green-400"><Check className="h-3.5 w-3.5" /> Fait</span>

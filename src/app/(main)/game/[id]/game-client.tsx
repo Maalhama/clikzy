@@ -265,6 +265,7 @@ export function GameClient({
           >
             {/* Product image section */}
             <div className={`relative aspect-[4/3] bg-gradient-to-br from-bg-tertiary to-bg-secondary overflow-hidden ${game.status === 'ended' ? 'grayscale-[30%]' : ''}`}>
+              <div className="hero-stage-floor opacity-70" aria-hidden="true" />
               {/* Back to lobby button - top left */}
               <Link
                 href="/lobby"
@@ -388,7 +389,7 @@ export function GameClient({
                   </div>
                 </div>
               ) : (
-                <div className={`p-4 rounded-xl mb-5 transition-all ${isUrgent ? 'bg-danger/20 border border-danger/30' : 'bg-bg-tertiary/50 border border-white/5'}`}>
+                <div className={`p-4 rounded-xl mb-5 transition-all ${isUrgent ? 'bg-danger/20 border border-danger/30' : 'hero-live-card'}`}>
                   <div className="flex items-center justify-between mb-3">
                     <span className="text-xs text-white/50 uppercase tracking-wider flex items-center gap-2">
                       <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -475,7 +476,7 @@ export function GameClient({
               {game.status !== 'ended' && !hasCredits && (
                 <button
                   onClick={() => setShowCreditModal(true)}
-                  className="w-full py-4 rounded-xl font-display font-semibold uppercase tracking-wide text-base transition-all flex items-center justify-center gap-2 bg-gradient-to-r from-neon-purple to-neon-pink text-white shadow-[0_0_25px_rgba(155,92,255,0.4)] hover:shadow-[0_0_35px_rgba(155,92,255,0.6)] active:scale-[0.98]"
+                  className="w-full py-4 [clip-path:polygon(0_0,100%_0,100%_calc(100%-10px),calc(100%-10px)_100%,0_100%)] font-display font-semibold uppercase tracking-wide text-base transition-all flex items-center justify-center gap-2 bg-gradient-to-r from-neon-purple to-neon-pink text-white drop-shadow-[0_0_12px_rgba(155,92,255,0.45)] hover:drop-shadow-[0_0_18px_rgba(155,92,255,0.65)] active:scale-[0.98]"
                 >
                   <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -488,16 +489,16 @@ export function GameClient({
                   onClick={handleClick}
                   disabled={!canClick || isPending}
                   className={`
-                    w-full py-4 rounded-xl font-display font-semibold uppercase tracking-wide text-base transition-all flex items-center justify-center gap-2
+                    w-full py-4 [clip-path:polygon(0_0,100%_0,100%_calc(100%-10px),calc(100%-10px)_100%,0_100%)] font-display font-semibold uppercase tracking-wide text-base transition-all flex items-center justify-center gap-2
                     ${!canClick
                       ? 'bg-bg-secondary/50 text-white/30 cursor-not-allowed'
                       : (game.item?.retail_value ?? 0) >= 1000
                       ? isUrgent
-                        ? `bg-gradient-to-r from-[#FFB800] via-[#FF8C00] to-[#FFD700] text-[#0B0F1A] shadow-[0_0_30px_rgba(255,184,0,0.5)] active:scale-[0.98] animate-pulse ${clickAnimation ? 'scale-95' : ''}`
-                        : `bg-gradient-to-r from-[#FFB800] via-[#FFD700] to-[#FF8C00] text-[#0B0F1A] shadow-[0_0_25px_rgba(255,184,0,0.4)] hover:shadow-[0_0_35px_rgba(255,184,0,0.6)] active:scale-[0.98] ${clickAnimation ? 'scale-95' : ''}`
+                        ? `bg-gradient-to-r from-[#FFB800] via-[#FF8C00] to-[#FFD700] text-[#0B0F1A] drop-shadow-[0_0_14px_rgba(255,184,0,0.55)] active:scale-[0.98] animate-pulse ${clickAnimation ? 'scale-95' : ''}`
+                        : `bg-gradient-to-r from-[#FFB800] via-[#FFD700] to-[#FF8C00] text-[#0B0F1A] drop-shadow-[0_0_12px_rgba(255,184,0,0.5)] hover:drop-shadow-[0_0_18px_rgba(255,184,0,0.7)] active:scale-[0.98] ${clickAnimation ? 'scale-95' : ''}`
                       : isUrgent
-                      ? `bg-danger text-white shadow-[0_0_30px_rgba(255,68,68,0.4)] hover:shadow-[0_0_40px_rgba(255,68,68,0.6)] active:scale-[0.98] ${clickAnimation ? 'scale-95' : ''}`
-                      : `bg-gradient-to-r from-neon-purple to-neon-pink text-white shadow-[0_0_25px_rgba(155,92,255,0.4)] hover:shadow-[0_0_35px_rgba(155,92,255,0.6)] active:scale-[0.98] ${clickAnimation ? 'scale-95' : ''}`
+                      ? `bg-danger text-white drop-shadow-[0_0_14px_rgba(255,71,87,0.5)] hover:drop-shadow-[0_0_20px_rgba(255,71,87,0.7)] active:scale-[0.98] ${clickAnimation ? 'scale-95' : ''}`
+                      : `bg-gradient-to-r from-neon-purple to-neon-pink text-white drop-shadow-[0_0_12px_rgba(155,92,255,0.45)] hover:drop-shadow-[0_0_18px_rgba(155,92,255,0.65)] active:scale-[0.98] ${clickAnimation ? 'scale-95' : ''}`
                     }
                   `}
                 >
@@ -631,6 +632,7 @@ export function GameClient({
               style={borderStyle}
             >
               <div className={`relative aspect-[4/3] bg-gradient-to-br from-bg-tertiary to-bg-secondary overflow-hidden ${game.status === 'ended' ? 'grayscale-[30%]' : ''}`}>
+              <div className="hero-stage-floor opacity-70" aria-hidden="true" />
                 {/* Back to lobby button - top left */}
                 <Link
                   href="/lobby"
@@ -721,6 +723,10 @@ export function GameClient({
 
             {/* RIGHT COLUMN - Action Panel */}
             <div className="space-y-4">
+              <div className="flex items-center gap-2.5">
+                <span className="live-dot" aria-hidden="true" />
+                <span className="kicker !text-[0.6rem]">Arène en direct</span>
+              </div>
               {/* Timer Card */}
               {game.status === 'ended' ? (
                 <div className="p-5 rounded-2xl bg-gradient-to-br from-success/10 via-emerald-500/5 to-success/10 border border-success/30">
@@ -748,7 +754,7 @@ export function GameClient({
                   </div>
                 </div>
               ) : (
-                <div className={`p-5 rounded-2xl transition-all ${isUrgent ? 'bg-danger/20 border border-danger/40' : 'bg-bg-tertiary/50 border border-white/10'}`}>
+                <div className={`p-5 rounded-2xl transition-all ${isUrgent ? 'bg-danger/20 border border-danger/40' : 'hero-live-card'}`}>
                   <div className="flex items-center justify-between mb-3">
                     <span className="text-xs text-white/50 uppercase tracking-wider flex items-center gap-2">
                       <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -838,7 +844,7 @@ export function GameClient({
               {game.status !== 'ended' && !hasCredits && (
                 <button
                   onClick={() => setShowCreditModal(true)}
-                  className="w-full py-4 rounded-xl font-display font-semibold uppercase tracking-wide text-base transition-all flex items-center justify-center gap-2 bg-gradient-to-r from-neon-purple to-neon-pink text-white shadow-[0_0_25px_rgba(155,92,255,0.4)] hover:shadow-[0_0_35px_rgba(155,92,255,0.6)] hover:scale-[1.01] active:scale-[0.98]"
+                  className="w-full py-4 [clip-path:polygon(0_0,100%_0,100%_calc(100%-10px),calc(100%-10px)_100%,0_100%)] font-display font-semibold uppercase tracking-wide text-base transition-all flex items-center justify-center gap-2 bg-gradient-to-r from-neon-purple to-neon-pink text-white drop-shadow-[0_0_12px_rgba(155,92,255,0.45)] hover:drop-shadow-[0_0_18px_rgba(155,92,255,0.65)] hover:scale-[1.01] active:scale-[0.98]"
                 >
                   <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -851,16 +857,16 @@ export function GameClient({
                   onClick={handleClick}
                   disabled={!canClick || isPending}
                   className={`
-                    w-full py-4 rounded-xl font-display font-semibold uppercase tracking-wide text-base transition-all flex items-center justify-center gap-2
+                    w-full py-4 [clip-path:polygon(0_0,100%_0,100%_calc(100%-10px),calc(100%-10px)_100%,0_100%)] font-display font-semibold uppercase tracking-wide text-base transition-all flex items-center justify-center gap-2
                     ${!canClick
                       ? 'bg-bg-secondary/50 text-white/30 cursor-not-allowed'
                       : (game.item?.retail_value ?? 0) >= 1000
                       ? isUrgent
-                        ? `bg-gradient-to-r from-[#FFB800] via-[#FF8C00] to-[#FFD700] text-[#0B0F1A] shadow-[0_0_30px_rgba(255,184,0,0.5)] hover:scale-[1.01] active:scale-[0.98] animate-pulse ${clickAnimation ? 'scale-95' : ''}`
-                        : `bg-gradient-to-r from-[#FFB800] via-[#FFD700] to-[#FF8C00] text-[#0B0F1A] shadow-[0_0_25px_rgba(255,184,0,0.4)] hover:shadow-[0_0_35px_rgba(255,184,0,0.6)] hover:scale-[1.01] active:scale-[0.98] ${clickAnimation ? 'scale-95' : ''}`
+                        ? `bg-gradient-to-r from-[#FFB800] via-[#FF8C00] to-[#FFD700] text-[#0B0F1A] drop-shadow-[0_0_14px_rgba(255,184,0,0.55)] hover:scale-[1.01] active:scale-[0.98] animate-pulse ${clickAnimation ? 'scale-95' : ''}`
+                        : `bg-gradient-to-r from-[#FFB800] via-[#FFD700] to-[#FF8C00] text-[#0B0F1A] drop-shadow-[0_0_12px_rgba(255,184,0,0.5)] hover:drop-shadow-[0_0_18px_rgba(255,184,0,0.7)] hover:scale-[1.01] active:scale-[0.98] ${clickAnimation ? 'scale-95' : ''}`
                       : isUrgent
-                      ? `bg-danger text-white shadow-[0_0_30px_rgba(255,68,68,0.4)] hover:shadow-[0_0_40px_rgba(255,68,68,0.6)] hover:scale-[1.01] active:scale-[0.98] ${clickAnimation ? 'scale-95' : ''}`
-                      : `bg-gradient-to-r from-neon-purple to-neon-pink text-white shadow-[0_0_25px_rgba(155,92,255,0.4)] hover:shadow-[0_0_35px_rgba(155,92,255,0.6)] hover:scale-[1.01] active:scale-[0.98] ${clickAnimation ? 'scale-95' : ''}`
+                      ? `bg-danger text-white drop-shadow-[0_0_14px_rgba(255,71,87,0.5)] hover:drop-shadow-[0_0_20px_rgba(255,71,87,0.7)] hover:scale-[1.01] active:scale-[0.98] ${clickAnimation ? 'scale-95' : ''}`
+                      : `bg-gradient-to-r from-neon-purple to-neon-pink text-white drop-shadow-[0_0_12px_rgba(155,92,255,0.45)] hover:drop-shadow-[0_0_18px_rgba(155,92,255,0.65)] hover:scale-[1.01] active:scale-[0.98] ${clickAnimation ? 'scale-95' : ''}`
                     }
                   `}
                 >

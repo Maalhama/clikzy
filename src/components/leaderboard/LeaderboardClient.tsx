@@ -80,6 +80,37 @@ function LeaderboardBody({ loading, rows, me, period }: { loading: boolean; rows
             Personne n&apos;a encore marqué d&apos;XP sur cette période. Joue, accomplis tes quêtes et reviens !
           </p>
         ) : (
+        <>
+        {/* Mini-podium top 3 (2e — 1er — 3e) */}
+        {rows.length >= 3 && (
+          <div className="flex items-end justify-center gap-5 px-4 pb-2 pt-5">
+            {[1, 0, 2].map((idx) => {
+              const r = rows[idx]
+              if (!r) return null
+              const hex = MEDAL_HEX[idx]
+              const first = idx === 0
+              return (
+                <div key={r.userId} className="flex w-24 flex-col items-center">
+                  <div
+                    className={`flex items-center justify-center rounded-full bg-gradient-to-br from-neon-purple to-neon-pink font-display font-bold text-white ${first ? 'h-12 w-12 text-lg' : 'h-9 w-9 text-sm'}`}
+                    style={{ boxShadow: `0 0 0 2px ${hex}66, 0 0 16px -2px ${hex}` }}
+                  >
+                    {r.username?.[0]?.toUpperCase() ?? '?'}
+                  </div>
+                  <p className="mt-1.5 w-full truncate text-center text-xs font-semibold text-white">{r.username}</p>
+                  <p className="stat-numeral text-[11px] text-neon-purple">{r.xp.toLocaleString('fr-FR')} XP</p>
+                  <div
+                    className={`mt-1.5 flex w-full items-center justify-center rounded-t-lg border border-b-0 ${first ? 'h-12' : idx === 1 ? 'h-8' : 'h-6'}`}
+                    style={{ borderColor: `${hex}55`, background: `linear-gradient(180deg, ${hex}26, transparent)` }}
+                  >
+                    <span className="stat-numeral text-sm" style={{ color: hex }}>{idx + 1}</span>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        )}
+
         <ul className="divide-y divide-white/5">
           {rows.map((r) => (
             <li key={r.userId} className={`flex items-center gap-3 px-4 py-2.5 ${r.rank <= 3 ? 'bg-white/[0.03]' : ''}`}>
@@ -108,6 +139,7 @@ function LeaderboardBody({ loading, rows, me, period }: { loading: boolean; rows
             </li>
           ))}
         </ul>
+        </>
         )}
       </div>
     </div>
