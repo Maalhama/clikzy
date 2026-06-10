@@ -129,7 +129,7 @@ function WinnerCard({ winner }: { winner: Winner }) {
   const isRecent = timeLabel === 'À l\'instant' || timeLabel.includes('min')
 
   return (
-    <div className="panel w-[220px] sm:w-[280px] min-h-[150px] sm:min-h-[180px] p-3 sm:p-5">
+    <div className="panel panel-hover w-[220px] sm:w-[280px] min-h-[150px] sm:min-h-[180px] p-3 sm:p-5">
       {/* Time badge */}
       <div className="inline-flex items-center gap-1.5 px-2 py-1 rounded-full bg-white/5 border border-white/10 mb-2 sm:mb-3 text-[10px] sm:text-xs">
         {isRecent && <span className="w-1.5 h-1.5 rounded-full bg-success animate-pulse" />}
@@ -1052,8 +1052,7 @@ export function LandingClient({
           <div className="mt-10 text-center">
             <Link
               href="/lobby"
-              className="inline-flex items-center gap-2 px-6 py-3 text-sm font-semibold text-success border border-success/30 rounded-full hover:bg-success/10 hover:border-success/50 transition-all duration-300"
-              style={{ boxShadow: '0 0 20px rgba(0, 255, 136, 0.1)' }}
+              className="btn-arena-ghost px-8 py-3 text-sm !text-success hover:!border-success/60"
             >
               Voir tous les gagnants
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>

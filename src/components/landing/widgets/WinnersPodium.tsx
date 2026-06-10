@@ -27,7 +27,18 @@ export function WinnersPodium({ winners }: WinnersPodiumProps) {
   if (top3.length < 3) return null
 
   return (
-    <div className="mb-14 flex items-end justify-center gap-4 lg:gap-8" aria-label="Podium des plus grosses victoires">
+    <div className="relative mb-14" aria-label="Podium des plus grosses victoires">
+      {/* Projecteur derrière la première place */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute left-1/2 top-[-10%] h-[120%] w-[420px] -translate-x-1/2"
+        style={{
+          background: 'radial-gradient(ellipse 50% 60% at 50% 35%, rgba(255,215,0,0.14), transparent 70%)',
+          filter: 'blur(6px)',
+        }}
+      />
+
+      <div className="relative flex items-end justify-center gap-4 lg:gap-8">
       {PODIUM.map(({ rank, height, color, label }) => {
         const w = top3[rank - 1]
         const first = rank === 1
@@ -85,6 +96,14 @@ export function WinnersPodium({ winners }: WinnersPodiumProps) {
           </div>
         )
       })}
+      </div>
+
+      {/* Ligne de scène sous le podium */}
+      <div
+        aria-hidden="true"
+        className="mx-auto h-[2px] w-[min(680px,90%)] bg-gradient-to-r from-transparent via-yellow-400/70 to-transparent"
+        style={{ boxShadow: '0 0 18px rgba(255,215,0,0.45)' }}
+      />
     </div>
   )
 }
