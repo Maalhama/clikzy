@@ -359,12 +359,7 @@ export function LandingClient({
           {/* Logo */}
           <Logo size="md" animated={true} href="/" />
 
-          <nav className="flex-1 flex items-center justify-center gap-7" aria-label="Sections">
-            <a href="#how-it-works-desktop" className="text-sm font-medium text-white/55 hover:text-white transition-colors">Comment ça marche</a>
-            <a href="#lots-desktop" className="text-sm font-medium text-white/55 hover:text-white transition-colors">Lots</a>
-            <a href="#gagnants" className="text-sm font-medium text-white/55 hover:text-white transition-colors">Gagnants</a>
-            <a href="#faq-desktop" className="text-sm font-medium text-white/55 hover:text-white transition-colors">FAQ</a>
-          </nav>
+          <div className="flex-1" />
 
           {/* Right section */}
           <div className="flex items-center gap-4">

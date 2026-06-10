@@ -43,8 +43,9 @@ export function LiveTickerBar({ winners }: LiveTickerBarProps) {
   return (
     <div className="relative border-y border-white/[0.07] bg-bg-secondary/40 py-2.5 overflow-hidden" aria-label="Dernières victoires">
       {/* Étiquette LIVE fixe à gauche */}
-      <div className="absolute left-0 top-0 bottom-0 z-10 flex items-center gap-2 bg-bg-primary pl-4 pr-5 md:pl-6"
-        style={{ boxShadow: '24px 0 24px -12px rgba(11,15,26,1)' }}
+      <div
+        className="absolute left-0 top-0 bottom-0 z-10 flex items-center gap-2 pl-4 pr-5 md:pl-6"
+        style={{ backgroundColor: '#0F1422', boxShadow: '24px 0 24px -12px rgba(15,20,34,1)' }}
       >
         <span className="live-dot" aria-hidden="true" />
         <span className="font-display text-[0.6rem] font-semibold uppercase tracking-[0.3em] text-success">Live</span>
