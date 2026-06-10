@@ -3,24 +3,57 @@
 import { useEffect, useState } from 'react'
 import Image from 'next/image'
 import { Trophy } from 'lucide-react'
-import { getLeaderboard, getMyRank, type LeaderboardEntry } from '@/actions/leaderboard'
+import { getLeaderboard, getMyRank, type LeaderboardEntry, type LeaderboardPeriod } from '@/actions/leaderboard'
 
 const MEDAL = ['🥇', '🥈', '🥉']
+const PERIODS: Array<{ key: LeaderboardPeriod; label: string }> = [
+  { key: 'day', label: 'Jour' },
+  { key: 'week', label: 'Semaine' },
+  { key: 'month', label: 'Mois' },
+  { key: 'all', label: 'All-time' },
+]
 
 export function LeaderboardClient() {
+  const [period, setPeriod] = useState<LeaderboardPeriod>('week')
   const [rows, setRows] = useState<LeaderboardEntry[]>([])
   const [me, setMe] = useState<{ rank: number; total: number } | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    (async () => {
-      const [lb, rk] = await Promise.all([getLeaderboard(50), getMyRank()])
-      if (lb.success && lb.data) setRows(lb.data)
-      if (rk.success && rk.data) setMe(rk.data)
+    let active = true
+    setLoading(true)
+    ;(async () => {
+      const [lb, rk] = await Promise.all([getLeaderboard(period, 50), getMyRank(period)])
+      if (!active) return
+      setRows(lb.success && lb.data ? lb.data : [])
+      setMe(rk.success && rk.data ? rk.data : null)
       setLoading(false)
     })()
-  }, [])
+    return () => { active = false }
+  }, [period])
 
+  return (
+    <div className="space-y-4">
+      {/* Onglets de période */}
+      <div className="flex gap-1.5 overflow-x-auto rounded-xl border border-white/10 bg-bg-secondary/60 p-1 scrollbar-hide">
+        {PERIODS.map((p) => (
+          <button
+            key={p.key}
+            onClick={() => setPeriod(p.key)}
+            className={`flex-1 whitespace-nowrap rounded-lg px-3 py-1.5 text-sm font-semibold transition-colors ${
+              period === p.key ? 'bg-gradient-to-r from-neon-purple to-cyan-500 text-white' : 'text-white/50 hover:text-white'
+            }`}
+          >
+            {p.label}
+          </button>
+        ))}
+      </div>
+      <LeaderboardBody loading={loading} rows={rows} me={me} period={period} />
+    </div>
+  )
+}
+
+function LeaderboardBody({ loading, rows, me, period }: { loading: boolean; rows: LeaderboardEntry[]; me: { rank: number; total: number } | null; period: LeaderboardPeriod }) {
   if (loading) return <div className="h-72 animate-pulse rounded-2xl border border-white/10 bg-bg-secondary/50" />
 
   return (
@@ -38,8 +71,15 @@ export function LeaderboardClient() {
         <div className="flex items-center gap-2 border-b border-white/10 px-4 py-3">
           <Trophy className="h-5 w-5 text-yellow-400" />
           <h2 className="font-black text-white">Top joueurs</h2>
-          <span className="ml-auto text-xs text-white/40">par XP</span>
+          <span className="ml-auto text-xs text-white/40">
+            {period === 'all' ? 'all-time' : period === 'day' ? "aujourd'hui" : period === 'week' ? 'cette semaine' : 'ce mois'}
+          </span>
         </div>
+        {rows.length === 0 ? (
+          <p className="px-4 py-10 text-center text-sm text-white/40">
+            Personne n&apos;a encore marqué d&apos;XP sur cette période. Joue, accomplis tes quêtes et reviens 🔥
+          </p>
+        ) : (
         <ul className="divide-y divide-white/5">
           {rows.map((r) => (
             <li key={r.userId} className={`flex items-center gap-3 px-4 py-2.5 ${r.rank <= 3 ? 'bg-white/[0.03]' : ''}`}>
@@ -61,6 +101,7 @@ export function LeaderboardClient() {
             </li>
           ))}
         </ul>
+        )}
       </div>
     </div>
   )

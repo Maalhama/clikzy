@@ -12,10 +12,12 @@ export type LeaderboardEntry = {
   totalWins: number
 }
 
-export async function getLeaderboard(limit = 50): Promise<{ success: boolean; data?: LeaderboardEntry[]; error?: string }> {
+export type LeaderboardPeriod = 'all' | 'day' | 'week' | 'month'
+
+export async function getLeaderboard(period: LeaderboardPeriod = 'all', limit = 50): Promise<{ success: boolean; data?: LeaderboardEntry[]; error?: string }> {
   const supabase = await createClient()
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data, error } = await (supabase.rpc as any)('get_leaderboard', { p_limit: limit })
+  const { data, error } = await (supabase.rpc as any)('get_leaderboard', { p_period: period, p_limit: limit })
   if (error) return { success: false, error: 'Erreur classement' }
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const rows = ((data as any[]) || []).map((r) => ({
@@ -30,12 +32,12 @@ export async function getLeaderboard(limit = 50): Promise<{ success: boolean; da
   return { success: true, data: rows }
 }
 
-export async function getMyRank(): Promise<{ success: boolean; data?: { rank: number; total: number }; error?: string }> {
+export async function getMyRank(period: LeaderboardPeriod = 'all'): Promise<{ success: boolean; data?: { rank: number; total: number }; error?: string }> {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { success: false, error: 'Non authentifié' }
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data, error } = await (supabase.rpc as any)('get_my_rank')
+  const { data, error } = await (supabase.rpc as any)('get_my_rank', { p_period: period })
   if (error) return { success: false, error: 'Erreur rang' }
   const row = Array.isArray(data) ? data[0] : data
   if (!row) return { success: true, data: { rank: 0, total: 0 } }

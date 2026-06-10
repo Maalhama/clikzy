@@ -788,6 +788,35 @@ export type Database = {
           },
         ]
       }
+      xp_events: {
+        Row: {
+          amount: number
+          created_at: string
+          id: number
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          id?: number
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          id?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "xp_events_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -889,7 +918,7 @@ export type Database = {
         }[]
       }
       get_leaderboard: {
-        Args: { p_limit?: number }
+        Args: { p_limit?: number; p_period?: string }
         Returns: {
           avatar_url: string
           level: number
@@ -901,7 +930,7 @@ export type Database = {
         }[]
       }
       get_my_rank: {
-        Args: never
+        Args: { p_period?: string }
         Returns: {
           my_rank: number
           total_players: number
