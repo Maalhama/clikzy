@@ -756,14 +756,14 @@ export function LandingClient({
           <div className="relative pb-2">
             {/* Ligne circuit diagonale qui suit la cascade */}
             <div
-              className="absolute left-[4%] right-[4%] top-[72px] h-[2px] origin-left rotate-[3.2deg]"
+              className="absolute left-[4%] right-[4%] top-[72px] h-[2px] origin-left rotate-[3.2deg] -z-10"
               aria-hidden="true"
             >
               <div className="absolute inset-0 bg-white/10" />
               <div className="absolute inset-0 bg-gradient-to-r from-neon-purple via-neon-blue via-success to-neon-pink animate-gradient-x opacity-80" />
             </div>
 
-            <div className="grid grid-cols-4 gap-6 items-start auto-rows-min">
+            <div className="relative z-10 grid grid-cols-4 gap-6 items-start auto-rows-min">
               {[
                 { num: '01', title: 'Choisis', desc: 'Parcours les lots : smartphones, consoles, accessoires... Choisis celui qui te fait envie.', Icon: TargetIcon, hex: '#9B5CFF' },
                 { num: '02', title: 'Clique', desc: 'Chaque clic utilise 1 crédit. Tu reçois 10 crédits gratuits chaque jour, sans aucun paiement.', Icon: CursorClickIcon, hex: '#3CCBFF' },
