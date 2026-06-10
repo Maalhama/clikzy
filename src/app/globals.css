@@ -1202,6 +1202,8 @@ body::after {
   display: flex;
   width: max-content;
   animation: scroll-left 40s linear infinite;
+  /* marge verticale : laisse la place au lift des cartes au hover (panel-hover) */
+  padding: 14px 0;
 }
 
 .winners-marquee-track:hover {
