@@ -236,9 +236,10 @@ export function Guarantees({ className = '' }: GuaranteesProps) {
 
           {/* Delivery Proofs + Trustpilot */}
           <div>
-            <h3 className="title-giant text-2xl lg:text-3xl mb-6">
+            <h3 className="title-giant text-2xl lg:text-3xl mb-2">
               <span className="text-white">Preuves de</span> <span className="text-success neon-text-success">livraison</span>
             </h3>
+            <p className="mb-8 text-sm text-white/50">Des photos réelles envoyées par les gagnants à la réception de leur lot.</p>
             <div className="grid grid-cols-5 gap-4">
               {/* Delivery Proofs */}
               {DELIVERY_PROOFS.map((proof, index) => (
@@ -247,6 +248,7 @@ export function Guarantees({ className = '' }: GuaranteesProps) {
                   className={`
                     group relative rounded-2xl overflow-hidden bg-bg-secondary/50 border border-white/10 panel-hover
                     hover:border-success/50 transition-all duration-500
+                    ${['-rotate-2', 'rotate-1', '-rotate-1', 'rotate-2'][index % 4]}
                     ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}
                   `}
                   style={{ transitionDelay: `${(index + 4) * 100}ms` }}
