@@ -1852,6 +1852,17 @@ body::after {
   -webkit-text-stroke: 1.5px rgba(155, 92, 255, 0.7);
 }
 
+/* ---- Filigrane dégradé fondu : mots géants en fond de section ----
+   Couleur passée via --wm-color (opacité incluse), dissolution vers le bas.
+   Éléments statiques sans ancêtre en transform 3D → background-clip:text sûr. */
+.watermark-fade {
+  background-image: linear-gradient(180deg, var(--wm-color, rgba(237, 237, 237, 0.12)) 0%, transparent 80%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
 /* ---- Effet électrique (tube néon qui grésille) — pour « gagne » ---- */
 @keyframes elec-flicker {
   0%, 100% {
