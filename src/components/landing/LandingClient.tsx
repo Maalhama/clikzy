@@ -851,10 +851,7 @@ export function LandingClient({
           {/* Header compact */}
           <div className="flex items-center justify-between mb-4">
             <div>
-              <div className="inline-flex items-center gap-1.5 px-2 py-1 bg-neon-pink/10 border border-neon-pink/30 rounded-full text-neon-pink text-[10px] font-medium mb-2">
-                <GiftIcon className="w-3 h-3" />
-                Premium
-              </div>
+              <span className="kicker !text-[0.55rem] mb-2">Lots premium</span>
               <h2 className="title-giant text-xl">
                 <span className="text-white">Lots</span> <span className="text-neon-pink neon-text-pink">à gagner</span>
               </h2>
@@ -885,19 +882,14 @@ export function LandingClient({
 
         <div className="relative max-w-7xl mx-auto px-6">
           <div className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-neon-pink/10 border border-neon-pink/30 rounded-full text-neon-pink text-sm font-medium mb-4">
-              <GiftIcon className="w-5 h-5" />
-              Premium
-            </div>
+            <span className="kicker mb-4">Lots premium</span>
             <h2 className="title-giant text-5xl lg:text-6xl mb-4">
               <span className="text-white">Lots</span> <span className="text-neon-pink neon-text-pink">à remporter</span>
             </h2>
             <p className="text-white/60 text-lg">Produits premium quotidiens</p>
             <div className="mx-auto mt-6 h-[2px] w-24 bg-gradient-to-r from-transparent via-neon-pink to-transparent" />
           </div>
-          {heroGames.length >= 2 ? (
-            <PrizesBento games={heroGames} />
-          ) : prizes && prizes.length > 0 ? <PrizeCarousel prizes={prizes} /> : <PrizeCarousel />}
+          <PrizesBento games={heroGames} />
         </div>
       </section>
 
@@ -924,13 +916,7 @@ export function LandingClient({
           {/* Header compact */}
           <div className="flex items-center justify-between mb-4">
             <div>
-              <div className="inline-flex items-center gap-1.5 px-2 py-1 bg-success/10 border border-success/30 rounded-full text-success text-[10px] font-medium mb-2">
-                <span className="relative flex h-1.5 w-1.5">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-success opacity-75" />
-                  <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-success" />
-                </span>
-                Live
-              </div>
+              <span className="kicker !text-[0.55rem] mb-2" style={{ color: '#00FF88' }}>En direct</span>
               <h2 className="title-giant text-xl">
                 <span className="text-white">Derniers</span> <span className="text-success neon-text-success">gagnants</span>
               </h2>
@@ -993,13 +979,7 @@ export function LandingClient({
         <div className="relative max-w-7xl mx-auto px-6">
           <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6 mb-12">
             <div>
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-success/10 border border-success/30 rounded-full text-success text-sm font-medium mb-4">
-                <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-success opacity-75" />
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-success" />
-                </span>
-                Live
-              </div>
+              <span className="kicker mb-4" style={{ color: '#00FF88' }}>En direct</span>
               <h2 className="title-giant text-5xl lg:text-6xl">
                 <span className="text-white">Derniers</span> <span className="text-success neon-text-success">gagnants</span>
               </h2>
@@ -1104,10 +1084,7 @@ export function LandingClient({
 
         <div className="relative text-center final-cta-content">
           {/* Badge */}
-          <div className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-neon-purple/20 border border-neon-purple/40 rounded-full mb-4">
-            <GiftIcon className="w-4 h-4 text-neon-pink" />
-            <span className="text-white text-xs font-bold">REJOINS LA PARTIE</span>
-          </div>
+          <span className="kicker !text-[0.55rem] mb-4">Rejoins la partie</span>
 
           <h2 className="title-giant text-3xl mb-3">
             <span className="text-white">Prêt à</span>{' '}
@@ -1179,13 +1156,7 @@ export function LandingClient({
         </div>
 
         <div className="relative max-w-4xl mx-auto px-6 text-center final-cta-content">
-          <div
-            className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-neon-purple/20 to-neon-pink/20 border border-neon-purple/40 rounded-full mb-8 animate-pulse"
-            style={{ boxShadow: '0 0 25px rgba(155, 92, 255, 0.3)' }}
-          >
-            <GiftIcon className="w-5 h-5 text-neon-pink" />
-            <span className="text-white text-sm font-bold tracking-wide">REJOINS LA PARTIE</span>
-          </div>
+          <span className="kicker mb-8">Rejoins la partie</span>
 
           <h2 className="title-giant text-6xl lg:text-7xl mb-6">
             <span className="text-white">Prêt à</span>{' '}

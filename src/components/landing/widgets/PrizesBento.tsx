@@ -12,6 +12,33 @@ interface PrizesBentoProps {
   games: HeroLiveGame[]
 }
 
+// Lots de démonstration pour compléter le bento quand il manque des parties
+// réelles (vraies images du catalogue, lien vers /lobby).
+const BENTO_DEMO_POOL = [
+  { name: 'iPhone 17 Pro', image: '/products/iphone-17-pro-neon.png', value: 1479 },
+  { name: 'PlayStation 5 Pro', image: '/products/playstation-5-pro-neon.png', value: 799 },
+  { name: 'MacBook Pro 16 M5 Max', image: '/products/macbook-pro-16-m5-max-neon.png', value: 4499 },
+  { name: 'AirPods Pro 3', image: '/products/airpods-pro-3-neon.png', value: 299 },
+  { name: 'PlayStation 5 Pro', image: '/products/playstation-5-pro-neon.png', value: 799 },
+]
+
+function makeBentoDemo(seed: number): HeroLiveGame {
+  const item = BENTO_DEMO_POOL[seed % BENTO_DEMO_POOL.length]
+  const durationMs = (180 + Math.floor(Math.random() * 600)) * 1000
+  return {
+    id: `bento-demo-${seed}`,
+    item_name: item.name,
+    item_image_url: item.image,
+    item_value: item.value,
+    end_time: Date.now() + durationMs,
+    total_clicks: 8 + (seed % 50),
+    last_click_username: null,
+    status: 'active',
+  }
+}
+
+const BENTO_SIZE = 5 // 1 vedette + 4 tuiles
+
 function TileImage({ name, url, sizes, className }: { name: string; url: string; sizes: string; className?: string }) {
   const { primary, fallback } = useMemo(() => getProductImageWithFallback(name, url), [name, url])
   const [err, setErr] = useState(false)
@@ -41,16 +68,39 @@ export function PrizesBento({ games }: PrizesBentoProps) {
     return () => clearInterval(interval)
   }, [])
 
+  const [mounted, setMounted] = useState(false)
+  const [demos, setDemos] = useState<HeroLiveGame[]>([])
+  useEffect(() => setMounted(true), [])
+
   const live = useMemo(
     () => games.filter((g) => g.status !== 'ended' && g.status !== 'waiting' && g.end_time > now),
     [games, now]
   )
 
-  if (live.length < 2) return null
+  // Complète avec des lots démo (client uniquement) ; remplace ceux expirés
+  useEffect(() => {
+    if (!mounted) return
+    setDemos((prev) => {
+      const alive = prev.filter((d) => d.end_time > now)
+      const missing = Math.max(0, BENTO_SIZE - live.length - alive.length)
+      if (missing === 0 && alive.length === prev.length) return prev
+      const next = [...alive]
+      for (let i = 0; i < missing; i++) {
+        next.push(makeBentoDemo(now % 1000 + prev.length + i))
+      }
+      return next
+    })
+  }, [mounted, live.length, now])
+
+  const all = useMemo(() => [...live, ...demos].slice(0, BENTO_SIZE), [live, demos])
+
+  if (all.length < 2) return null
 
   // Vedette = la plus grosse valeur encore en jeu ; le reste trié par fin imminente
-  const featured = [...live].sort((a, b) => b.item_value - a.item_value)[0]
-  const rest = live.filter((g) => g.id !== featured.id).slice(0, 4)
+  const featured = [...all].sort((a, b) => b.item_value - a.item_value)[0]
+  const rest = all.filter((g) => g.id !== featured.id).slice(0, 4)
+
+  const isDemoGame = (g: HeroLiveGame) => g.id.startsWith('bento-demo-')
 
   const featuredLeft = calculateTimeLeft(featured.end_time)
   const featuredUrgent = featuredLeft <= 90000
@@ -61,7 +111,7 @@ export function PrizesBento({ games }: PrizesBentoProps) {
     <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 auto-rows-fr">
       {/* Tuile vedette */}
       <Link
-        href={`/game/${featured.id}`}
+        href={isDemoGame(featured) ? '/lobby' : `/game/${featured.id}`}
         className="hero-live-card group relative lg:col-span-2 lg:row-span-2 p-7 flex flex-col overflow-hidden"
       >
         <div className="flex items-center justify-between mb-2">
@@ -125,7 +175,7 @@ export function PrizesBento({ games }: PrizesBentoProps) {
         return (
           <Link
             key={g.id}
-            href={`/game/${g.id}`}
+            href={isDemoGame(g) ? '/lobby' : `/game/${g.id}`}
             className="panel panel-hover group relative lg:col-span-1 p-4 flex items-center gap-4 overflow-hidden"
             style={premium ? { boxShadow: '0 0 40px -16px rgba(255,184,0,0.45)' } : undefined}
           >
