@@ -134,7 +134,7 @@ export function Testimonials({
             <div className="absolute inset-0 bg-neon-pink/30 blur-lg rounded-full animate-pulse" />
             <FireIcon className="w-7 h-7 text-neon-pink relative z-10" />
           </div>
-          <h3 className="text-xl font-black uppercase tracking-wider">ILS L'ONT FAIT</h3>
+          <h3 className="font-display font-semibold text-lg uppercase tracking-[0.15em]">Ils l'ont fait</h3>
         </div>
       </div>
 

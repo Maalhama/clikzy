@@ -253,7 +253,7 @@ export function Leaderboard({
               <CrownIcon className="w-7 h-7 text-yellow-400 relative z-10" />
             </div>
             <div>
-              <h3 className="text-xl font-black uppercase tracking-wider">{title}</h3>
+              <h3 className="font-display font-semibold text-lg uppercase tracking-[0.15em]">{title}</h3>
               <p className="text-xs text-white/50">{getPeriodLabel()}</p>
             </div>
           </div>

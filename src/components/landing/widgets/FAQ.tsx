@@ -121,8 +121,8 @@ export function FAQ({ className = '' }: FAQProps) {
           </svg>
           FAQ
         </div>
-        <h2 className="text-2xl md:text-4xl font-black mb-2 md:mb-3">
-          QUESTIONS <span className="text-neon-purple">FRÉQUENTES</span>
+        <h2 className="title-giant text-2xl md:text-4xl mb-2 md:mb-3">
+          <span className="text-white">Questions</span> <span className="text-neon-purple neon-text">fréquentes</span>
         </h2>
         <p className="text-white/60 text-sm md:text-base max-w-xl mx-auto">
           Tout ce que tu dois savoir avant de jouer

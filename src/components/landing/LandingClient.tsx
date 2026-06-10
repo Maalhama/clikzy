@@ -754,37 +754,58 @@ export function LandingClient({
             </p>
           </div>
 
-          <div className="relative">
-            {/* Progress line */}
-            <div className="absolute top-16 left-[12.5%] right-[12.5%] h-[2px]">
+          <div className="relative pb-24">
+            {/* Ligne circuit diagonale qui suit la cascade */}
+            <div
+              className="absolute left-[4%] right-[4%] top-[72px] h-[2px] origin-left rotate-[3.2deg]"
+              aria-hidden="true"
+            >
               <div className="absolute inset-0 bg-white/10" />
-              <div className="absolute inset-0 bg-gradient-to-r from-neon-purple via-neon-blue via-success to-neon-pink animate-gradient-x" />
+              <div className="absolute inset-0 bg-gradient-to-r from-neon-purple via-neon-blue via-success to-neon-pink animate-gradient-x opacity-80" />
             </div>
 
-            <div className="grid grid-cols-4 gap-8">
+            <div className="grid grid-cols-4 gap-6 items-start">
               {[
-                { num: '1', title: 'CHOISIS', desc: 'Parcours les lots disponibles : smartphones, consoles, accessoires... Choisis celui qui te fait envie.', Icon: TargetIcon, hex: '#9B5CFF' },
-                { num: '2', title: 'CLIQUE', desc: 'Chaque clic utilise 1 crédit. Tu reçois 10 crédits gratuits chaque jour, sans aucun paiement.', Icon: CursorClickIcon, hex: '#3CCBFF' },
-                { num: '3', title: 'LE TIMER', desc: 'Quand le timer passe sous 1min30, chaque clic le relance à 1min30. Le jeu continue tant que la communauté joue.', Icon: TrophyIcon, hex: '#00FF88' },
-                { num: '4', title: 'GAGNE', desc: 'Quand le timer atteint zéro, le dernier joueur à avoir cliqué remporte le lot. Simple.', Icon: GiftIcon, hex: '#FF4FD8' },
+                { num: '01', title: 'Choisis', desc: 'Parcours les lots disponibles : smartphones, consoles, accessoires... Choisis celui qui te fait envie.', Icon: TargetIcon, hex: '#9B5CFF' },
+                { num: '02', title: 'Clique', desc: 'Chaque clic utilise 1 crédit. Tu reçois 10 crédits gratuits chaque jour, sans aucun paiement.', Icon: CursorClickIcon, hex: '#3CCBFF' },
+                { num: '03', title: 'Le timer', desc: 'Quand le timer passe sous 1min30, chaque clic le relance à 1min30. Le jeu continue tant que la communauté joue.', Icon: TrophyIcon, hex: '#00FF88' },
+                { num: '04', title: 'Gagne', desc: 'Quand le timer atteint zéro, le dernier joueur à avoir cliqué remporte le lot. Simple.', Icon: GiftIcon, hex: '#FF4FD8' },
               ].map((step, i) => (
-                <div key={i} className="step-card group relative">
-                  <div className="relative z-10 flex justify-center mb-6">
-                    <div
-                      className="w-12 h-12 rounded-full flex items-center justify-center font-black text-xl text-white border-2"
-                      style={{ backgroundColor: `${step.hex}20`, borderColor: step.hex }}
+                <div key={i} className="step-card group relative" style={{ marginTop: `${i * 30}px` }}>
+                  <div
+                    className="relative p-6 rounded-2xl bg-bg-secondary/60 backdrop-blur-sm border h-full panel-hover overflow-hidden"
+                    style={{
+                      borderColor: `${step.hex}35`,
+                      boxShadow: `0 0 50px -22px ${step.hex}`,
+                    }}
+                  >
+                    {/* Numéro fantôme géant teinté */}
+                    <span
+                      aria-hidden="true"
+                      className="pointer-events-none select-none absolute -right-4 -top-8 title-giant text-[7.5rem] leading-none opacity-30"
+                      style={{ color: 'transparent', WebkitTextStroke: `1.5px ${step.hex}` }}
                     >
                       {step.num}
-                    </div>
-                  </div>
+                    </span>
 
-                  <div className="relative p-6 rounded-2xl bg-bg-secondary/50 border h-full panel-hover overflow-hidden" style={{ borderColor: `${step.hex}30` }}>
-                    <span aria-hidden="true" className="pointer-events-none select-none absolute -right-3 -top-7 title-giant text-[7rem] text-outline opacity-25">{step.num}</span>
-                    <div className="mb-4">
-                      <step.Icon className="w-12 h-12" style={{ color: step.hex }} />
+                    {/* Icône dans une puce teintée */}
+                    <div
+                      className="mb-5 inline-flex h-14 w-14 items-center justify-center rounded-xl border"
+                      style={{ backgroundColor: `${step.hex}1A`, borderColor: `${step.hex}55`, boxShadow: `0 0 24px -6px ${step.hex}` }}
+                    >
+                      <step.Icon className="w-7 h-7" style={{ color: step.hex }} />
                     </div>
-                    <h3 className="text-xl font-black mb-2" style={{ color: step.hex }}>{step.title}</h3>
+
+                    <h3 className="font-display font-semibold text-xl mb-2 uppercase tracking-wide" style={{ color: step.hex }}>{step.title}</h3>
                     <p className="text-white/60 text-sm leading-relaxed">{step.desc}</p>
+
+                    {/* Footer mono : position dans le circuit */}
+                    <div className="mt-5 flex items-center justify-between border-t border-white/5 pt-3">
+                      <span className="stat-numeral text-xs text-white/30">{step.num} / 04</span>
+                      <svg className="h-4 w-4 transition-transform group-hover:translate-x-1" style={{ color: `${step.hex}99` }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                      </svg>
+                    </div>
                   </div>
                 </div>
               ))}
@@ -843,6 +864,7 @@ export function LandingClient({
       {/* === DESKTOP PRIZES === */}
       <section className="hidden md:block relative py-20 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-neon-pink/5 to-transparent" />
+        <div aria-hidden="true" className="pointer-events-none select-none absolute left-1/2 top-6 -translate-x-1/2 whitespace-nowrap title-giant text-[10rem] text-outline opacity-[0.06]">LOTS</div>
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-neon-pink/10 rounded-full blur-[150px]" />
         </div>
@@ -941,6 +963,7 @@ export function LandingClient({
 
       {/* === DESKTOP WINNERS === */}
       <section className="hidden md:block winners-section relative py-20 overflow-hidden">
+        <div aria-hidden="true" className="pointer-events-none select-none absolute left-1/2 top-4 -translate-x-1/2 whitespace-nowrap title-giant text-[9rem] text-outline opacity-[0.06]">GAGNANTS</div>
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-success/5 rounded-full blur-[120px]" />
         </div>
@@ -1116,7 +1139,9 @@ export function LandingClient({
       </section>
 
       {/* === DESKTOP FINAL CTA === */}
-      <section className="hidden md:block final-cta relative py-20 overflow-hidden">
+      <section className="hidden md:block final-cta relative py-24 overflow-hidden">
+        <div className="hero-stage-floor" aria-hidden="true" />
+        <div aria-hidden="true" className="pointer-events-none select-none absolute left-1/2 top-2 -translate-x-1/2 whitespace-nowrap title-giant text-outline text-[10rem] opacity-[0.07]">JOUER</div>
         <div className="absolute inset-0">
           <div className="absolute inset-0 bg-gradient-to-t from-neon-purple/20 via-transparent to-transparent" />
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-neon-purple/10 rounded-full blur-[150px]" />

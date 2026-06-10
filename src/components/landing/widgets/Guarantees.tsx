@@ -196,8 +196,8 @@ export function Guarantees({ className = '' }: GuaranteesProps) {
         <div className="max-w-7xl mx-auto px-6">
           {/* Header */}
           <div className="text-center mb-12">
-            <h2 className="text-4xl font-black mb-3">
-              NOS <span className="text-neon-purple">GARANTIES</span>
+            <h2 className="title-giant text-4xl mb-3">
+              <span className="text-white">Nos</span> <span className="text-neon-purple neon-text">garanties</span>
             </h2>
             <p className="text-white/60 max-w-xl mx-auto">
               Ta confiance est notre priorité. Voici nos engagements.
