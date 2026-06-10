@@ -1,6 +1,7 @@
 'use client'
 
 import { memo } from 'react'
+import { NeonChest } from '@/components/collection/NeonChest'
 
 interface LobbyHeaderProps {
   credits: number
@@ -8,6 +9,8 @@ interface LobbyHeaderProps {
   urgentCount: number
   endedCount: number
   wasReset?: boolean
+  chestInfo?: { count: number; bestRarity: string; dailyAvailable: boolean } | null
+  onChestsClick?: () => void
 }
 
 export const LobbyHeader = memo(function LobbyHeader({
@@ -16,6 +19,8 @@ export const LobbyHeader = memo(function LobbyHeader({
   urgentCount,
   endedCount,
   wasReset = false,
+  chestInfo = null,
+  onChestsClick,
 }: LobbyHeaderProps) {
   return (
     <div className="relative py-6 md:py-8 px-4 md:px-6">
@@ -77,6 +82,44 @@ export const LobbyHeader = memo(function LobbyHeader({
               </span>
             </div>
           </div>
+
+          {/* Coffres + stats */}
+          <div className="flex flex-col items-stretch gap-3 sm:items-end">
+          {/* Widget coffres — lien vers la collection */}
+          {chestInfo && (
+            <button
+              type="button"
+              onClick={onChestsClick}
+              className="hero-live-card group flex items-center gap-4 px-5 py-3 text-left transition-transform hover:-translate-y-0.5"
+            >
+              <div className="relative">
+                <NeonChest rarity={chestInfo.count > 0 ? chestInfo.bestRarity : 'common'} size={62} />
+                {chestInfo.count > 0 && (
+                  <span className="stat-numeral absolute -right-2 -top-2 z-20 flex h-6 min-w-6 items-center justify-center rounded-full border border-neon-pink/60 bg-bg-primary px-1 text-xs text-neon-pink shadow-[0_0_10px_rgba(255,79,216,0.5)]">
+                    ×{chestInfo.count}
+                  </span>
+                )}
+              </div>
+              <div className="min-w-0">
+                <div className="font-display text-sm font-semibold text-white">
+                  {chestInfo.count > 0
+                    ? `${chestInfo.count} coffre${chestInfo.count > 1 ? 's' : ''} à ouvrir`
+                    : 'Tes coffres'}
+                </div>
+                {chestInfo.dailyAvailable ? (
+                  <div className="mt-0.5 flex items-center gap-1.5 text-xs text-success">
+                    <span className="live-dot" aria-hidden="true" />
+                    3 coffres gratuits dispo aujourd&apos;hui
+                  </div>
+                ) : (
+                  <div className="mt-0.5 text-xs text-white/40">Coffres gratuits récupérés — reviens demain</div>
+                )}
+              </div>
+              <svg className="h-4 w-4 shrink-0 text-white/30 transition-all group-hover:translate-x-1 group-hover:text-neon-purple" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+          )}
 
           {/* Stats pills */}
           <div className="flex flex-wrap gap-2">
@@ -140,6 +183,7 @@ export const LobbyHeader = memo(function LobbyHeader({
               <span className="text-neon-blue stat-numeral text-sm">{credits}</span>
               <span className="text-white/50 text-xs">crédits</span>
             </div>
+          </div>
           </div>
         </div>
       </div>

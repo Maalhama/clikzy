@@ -11,8 +11,11 @@ import {
   PullToRefreshIndicator,
 } from '@/components/lobby'
 import { LobbyFeatured } from '@/components/lobby/LobbyFeatured'
+import { LobbyChestsModal } from '@/components/lobby/LobbyChestsModal'
 import { PaymentSuccessModal } from '@/components/lobby/PaymentSuccessModal'
 import { LobbyGamificationBar } from '@/components/progression/LobbyGamificationBar'
+import { RewardsCalendarModal } from '@/components/progression/RewardsCalendarModal'
+import { getCalendarMonth, type CalendarDay } from '@/actions/calendar'
 import type { WinnerData } from '@/actions/winners'
 import { FloatingTimer } from '@/components/landing/widgets/FloatingTimer'
 import { useLobbyFilters } from '@/hooks/lobby/useLobbyFilters'
@@ -28,6 +31,9 @@ interface LobbyClientProps {
   credits: number
   wasReset: boolean
   winners: WinnerData[]
+  chestInfo?: { count: number; bestRarity: string; dailyAvailable: boolean } | null
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  progression?: any
 }
 
 export function LobbyClient({
@@ -35,9 +41,13 @@ export function LobbyClient({
   credits,
   wasReset,
   winners,
+  chestInfo,
+  progression,
 }: LobbyClientProps) {
   // Search state
   const [searchQuery, setSearchQuery] = useState('')
+  const [calendarDays, setCalendarDays] = useState<CalendarDay[] | null>(null)
+  const [showChests, setShowChests] = useState(false)
   const [paymentSuccess, setPaymentSuccess] = useState<{ show: boolean; credits: number }>({ show: false, credits: 0 })
 
   // Favorites
@@ -66,6 +76,20 @@ export function LobbyClient({
       }
     }
   }, [searchParams, router, creditsContext])
+
+  // Calendrier des récompenses : pop une fois par jour (Paris) à la connexion
+  useEffect(() => {
+    if (!progression) return // visiteur non connecté
+    const parisDay = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Paris' }).format(new Date())
+    const key = `cleekzy-calendar-${parisDay}`
+    if (typeof window === 'undefined' || localStorage.getItem(key)) return
+    getCalendarMonth().then((res) => {
+      if (res.success && res.data && res.data.length > 0) {
+        setCalendarDays(res.data)
+        localStorage.setItem(key, '1')
+      }
+    })
+  }, [progression])
 
   // Pull to refresh handler
   const handleRefresh = useCallback(async () => {
@@ -168,6 +192,20 @@ export function LobbyClient({
 
   return (
     <>
+      {/* Modal coffres (ouverture depuis le lobby) */}
+      {showChests && (
+        <LobbyChestsModal onClose={() => { setShowChests(false); router.refresh() }} />
+      )}
+
+      {/* Calendrier des récompenses (1 pop par jour) */}
+      {calendarDays && (
+        <RewardsCalendarModal
+          days={calendarDays}
+          onClose={() => setCalendarDays(null)}
+          onClaimed={() => creditsContext?.refreshCredits()}
+        />
+      )}
+
       {/* Payment success modal */}
       {paymentSuccess.show && (
         <PaymentSuccessModal
@@ -204,10 +242,12 @@ export function LobbyClient({
         urgentCount={stats.urgentCount}
         endedCount={stats.endedCount}
         wasReset={wasReset}
+        chestInfo={chestInfo}
+        onChestsClick={() => setShowChests(true)}
       />
 
       {/* Bandeau gamification (rappel coffres/progression) — masqué si non connecté */}
-      <LobbyGamificationBar />
+      <LobbyGamificationBar initialProg={progression} initialChests={chestInfo?.count ?? 0} />
 
       {/* Filters */}
       <div className="px-4 md:px-6 mb-6">

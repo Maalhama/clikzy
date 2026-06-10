@@ -1,6 +1,7 @@
 import { Suspense } from 'react'
 import { createClient } from '@/lib/supabase/server'
 import { checkAndResetDailyCredits } from '@/actions/credits'
+import { getProgression } from '@/actions/progression'
 import { getRecentWinners } from '@/actions/winners'
 import { LobbyClient } from './LobbyClient'
 import { GameCardSkeleton } from '@/components/lobby'
@@ -116,7 +117,32 @@ async function getLobbyData() {
 
   const winners = winnersResult
 
-  return { games, credits, wasReset, winners }
+  // Coffres du joueur pour le widget du header (connecté uniquement)
+  let chestInfo: { count: number; bestRarity: string; dailyAvailable: boolean } | null = null
+  const { data: { user } } = await supabase.auth.getUser()
+  if (user) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const sb = supabase as any
+    const [{ data: chests }, { data: prof }] = await Promise.all([
+      sb.from('user_chests').select('rarity').eq('user_id', user.id).eq('opened', false),
+      sb.from('profiles').select('chest_last_claim_day').eq('id', user.id).single(),
+    ])
+    const order = ['legendary', 'epic', 'rare', 'common']
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const rarities: string[] = ((chests as any[]) ?? []).map((c) => c.rarity)
+    const parisToday = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Paris' }).format(new Date())
+    chestInfo = {
+      count: rarities.length,
+      bestRarity: order.find((r) => rarities.includes(r)) ?? 'common',
+      dailyAvailable: (prof?.chest_last_claim_day ?? '') !== parisToday,
+    }
+  }
+
+  // Progression pour le bandeau gamification (rendu immédiat, pas de fetch client)
+  const progressionResult = user ? await getProgression() : null
+  const progression = progressionResult?.success ? progressionResult.data ?? null : null
+
+  return { games, credits, wasReset, winners, chestInfo, progression }
 }
 
 function LobbyLoading() {
@@ -165,7 +191,7 @@ function LobbyLoading() {
 }
 
 export default async function LobbyPage() {
-  const { games, credits, wasReset, winners } = await getLobbyData()
+  const { games, credits, wasReset, winners, chestInfo, progression } = await getLobbyData()
 
   return (
     <Suspense fallback={<LobbyLoading />}>
@@ -174,6 +200,8 @@ export default async function LobbyPage() {
         credits={credits}
         wasReset={wasReset}
         winners={winners}
+        chestInfo={chestInfo}
+        progression={progression}
       />
     </Suspense>
   )

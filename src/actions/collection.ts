@@ -121,7 +121,7 @@ export async function unequipSlot(slot: string): Promise<Res<null>> {
   return { success: true, data: null }
 }
 
-export async function claimDailyChest(): Promise<Res<{ already: boolean; chestId: string | null }>> {
+export async function claimDailyChest(): Promise<Res<{ already: boolean; granted: number; rarities: string[] }>> {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { success: false, error: 'Non authentifié' }
@@ -130,5 +130,5 @@ export async function claimDailyChest(): Promise<Res<{ already: boolean; chestId
   if (error) return { success: false, error: 'Erreur' }
   const r = Array.isArray(data) ? data[0] : data
   if (!r?.ok) return { success: false, error: 'Erreur' }
-  return { success: true, data: { already: !!r.already, chestId: r.chest_id ?? null } }
+  return { success: true, data: { already: !!r.already, granted: r.granted ?? 0, rarities: r.rarities ?? [] } }
 }

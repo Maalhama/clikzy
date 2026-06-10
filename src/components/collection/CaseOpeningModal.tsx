@@ -1,10 +1,12 @@
 'use client'
 
-import { useCallback, useRef, useState } from 'react'
-import { X } from 'lucide-react'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
+import { X, Coins, Zap } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { openChest, type ChestDrop } from '@/actions/collection'
 import { RARITY, bonusLabel, type Rarity } from './rarity'
+import { NeonChest } from './NeonChest'
 
 const CHEST_RARITY: Record<string, Rarity> = { common: 'common', rare: 'rare', epic: 'epic', legendary: 'legendary' }
 
@@ -39,6 +41,7 @@ export function CaseOpeningModal({
 }) {
   const [phase, setPhase] = useState<'chest' | 'opening' | 'revealed' | 'error'>('chest')
   const [drop, setDrop] = useState<ChestDrop | null>(null)
+  const [unlocked, setUnlocked] = useState(false)
   const startedRef = useRef(false)
 
   const cr = CHEST_RARITY[chestRarity] ?? 'common'
@@ -52,16 +55,22 @@ export function CaseOpeningModal({
     const res = await openChest(chestId)
     if (!res.success || !res.data) { setPhase('error'); return }
     setDrop(res.data)
-    // tremblement (500ms) puis ouverture + burst, puis révélation
-    setTimeout(() => {
-      onReward(res.data!)
+  }, [chestId])
+
+  // Révélation quand la clé a tourné ET que le drop serveur est arrivé
+  useEffect(() => {
+    if (phase !== 'opening' || !drop || !unlocked) return
+    const t = setTimeout(() => {
+      onReward(drop)
       setPhase('revealed')
-    }, 1400)
-  }, [chestId, onReward])
+    }, 650)
+    return () => clearTimeout(t)
+  }, [phase, drop, unlocked, onReward])
 
-  const lidOpen = phase === 'revealed' || (phase === 'opening' && drop !== null)
+  const lidOpen = phase === 'revealed' || (phase === 'opening' && drop !== null && unlocked)
 
-  return (
+  if (typeof window === 'undefined') return null
+  return createPortal(
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/85 backdrop-blur-sm p-4">
       {/* Flash plein écran à l'ouverture */}
       <AnimatePresence>
@@ -130,13 +139,13 @@ export function CaseOpeningModal({
                     )}
                     {drop.rewardKind === 'credits' && (
                       <div className="flex flex-col items-center gap-1">
-                        <span className="text-6xl">💰</span>
+                        <Coins className="h-14 w-14 text-yellow-300" strokeWidth={1.5} style={{ filter: 'drop-shadow(0 0 12px rgba(255,215,0,0.6))' }} />
                         <span className="stat-numeral text-2xl text-yellow-300">+{drop.credits} crédits</span>
                       </div>
                     )}
                     {drop.rewardKind === 'xp' && (
                       <div className="flex flex-col items-center gap-1">
-                        <span className="text-6xl">⚡</span>
+                        <Zap className="h-14 w-14 text-cyan-300" strokeWidth={1.5} style={{ filter: 'drop-shadow(0 0 12px rgba(60,203,255,0.6))' }} />
                         <span className="stat-numeral text-2xl text-cyan-300">+{drop.xp} XP</span>
                       </div>
                     )}
@@ -190,71 +199,55 @@ export function CaseOpeningModal({
             {/* LE COFFRE (CSS pur, perspective pour le couvercle) */}
             <motion.div
               animate={
-                phase === 'opening' && !drop
-                  ? { x: [0, -5, 5, -4, 4, -2, 2, 0], rotate: [0, -1.5, 1.5, -1, 1, 0] }
+                phase === 'opening' && unlocked && !lidOpen
+                  ? { x: [0, -5, 5, -4, 4, 0] }
                   : phase === 'revealed'
                   ? { scale: 0.92, y: 8 }
+                  : phase === 'opening'
+                  ? { y: 0 }
                   : { y: [0, -7, 0] }
               }
               transition={
-                phase === 'opening' && !drop
-                  ? { duration: 0.5, repeat: Infinity }
+                phase === 'opening' && unlocked && !lidOpen
+                  ? { duration: 0.4 }
                   : phase === 'revealed'
                   ? { duration: 0.4 }
+                  : phase === 'opening'
+                  ? { duration: 0.2 }
                   : { duration: 3, repeat: Infinity, ease: 'easeInOut' }
               }
               className="relative"
               style={{ perspective: 600, opacity: phase === 'revealed' ? 0.65 : 1 }}
             >
-              {/* lueur sous le coffre */}
-              <div
-                aria-hidden="true"
-                className="absolute -inset-6 -z-10 rounded-full blur-2xl"
-                style={{ background: `radial-gradient(ellipse at center 70%, ${burst}55, transparent 70%)` }}
-              />
+              <NeonChest rarity={cr} open={lidOpen} size={180} />
 
-              {/* Couvercle */}
-              <motion.div
-                animate={lidOpen ? { rotateX: -115 } : { rotateX: 0 }}
-                transition={{ type: 'spring', stiffness: 160, damping: 14 }}
-                className="relative z-10 h-12 w-44 origin-bottom rounded-t-2xl border-2 border-b-0"
-                style={{
-                  transformStyle: 'preserve-3d',
-                  borderColor: burst,
-                  background: `linear-gradient(180deg, #1E2942, #141B2D)`,
-                  boxShadow: `0 0 18px -4px ${burst}, inset 0 2px 0 ${burst}44`,
-                }}
-              >
-                {/* bande centrale du couvercle */}
-                <div className="absolute left-1/2 top-0 h-full w-8 -translate-x-1/2 border-x-2" style={{ borderColor: `${burst}88`, background: `${burst}1A` }} />
-              </motion.div>
-
-              {/* Corps du coffre */}
-              <div
-                className="relative h-[88px] w-44 rounded-b-2xl border-2 border-t-0"
-                style={{
-                  borderColor: burst,
-                  background: `linear-gradient(180deg, #141B2D, #0B0F1A)`,
-                  boxShadow: `0 0 24px -6px ${burst}`,
-                }}
-              >
-                {/* intérieur lumineux visible quand ouvert */}
-                <div
-                  className="absolute inset-x-1 top-0 h-3 rounded-sm transition-opacity duration-300"
-                  style={{ background: `linear-gradient(to bottom, ${burst}CC, transparent)`, opacity: lidOpen ? 1 : 0 }}
-                />
-                {/* bande centrale + serrure */}
-                <div className="absolute left-1/2 top-0 h-full w-8 -translate-x-1/2 border-x-2" style={{ borderColor: `${burst}88`, background: `${burst}14` }} />
-                <div
-                  className="absolute left-1/2 top-2 flex h-9 w-9 -translate-x-1/2 items-center justify-center rounded-full border-2 transition-opacity duration-300"
-                  style={{ borderColor: burst, background: '#0B0F1A', boxShadow: `0 0 14px -2px ${burst}`, opacity: lidOpen ? 0 : 1 }}
-                >
-                  <div className="h-3.5 w-2 rounded-full" style={{ background: burst, boxShadow: `0 0 8px ${burst}` }} />
-                </div>
-                {/* rivets */}
-                <div className="absolute bottom-2 left-3 h-1.5 w-1.5 rounded-full" style={{ background: `${burst}99` }} />
-                <div className="absolute bottom-2 right-3 h-1.5 w-1.5 rounded-full" style={{ background: `${burst}99` }} />
-              </div>
+              {/* Clé néon : glisse vers la serrure puis tourne d'un quart de tour */}
+              <AnimatePresence>
+                {phase === 'opening' && !unlocked && (
+                  <motion.div
+                    key="key"
+                    className="pointer-events-none absolute left-1/2 top-[34%] z-30"
+                    initial={{ x: 70, y: -60, rotate: -30, opacity: 0, scale: 0.9 }}
+                    animate={{
+                      x: [70, -14, -14, -14],
+                      y: [-60, -2, -2, -2],
+                      rotate: [-30, 0, 0, 90],
+                      opacity: [0, 1, 1, 1],
+                      scale: [0.9, 1, 1, 1],
+                    }}
+                    exit={{ opacity: 0, scale: 0.6 }}
+                    transition={{ duration: 1.35, times: [0, 0.42, 0.6, 1], ease: 'easeInOut' }}
+                    onAnimationComplete={() => setUnlocked(true)}
+                    style={{ transformOrigin: '50% 50%' }}
+                  >
+                    <svg width="46" height="22" viewBox="0 0 46 22" fill="none" aria-hidden="true"
+                      style={{ filter: `drop-shadow(0 0 8px ${burst})` }}>
+                      <circle cx="9" cy="11" r="6.5" stroke={burst} strokeWidth="3" />
+                      <path d="M15.5 11H42M36 11v6M30 11v4.5" stroke={burst} strokeWidth="3" strokeLinecap="round" />
+                    </svg>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </motion.div>
 
             {/* CTA */}
@@ -276,6 +269,7 @@ export function CaseOpeningModal({
           </div>
         )}
       </div>
-    </div>
+    </div>,
+    document.body
   )
 }

@@ -5,6 +5,7 @@ import { Loader2, Gift, Sparkles, Zap, Coins, MousePointerClick, Clover } from '
 import { getCollection, equipItem, unequipSlot, claimDailyChest, type Collection, type ChestDrop } from '@/actions/collection'
 import { RARITY, SLOT_LABEL, SLOT_EMOJI, bonusLabel, type Rarity } from './rarity'
 import { CaseOpeningModal } from './CaseOpeningModal'
+import { NeonChest } from './NeonChest'
 
 const SLOTS: Array<Collection['equipment'] extends Partial<Record<infer K, unknown>> ? K : never> = ['casque', 'armure', 'anneau', 'artefact']
 const CHEST_LABEL: Record<string, Rarity> = { common: 'common', rare: 'rare', epic: 'epic', legendary: 'legendary' }
@@ -25,8 +26,8 @@ export function CollectionClient() {
 
   const onReward = (d: ChestDrop) => {
     if (d.rewardKind === 'item' && d.item) setFlash(`${d.item.emoji} ${d.item.name} (${RARITY[d.item.rarity].label})`)
-    else if (d.rewardKind === 'credits') setFlash(`💰 +${d.credits} crédits`)
-    else setFlash(`⚡ +${d.xp} XP`)
+    else if (d.rewardKind === 'credits') setFlash(`+${d.credits} crédits`)
+    else setFlash(`+${d.xp} XP`)
     setTimeout(() => setFlash(null), 3500)
   }
 
@@ -36,11 +37,11 @@ export function CollectionClient() {
     const res = await claimDailyChest()
     if (res.success && res.data) {
       if (res.data.already) {
-        setFlash('🎁 Coffre du jour déjà récupéré — reviens après minuit !')
-        setTimeout(() => setFlash(null), 3500)
-      } else if (res.data.chestId) {
-        setOpening({ id: res.data.chestId, rarity: 'common' })
+        setFlash('Coffres du jour déjà récupérés — reviens après minuit !')
+      } else {
+        setFlash(`+${res.data.granted} coffres ajoutés — ouvre-les !`)
       }
+      setTimeout(() => setFlash(null), 3500)
       await load()
     }
     setBusy(null)
@@ -88,10 +89,10 @@ export function CollectionClient() {
             className="group relative mb-4 flex w-full items-center gap-4 overflow-hidden rounded-xl border border-neon-purple/50 bg-gradient-to-r from-neon-purple/15 via-neon-pink/10 to-neon-purple/15 p-4 transition-all hover:border-neon-purple disabled:opacity-60"
             style={{ boxShadow: '0 0 30px -10px rgba(155,92,255,0.5)' }}
           >
-            <span className="text-3xl transition-transform group-hover:scale-110 group-hover:rotate-6">🎁</span>
+            <span className="transition-transform group-hover:scale-105"><NeonChest rarity="common" size={56} /></span>
             <span className="flex-1 text-left">
-              <span className="block font-display text-sm font-semibold text-white">Ton coffre du jour est arrivé !</span>
-              <span className="block text-xs text-white/50">1 coffre gratuit par jour — reset à minuit</span>
+              <span className="block font-display text-sm font-semibold text-white">Tes 3 coffres du jour sont arrivés !</span>
+              <span className="block text-xs text-white/50">3 coffres gratuits par jour, raretés aléatoires — reset à minuit</span>
             </span>
             <span className="btn-arena px-5 py-2 text-xs">
               {busy === 'daily' ? 'Ouverture…' : 'Récupérer'}
@@ -100,7 +101,7 @@ export function CollectionClient() {
         )}
 
         {data.chests.length === 0 ? (
-          <p className="py-6 text-center text-sm text-white/40">Aucun coffre. Gagne des parties, monte de niveau et garde ta série pour en obtenir 🔥</p>
+          <p className="py-6 text-center text-sm text-white/40">Aucun coffre. Gagne des parties, monte de niveau et garde ta série pour en obtenir</p>
         ) : (
           <div className="grid grid-cols-3 gap-3 sm:grid-cols-5">
             {data.chests.map((c) => {
@@ -111,7 +112,7 @@ export function CollectionClient() {
                   onClick={() => setOpening({ id: c.id, rarity: c.rarity })}
                   className={`group flex flex-col items-center gap-1 rounded-xl border bg-gradient-to-b p-3 transition-transform hover:scale-105 ${RARITY[r].border} ${RARITY[r].bg} ${RARITY[r].glow}`}
                 >
-                  <span className="text-3xl transition-transform group-hover:rotate-6">🎁</span>
+                  <span className="transition-transform group-hover:scale-105"><NeonChest rarity={c.rarity} size={64} /></span>
                   <span className={`text-[10px] font-bold uppercase tracking-wider ${RARITY[r].text}`}>{RARITY[r].label}</span>
                 </button>
               )
