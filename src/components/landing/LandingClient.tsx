@@ -1204,9 +1204,16 @@ export function LandingClient({
             </button>
           </div>
 
-          <div className="mt-14 flex flex-wrap justify-center gap-4">
-            <div className="flex items-center gap-3 px-5 py-3 rounded-2xl bg-success/10 border border-success/30">
-              <div className="w-10 h-10 rounded-xl bg-success/20 flex items-center justify-center">
+          <div className="mt-6 flex items-center justify-center gap-2.5">
+            <span className="live-dot" aria-hidden="true" />
+            <span className="text-sm text-white/60">
+              <span className="stat-numeral text-success">{playerCount.toLocaleString()}</span> joueurs sont dans l'arène en ce moment
+            </span>
+          </div>
+
+          <div className="mt-12 flex flex-wrap justify-center gap-4">
+            <div className="panel flex items-center gap-3 px-5 py-3">
+              <div className="w-10 h-10 rounded-xl border border-success/50 bg-success/15 flex items-center justify-center shadow-[0_0_18px_-4px_rgba(0,255,136,0.6)]">
                 <svg className="w-5 h-5 text-success" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
@@ -1216,8 +1223,8 @@ export function LandingClient({
                 <div className="text-white/40 text-xs">100% gratuit</div>
               </div>
             </div>
-            <div className="flex items-center gap-3 px-5 py-3 rounded-2xl bg-neon-blue/10 border border-neon-blue/30">
-              <div className="w-10 h-10 rounded-xl bg-neon-blue/20 flex items-center justify-center">
+            <div className="panel flex items-center gap-3 px-5 py-3">
+              <div className="w-10 h-10 rounded-xl border border-neon-blue/50 bg-neon-blue/15 flex items-center justify-center shadow-[0_0_18px_-4px_rgba(60,203,255,0.6)]">
                 <svg className="w-5 h-5 text-neon-blue" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                 </svg>
@@ -1227,8 +1234,8 @@ export function LandingClient({
                 <div className="text-white/40 text-xs">Conforme CNIL</div>
               </div>
             </div>
-            <div className="flex items-center gap-3 px-5 py-3 rounded-2xl bg-neon-pink/10 border border-neon-pink/30">
-              <div className="w-10 h-10 rounded-xl bg-neon-pink/20 flex items-center justify-center">
+            <div className="panel flex items-center gap-3 px-5 py-3">
+              <div className="w-10 h-10 rounded-xl border border-neon-pink/50 bg-neon-pink/15 flex items-center justify-center shadow-[0_0_18px_-4px_rgba(255,79,216,0.6)]">
                 <svg className="w-5 h-5 text-neon-pink" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
                 </svg>
