@@ -6,6 +6,7 @@ import { getCollection, equipItem, unequipSlot, claimDailyChest, type Collection
 import { RARITY, SLOT_LABEL, SLOT_EMOJI, bonusLabel, type Rarity } from './rarity'
 import { CaseOpeningModal } from './CaseOpeningModal'
 import { NeonChest } from './NeonChest'
+import { ItemIcon } from './ItemIcon'
 
 const SLOTS: Array<Collection['equipment'] extends Partial<Record<infer K, unknown>> ? K : never> = ['casque', 'armure', 'anneau', 'artefact']
 const CHEST_LABEL: Record<string, Rarity> = { common: 'common', rare: 'rare', epic: 'epic', legendary: 'legendary' }
@@ -25,7 +26,7 @@ export function CollectionClient() {
   useEffect(() => { load() }, [load])
 
   const onReward = (d: ChestDrop) => {
-    if (d.rewardKind === 'item' && d.item) setFlash(`${d.item.emoji} ${d.item.name} (${RARITY[d.item.rarity].label})`)
+    if (d.rewardKind === 'item' && d.item) setFlash(`${d.item.name} (${RARITY[d.item.rarity].label})`)
     else if (d.rewardKind === 'credits') setFlash(`+${d.credits} crédits`)
     else setFlash(`+${d.xp} XP`)
     setTimeout(() => setFlash(null), 3500)
@@ -144,7 +145,7 @@ export function CollectionClient() {
                 <p className="mb-2 text-[10px] uppercase tracking-wider text-white/40">{SLOT_LABEL[slot]}</p>
                 {eq ? (
                   <div className={`rounded-lg border bg-gradient-to-b p-2 ${RARITY[eq.item.rarity].border} ${RARITY[eq.item.rarity].bg}`}>
-                    <span className="text-3xl">{eq.item.emoji}</span>
+                    <span className="flex justify-center"><ItemIcon itemId={eq.item.id} slot={eq.item.slot} rarity={eq.item.rarity} size={34} /></span>
                     <p className={`mt-1 truncate text-xs font-bold ${RARITY[eq.item.rarity].text}`}>{eq.item.name}</p>
                     <p className="truncate text-[10px] text-white/50">{bonusLabel(eq.item.bonusKind, eq.item.bonusValue)}</p>
                     <button onClick={() => onUnequip(slot)} disabled={busy === 'slot-' + slot} className="mt-2 text-[10px] font-semibold text-white/40 hover:text-white/70">
@@ -180,7 +181,7 @@ export function CollectionClient() {
                   title={`${inv.item.name} — ${bonusLabel(inv.item.bonusKind, inv.item.bonusValue)}`}
                   className={`relative flex flex-col items-center gap-0.5 rounded-lg border bg-gradient-to-b p-2 transition-transform ${RARITY[inv.item.rarity].border} ${RARITY[inv.item.rarity].bg} ${equipped ? 'opacity-50' : 'hover:scale-105'}`}
                 >
-                  {busy === inv.inventoryId ? <Loader2 className="h-7 w-7 animate-spin text-white/60" /> : <span className="text-2xl">{inv.item.emoji}</span>}
+                  {busy === inv.inventoryId ? <Loader2 className="h-7 w-7 animate-spin text-white/60" /> : <ItemIcon itemId={inv.item.id} slot={inv.item.slot} rarity={inv.item.rarity} size={28} />}
                   <span className={`truncate text-[9px] font-semibold ${RARITY[inv.item.rarity].text}`}>{inv.item.name}</span>
                   {equipped && <span className="absolute right-1 top-1 rounded bg-green-500/80 px-1 text-[8px] font-bold text-white">É</span>}
                 </button>

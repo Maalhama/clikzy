@@ -41,7 +41,7 @@ export function LobbyChestsModal({ onClose }: { onClose: () => void }) {
   }
 
   const onReward = (d: ChestDrop) => {
-    if (d.rewardKind === 'item' && d.item) setFlash(`${d.item.emoji} ${d.item.name} obtenu !`)
+    if (d.rewardKind === 'item' && d.item) setFlash(`${d.item.name} obtenu !`)
     else if (d.rewardKind === 'credits') setFlash(`+${d.credits} crédits !`)
     else setFlash(`+${d.xp} XP !`)
     setTimeout(() => setFlash(null), 3000)

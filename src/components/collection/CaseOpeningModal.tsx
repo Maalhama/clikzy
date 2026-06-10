@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { openChest, type ChestDrop } from '@/actions/collection'
 import { RARITY, bonusLabel, type Rarity } from './rarity'
 import { NeonChest } from './NeonChest'
+import { ItemIcon } from './ItemIcon'
 
 const CHEST_RARITY: Record<string, Rarity> = { common: 'common', rare: 'rare', epic: 'epic', legendary: 'legendary' }
 
@@ -130,7 +131,7 @@ export function CaseOpeningModal({
                   >
                     {drop.rewardKind === 'item' && drop.item && (
                       <div className="flex flex-col items-center gap-1">
-                        <span className="text-6xl drop-shadow-[0_0_18px_rgba(255,255,255,0.35)]">{drop.item.emoji}</span>
+                        <ItemIcon itemId={drop.item.id} slot={drop.item.slot} rarity={drop.item.rarity} size={64} />
                         <span className="font-display text-lg font-semibold" style={{ color: rewardColor }}>{drop.item.name}</span>
                         <span className="text-xs uppercase tracking-wider text-white/50">
                           {RARITY[drop.item.rarity].label} · {bonusLabel(drop.item.bonusKind, drop.item.bonusValue)}
@@ -221,29 +222,38 @@ export function CaseOpeningModal({
             >
               <NeonChest rarity={cr} open={lidOpen} size={180} />
 
-              {/* Clé néon : glisse vers la serrure puis tourne d'un quart de tour */}
+              {/* Clé néon : la pointe vise exactement le trou de serrure (90, 62
+                  pour un coffre de 180), s'insère avec un petit « clic », puis
+                  tourne d'un quart de tour en pivotant SUR la pointe. */}
               <AnimatePresence>
                 {phase === 'opening' && !unlocked && (
                   <motion.div
                     key="key"
-                    className="pointer-events-none absolute left-1/2 top-[34%] z-30"
-                    initial={{ x: 70, y: -60, rotate: -30, opacity: 0, scale: 0.9 }}
+                    className="pointer-events-none absolute z-30"
+                    initial={{ x: 78, y: -10, rotate: -18, opacity: 0 }}
                     animate={{
-                      x: [70, -14, -14, -14],
-                      y: [-60, -2, -2, -2],
-                      rotate: [-30, 0, 0, 90],
-                      opacity: [0, 1, 1, 1],
-                      scale: [0.9, 1, 1, 1],
+                      x: [78, 3, -1.5, 0, 0],
+                      y: [-10, 0, 0, 0, 0],
+                      rotate: [-18, 0, 0, 0, 90],
+                      opacity: [0, 1, 1, 1, 1],
                     }}
-                    exit={{ opacity: 0, scale: 0.6 }}
-                    transition={{ duration: 1.35, times: [0, 0.42, 0.6, 1], ease: 'easeInOut' }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 1.4, times: [0, 0.38, 0.48, 0.58, 1], ease: [0.22, 1, 0.36, 1] }}
                     onAnimationComplete={() => setUnlocked(true)}
-                    style={{ transformOrigin: '50% 50%' }}
+                    style={{ left: 90, top: 62, transformOrigin: '0px 0px' }}
                   >
-                    <svg width="46" height="22" viewBox="0 0 46 22" fill="none" aria-hidden="true"
-                      style={{ filter: `drop-shadow(0 0 8px ${burst})` }}>
-                      <circle cx="9" cy="11" r="6.5" stroke={burst} strokeWidth="3" />
-                      <path d="M15.5 11H42M36 11v6M30 11v4.5" stroke={burst} strokeWidth="3" strokeLinecap="round" />
+                    {/* tip de la clé = (0,0) du conteneur = trou de serrure */}
+                    <svg
+                      width="44" height="24" viewBox="0 0 44 24" fill="none" aria-hidden="true"
+                      style={{ position: 'absolute', left: -2, top: -12, filter: `drop-shadow(0 0 8px ${burst})` }}
+                    >
+                      {/* dents (pointe, côté serrure) */}
+                      <path d="M4 12v5M9 12v4" stroke={burst} strokeWidth="3" strokeLinecap="round" />
+                      {/* tige */}
+                      <path d="M2 12h27" stroke={burst} strokeWidth="3" strokeLinecap="round" />
+                      {/* anneau ouvragé */}
+                      <circle cx="35" cy="12" r="6.5" stroke={burst} strokeWidth="3" />
+                      <circle cx="35" cy="12" r="2" stroke={burst} strokeWidth="2" />
                     </svg>
                   </motion.div>
                 )}
