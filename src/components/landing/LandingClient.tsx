@@ -782,7 +782,7 @@ export function LandingClient({
               ].map((step, i) => (
                 <div key={i} className="step-card group relative" style={{ marginTop: `${i * 30}px` }}>
                   <div
-                    className="relative p-6 rounded-2xl bg-bg-secondary/60 backdrop-blur-sm border h-full panel-hover overflow-hidden"
+                    className="relative p-6 rounded-2xl bg-bg-secondary/60 backdrop-blur-sm border h-full panel-hover"
                     style={{
                       borderColor: `${step.hex}35`,
                       boxShadow: `0 0 50px -22px ${step.hex}`,
@@ -791,8 +791,8 @@ export function LandingClient({
                     {/* Numéro fantôme géant teinté */}
                     <span
                       aria-hidden="true"
-                      className="pointer-events-none select-none absolute -right-4 -top-8 title-giant text-[7.5rem] leading-none opacity-30"
-                      style={{ color: 'transparent', WebkitTextStroke: `1.5px ${step.hex}` }}
+                      className="pointer-events-none select-none absolute -right-5 -top-14 z-10 title-giant text-[7.5rem] leading-none opacity-40"
+                      style={{ color: step.hex, textShadow: `0 0 36px ${step.hex}80` }}
                     >
                       {step.num}
                     </span>
