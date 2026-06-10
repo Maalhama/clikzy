@@ -92,9 +92,13 @@ export function LobbyChestsModal({ onClose }: { onClose: () => void }) {
               )}
 
               {data.chests.length === 0 ? (
-                <p className="py-8 text-center text-sm text-white/40">
-                  Aucun coffre à ouvrir. Gagne des parties, monte de niveau et reviens demain pour tes 3 coffres gratuits
-                </p>
+                <div className="flex flex-col items-center gap-3 py-8">
+                  <span className="opacity-35"><NeonChest rarity="common" size={84} /></span>
+                  <p className="text-center text-sm text-white/40">
+                    Aucun coffre à ouvrir pour l'instant.<br />
+                    <span className="text-white/60">Reviens après minuit</span> pour tes 3 coffres gratuits.
+                  </p>
+                </div>
               ) : (
                 /* Une pile par rareté : clic = ouvre un coffre de la pile */
                 <div className="mt-4 flex flex-wrap items-end justify-center gap-4">

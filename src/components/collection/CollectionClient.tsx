@@ -102,7 +102,13 @@ export function CollectionClient() {
         )}
 
         {data.chests.length === 0 ? (
-          <p className="py-6 text-center text-sm text-white/40">Aucun coffre. Gagne des parties, monte de niveau et garde ta série pour en obtenir</p>
+          <div className="flex flex-col items-center gap-3 py-8">
+            <span className="opacity-35"><NeonChest rarity="common" size={84} /></span>
+            <p className="text-center text-sm text-white/40">
+              Aucun coffre à ouvrir pour l'instant.<br />
+              <span className="text-white/60">Reviens après minuit</span> pour tes 3 coffres gratuits — et gagne des parties pour en obtenir plus.
+            </p>
+          </div>
         ) : (
           <div className="grid grid-cols-3 gap-3 sm:grid-cols-5">
             {data.chests.map((c) => {
@@ -154,7 +160,7 @@ export function CollectionClient() {
                   </div>
                 ) : (
                   <div className="flex h-[104px] flex-col items-center justify-center rounded-lg border border-dashed border-white/10 text-white/20">
-                    <span className="text-3xl opacity-40">{SLOT_EMOJI[slot]}</span>
+                    <span className="flex justify-center opacity-30"><ItemIcon slot={slot} rarity="common" size={30} /></span>
                     <span className="text-[10px]">Vide</span>
                   </div>
                 )}

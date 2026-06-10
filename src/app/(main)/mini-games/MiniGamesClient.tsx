@@ -357,7 +357,7 @@ export default function MiniGamesClient({ initialEligibility }: MiniGamesClientP
         </div>
 
         {/* Games Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="flex flex-wrap justify-center gap-8 [&>*]:w-full md:[&>*]:w-[30.8%]">
           {(Object.keys(GAME_CONFIG) as MiniGameType[]).map((key, index) => (
             <GameCard
               key={key}
