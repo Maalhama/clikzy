@@ -773,16 +773,16 @@ export function LandingClient({
               <div className="absolute inset-0 bg-gradient-to-r from-neon-purple via-neon-blue via-success to-neon-pink animate-gradient-x opacity-80" />
             </div>
 
-            <div className="grid grid-cols-4 gap-6 items-start">
+            <div className="grid grid-cols-4 gap-6 items-start auto-rows-min">
               {[
-                { num: '01', title: 'Choisis', desc: 'Parcours les lots disponibles : smartphones, consoles, accessoires... Choisis celui qui te fait envie.', Icon: TargetIcon, hex: '#9B5CFF' },
+                { num: '01', title: 'Choisis', desc: 'Parcours les lots : smartphones, consoles, accessoires... Choisis celui qui te fait envie.', Icon: TargetIcon, hex: '#9B5CFF' },
                 { num: '02', title: 'Clique', desc: 'Chaque clic utilise 1 crédit. Tu reçois 10 crédits gratuits chaque jour, sans aucun paiement.', Icon: CursorClickIcon, hex: '#3CCBFF' },
-                { num: '03', title: 'Le timer', desc: 'Quand le timer passe sous 1min30, chaque clic le relance à 1min30. Le jeu continue tant que la communauté joue.', Icon: TrophyIcon, hex: '#00FF88' },
+                { num: '03', title: 'Le timer', desc: 'Sous 1min30, chaque clic relance le timer à 1min30. La partie vit tant que la communauté clique.', Icon: TrophyIcon, hex: '#00FF88' },
                 { num: '04', title: 'Gagne', desc: 'Quand le timer atteint zéro, le dernier joueur à avoir cliqué remporte le lot. Simple.', Icon: GiftIcon, hex: '#FF4FD8' },
               ].map((step, i) => (
-                <div key={i} className="step-card group relative" style={{ marginTop: `${i * 30}px` }}>
+                <div key={i} className="step-card group relative" style={{ marginTop: `${i * 40}px` }}>
                   <div
-                    className="relative p-6 rounded-2xl bg-bg-secondary/60 backdrop-blur-sm border h-full panel-hover"
+                    className="relative p-6 rounded-2xl bg-bg-secondary/60 backdrop-blur-sm border min-h-[300px] flex flex-col panel-hover"
                     style={{
                       borderColor: `${step.hex}35`,
                       boxShadow: `0 0 50px -22px ${step.hex}`,
@@ -809,7 +809,7 @@ export function LandingClient({
                     <p className="text-white/60 text-sm leading-relaxed">{step.desc}</p>
 
                     {/* Footer mono : position dans le circuit */}
-                    <div className="mt-5 flex items-center justify-between border-t border-white/5 pt-3">
+                    <div className="mt-auto flex items-center justify-between border-t border-white/5 pt-3">
                       <span className="stat-numeral text-xs text-white/30">{step.num} / 04</span>
                       <svg className="h-4 w-4 transition-transform group-hover:translate-x-1" style={{ color: `${step.hex}99` }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
