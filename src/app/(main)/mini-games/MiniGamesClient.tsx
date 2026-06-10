@@ -3,7 +3,7 @@
 import React, { useState, useCallback } from 'react';
 import dynamic from 'next/dynamic';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Trophy, Clock, Zap, ChevronRight, X, Sparkles, Coins } from 'lucide-react';
+import { Trophy, Clock, ChevronRight, X, Sparkles, Coins } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
 import { WheelIcon, ScratchIcon, PachinkoIcon, CreditIcon, SlotsIcon, CoinFlipIcon, DiceIcon } from '@/components/mini-games/GameIcons';
