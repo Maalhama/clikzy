@@ -94,8 +94,8 @@ export function Guarantees({ className = '' }: GuaranteesProps) {
       <div className="md:hidden px-4 py-8">
         {/* Guarantees */}
         <div className="mb-8">
-          <h3 className="text-lg font-black text-center mb-4">
-            NOS <span className="text-neon-purple">GARANTIES</span>
+          <h3 className="title-giant text-lg text-center mb-4">
+            <span className="text-white">Nos</span> <span className="text-neon-purple neon-text">garanties</span>
           </h3>
           <div className="grid grid-cols-2 gap-3">
             {GUARANTEES.map((item, index) => (
@@ -120,8 +120,8 @@ export function Guarantees({ className = '' }: GuaranteesProps) {
 
         {/* Delivery Proofs */}
         <div className="mb-8">
-          <h3 className="text-lg font-black text-center mb-4">
-            PREUVES DE <span className="text-success">LIVRAISON</span>
+          <h3 className="title-giant text-lg text-center mb-4">
+            <span className="text-white">Preuves de</span> <span className="text-success neon-text-success">livraison</span>
           </h3>
           <div className="grid grid-cols-2 gap-3">
             {DELIVERY_PROOFS.map((proof, index) => (
@@ -196,7 +196,8 @@ export function Guarantees({ className = '' }: GuaranteesProps) {
         <div className="max-w-7xl mx-auto px-6">
           {/* Header */}
           <div className="text-center mb-12">
-            <h2 className="title-giant text-4xl mb-3">
+            <span className="kicker mb-4">Confiance</span>
+            <h2 className="title-giant text-4xl lg:text-5xl mb-3 mt-3">
               <span className="text-white">Nos</span> <span className="text-neon-purple neon-text">garanties</span>
             </h2>
             <p className="text-white/60 max-w-xl mx-auto">
@@ -210,18 +211,20 @@ export function Guarantees({ className = '' }: GuaranteesProps) {
               <div
                 key={index}
                 className={`
-                  group p-6 rounded-xl bg-bg-secondary/50 border border-white/10
-                  hover:border-opacity-50 transition-all duration-500
+                  group relative overflow-hidden p-6 rounded-2xl bg-bg-secondary/60 backdrop-blur-sm border panel-hover
+                  transition-all duration-500
                   ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}
                 `}
                 style={{
                   transitionDelay: `${index * 100}ms`,
-                  borderColor: `${item.color}20`,
+                  borderColor: `${item.color}30`,
+                  boxShadow: `0 0 44px -22px ${item.color}`,
                 }}
               >
+                <div className="absolute inset-x-0 top-0 h-[2px]" style={{ background: `linear-gradient(90deg, transparent, ${item.color}, transparent)` }} />
                 <div
-                  className="w-12 h-12 rounded-lg flex items-center justify-center mb-4 transition-transform group-hover:scale-110"
-                  style={{ backgroundColor: `${item.color}20`, color: item.color }}
+                  className="w-14 h-14 rounded-xl border flex items-center justify-center mb-4 transition-transform group-hover:scale-110"
+                  style={{ backgroundColor: `${item.color}1A`, borderColor: `${item.color}55`, color: item.color, boxShadow: `0 0 24px -6px ${item.color}` }}
                 >
                   {item.icon}
                 </div>
@@ -233,8 +236,8 @@ export function Guarantees({ className = '' }: GuaranteesProps) {
 
           {/* Delivery Proofs + Trustpilot */}
           <div>
-            <h3 className="text-2xl font-black mb-6">
-              PREUVES DE <span className="text-success">LIVRAISON</span>
+            <h3 className="title-giant text-2xl lg:text-3xl mb-6">
+              <span className="text-white">Preuves de</span> <span className="text-success neon-text-success">livraison</span>
             </h3>
             <div className="grid grid-cols-5 gap-4">
               {/* Delivery Proofs */}
@@ -242,7 +245,7 @@ export function Guarantees({ className = '' }: GuaranteesProps) {
                 <div
                   key={proof.id}
                   className={`
-                    group relative rounded-xl overflow-hidden bg-bg-secondary/50 border border-white/10
+                    group relative rounded-2xl overflow-hidden bg-bg-secondary/50 border border-white/10 panel-hover
                     hover:border-success/50 transition-all duration-500
                     ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}
                   `}
@@ -266,6 +269,10 @@ export function Guarantees({ className = '' }: GuaranteesProps) {
                         onError={() => handleImageError(proof.id)}
                       />
                     )}
+                    <div className="absolute top-2 right-2 z-10 inline-flex items-center gap-1 rounded-full border border-success/40 bg-bg-primary/80 px-2 py-0.5 backdrop-blur-sm">
+                      <svg className="h-3 w-3 text-success" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
+                      <span className="text-[0.6rem] font-semibold uppercase tracking-wider text-success">Vérifié</span>
+                    </div>
                     <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/90 to-transparent">
                       <div className="text-sm font-bold text-white">{proof.username}</div>
                       <div className="text-xs text-success">{proof.item}</div>
@@ -277,7 +284,7 @@ export function Guarantees({ className = '' }: GuaranteesProps) {
               {/* Trustpilot - Same row as photos */}
               <div
                 className={`
-                  p-4 rounded-xl bg-bg-secondary/50 border border-[#00B67A]/30
+                  panel p-4 rounded-2xl !border-[#00B67A]/40
                   transition-all duration-500 flex flex-col justify-center
                   ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}
                 `}
