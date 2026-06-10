@@ -413,6 +413,11 @@ export function LandingClient({
 
       </header>
 
+      {/* BANDEAU LIVE — entre le header fixe et le hero */}
+      <div className="mt-14 md:mt-[72px]">
+        <LiveTickerBar winners={initialWinners} />
+      </div>
+
       {/* HERO SECTION */}
       {/* === MOBILE HERO === */}
       <section className="md:hidden relative min-h-[100svh] flex flex-col justify-center pt-10 pb-6 px-4">
@@ -568,7 +573,7 @@ export function LandingClient({
       </section>
 
       {/* === DESKTOP HERO === */}
-      <section className="hidden md:flex relative min-h-[92vh] items-center pt-12 overflow-hidden">
+      <section className="hidden md:flex relative min-h-[88vh] items-center pt-6 overflow-hidden">
         {/* Click Pulse Effect */}
         <ClickPulse enabled={true} intensity="medium" />
 
@@ -676,8 +681,6 @@ export function LandingClient({
         </div>
 
       </section>
-
-      <LiveTickerBar winners={initialWinners} />
 
       {/* TRUST BADGES */}
       <TrustBadges variant="horizontal" />

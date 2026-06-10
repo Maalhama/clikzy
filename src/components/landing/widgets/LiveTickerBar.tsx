@@ -51,7 +51,7 @@ export function LiveTickerBar({ winners }: LiveTickerBarProps) {
       </div>
 
       <div className="marquee-container pl-24">
-        <div className="flex w-max animate-[marquee_30s_linear_infinite]">
+        <div className="flex w-max animate-[marquee_75s_linear_infinite]">
           <Track />
           <Track />
         </div>
