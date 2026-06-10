@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react'
 import { Loader2, Gift, Sparkles, Zap, Coins, MousePointerClick, Clover } from 'lucide-react'
-import { getCollection, equipItem, unequipSlot, type Collection, type ChestDrop } from '@/actions/collection'
+import { getCollection, equipItem, unequipSlot, claimDailyChest, type Collection, type ChestDrop } from '@/actions/collection'
 import { RARITY, SLOT_LABEL, SLOT_EMOJI, bonusLabel, type Rarity } from './rarity'
 import { CaseOpeningModal } from './CaseOpeningModal'
 
@@ -28,6 +28,22 @@ export function CollectionClient() {
     else if (d.rewardKind === 'credits') setFlash(`💰 +${d.credits} crédits`)
     else setFlash(`⚡ +${d.xp} XP`)
     setTimeout(() => setFlash(null), 3500)
+  }
+
+  // Coffre quotidien : claim puis ouverture immédiate (reset à minuit Paris)
+  const onClaimDaily = async () => {
+    setBusy('daily')
+    const res = await claimDailyChest()
+    if (res.success && res.data) {
+      if (res.data.already) {
+        setFlash('🎁 Coffre du jour déjà récupéré — reviens après minuit !')
+        setTimeout(() => setFlash(null), 3500)
+      } else if (res.data.chestId) {
+        setOpening({ id: res.data.chestId, rarity: 'common' })
+      }
+      await load()
+    }
+    setBusy(null)
   }
 
   const onEquip = async (inventoryId: string) => {
@@ -63,6 +79,26 @@ export function CollectionClient() {
           <h2 className="text-lg font-display font-semibold text-white">Coffres</h2>
           <span className="ml-auto text-sm text-white/40">{data.chests.length} à ouvrir</span>
         </div>
+
+        {/* Coffre quotidien gratuit (reset minuit Paris) */}
+        {data.dailyChestAvailable && (
+          <button
+            onClick={onClaimDaily}
+            disabled={busy === 'daily'}
+            className="group relative mb-4 flex w-full items-center gap-4 overflow-hidden rounded-xl border border-neon-purple/50 bg-gradient-to-r from-neon-purple/15 via-neon-pink/10 to-neon-purple/15 p-4 transition-all hover:border-neon-purple disabled:opacity-60"
+            style={{ boxShadow: '0 0 30px -10px rgba(155,92,255,0.5)' }}
+          >
+            <span className="text-3xl transition-transform group-hover:scale-110 group-hover:rotate-6">🎁</span>
+            <span className="flex-1 text-left">
+              <span className="block font-display text-sm font-semibold text-white">Ton coffre du jour est arrivé !</span>
+              <span className="block text-xs text-white/50">1 coffre gratuit par jour — reset à minuit</span>
+            </span>
+            <span className="btn-arena px-5 py-2 text-xs">
+              {busy === 'daily' ? 'Ouverture…' : 'Récupérer'}
+            </span>
+          </button>
+        )}
+
         {data.chests.length === 0 ? (
           <p className="py-6 text-center text-sm text-white/40">Aucun coffre. Gagne des parties, monte de niveau et garde ta série pour en obtenir 🔥</p>
         ) : (

@@ -24,6 +24,7 @@ export type Collection = {
   inventory: InventoryItem[]
   equipment: Partial<Record<CatalogItem['slot'], InventoryItem>>
   bonuses: { xpPct: number; creditPct: number; dailyClicks: number; chestLuck: number }
+  dailyChestAvailable: boolean
 }
 
 type Res<T> = { success: boolean; data?: T; error?: string }
@@ -44,7 +45,7 @@ export async function getCollection(): Promise<Res<Collection>> {
     sb.from('user_chests').select('id, rarity, source').eq('user_id', user.id).eq('opened', false).order('created_at', { ascending: false }),
     sb.from('user_inventory').select('id, item:items_catalog(*)').eq('user_id', user.id).order('acquired_at', { ascending: false }),
     sb.from('user_equipment').select('slot, inventory_id, item:items_catalog(*)').eq('user_id', user.id),
-    sb.from('profiles').select('equip_bonus_pct, equip_credit_bonus_pct, equip_daily_clicks, equip_chest_luck').eq('id', user.id).single(),
+    sb.from('profiles').select('equip_bonus_pct, equip_credit_bonus_pct, equip_daily_clicks, equip_chest_luck, chest_last_claim_day').eq('id', user.id).single(),
   ])
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -68,6 +69,10 @@ export async function getCollection(): Promise<Res<Collection>> {
         dailyClicks: prof?.equip_daily_clicks ?? 0,
         chestLuck: prof?.equip_chest_luck ?? 0,
       },
+      // jour Paris : le coffre quotidien se réinitialise à minuit Europe/Paris
+      dailyChestAvailable:
+        (prof?.chest_last_claim_day ?? '') !==
+        new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Paris' }).format(new Date()),
     },
   }
 }
@@ -114,4 +119,16 @@ export async function unequipSlot(slot: string): Promise<Res<null>> {
   const { error } = await (supabase.rpc as any)('unequip_slot', { p_slot: slot })
   if (error) return { success: false, error: 'Erreur' }
   return { success: true, data: null }
+}
+
+export async function claimDailyChest(): Promise<Res<{ already: boolean; chestId: string | null }>> {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { success: false, error: 'Non authentifié' }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data, error } = await (supabase.rpc as any)('claim_daily_chest', { p_user_id: user.id })
+  if (error) return { success: false, error: 'Erreur' }
+  const r = Array.isArray(data) ? data[0] : data
+  if (!r?.ok) return { success: false, error: 'Erreur' }
+  return { success: true, data: { already: !!r.already, chestId: r.chest_id ?? null } }
 }
