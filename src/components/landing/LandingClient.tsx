@@ -763,7 +763,7 @@ export function LandingClient({
             </p>
           </div>
 
-          <div className="relative pb-24">
+          <div className="relative pb-2">
             {/* Ligne circuit diagonale qui suit la cascade */}
             <div
               className="absolute left-[4%] right-[4%] top-[72px] h-[2px] origin-left rotate-[3.2deg]"
@@ -822,7 +822,7 @@ export function LandingClient({
           </div>
 
           {/* Note fair-play */}
-          <div className="panel relative mt-14 max-w-3xl mx-auto px-6 py-5 overflow-hidden">
+          <div className="panel relative mt-10 max-w-3xl mx-auto px-6 py-5 overflow-hidden">
             <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-transparent via-neon-blue to-transparent" style={{ boxShadow: '0 0 12px rgba(60,203,255,0.5)' }} />
             <div className="flex items-center gap-4">
               <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-neon-blue/40 bg-neon-blue/10 shadow-[0_0_20px_-4px_rgba(60,203,255,0.6)]">
