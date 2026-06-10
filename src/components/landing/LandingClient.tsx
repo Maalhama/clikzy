@@ -31,6 +31,9 @@ import { TargetIcon, CursorClickIcon, TrophyIcon, GiftIcon } from '@/components/
 // Widgets - PrizeCarousel
 import { PrizeCarousel } from './widgets/PrizeCarousel'
 import { HeroLiveCard } from './widgets/HeroLiveCard'
+import { LiveTickerBar } from './widgets/LiveTickerBar'
+import { PrizesBento } from './widgets/PrizesBento'
+import { WinnersPodium } from './widgets/WinnersPodium'
 
 // Background Effects - Lazy loaded (heavy 3D component)
 const BackgroundEffects = dynamic(
@@ -356,8 +359,12 @@ export function LandingClient({
           {/* Logo */}
           <Logo size="md" animated={true} href="/" />
 
-          {/* Spacer pour centrer les CTAs */}
-          <div className="flex-1" />
+          <nav className="flex-1 flex items-center justify-center gap-7" aria-label="Sections">
+            <a href="#how-it-works-desktop" className="text-sm font-medium text-white/55 hover:text-white transition-colors">Comment ça marche</a>
+            <a href="#lots-desktop" className="text-sm font-medium text-white/55 hover:text-white transition-colors">Lots</a>
+            <a href="#gagnants" className="text-sm font-medium text-white/55 hover:text-white transition-colors">Gagnants</a>
+            <a href="#faq-desktop" className="text-sm font-medium text-white/55 hover:text-white transition-colors">FAQ</a>
+          </nav>
 
           {/* Right section */}
           <div className="flex items-center gap-4">
@@ -670,6 +677,8 @@ export function LandingClient({
 
       </section>
 
+      <LiveTickerBar winners={initialWinners} />
+
       {/* TRUST BADGES */}
       <TrustBadges variant="horizontal" />
 
@@ -862,7 +871,7 @@ export function LandingClient({
       </section>
 
       {/* === DESKTOP PRIZES === */}
-      <section className="hidden md:block relative py-20 overflow-hidden">
+      <section id="lots-desktop" className="hidden md:block relative py-20 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-neon-pink/5 to-transparent" />
         <div aria-hidden="true" className="pointer-events-none select-none absolute left-1/2 top-6 -translate-x-1/2 whitespace-nowrap title-giant text-[10rem] text-outline opacity-[0.06]">LOTS</div>
         <div className="absolute inset-0 pointer-events-none">
@@ -881,13 +890,21 @@ export function LandingClient({
             <p className="text-white/60 text-lg">Produits premium quotidiens</p>
             <div className="mx-auto mt-6 h-[2px] w-24 bg-gradient-to-r from-transparent via-neon-pink to-transparent" />
           </div>
-          {prizes && prizes.length > 0 ? <PrizeCarousel prizes={prizes} /> : <PrizeCarousel />}
+          {heroGames.length >= 2 ? (
+            <PrizesBento games={heroGames} />
+          ) : prizes && prizes.length > 0 ? <PrizeCarousel prizes={prizes} /> : <PrizeCarousel />}
         </div>
       </section>
 
       {/* LEADERBOARD & TESTIMONIALS - Hidden on mobile to reduce length */}
       <section className="hidden md:block relative py-20">
         <div className="max-w-7xl mx-auto px-6">
+          <div className="text-center mb-12">
+            <span className="kicker mb-4">La communauté</span>
+            <h2 className="title-giant text-4xl lg:text-5xl mt-3">
+              <span className="text-white">Ils jouent,</span> <span className="text-neon-pink neon-text-pink">ils gagnent</span>
+            </h2>
+          </div>
           <div className="grid lg:grid-cols-2 gap-8">
             <Leaderboard realWinners={recentWinners} />
             <Testimonials />
@@ -962,7 +979,7 @@ export function LandingClient({
       </section>
 
       {/* === DESKTOP WINNERS === */}
-      <section className="hidden md:block winners-section relative py-20 overflow-hidden">
+      <section id="gagnants" className="hidden md:block winners-section relative py-20 overflow-hidden">
         <div aria-hidden="true" className="pointer-events-none select-none absolute left-1/2 top-4 -translate-x-1/2 whitespace-nowrap title-giant text-[9rem] text-outline opacity-[0.06]">GAGNANTS</div>
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-success/5 rounded-full blur-[120px]" />
@@ -997,6 +1014,12 @@ export function LandingClient({
               </div>
             </div>
           </div>
+
+          <WinnersPodium winners={recentWinners.length >= 3 ? recentWinners : [
+            { id: 'p1', username: 'Alex42', item_name: 'iPhone 17 Pro', item_value: 1229 },
+            { id: 'p2', username: 'GamerPro', item_name: 'PS5', item_value: 549 },
+            { id: 'p3', username: 'LuckyOne', item_name: 'AirPods Pro', item_value: 279 },
+          ]} />
 
           {/* Winners Marquee */}
           <div className="relative">
@@ -1062,7 +1085,7 @@ export function LandingClient({
       </section>
 
       {/* === DESKTOP FAQ === */}
-      <section className="hidden md:block relative py-20">
+      <section id="faq-desktop" className="hidden md:block relative py-20">
         <div className="max-w-7xl mx-auto px-6">
           <FAQ />
         </div>
@@ -1283,6 +1306,9 @@ export function LandingClient({
       {/* === DESKTOP FOOTER === */}
       <footer className="hidden md:block relative border-t border-white/10">
         <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-neon-purple/50 to-transparent" style={{ boxShadow: '0 0 10px rgba(155, 92, 255, 0.3)' }} />
+        <div className="relative overflow-hidden pt-12 -mb-6" aria-hidden="true">
+          <div className="text-center title-giant text-[8.5rem] leading-none text-outline opacity-[0.07] select-none pointer-events-none whitespace-nowrap">CLEEKZY</div>
+        </div>
 
         <div className="max-w-7xl mx-auto px-6 py-16">
           <div className="grid grid-cols-4 gap-12">
