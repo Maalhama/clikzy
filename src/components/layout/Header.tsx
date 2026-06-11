@@ -220,22 +220,22 @@ export function Header({ profile }: HeaderProps) {
                   key={item.href}
                   href={item.href}
                   aria-current={active ? 'page' : undefined}
-                  className={`relative flex items-center gap-2 px-3.5 py-2 rounded-xl font-medium transition-all group ${
+                  className={`relative flex items-center gap-1.5 px-2.5 py-2 rounded-xl font-medium transition-all group ${
                     active
                       ? 'text-white bg-white/[0.06]'
                       : 'text-white/55 hover:text-white hover:bg-white/[0.04]'
                   }`}
                 >
                   <span
-                    className="w-[18px] h-[18px] transition-colors"
+                    className="w-4 h-4 transition-colors"
                     style={{ color: active ? item.accent : undefined }}
                   >
                     {item.icon}
                   </span>
-                  <span className="text-[0.9rem]">{item.label}</span>
+                  <span className="text-[0.8rem]">{item.label}</span>
                   {/* Soulignement néon actif */}
                   <span
-                    className={`absolute -bottom-[3px] left-3.5 right-3.5 h-[2px] rounded-full transition-opacity ${
+                    className={`absolute -bottom-[3px] left-2.5 right-2.5 h-[2px] rounded-full transition-opacity ${
                       active ? 'opacity-100' : 'opacity-0 group-hover:opacity-40'
                     }`}
                     style={{ background: item.accent, boxShadow: `0 0 10px ${item.accent}` }}
