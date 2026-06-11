@@ -3,6 +3,7 @@ import { Header } from '@/components/layout/Header'
 import { BackgroundEffects } from '@/components/ui/BackgroundEffects'
 import { ClientProviders } from '@/components/providers/ClientProviders'
 import { InstallBanner } from '@/components/pwa/InstallBanner'
+import { CosmeticsProvider } from '@/components/cosmetics/CosmeticsProvider'
 import type { Profile } from '@/types/database'
 
 export default async function MainLayout({
@@ -56,6 +57,14 @@ export default async function MainLayout({
         <main className="flex-1 relative z-10">
           {children}
         </main>
+
+        {/* Cosmétiques globaux : curseur + traînée de clic */}
+        {profile && (
+          <CosmeticsProvider
+            cursor={(profile as { cosmetic_cursor?: string }).cosmetic_cursor ?? 'cursor_default'}
+            trail={(profile as { cosmetic_trail?: string }).cosmetic_trail ?? 'trail_none'}
+          />
+        )}
 
         {/* PWA Install Banner */}
         <InstallBanner />

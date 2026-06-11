@@ -8,6 +8,7 @@ import { CaseOpeningModal } from './CaseOpeningModal'
 import { NeonChest } from './NeonChest'
 import { ItemIcon } from './ItemIcon'
 import { CharacterAvatar } from './CharacterAvatar'
+import { CustomizationSection } from './CustomizationSection'
 
 const SLOTS: Array<Collection['equipment'] extends Partial<Record<infer K, unknown>> ? K : never> = ['casque', 'armure', 'anneau', 'artefact']
 const CHEST_LABEL: Record<string, Rarity> = { common: 'common', rare: 'rare', epic: 'epic', legendary: 'legendary' }
@@ -178,6 +179,9 @@ export function CollectionClient() {
           </div>
         </div>
       </section>
+
+      {/* Personnalisation (cosmétiques) */}
+      <CustomizationSection />
 
       {/* Inventaire */}
       <section className="panel reveal reveal-4 p-5">

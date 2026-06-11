@@ -6,6 +6,7 @@ import Image from 'next/image'
 import { useRouter, usePathname } from 'next/navigation'
 import { createPortal } from 'react-dom'
 import { signOut } from '@/actions/auth'
+import { Avatar } from '@/components/ui/Avatar'
 import { Logo } from '@/components/ui/Logo'
 import { useCredits } from '@/contexts/CreditsContext'
 import type { Profile } from '@/types/database'
@@ -264,21 +265,7 @@ export function Header({ profile }: HeaderProps) {
                   href="/profile"
                   className="flex items-center gap-2.5 pl-1.5 pr-3 py-1.5 rounded-full hover:bg-white/5 transition-colors group border border-transparent hover:border-white/10"
                 >
-                  {profile.avatar_url ? (
-                    <div className="w-8 h-8 rounded-full overflow-hidden ring-2 ring-neon-purple/50 group-hover:ring-neon-purple transition-all">
-                      <Image
-                        src={profile.avatar_url}
-                        alt={profile.username}
-                        width={32}
-                        height={32}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                  ) : (
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-neon-purple to-neon-pink flex items-center justify-center text-sm font-bold text-white">
-                      {profile.username.charAt(0).toUpperCase()}
-                    </div>
-                  )}
+                  <Avatar username={profile.username} avatarUrl={profile.avatar_url} frame={(profile as { cosmetic_frame?: string }).cosmetic_frame ?? 'frame_default'} size={32} />
                   <span className="font-medium text-sm text-white/80 group-hover:text-white transition-colors">
                     {profile.username}
                   </span>
@@ -370,21 +357,7 @@ export function Header({ profile }: HeaderProps) {
                 className="block px-4 py-4 border-b border-white/10 hover:bg-white/5 transition-colors"
               >
                 <div className="flex items-center gap-3">
-                  {profile.avatar_url ? (
-                    <div className="w-12 h-12 rounded-full overflow-hidden ring-2 ring-neon-purple/50">
-                      <Image
-                        src={profile.avatar_url}
-                        alt={profile.username}
-                        width={48}
-                        height={48}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                  ) : (
-                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-neon-purple to-neon-pink flex items-center justify-center font-bold text-white text-lg">
-                      {profile.username.charAt(0).toUpperCase()}
-                    </div>
-                  )}
+                  <Avatar username={profile.username} avatarUrl={profile.avatar_url} frame={(profile as { cosmetic_frame?: string }).cosmetic_frame ?? 'frame_default'} size={48} />
                   <div className="flex-1">
                     <div className="flex items-center gap-1.5">
                       <span className="font-bold text-white">{profile.username}</span>
