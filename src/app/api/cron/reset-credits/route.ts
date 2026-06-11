@@ -17,16 +17,18 @@ export async function GET(request: NextRequest) {
   // Verify authentication
   const authHeader = request.headers.get('authorization')
   if (!CRON_SECRET || authHeader !== `Bearer ${CRON_SECRET}`) {
-      // Notification quotidienne : crédits + 3 coffres gratuits dispo (non-bloquant)
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  // Notification quotidienne : crédits + 3 coffres gratuits dispo (non-bloquant).
+  // DOIT rester après la vérification du secret : sinon un appel anonyme
+  // spamme tous les abonnés et la notif ne part jamais lors du vrai cron.
   broadcastPush({
     title: 'Tes récompenses du jour sont là',
     body: '10 clics gratuits + 3 coffres à ouvrir t\'attendent dans l\'arène.',
     url: '/lobby',
     tag: 'daily',
   }).catch((err) => console.error('[CRON] Failed to broadcast daily push:', err))
-
-  return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
 
   try {
     const supabase = createClient(supabaseUrl, supabaseServiceKey)
