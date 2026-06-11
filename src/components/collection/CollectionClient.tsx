@@ -7,6 +7,7 @@ import { RARITY, SLOT_LABEL, SLOT_EMOJI, bonusLabel, type Rarity } from './rarit
 import { CaseOpeningModal } from './CaseOpeningModal'
 import { NeonChest } from './NeonChest'
 import { ItemIcon } from './ItemIcon'
+import { CharacterAvatar } from './CharacterAvatar'
 
 const SLOTS: Array<Collection['equipment'] extends Partial<Record<infer K, unknown>> ? K : never> = ['casque', 'armure', 'anneau', 'artefact']
 const CHEST_LABEL: Record<string, Rarity> = { common: 'common', rare: 'rare', epic: 'epic', legendary: 'legendary' }
@@ -143,7 +144,14 @@ export function CollectionClient() {
           ))}
         </div>
 
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <div className="grid gap-5 lg:grid-cols-[minmax(0,260px)_1fr] lg:items-center">
+          {/* Mannequin : les items équipés s'affichent dessus */}
+          <div className="relative rounded-2xl border border-white/10 bg-gradient-to-b from-white/[0.04] to-transparent p-4">
+            <CharacterAvatar equipment={data.equipment} size={232} />
+          </div>
+
+          {/* Slots cliquables */}
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-2">
           {SLOTS.map((slot) => {
             const eq = data.equipment[slot]
             return (
@@ -167,6 +175,7 @@ export function CollectionClient() {
               </div>
             )
           })}
+          </div>
         </div>
       </section>
 

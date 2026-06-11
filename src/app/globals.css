@@ -2307,3 +2307,36 @@ body::after {
 @media (prefers-reduced-motion: reduce) {
   .click-burst i, .arena-vignette { animation: none; }
 }
+
+/* ============================================
+   PERSONNAGE PAPER-DOLL (collection)
+   ============================================ */
+.character-float {
+  animation: character-float 4.5s ease-in-out infinite;
+  will-change: transform;
+}
+@keyframes character-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+.character-breathe {
+  animation: character-breathe 4s ease-in-out infinite;
+}
+@keyframes character-breathe {
+  0%, 100% { opacity: 0.55; transform: translate(-50%, -50%) scale(1); }
+  50% { opacity: 0.85; transform: translate(-50%, -50%) scale(1.08); }
+}
+
+/* Artefact en orbite autour du perso */
+.character-orbit {
+  animation: character-orbit 6s ease-in-out infinite;
+}
+@keyframes character-orbit {
+  0%, 100% { transform: translate(-50%, -50%) translateY(0); }
+  50% { transform: translate(-50%, -50%) translateY(-12px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .character-float, .character-breathe, .character-orbit { animation: none; }
+}
