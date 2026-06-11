@@ -101,7 +101,8 @@ export async function POST(request: NextRequest) {
   return NextResponse.json(result.body, { status: result.status })
 }
 
-async function handleStripeEvent(event: Stripe.Event): Promise<HandlerResult> {
+// Exporté pour les tests unitaires (logique métier des événements Stripe).
+export async function handleStripeEvent(event: Stripe.Event): Promise<HandlerResult> {
   // Handle the checkout.session.completed event
   if (event.type === 'checkout.session.completed') {
     const session = event.data.object as Stripe.Checkout.Session

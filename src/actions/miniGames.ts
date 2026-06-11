@@ -168,10 +168,9 @@ export async function playMiniGame(gameType: MiniGameType): Promise<ActionResult
         Math.floor(Math.random() * 6) + 1,
         Math.floor(Math.random() * 6) + 1,
       ]
-      // Calculate credits based on dice sum (min 2, max 10)
+      // Gains selon la somme des 2 dés (barème resserré, max 5 crédits)
       const diceSum = diceResults[0] + diceResults[1]
-      // Map sum (2-12) to credits (2-10)
-      // 2-3: 2, 4-5: 3, 6-7: 4, 8-9: 6, 10-11: 8, 12: 10
+      // 2-3: 0, 4-7: 1, 8-9: 2, 10-11: 3, 12 (double 6): 5
       if (diceSum <= 3) creditsWon = 0
       else if (diceSum <= 5) creditsWon = 1
       else if (diceSum <= 7) creditsWon = 1

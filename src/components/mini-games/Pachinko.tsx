@@ -13,7 +13,7 @@ interface PachinkoProps {
 }
 
 // MIROIR EXACT de PACHINKO_SLOTS (src/types/miniGames.ts) — le serveur renvoie un indice.
-const SLOTS = [0, 0, 1, 2, 5, 2, 1, 0, 0]
+export const SLOTS = [0, 0, 1, 2, 5, 2, 1, 0, 0]
 // Responsive board dimensions
 const BOARD_WIDTH = 260
 const BOARD_HEIGHT = 320

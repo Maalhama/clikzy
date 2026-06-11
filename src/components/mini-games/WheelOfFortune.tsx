@@ -14,7 +14,7 @@ interface WheelOfFortuneProps {
 // Couleurs DA : alternance dark/neon avec dégradés (moyenne: 2.25 crédits)
 // MIROIR EXACT de WHEEL_SEGMENTS (src/types/miniGames.ts) : le serveur renvoie
 // un INDICE dans cette table — toute divergence = gain affiché mensonger.
-const SEGMENTS = [
+export const SEGMENTS = [
   { value: 0, color: '#0B0F1A', text: '#4A5568', borderColor: '#1E2942' },
   { value: 0, color: '#141B2D', text: '#4A5568', borderColor: '#1E2942' },
   { value: 0, color: '#0B0F1A', text: '#4A5568', borderColor: '#1E2942' },
