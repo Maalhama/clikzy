@@ -106,7 +106,7 @@ export function ReferralSection({ referralCode, referralCount, creditsEarned, ha
         </div>
         <div>
           <h3 className="text-white font-bold">Parrainage</h3>
-          <p className="text-white/50 text-xs">Invite tes amis, gagne des crédits</p>
+          <p className="text-white/50 text-xs">+10 crédits pour toi, +5 pour ton filleul</p>
         </div>
       </div>
 
@@ -208,7 +208,7 @@ export function ReferralSection({ referralCode, referralCount, creditsEarned, ha
           animate={{ opacity: 1, scale: 1 }}
           className="mt-4 p-3 rounded-xl bg-success/20 border border-success/30 text-success text-sm text-center"
         >
-          Code appliqué ! Ton parrain a reçu 10 crédits.
+          Code appliqué ! Tu reçois 5 crédits de bienvenue, ton parrain en reçoit 10.
         </motion.div>
       )}
     </motion.div>
