@@ -226,15 +226,22 @@ export function Header({ profile }: HeaderProps) {
                   className={`relative flex items-center gap-1.5 px-2.5 py-2 rounded-xl font-medium transition-all group ${
                     active ? 'bg-white/[0.06]' : 'hover:bg-white/[0.05]'
                   }`}
-                  style={{ color: item.accent }}
+                  style={{ ['--accent' as string]: item.accent }}
                 >
+                  {/* Icône toujours en couleur de la section */}
                   <span
-                    className={`w-4 h-4 transition-all ${active ? '' : 'opacity-90 group-hover:opacity-100'}`}
-                    style={{ filter: active ? `drop-shadow(0 0 6px ${item.accent})` : undefined }}
+                    className="w-4 h-4 transition-all"
+                    style={{ color: item.accent, filter: active ? `drop-shadow(0 0 6px ${item.accent})` : undefined }}
                   >
                     {item.icon}
                   </span>
-                  <span className={`text-[0.8rem] transition-opacity ${active ? '' : 'opacity-90 group-hover:opacity-100'}`}>{item.label}</span>
+                  {/* Texte coloré seulement au survol ou sur la section active */}
+                  <span
+                    className={`text-[0.8rem] transition-colors ${active ? '' : 'text-white/70 group-hover:[color:var(--accent)]'}`}
+                    style={active ? { color: item.accent } : undefined}
+                  >
+                    {item.label}
+                  </span>
                   {/* Soulignement néon actif */}
                   <span
                     className={`absolute -bottom-[3px] left-2.5 right-2.5 h-[2px] rounded-full transition-opacity ${
