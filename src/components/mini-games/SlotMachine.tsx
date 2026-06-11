@@ -209,7 +209,7 @@ export default function SlotMachine({
               setLeverPulled(false)
 
               const allMatch = targetSymbols[0] === targetSymbols[1] && targetSymbols[1] === targetSymbols[2]
-              const isJackpot = prizeAmount >= 10
+              const isJackpot = prizeAmount >= 5
 
               if (prizeAmount > 0) {
                 setShowParticles(true)
@@ -235,7 +235,7 @@ export default function SlotMachine({
     }, 300)
   }, [isSpinning, disabled, prizeAmount, onComplete, targetSymbols, playWhoosh, playImpact, playWin, vibrate])
 
-  const isJackpot = prizeAmount >= 10
+  const isJackpot = prizeAmount >= 5
   const isWin = prizeAmount > 0
 
   // Check if all symbols match

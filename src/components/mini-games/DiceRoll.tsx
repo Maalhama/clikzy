@@ -553,7 +553,7 @@ export default function DiceRoll({
               </>
             ) : (
               <div className="text-[var(--text-secondary)] text-sm">
-                Cliquez pour lancer
+                Clique pour lancer
               </div>
             )}
           </div>

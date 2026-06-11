@@ -12,15 +12,17 @@ interface WheelOfFortuneProps {
 }
 
 // Couleurs DA : alternance dark/neon avec dégradés (moyenne: 2.25 crédits)
+// MIROIR EXACT de WHEEL_SEGMENTS (src/types/miniGames.ts) : le serveur renvoie
+// un INDICE dans cette table — toute divergence = gain affiché mensonger.
 const SEGMENTS = [
   { value: 0, color: '#0B0F1A', text: '#4A5568', borderColor: '#1E2942' },
   { value: 0, color: '#141B2D', text: '#4A5568', borderColor: '#1E2942' },
+  { value: 0, color: '#0B0F1A', text: '#4A5568', borderColor: '#1E2942' },
   { value: 1, color: '#1A1033', text: '#9B5CFF', borderColor: '#9B5CFF' },
   { value: 1, color: '#0B0F1A', text: '#9B5CFF', borderColor: '#1E2942' },
   { value: 2, color: '#1A2A33', text: '#3CCBFF', borderColor: '#3CCBFF' },
-  { value: 3, color: '#2D1A3D', text: '#FF4FD8', borderColor: '#FF4FD8' },
-  { value: 3, color: '#1A1033', text: '#FF4FD8', borderColor: '#1E2942' },
-  { value: 10, color: '#FFB800', text: '#0B0F1A', borderColor: '#FFD700', isSpecial: true },
+  { value: 2, color: '#2D1A3D', text: '#FF4FD8', borderColor: '#FF4FD8' },
+  { value: 5, color: '#FFB800', text: '#0B0F1A', borderColor: '#FFD700', isSpecial: true },
 ]
 
 

@@ -12,7 +12,8 @@ interface PachinkoProps {
   disabled?: boolean
 }
 
-const SLOTS = [0, 0, 1, 3, 10, 3, 1, 0, 0]
+// MIROIR EXACT de PACHINKO_SLOTS (src/types/miniGames.ts) — le serveur renvoie un indice.
+const SLOTS = [0, 0, 1, 2, 5, 2, 1, 0, 0]
 // Responsive board dimensions
 const BOARD_WIDTH = 260
 const BOARD_HEIGHT = 320
@@ -256,11 +257,11 @@ export default function Pachinko({
 
       // Slot gradient based on value
       const slotGradient = ctx.createLinearGradient(x, slotY, x, slotY + slotHeight)
-      if (value === 10) {
+      if (value === 5) {
         slotGradient.addColorStop(0, '#FFD700')
         slotGradient.addColorStop(0.5, '#FFB800')
         slotGradient.addColorStop(1, '#FF8C00')
-      } else if (value === 5) {
+      } else if (value === 2) {
         slotGradient.addColorStop(0, '#2D1A3D')
         slotGradient.addColorStop(1, '#1A0F24')
       } else if (value === 0) {
@@ -278,19 +279,19 @@ export default function Pachinko({
       ctx.fill()
 
       // Slot border glow
-      ctx.strokeStyle = value === 10 ? '#FFB800' : value === 5 ? '#FF4FD8' : value === 0 ? '#3E4A5E' : '#3CCBFF'
-      ctx.lineWidth = value === 10 ? 2 : 1
-      ctx.shadowColor = value === 10 ? '#FFB800' : value === 5 ? '#FF4FD8' : '#3CCBFF'
-      ctx.shadowBlur = value === 10 ? 10 : value === 5 ? 5 : 3
+      ctx.strokeStyle = value === 5 ? '#FFB800' : value === 2 ? '#FF4FD8' : value === 0 ? '#3E4A5E' : '#3CCBFF'
+      ctx.lineWidth = value === 5 ? 2 : 1
+      ctx.shadowColor = value === 5 ? '#FFB800' : value === 2 ? '#FF4FD8' : '#3CCBFF'
+      ctx.shadowBlur = value === 5 ? 10 : value === 2 ? 5 : 3
       ctx.stroke()
       ctx.shadowBlur = 0
 
       // Value text with glow
-      ctx.fillStyle = value === 10 ? '#0B0F1A' : value === 0 ? '#4A5568' : '#FFFFFF'
-      ctx.font = value === 10 ? 'bold 20px Inter' : value === 5 ? 'bold 16px Inter' : '14px Inter'
+      ctx.fillStyle = value === 5 ? '#0B0F1A' : value === 0 ? '#4A5568' : '#FFFFFF'
+      ctx.font = value === 5 ? 'bold 20px Inter' : value === 2 ? 'bold 16px Inter' : '14px Inter'
       ctx.textAlign = 'center'
       ctx.textBaseline = 'middle'
-      if (value === 10) {
+      if (value === 5) {
         ctx.shadowColor = '#FFB800'
         ctx.shadowBlur = 5
       }
@@ -466,7 +467,7 @@ export default function Pachinko({
 
       setTimeout(() => {
         // Son de victoire et vibration selon le gain
-        if (credits === 10) {
+        if (credits === 5) {
           playWin()
           vibrate([100, 50, 100, 50, 100])
         } else if (credits > 0) {
@@ -508,7 +509,7 @@ export default function Pachinko({
   }, [])
 
   const isWin = hasFinished && result !== null && result > 0
-  const isJackpot = hasFinished && result === 10
+  const isJackpot = hasFinished && result === 5
 
   return (
     <div className="relative flex flex-col items-center p-2">

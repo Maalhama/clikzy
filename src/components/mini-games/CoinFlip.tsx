@@ -257,7 +257,7 @@ export default function CoinFlip({
             transition={{ duration: 0.5, repeat: Infinity }}
             className="text-[#FFB800] text-base sm:text-lg font-bold"
           >
-            🪙 La pièce tourne...
+            La pièce tourne…
           </motion.p>
         )}
         {(game.isStopping || game.isCompleted) && (
@@ -267,7 +267,7 @@ export default function CoinFlip({
             className="text-center"
           >
             <p className={`text-2xl sm:text-3xl font-black flex items-center justify-center gap-2 ${result === 'heads' ? 'text-[#FFB800]' : 'text-[#C0C0C0]'}`}>
-              {result === 'heads' ? <><Zap className="w-6 h-6 sm:w-8 sm:h-8" fill="currentColor" /> PILE !</> : '🪙 FACE !'}
+              {result === 'heads' ? <><Zap className="w-6 h-6 sm:w-8 sm:h-8" fill="currentColor" /> PILE !</> : <><span className="inline-flex h-6 w-6 sm:h-7 sm:w-7 items-center justify-center rounded-full bg-gradient-to-br from-[#E8E8E8] to-[#A8A8A8] text-sm font-black text-[#4A5568]">C</span> FACE !</>}
             </p>
           </motion.div>
         )}
@@ -289,7 +289,7 @@ export default function CoinFlip({
             }
           `}
         >
-          🪙 Lancer
+          <span className="inline-flex items-center gap-2"><span className="h-4 w-4 rounded-full border-2 border-[#0B0F1A]/60 bg-gradient-to-br from-[#FFD700] to-[#FF8C00]" aria-hidden />Lancer</span>
         </motion.button>
       )}
 

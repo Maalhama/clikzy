@@ -120,13 +120,13 @@ export default function ScratchCard({
     ctx.shadowColor = '#FF4FD8'
     ctx.shadowBlur = 15
     ctx.fillStyle = '#FF4FD8'
-    ctx.fillText('GRATTEZ ICI', width / 2, height / 2 - 8)
+    ctx.fillText('GRATTE ICI', width / 2, height / 2 - 8)
     ctx.shadowBlur = 0
 
     // Subtitle
     ctx.font = 'bold 10px "Inter", system-ui, sans-serif'
     ctx.fillStyle = 'rgba(255, 255, 255, 0.5)'
-    ctx.fillText('RÉVÉLEZ VOTRE GAIN', width / 2, height / 2 + 15)
+    ctx.fillText('RÉVÈLE TON GAIN', width / 2, height / 2 + 15)
 
     // Corner decorations
     ctx.strokeStyle = '#3CCBFF'
@@ -277,7 +277,7 @@ export default function ScratchCard({
     if (prizeAmount > 0) {
       playWin()
 
-      if (prizeAmount >= 10) {
+      if (prizeAmount >= 5) {
         vibrate([100, 50, 100, 50, 100]) // Jackpot
       } else {
         vibrate([70, 40, 70]) // Victoire normale
@@ -292,7 +292,7 @@ export default function ScratchCard({
   }
 
   const isWin = isRevealed && prizeAmount > 0
-  const isJackpot = isRevealed && prizeAmount >= 10
+  const isJackpot = isRevealed && prizeAmount >= 5
 
   return (
     <div className="relative flex flex-col items-center p-2 sm:p-4">
@@ -492,7 +492,7 @@ export default function ScratchCard({
             transition={{ duration: 2, repeat: Infinity }}
             className="text-[10px] tracking-widest text-white/50 uppercase font-medium"
           >
-            Grattez ici
+            Gratte ici
           </motion.p>
         </motion.div>
       )}

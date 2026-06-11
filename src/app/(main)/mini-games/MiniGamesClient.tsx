@@ -91,7 +91,7 @@ const GAME_CONFIG = {
     id: 'wheel' as MiniGameType,
     title: 'Roue de la Fortune',
     IconComponent: WheelIcon,
-    description: 'Faites tourner la roue et tentez de gagner jusqu\'à 5 crédits !',
+    description: 'Fais tourner la roue et tente de gagner jusqu\'à 5 crédits !',
     color: 'var(--neon-purple)',
     glowClass: 'neon-glow',
     textClass: 'neon-text',
@@ -101,7 +101,7 @@ const GAME_CONFIG = {
     id: 'scratch' as MiniGameType,
     title: 'Carte à Gratter',
     IconComponent: ScratchIcon,
-    description: 'Grattez la carte pour révéler votre gain instantanément !',
+    description: 'Gratte la carte pour révéler ton gain instantanément !',
     color: 'var(--neon-pink)',
     glowClass: 'neon-glow-pink',
     textClass: 'neon-text-pink',
@@ -111,7 +111,7 @@ const GAME_CONFIG = {
     id: 'pachinko' as MiniGameType,
     title: 'Pachinko',
     IconComponent: PachinkoIcon,
-    description: 'Lancez la bille et regardez-la tomber vers votre récompense !',
+    description: 'Lance la bille et regarde-la tomber vers ta récompense !',
     color: 'var(--neon-blue)',
     glowClass: 'neon-glow-blue',
     textClass: 'neon-text-blue',
@@ -121,7 +121,7 @@ const GAME_CONFIG = {
     id: 'slots' as MiniGameType,
     title: 'Machine à Sous',
     IconComponent: SlotsIcon,
-    description: 'Alignez les symboles et décrochez le jackpot !',
+    description: 'Aligne les symboles et décroche le jackpot !',
     color: 'var(--warning)',
     glowClass: 'neon-glow',
     textClass: 'text-[#FFB800]',
@@ -131,7 +131,7 @@ const GAME_CONFIG = {
     id: 'coinflip' as MiniGameType,
     title: 'Pile ou Face',
     IconComponent: CoinFlipIcon,
-    description: 'Lancez la pièce et tentez votre chance !',
+    description: 'Lance la pièce et tente ta chance !',
     color: 'var(--warning)',
     glowClass: 'neon-glow',
     textClass: 'text-[#FFB800]',
@@ -141,7 +141,7 @@ const GAME_CONFIG = {
     id: 'dice' as MiniGameType,
     title: 'Lancer de Dés',
     IconComponent: DiceIcon,
-    description: 'Lancez les dés et voyez ce que le destin vous réserve !',
+    description: 'Lance les dés et vois ce que le destin te réserve !',
     color: 'var(--neon-purple)',
     glowClass: 'neon-glow',
     textClass: 'neon-text',
@@ -398,6 +398,21 @@ export default function MiniGamesClient({ initialEligibility }: MiniGamesClientP
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
               className="relative w-full max-w-md lg:max-w-lg glass-dark rounded-2xl border border-[var(--bg-tertiary)] overflow-hidden my-4 lg:my-6"
             >
+              {/* Scène : halo aux couleurs du jeu + grille d'arène */}
+              <div aria-hidden className="pointer-events-none absolute inset-0">
+                <div className={`absolute -top-24 left-1/2 h-72 w-72 -translate-x-1/2 rounded-full bg-gradient-to-br ${GAME_CONFIG[activeGame].gradient} opacity-[0.16] blur-3xl`} />
+                <div
+                  className="absolute inset-0 opacity-[0.045]"
+                  style={{
+                    backgroundImage:
+                      'linear-gradient(rgba(255,255,255,0.7) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.7) 1px, transparent 1px)',
+                    backgroundSize: '34px 34px',
+                    maskImage: 'radial-gradient(ellipse 90% 70% at 50% 30%, black 30%, transparent 80%)',
+                    WebkitMaskImage: 'radial-gradient(ellipse 90% 70% at 50% 30%, black 30%, transparent 80%)',
+                  }}
+                />
+              </div>
+
               {/* Close button - only when showing result */}
               {result && (
                 <button
@@ -424,7 +439,7 @@ export default function MiniGamesClient({ initialEligibility }: MiniGamesClientP
               {/* Game Component */}
               {!isLoading && pendingGame && !result && (
                 <div className="p-3 lg:p-4">
-                  <h2 className={`text-xl lg:text-2xl font-black text-center mb-3 ${GAME_CONFIG[activeGame].textClass}`}>
+                  <h2 className={`font-display text-xl lg:text-2xl font-black text-center mb-3 ${GAME_CONFIG[activeGame].textClass}`}>
                     {GAME_CONFIG[activeGame].title}
                   </h2>
 
@@ -543,7 +558,7 @@ export default function MiniGamesClient({ initialEligibility }: MiniGamesClientP
                       />
                     )}
                     <div className={`w-full h-full rounded-full flex items-center justify-center ${
-                      result.creditsWon >= 10
+                      result.creditsWon >= 5
                         ? 'bg-gradient-to-br from-[#FFB800] to-[#FF8C00] shadow-[0_0_40px_rgba(255,184,0,0.5)]'
                         : result.creditsWon > 0
                           ? 'bg-gradient-to-br from-[#9B5CFF] to-[#FF4FD8] shadow-[0_0_30px_rgba(155,92,255,0.4)]'
@@ -558,8 +573,8 @@ export default function MiniGamesClient({ initialEligibility }: MiniGamesClientP
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.2 }}
-                    className={`text-4xl sm:text-5xl font-black mb-2 ${
-                      result.creditsWon >= 10
+                    className={`font-display text-4xl sm:text-5xl font-black mb-2 ${
+                      result.creditsWon >= 5
                         ? 'text-[#FFB800] drop-shadow-[0_0_20px_rgba(255,184,0,0.5)]'
                         : 'text-white'
                     }`}
@@ -573,7 +588,7 @@ export default function MiniGamesClient({ initialEligibility }: MiniGamesClientP
                     transition={{ delay: 0.3 }}
                     className="text-[var(--text-secondary)] text-xl mb-6"
                   >
-                    {result.creditsWon > 0 ? 'Vous avez remporté' : 'Vous repartez avec'}
+                    {result.creditsWon > 0 ? 'Tu as remporté' : 'Tu repars avec'}
                   </motion.p>
 
                   {/* Credits won with animated counter effect */}
@@ -584,7 +599,7 @@ export default function MiniGamesClient({ initialEligibility }: MiniGamesClientP
                     className="relative mb-8"
                   >
                     <div className={`flex items-center justify-center gap-3 ${
-                      result.creditsWon >= 10
+                      result.creditsWon >= 5
                         ? 'text-[#FFB800]'
                         : result.creditsWon > 0
                           ? 'text-white'
