@@ -15,7 +15,7 @@ const RARITY_RANK: Record<string, number> = { common: 0, rare: 1, epic: 2, legen
 
 /** Personnage pixel art : héros + couches casque/armure portées (pixel-perfect),
  *  anneau et artefact en orbes flottants de part et d'autre (pas de zone portée). */
-export function CharacterAvatar({ equipment, size = 200 }: { equipment: Equipment; size?: number }) {
+export function CharacterAvatar({ equipment, size = 200, compact = false }: { equipment: Equipment; size?: number; compact?: boolean }) {
   const equipped = (['casque', 'armure', 'anneau', 'artefact'] as Slot[])
     .map((s) => equipment[s]?.item)
     .filter(Boolean) as EquippedItem[]
@@ -41,7 +41,7 @@ export function CharacterAvatar({ equipment, size = 200 }: { equipment: Equipmen
       />
 
       {/* Artefact flottant à gauche */}
-      {equipment.artefact && (
+      {!compact && equipment.artefact && (
         <div className="character-orbit absolute top-[20%]" style={{ left: '-16%' }} title={equipment.artefact.item.name}>
           <span style={{ filter: `drop-shadow(0 0 6px ${RARITY_HEX[equipment.artefact.item.rarity]}AA)`, display: 'inline-flex' }}>
             <PixelSprite layers={[itemIconLayer('artefact', equipment.artefact.item.rarity)]} size={orb} />
@@ -49,7 +49,7 @@ export function CharacterAvatar({ equipment, size = 200 }: { equipment: Equipmen
         </div>
       )}
       {/* Anneau flottant à droite */}
-      {equipment.anneau && (
+      {!compact && equipment.anneau && (
         <div className="character-orbit absolute bottom-[26%]" style={{ right: '-12%', animationDelay: '-3s' }} title={equipment.anneau.item.name}>
           <span style={{ filter: `drop-shadow(0 0 6px ${RARITY_HEX[equipment.anneau.item.rarity]}AA)`, display: 'inline-flex' }}>
             <PixelSprite layers={[itemIconLayer('anneau', equipment.anneau.item.rarity)]} size={Math.round(orb * 0.8)} />

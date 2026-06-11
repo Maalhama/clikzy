@@ -2,6 +2,8 @@
 
 import { memo, useEffect, useState } from 'react'
 import { NeonChest } from '@/components/collection/NeonChest'
+import { LobbyCharacterWidget } from '@/components/lobby/LobbyCharacterWidget'
+import { MidnightCountdown } from '@/components/lobby/MidnightCountdown'
 
 interface LobbyHeaderProps {
   credits: number
@@ -11,6 +13,8 @@ interface LobbyHeaderProps {
   wasReset?: boolean
   chestInfo?: { count: number; bestRarity: string; dailyAvailable: boolean } | null
   onChestsClick?: () => void
+  calendarAvailable?: boolean
+  onCalendarClick?: () => void
 }
 
 export const LobbyHeader = memo(function LobbyHeader({
@@ -21,6 +25,8 @@ export const LobbyHeader = memo(function LobbyHeader({
   wasReset = false,
   chestInfo = null,
   onChestsClick,
+  calendarAvailable = false,
+  onCalendarClick,
 }: LobbyHeaderProps) {
   return (
     <div className="relative py-6 md:py-8 px-4 md:px-6">
@@ -86,15 +92,53 @@ export const LobbyHeader = memo(function LobbyHeader({
 
           {/* Coffres + stats */}
           <div className="flex flex-col items-stretch gap-3 sm:items-end">
+          {/* Récompense du jour (calendrier) + coffres, côte à côte */}
+          <div className="flex items-stretch gap-3">
+          {/* Widget personnage — aperçu du héros équipé → collection */}
+          {onCalendarClick && <LobbyCharacterWidget />}
+          {/* Widget récompense du jour — ouvre le calendrier */}
+          {onCalendarClick && (
+            <button
+              type="button"
+              onClick={onCalendarClick}
+              className="hero-live-card group flex items-center gap-3 px-4 py-3 text-left transition-transform hover:-translate-y-0.5"
+            >
+              <div className="relative flex h-[46px] w-[46px] shrink-0 items-center justify-center rounded-xl border border-neon-purple/30 bg-neon-purple/10">
+                <svg className="h-6 w-6 text-neon-purple" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.7} strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="3" y="5" width="18" height="16" rx="2.5" />
+                  <path d="M3 10h18" />
+                  <path d="M8 3v3M16 3v3" />
+                  <path d="M12 12.4l1.1 2.25 2.48.32-1.82 1.7.46 2.45L12 17.9l-2.22 1.21.46-2.44-1.82-1.71 2.48-.32z" fill="currentColor" stroke="none" />
+                </svg>
+                {calendarAvailable && (
+                  <span className="absolute -right-1.5 -top-1.5 flex h-3.5 w-3.5">
+                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-success opacity-75" />
+                    <span className="relative inline-flex h-3.5 w-3.5 rounded-full bg-success" />
+                  </span>
+                )}
+              </div>
+              <div className="min-w-0">
+                <div className="font-display text-sm font-semibold text-white whitespace-nowrap">Récompense du jour</div>
+                {calendarAvailable ? (
+                  <div className="mt-0.5 flex items-center gap-1.5 text-xs text-success">
+                    <span className="live-dot" aria-hidden="true" />
+                    À réclamer maintenant
+                  </div>
+                ) : (
+                  <div className="mt-0.5 flex items-center gap-1.5 text-xs text-white/45">Prochaine dans <MidnightCountdown /></div>
+                )}
+              </div>
+            </button>
+          )}
           {/* Widget coffres — lien vers la collection */}
           {chestInfo && (
             <button
               type="button"
               onClick={onChestsClick}
-              className="hero-live-card group flex items-center gap-4 px-5 py-3 text-left transition-transform hover:-translate-y-0.5"
+              className="hero-live-card group flex items-center gap-3 px-4 py-3 text-left transition-transform hover:-translate-y-0.5"
             >
-              <div className="relative">
-                <NeonChest rarity={chestInfo.count > 0 ? chestInfo.bestRarity : 'common'} size={62} />
+              <div className="relative flex h-[46px] w-[46px] shrink-0 items-center justify-center">
+                <NeonChest rarity={chestInfo.count > 0 ? chestInfo.bestRarity : 'common'} size={46} />
                 {chestInfo.count > 0 && (
                   <span className="stat-numeral absolute -right-2 -top-2 z-20 flex h-6 min-w-6 items-center justify-center rounded-full border border-neon-pink/60 bg-bg-primary px-1 text-xs text-neon-pink shadow-[0_0_10px_rgba(255,79,216,0.5)]">
                     ×{chestInfo.count}
@@ -102,7 +146,7 @@ export const LobbyHeader = memo(function LobbyHeader({
                 )}
               </div>
               <div className="min-w-0">
-                <div className="font-display text-sm font-semibold text-white">
+                <div className="font-display text-sm font-semibold text-white whitespace-nowrap">
                   {chestInfo.count > 0
                     ? `${chestInfo.count} coffre${chestInfo.count > 1 ? 's' : ''} à ouvrir`
                     : 'Tes coffres'}
@@ -113,7 +157,7 @@ export const LobbyHeader = memo(function LobbyHeader({
                     3 coffres gratuits dispo aujourd&apos;hui
                   </div>
                 ) : (
-                  <div className="mt-0.5 text-xs text-white/40">Coffres gratuits récupérés — reviens demain</div>
+                  <div className="mt-0.5 flex items-center gap-1.5 text-xs text-white/45">Prochains dans <MidnightCountdown /></div>
                 )}
               </div>
               <svg className="h-4 w-4 shrink-0 text-white/50 transition-all group-hover:translate-x-1 group-hover:text-neon-purple" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
@@ -121,6 +165,7 @@ export const LobbyHeader = memo(function LobbyHeader({
               </svg>
             </button>
           )}
+          </div>
 
           {/* Stats pills */}
           <div className="flex flex-wrap gap-2">

@@ -46,7 +46,8 @@ export function LobbyClient({
 }: LobbyClientProps) {
   // Search state
   const [searchQuery, setSearchQuery] = useState('')
-  const [calendarDays, setCalendarDays] = useState<CalendarDay[] | null>(null)
+  const [calendarData, setCalendarData] = useState<CalendarDay[] | null>(null)
+  const [showCalendar, setShowCalendar] = useState(false)
   const [showChests, setShowChests] = useState(false)
   const [paymentSuccess, setPaymentSuccess] = useState<{ show: boolean; credits: number }>({ show: false, credits: 0 })
 
@@ -77,19 +78,23 @@ export function LobbyClient({
     }
   }, [searchParams, router, creditsContext])
 
-  // Calendrier des récompenses : pop une fois par jour (Paris) à la connexion
+  // Calendrier des récompenses : charge les données + pop une fois/jour (Paris)
   useEffect(() => {
     if (!progression) return // visiteur non connecté
-    const parisDay = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Paris' }).format(new Date())
-    const key = `cleekzy-calendar-${parisDay}`
-    if (typeof window === 'undefined' || localStorage.getItem(key)) return
     getCalendarMonth().then((res) => {
       if (res.success && res.data && res.data.length > 0) {
-        setCalendarDays(res.data)
-        localStorage.setItem(key, '1')
+        setCalendarData(res.data)
+        const parisDay = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Paris' }).format(new Date())
+        const key = `cleekzy-calendar-${parisDay}`
+        if (typeof window !== 'undefined' && !localStorage.getItem(key)) {
+          setShowCalendar(true)
+          localStorage.setItem(key, '1')
+        }
       }
     })
   }, [progression])
+
+  const calendarClaimable = !!calendarData?.some((d) => d.claimable)
 
   // Pull to refresh handler
   const handleRefresh = useCallback(async () => {
@@ -197,12 +202,15 @@ export function LobbyClient({
         <LobbyChestsModal onClose={() => { setShowChests(false); router.refresh() }} />
       )}
 
-      {/* Calendrier des récompenses (1 pop par jour) */}
-      {calendarDays && (
+      {/* Calendrier des récompenses */}
+      {showCalendar && calendarData && (
         <RewardsCalendarModal
-          days={calendarDays}
-          onClose={() => setCalendarDays(null)}
-          onClaimed={() => creditsContext?.refreshCredits()}
+          days={calendarData}
+          onClose={() => setShowCalendar(false)}
+          onClaimed={() => {
+            creditsContext?.refreshCredits()
+            getCalendarMonth().then((res) => { if (res.success && res.data) setCalendarData(res.data) })
+          }}
         />
       )}
 
@@ -251,6 +259,8 @@ export function LobbyClient({
         wasReset={wasReset}
         chestInfo={chestInfo}
         onChestsClick={() => setShowChests(true)}
+        calendarAvailable={calendarClaimable}
+        onCalendarClick={() => setShowCalendar(true)}
       />
 
       {/* Bandeau gamification (rappel coffres/progression) — masqué si non connecté */}

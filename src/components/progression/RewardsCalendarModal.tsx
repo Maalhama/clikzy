@@ -124,9 +124,6 @@ export function RewardsCalendarModal({
           })}
         </div>
 
-        {/* Passe d'Arène premium */}
-        <BattlePassRail />
-
         {/* CTA du jour */}
         <div className="mt-5 text-center">
           {result ? (
@@ -148,6 +145,10 @@ export function RewardsCalendarModal({
             <p className="text-xs text-white/40">Récompense du jour déjà réclamée — reviens demain !</p>
           )}
         </div>
+
+        {/* Passe d'Arène premium */}
+        <BattlePassRail />
+
       </motion.div>
     </div>,
     document.body
