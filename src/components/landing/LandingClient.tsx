@@ -1063,7 +1063,7 @@ export function LandingClient({
 
           <div className="mt-10 text-center">
             <Link
-              href="/lobby"
+              href="/gagnants"
               className="btn-arena-ghost px-8 py-3 text-sm !text-success hover:!border-success/60"
             >
               Voir tous les gagnants
@@ -1338,7 +1338,7 @@ export function LandingClient({
               <ul className="space-y-3">
                 <li><Link href="/lobby" className="text-white/50 hover:text-neon-purple transition-colors text-sm">Voir les lots</Link></li>
                 <li><a href="#how-it-works-desktop" className="text-white/50 hover:text-neon-purple transition-colors text-sm">Comment ça marche</a></li>
-                <li><a href="#winners" className="text-white/50 hover:text-neon-purple transition-colors text-sm">Derniers gagnants</a></li>
+                <li><Link href="/gagnants" className="text-white/50 hover:text-neon-purple transition-colors text-sm">Derniers gagnants</Link></li>
                 <li><Link href="/register" className="text-white/50 hover:text-neon-purple transition-colors text-sm">Créer un compte</Link></li>
               </ul>
             </div>

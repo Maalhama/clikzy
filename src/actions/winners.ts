@@ -207,3 +207,48 @@ export async function getGlobalStats(): Promise<{
     playersOnline: Math.max(recentClickers || 0, 15), // Minimum 15 pour l'affichage
   }
 }
+
+export type WallWinner = {
+  id: string
+  username: string
+  itemName: string
+  itemValue: number | null
+  itemImage: string
+  wonAt: string
+  shippingStatus: string
+  shippedAt: string | null
+  deliveredAt: string | null
+}
+
+/** Mur public des gagnants avec suivi de livraison (preuve de confiance). */
+export async function getWinnersWall(limit: number = 60): Promise<WallWinner[]> {
+  const supabase = await createClient()
+  const { data, error } = await supabase
+    .from('winners')
+    .select(`
+      id, username, item_name, item_value, won_at,
+      shipping_status, shipped_at, delivered_at,
+      profiles!winners_user_id_fkey ( username ),
+      items!winners_item_id_fkey ( image_url )
+    `)
+    .order('won_at', { ascending: false })
+    .limit(limit)
+
+  if (error || !data) return []
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const rows = data as any[]
+  const RANK: Record<string, number> = { delivered: 0, shipped: 1, processing: 2, address_needed: 3, pending: 4 }
+  return rows
+    .map((w) => ({
+      id: w.id,
+      username: w.username || w.profiles?.username || 'Joueur anonyme',
+      itemName: w.item_name,
+      itemValue: w.item_value ? Number(w.item_value) : null,
+      itemImage: w.items?.image_url || '/products/airpods-4-neon.png',
+      wonAt: w.won_at,
+      shippingStatus: w.shipping_status || 'pending',
+      shippedAt: w.shipped_at ?? null,
+      deliveredAt: w.delivered_at ?? null,
+    }))
+    .sort((a, b) => (RANK[a.shippingStatus] ?? 5) - (RANK[b.shippingStatus] ?? 5))
+}
