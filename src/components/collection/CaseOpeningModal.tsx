@@ -75,7 +75,7 @@ export function CaseOpeningModal({
 
   if (typeof window === 'undefined') return null
   return createPortal(
-    <div className="fixed inset-0 max-sm:min-h-[100lvh] z-[100] flex items-center justify-center bg-black/85 backdrop-blur-sm p-4">
+    <div role="dialog" aria-modal="true" aria-label="Ouverture de coffre" className="fixed inset-0 max-sm:min-h-[100lvh] z-[100] flex items-center justify-center bg-black/85 backdrop-blur-sm p-4">
       {/* Flash plein écran à l'ouverture */}
       <AnimatePresence>
         {phase === 'revealed' && (

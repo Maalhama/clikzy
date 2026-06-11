@@ -66,7 +66,7 @@ const WinnerItem = memo(function WinnerItem({
       </div>
 
       {/* Time */}
-      <div className="text-white/30 text-[10px] whitespace-nowrap">
+      <div className="text-white/50 text-[10px] whitespace-nowrap">
         {getTimeAgo()}
       </div>
     </div>

@@ -31,7 +31,7 @@ export function PaymentSuccessModal({ credits, onClose }: PaymentSuccessModalPro
   }, [onClose])
 
   return (
-    <div className="fixed inset-0 max-sm:min-h-[100lvh] z-50 flex items-center justify-center p-4">
+    <div role="dialog" aria-modal="true" aria-label="Paiement réussi" className="fixed inset-0 max-sm:min-h-[100lvh] z-50 flex items-center justify-center p-4">
       {/* Backdrop */}
       <div
         className="absolute inset-0 bg-black/80 backdrop-blur-sm animate-fade-in"
@@ -101,7 +101,7 @@ export function PaymentSuccessModal({ credits, onClose }: PaymentSuccessModalPro
               style={{ width: `${progress}%` }}
             />
           </div>
-          <p className="text-xs text-white/30 mt-2">
+          <p className="text-xs text-white/50 mt-2">
             Fermeture automatique...
           </p>
         </div>

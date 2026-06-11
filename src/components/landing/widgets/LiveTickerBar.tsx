@@ -31,7 +31,7 @@ export function LiveTickerBar({ winners }: LiveTickerBarProps) {
             <path d="M5 16L3 5l5.5 5L12 4l3.5 6L21 5l-2 11H5zm14 3c0 .6-.4 1-1 1H6c-.6 0-1-.4-1-1v-1h14v1z" />
           </svg>
           <span className="font-semibold text-white/85 text-xs">{w.username}</span>
-          <span className="text-white/35 text-xs">a remporté</span>
+          <span className="text-white/55 text-xs">a remporté</span>
           <span className="text-white/70 text-xs">{w.item_name}</span>
           <span className="stat-numeral text-xs text-success">{w.item_value.toLocaleString()}€</span>
           <span className="ml-6 h-1 w-1 rounded-full bg-neon-purple/60" aria-hidden="true" />

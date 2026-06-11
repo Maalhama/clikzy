@@ -308,7 +308,7 @@ export function LobbyClient({
                       <span className="text-white/50">
                         Page {currentPage}/{totalPages}
                       </span>
-                      <span className="text-white/30">•</span>
+                      <span className="text-white/50">•</span>
                       <span className="text-white/50">
                         {totalItems} produits
                       </span>
@@ -321,7 +321,7 @@ export function LobbyClient({
                           disabled={currentPage === 1}
                           className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                             currentPage === 1
-                              ? 'bg-white/5 text-white/30'
+                              ? 'bg-white/5 text-white/50'
                               : 'bg-bg-secondary text-white border border-white/10'
                           }`}
                         >
@@ -332,7 +332,7 @@ export function LobbyClient({
                           disabled={currentPage === totalPages}
                           className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                             currentPage === totalPages
-                              ? 'bg-white/5 text-white/30'
+                              ? 'bg-white/5 text-white/50'
                               : 'bg-gradient-to-r from-neon-purple to-neon-pink text-white'
                           }`}
                         >

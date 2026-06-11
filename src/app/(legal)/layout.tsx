@@ -49,7 +49,7 @@ export default function LegalLayout({
             <Link href="/legal" className="hover:text-neon-purple transition-colors">Mentions légales</Link>
             <Link href="/cgv" className="hover:text-neon-purple transition-colors">CGV</Link>
           </div>
-          <p className="text-center text-white/30 text-xs mt-4">
+          <p className="text-center text-white/50 text-xs mt-4">
             © 2026 CLEEKZY. Tous droits réservés.
           </p>
         </div>

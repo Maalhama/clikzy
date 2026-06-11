@@ -81,7 +81,7 @@ export const Pagination = memo(function Pagination({
             transition-all duration-200
             ${
               currentPage === 1
-                ? 'bg-white/5 text-white/30 cursor-not-allowed'
+                ? 'bg-white/5 text-white/50 cursor-not-allowed'
                 : 'bg-bg-secondary/80 text-white hover:bg-neon-purple/20 hover:text-neon-purple border border-white/10 hover:border-neon-purple/50'
             }
           `}
@@ -95,7 +95,7 @@ export const Pagination = memo(function Pagination({
         <div className="flex items-center gap-1 mx-2">
           {getPageNumbers().map((page, index) =>
             page === 'ellipsis' ? (
-              <span key={`ellipsis-${index}`} className="px-2 text-white/30">
+              <span key={`ellipsis-${index}`} className="px-2 text-white/50">
                 ...
               </span>
             ) : (
@@ -134,7 +134,7 @@ export const Pagination = memo(function Pagination({
             transition-all duration-200
             ${
               currentPage === totalPages
-                ? 'bg-white/5 text-white/30 cursor-not-allowed'
+                ? 'bg-white/5 text-white/50 cursor-not-allowed'
                 : 'bg-bg-secondary/80 text-white hover:bg-neon-purple/20 hover:text-neon-purple border border-white/10 hover:border-neon-purple/50'
             }
           `}

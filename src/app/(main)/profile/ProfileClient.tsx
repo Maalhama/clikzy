@@ -416,7 +416,7 @@ export function ProfileClient({ profile, wins, gamesPlayed, totalValueWon, gameH
         </motion.div>
 
         {/* Member since */}
-        <p className="text-center text-white/30 text-xs mt-6">
+        <p className="text-center text-white/50 text-xs mt-6">
           Membre depuis {profile.created_at
             ? new Date(profile.created_at).toLocaleDateString('fr-FR', { year: 'numeric', month: 'long' })
             : '-'}
@@ -505,7 +505,7 @@ function WinCard({ win, index }: { win: WinnerWithItem; index: number }) {
           </div>
         ))}
       </div>
-      <div className="mt-1 flex items-center justify-between text-[0.6rem] text-white/35">
+      <div className="mt-1 flex items-center justify-between text-[0.6rem] text-white/55">
         <span className={stepIndex >= 1 ? 'text-success' : ''}>Préparation</span>
         <span className={stepIndex >= 2 ? 'text-success' : ''}>
           Expédié{win.shipped_at ? ` · ${new Date(win.shipped_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })}` : ''}

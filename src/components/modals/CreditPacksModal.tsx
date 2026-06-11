@@ -31,7 +31,7 @@ export function CreditPacksModal({ isOpen, onClose }: CreditPacksModalProps) {
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 max-sm:min-h-[100lvh] z-50 flex items-center justify-center p-4">
+        <div role="dialog" aria-modal="true" aria-label="Acheter des crédits" className="fixed inset-0 max-sm:min-h-[100lvh] z-50 flex items-center justify-center p-4">
           {/* Backdrop */}
           <motion.div
             initial={{ opacity: 0 }}
@@ -159,7 +159,7 @@ export function CreditPacksModal({ isOpen, onClose }: CreditPacksModalProps) {
 
             {/* Footer */}
             <div className="px-4 pb-4 pt-1 border-t border-white/5">
-              <div className="flex items-center justify-center gap-2 text-white/30 text-[10px]">
+              <div className="flex items-center justify-center gap-2 text-white/50 text-[10px]">
                 <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                 </svg>

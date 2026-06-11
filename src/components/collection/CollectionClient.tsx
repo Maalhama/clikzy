@@ -137,7 +137,7 @@ export function CollectionClient() {
 
         <div className="mb-4 flex flex-wrap gap-2">
           {bonusChips.map((c) => (
-            <span key={c.label} className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold ${c.on ? c.color : 'border-white/10 bg-white/5 text-white/30'}`}>
+            <span key={c.label} className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold ${c.on ? c.color : 'border-white/10 bg-white/5 text-white/50'}`}>
               <c.icon className="h-3.5 w-3.5" /> {c.label}
             </span>
           ))}
@@ -225,7 +225,7 @@ export function CollectionClient() {
                   <span className={`shrink-0 text-[10px] font-bold uppercase tracking-wider ${RARITY[r].text}`}>
                     Coffre {RARITY[r].label}
                   </span>
-                  <span className="shrink-0 text-xs text-white/35">
+                  <span className="shrink-0 text-xs text-white/55">
                     {new Date(h.openedAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })}
                   </span>
                 </li>

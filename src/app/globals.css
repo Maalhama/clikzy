@@ -101,10 +101,13 @@ body::after {
   color: var(--text-primary);
 }
 
-/* Focus outline */
+/* Focus outline — double anneau (halo clair + néon) pour rester visible
+   même en plein soleil sur fond sombre (WCAG 2.4.7 / 1.4.11) */
 :focus-visible {
-  outline: 2px solid var(--neon-purple);
+  outline: 2px solid #FFFFFF;
   outline-offset: 2px;
+  box-shadow: 0 0 0 4px var(--neon-purple), 0 0 12px 2px rgba(155, 92, 255, 0.6);
+  border-radius: 6px;
 }
 
 /* Utility classes */

@@ -116,7 +116,7 @@ export const LobbyHeader = memo(function LobbyHeader({
                   <div className="mt-0.5 text-xs text-white/40">Coffres gratuits récupérés — reviens demain</div>
                 )}
               </div>
-              <svg className="h-4 w-4 shrink-0 text-white/30 transition-all group-hover:translate-x-1 group-hover:text-neon-purple" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
+              <svg className="h-4 w-4 shrink-0 text-white/50 transition-all group-hover:translate-x-1 group-hover:text-neon-purple" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
               </svg>
             </button>

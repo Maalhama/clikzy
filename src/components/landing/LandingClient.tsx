@@ -812,7 +812,7 @@ export function LandingClient({
 
                     {/* Footer mono : position dans le circuit */}
                     <div className="mt-auto flex items-center justify-between border-t border-white/5 pt-3">
-                      <span className="stat-numeral text-xs text-white/30">{step.num} / 04</span>
+                      <span className="stat-numeral text-xs text-white/50">{step.num} / 04</span>
                       <svg className="h-4 w-4 transition-transform group-hover:translate-x-1" style={{ color: `${step.hex}99` }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
                       </svg>
@@ -1289,7 +1289,7 @@ export function LandingClient({
         </div>
 
         {/* Copyright */}
-        <div className="flex items-center justify-between text-[10px] text-white/30">
+        <div className="flex items-center justify-between text-[10px] text-white/50">
           <span>© 2026 CLEEKZY</span>
           <span className="flex items-center gap-1">
             <svg className="w-3 h-3 text-neon-purple" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -1377,7 +1377,7 @@ export function LandingClient({
 
         <div className="border-t border-white/5">
           <div className="max-w-7xl mx-auto px-6 py-6 flex items-center justify-between">
-            <p className="text-white/30 text-sm">© 2026 CLEEKZY. Tous droits réservés.</p>
+            <p className="text-white/50 text-sm">© 2026 CLEEKZY. Tous droits réservés.</p>
             <p className="flex items-center gap-2 font-display text-[0.65rem] font-semibold uppercase tracking-[0.3em]">
               <svg className="w-3.5 h-3.5 text-neon-purple" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122" />

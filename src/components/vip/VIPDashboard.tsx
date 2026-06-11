@@ -447,7 +447,7 @@ export function VIPDashboard({
       {lockedBenefits.length > 0 && (
         <motion.section variants={itemVariants}>
           <h2 className="text-lg font-semibold text-white/50 mb-4 flex items-center gap-2">
-            <LockIcon className="w-5 h-5 text-white/30" />
+            <LockIcon className="w-5 h-5 text-white/50" />
             Prochains avantages à débloquer
           </h2>
 
@@ -459,14 +459,14 @@ export function VIPDashboard({
               >
                 <div className="flex items-start gap-3">
                   <div className="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center flex-shrink-0">
-                    <benefit.icon className="w-5 h-5 text-white/30" />
+                    <benefit.icon className="w-5 h-5 text-white/50" />
                   </div>
                   <div>
                     <div className="flex items-center gap-2 mb-1">
                       <h3 className="font-medium text-white/50">{benefit.title}</h3>
-                      <LockIcon className="w-4 h-4 text-white/30" />
+                      <LockIcon className="w-4 h-4 text-white/50" />
                     </div>
-                    <p className="text-sm text-white/30">{benefit.description}</p>
+                    <p className="text-sm text-white/50">{benefit.description}</p>
                   </div>
                 </div>
               </div>

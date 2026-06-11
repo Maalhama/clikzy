@@ -79,7 +79,7 @@ const FeedRow = memo(function FeedRow({
           Leader
         </span>
       )}
-      <span suppressHydrationWarning className="whitespace-nowrap text-[0.6rem] text-white/30">
+      <span suppressHydrationWarning className="whitespace-nowrap text-[0.6rem] text-white/50">
         {timeAgoLabel(seconds)}
       </span>
     </div>

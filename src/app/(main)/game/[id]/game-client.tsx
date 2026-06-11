@@ -519,7 +519,7 @@ export function GameClient({
                   className={`
                     w-full py-4 [clip-path:polygon(0_0,100%_0,100%_calc(100%-10px),calc(100%-10px)_100%,0_100%)] font-display font-semibold uppercase tracking-wide text-base transition-all flex items-center justify-center gap-2
                     ${!canClick
-                      ? 'bg-bg-secondary/50 text-white/30 cursor-not-allowed'
+                      ? 'bg-bg-secondary/50 text-white/50 cursor-not-allowed'
                       : (game.item?.retail_value ?? 0) >= 1000
                       ? isUrgent
                         ? `bg-gradient-to-r from-[#FFB800] via-[#FF8C00] to-[#FFD700] text-[#0B0F1A] drop-shadow-[0_0_14px_rgba(255,184,0,0.55)] active:scale-[0.98] animate-pulse ${clickAnimation ? 'scale-95' : ''}`
@@ -894,7 +894,7 @@ export function GameClient({
                   className={`
                     w-full py-4 [clip-path:polygon(0_0,100%_0,100%_calc(100%-10px),calc(100%-10px)_100%,0_100%)] font-display font-semibold uppercase tracking-wide text-base transition-all flex items-center justify-center gap-2
                     ${!canClick
-                      ? 'bg-bg-secondary/50 text-white/30 cursor-not-allowed'
+                      ? 'bg-bg-secondary/50 text-white/50 cursor-not-allowed'
                       : (game.item?.retail_value ?? 0) >= 1000
                       ? isUrgent
                         ? `bg-gradient-to-r from-[#FFB800] via-[#FF8C00] to-[#FFD700] text-[#0B0F1A] drop-shadow-[0_0_14px_rgba(255,184,0,0.55)] hover:scale-[1.01] active:scale-[0.98] animate-pulse ${clickAnimation ? 'scale-95' : ''}`

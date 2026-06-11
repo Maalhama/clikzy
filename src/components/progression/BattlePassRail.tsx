@@ -95,7 +95,7 @@ export function BattlePassRail({ onClaimed }: { onClaimed?: () => void }) {
                   : 'border-white/10 bg-white/[0.03] opacity-60'
               }`}
             >
-              <span className="stat-numeral absolute left-1 top-0.5 text-[0.55rem] text-white/35">{tier}j</span>
+              <span className="stat-numeral absolute left-1 top-0.5 text-[0.55rem] text-white/55">{tier}j</span>
               {claimed ? (
                 <Check className="h-4 w-4 text-success" />
               ) : busy === tier ? (
@@ -108,7 +108,7 @@ export function BattlePassRail({ onClaimed }: { onClaimed?: () => void }) {
                 <ItemIcon itemId="pass_artefact" slot="artefact" rarity="epic" size={20} />
               )}
               {!state.purchased && !claimed && (
-                <Lock className="absolute bottom-1 right-1 h-3 w-3 text-white/30" />
+                <Lock className="absolute bottom-1 right-1 h-3 w-3 text-white/50" />
               )}
             </button>
           )

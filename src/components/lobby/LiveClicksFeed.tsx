@@ -68,7 +68,7 @@ const ClickItem = memo(function ClickItem({
       </div>
 
       {/* Time */}
-      <div className="text-white/30 text-[10px] whitespace-nowrap" suppressHydrationWarning>
+      <div className="text-white/50 text-[10px] whitespace-nowrap" suppressHydrationWarning>
         {timeDisplay}
       </div>
     </div>

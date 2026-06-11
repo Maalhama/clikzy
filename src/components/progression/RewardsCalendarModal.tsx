@@ -66,7 +66,7 @@ export function RewardsCalendarModal({
 
   if (typeof window === 'undefined') return null
   return createPortal(
-    <div className="fixed inset-0 max-sm:min-h-[100lvh] z-[100] flex items-center justify-center bg-black/85 p-4 backdrop-blur-sm">
+    <div role="dialog" aria-modal="true" aria-label="Récompenses du mois" className="fixed inset-0 max-sm:min-h-[100lvh] z-[100] flex items-center justify-center bg-black/85 p-4 backdrop-blur-sm">
       <motion.div
         initial={{ opacity: 0, y: 24, scale: 0.96 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -87,7 +87,7 @@ export function RewardsCalendarModal({
         {/* Grille */}
         <div className="mb-1 grid grid-cols-7 gap-1.5 text-center">
           {DOW_LABELS.map((l, i) => (
-            <span key={i} className="font-display text-[0.6rem] font-semibold uppercase tracking-wider text-white/35">{l}</span>
+            <span key={i} className="font-display text-[0.6rem] font-semibold uppercase tracking-wider text-white/55">{l}</span>
           ))}
         </div>
         <div className="grid grid-cols-7 gap-1.5">
@@ -108,7 +108,7 @@ export function RewardsCalendarModal({
                 } ${!d.claimed && !d.claimable ? 'opacity-55' : ''}`}
                 style={d.kind === 'chest' && !d.claimed ? { borderColor: `${chestColor}66` } : undefined}
               >
-                <span className="stat-numeral absolute left-1 top-0.5 text-[0.55rem] text-white/35">{n}</span>
+                <span className="stat-numeral absolute left-1 top-0.5 text-[0.55rem] text-white/55">{n}</span>
                 {d.claimed ? (
                   <Check className="h-4 w-4 text-success" />
                 ) : (
