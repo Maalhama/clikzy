@@ -27,14 +27,35 @@ const trophy = (
 export function JackpotWidget({ variant }: { variant: 'inline' | 'pill' | 'stat' }) {
   const [jp, setJp] = useState<JackpotState | null>(null)
   const [open, setOpen] = useState(false)
+  const [display, setDisplay] = useState(0)
 
   useEffect(() => { getJackpot().then(setJp).catch(() => {}) }, [])
+
+  // Compteur animé : grimpe jusqu'au montant réel (effet « cagnotte qui gonfle »)
+  useEffect(() => {
+    if (!jp) return
+    const target = jp.amount
+    const from = Math.max(0, target - 320)
+    const dur = 1400
+    const start = performance.now()
+    let raf = 0
+    const tick = (t: number) => {
+      const p = Math.min(1, (t - start) / dur)
+      const eased = 1 - Math.pow(1 - p, 3)
+      setDisplay(Math.round(from + (target - from) * eased))
+      if (p < 1) raf = requestAnimationFrame(tick)
+    }
+    raf = requestAnimationFrame(tick)
+    return () => cancelAnimationFrame(raf)
+  }, [jp])
+
   if (!jp || jp.amount <= 0) return null
   const next = nextEighth()
+  const shown = display.toLocaleString('fr-FR')
 
   const trigger = variant === 'stat' ? (
     <button onClick={() => setOpen(true)} className="pl-8 text-left transition-opacity hover:opacity-90" title="Jackpot communautaire">
-      <div className="text-2xl lg:text-3xl stat-numeral text-yellow-300">{jp.amount.toLocaleString('fr-FR')}</div>
+      <div className="text-2xl lg:text-3xl stat-numeral text-yellow-300">{shown}</div>
       <div className="mt-1 text-[0.65rem] uppercase tracking-[0.2em] text-white/40">Jackpot · le 8</div>
     </button>
   ) : variant === 'pill' ? (
@@ -44,7 +65,7 @@ export function JackpotWidget({ variant }: { variant: 'inline' | 'pill' | 'stat'
       className="panel flex items-center gap-2 px-3.5 py-2 transition-colors hover:border-yellow-400/40"
     >
       <span className="h-4 w-4">{trophy}</span>
-      <span className="stat-numeral text-sm text-yellow-300">{jp.amount.toLocaleString('fr-FR')}</span>
+      <span className="stat-numeral text-sm text-yellow-300">{shown}</span>
       <span className="text-xs text-white/50">jackpot</span>
     </button>
   ) : (
@@ -74,7 +95,7 @@ export function JackpotWidget({ variant }: { variant: 'inline' | 'pill' | 'stat'
               <span className="mb-3 flex h-14 w-14 items-center justify-center rounded-2xl border border-yellow-400/40 bg-yellow-400/10"><span className="h-7 w-7">{trophy}</span></span>
               <span className="kicker !text-[0.6rem]">Jackpot communautaire</span>
               <div className="mt-1 flex items-baseline gap-2">
-                <span className="stat-numeral text-4xl font-bold text-yellow-300">{jp.amount.toLocaleString('fr-FR')}</span>
+                <span className="stat-numeral text-4xl font-bold text-yellow-300">{shown}</span>
                 <span className="text-sm text-white/55">crédits</span>
               </div>
               <p className="mt-1 text-xs text-white/50">Prochaine distribution le {next.label} (dans {next.days} jour{next.days > 1 ? 's' : ''})</p>
