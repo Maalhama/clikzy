@@ -2094,3 +2094,70 @@ body::after {
   animation: shine 2.5s ease-in-out infinite;
 }
 
+
+/* ============================================
+   SKELETONS NÉON — états de chargement visibles
+   (l'ancien bg-secondary sur bg-primary était invisible)
+   ============================================ */
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.045);
+  border: 1px solid rgba(155, 92, 255, 0.12);
+}
+
+.skeleton::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    100deg,
+    transparent 30%,
+    rgba(155, 92, 255, 0.14) 48%,
+    rgba(255, 79, 216, 0.1) 52%,
+    transparent 70%
+  );
+  background-size: 220% 100%;
+  animation: skeleton-sweep 1.6s ease-in-out infinite;
+}
+
+@keyframes skeleton-sweep {
+  0% { background-position: 120% 0; }
+  100% { background-position: -120% 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton::after { animation: none; }
+}
+
+/* ============================================
+   TRANSITION DE PAGE — entrée douce entre routes
+   ============================================ */
+.page-enter {
+  animation: page-enter 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes page-enter {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-enter { animation: none; }
+}
+
+/* ============================================
+   SCROLL PROGRESS — fil néon en haut de la LP
+   ============================================ */
+.scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  z-index: 80;
+  transform-origin: 0 50%;
+  background: linear-gradient(90deg, #9B5CFF, #FF4FD8 55%, #3CCBFF);
+  box-shadow: 0 0 10px rgba(155, 92, 255, 0.7);
+  pointer-events: none;
+}

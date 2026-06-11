@@ -79,22 +79,55 @@ export default async function TwitterImage() {
         <div
           style={{
             position: 'absolute',
-            top: '40px',
-            right: '60px',
-            fontSize: '60px',
+            top: '48px',
+            right: '64px',
+            display: 'flex',
           }}
         >
-          🎮
+          <svg width="72" height="72" viewBox="0 0 24 24">
+            <path
+              d="M5 3l14 9-7 2-3 7-4-18z"
+              fill="#FF4FD8"
+              stroke="#FFFFFF"
+              strokeWidth="1.6"
+              strokeLinejoin="round"
+            />
+          </svg>
         </div>
         <div
           style={{
             position: 'absolute',
-            bottom: '40px',
-            left: '60px',
-            fontSize: '60px',
+            bottom: '48px',
+            left: '64px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '14px',
+            padding: '12px 26px',
+            borderRadius: '999px',
+            border: '2px solid rgba(0, 255, 136, 0.5)',
+            background: 'rgba(0, 255, 136, 0.08)',
           }}
         >
-          🏆
+          <div
+            style={{
+              width: '14px',
+              height: '14px',
+              borderRadius: '999px',
+              background: '#00FF88',
+              boxShadow: '0 0 18px rgba(0, 255, 136, 0.9)',
+              display: 'flex',
+            }}
+          />
+          <span
+            style={{
+              fontSize: '26px',
+              fontWeight: 700,
+              letterSpacing: '4px',
+              color: '#00FF88',
+            }}
+          >
+            EN DIRECT
+          </span>
         </div>
       </div>
     ),

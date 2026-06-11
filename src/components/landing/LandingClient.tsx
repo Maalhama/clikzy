@@ -178,6 +178,17 @@ export function LandingClient({
   const [isNavigating, setIsNavigating] = useState(false)
   const { hasConsented } = useCookieConsent()
 
+  // Les widgets flottants (timer + toasts) n'apparaissent qu'une fois le hero
+  // quitté : l'écran d'arrivée reste épuré et la carte live du hero n'est pas
+  // doublée par le widget sticky qui la chevauchait.
+  const [pastHero, setPastHero] = useState(false)
+  useEffect(() => {
+    const onScroll = () => setPastHero(window.scrollY > 560)
+    onScroll()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+
   async function handleSignOut() {
     await signOut()
     router.push('/login')
@@ -301,7 +312,7 @@ export function LandingClient({
       </div>
 
       {/* FLOATING WIDGETS - Only show after cookie consent */}
-      {hasConsented && (
+      {hasConsented && pastHero && (
         <>
           <LiveActivityToast enabled={true} maxVisible={3} realWinners={initialWinners} />
           <FloatingTimer

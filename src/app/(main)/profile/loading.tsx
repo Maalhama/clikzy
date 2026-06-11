@@ -17,20 +17,20 @@ export default function ProfileLoading() {
           <div className="relative rounded-3xl overflow-hidden bg-bg-secondary/50 border border-white/10 p-6 md:p-8">
             {/* Credits badge skeleton */}
             <div className="flex justify-end mb-4">
-              <div className="w-32 h-10 rounded-2xl bg-white/5 animate-pulse" />
+              <div className="w-32 h-10 rounded-2xl skeleton " />
             </div>
 
             {/* Main profile content */}
             <div className="flex flex-col md:flex-row items-center gap-6">
               {/* Avatar skeleton */}
-              <div className="w-32 h-32 md:w-36 md:h-36 rounded-2xl bg-white/10 animate-pulse" />
+              <div className="w-32 h-32 md:w-36 md:h-36 rounded-2xl skeleton " />
 
               {/* User info skeleton */}
               <div className="flex-1 text-center md:text-left">
-                <div className="h-10 w-48 mx-auto md:mx-0 bg-white/10 rounded-xl animate-pulse mb-3" />
-                <div className="h-6 w-32 mx-auto md:mx-0 bg-white/5 rounded-lg animate-pulse mb-3" />
-                <div className="h-2 w-full max-w-xs mx-auto md:mx-0 bg-white/10 rounded-full animate-pulse mb-4" />
-                <div className="h-4 w-40 mx-auto md:mx-0 bg-white/5 rounded animate-pulse mb-4" />
+                <div className="h-10 w-48 mx-auto md:mx-0 skeleton rounded-xl  mb-3" />
+                <div className="h-6 w-32 mx-auto md:mx-0 skeleton rounded-lg  mb-3" />
+                <div className="h-2 w-full max-w-xs mx-auto md:mx-0 skeleton rounded-full  mb-4" />
+                <div className="h-4 w-40 mx-auto md:mx-0 skeleton rounded  mb-4" />
                 <div className="h-12 w-28 mx-auto md:mx-0 bg-neon-purple/20 rounded-xl animate-pulse" />
               </div>
             </div>
@@ -44,9 +44,9 @@ export default function ProfileLoading() {
               key={i}
               className="rounded-2xl p-4 bg-white/5 border border-white/10"
             >
-              <div className="w-10 h-10 rounded-xl bg-white/10 animate-pulse mb-3" />
-              <div className="h-8 w-16 bg-white/10 rounded animate-pulse mb-2" />
-              <div className="h-3 w-12 bg-white/5 rounded animate-pulse" />
+              <div className="w-10 h-10 rounded-xl skeleton  mb-3" />
+              <div className="h-8 w-16 skeleton rounded  mb-2" />
+              <div className="h-3 w-12 skeleton rounded " />
             </div>
           ))}
         </div>
@@ -54,7 +54,7 @@ export default function ProfileLoading() {
         {/* Wins Section Skeleton */}
         <div>
           <div className="flex items-center justify-between mb-4">
-            <div className="h-7 w-40 bg-white/10 rounded-lg animate-pulse" />
+            <div className="h-7 w-40 skeleton rounded-lg " />
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
             {[...Array(3)].map((_, i) => (
@@ -63,11 +63,11 @@ export default function ProfileLoading() {
                 className="rounded-2xl bg-white/5 border border-white/10 p-4"
               >
                 <div className="flex items-center gap-4">
-                  <div className="w-20 h-20 rounded-xl bg-white/10 animate-pulse" />
+                  <div className="w-20 h-20 rounded-xl skeleton " />
                   <div className="flex-1">
-                    <div className="h-5 w-32 bg-white/10 rounded animate-pulse mb-2" />
-                    <div className="h-4 w-24 bg-white/5 rounded animate-pulse mb-2" />
-                    <div className="h-6 w-16 bg-white/10 rounded-lg animate-pulse" />
+                    <div className="h-5 w-32 skeleton rounded  mb-2" />
+                    <div className="h-4 w-24 skeleton rounded  mb-2" />
+                    <div className="h-6 w-16 skeleton rounded-lg " />
                   </div>
                 </div>
               </div>
