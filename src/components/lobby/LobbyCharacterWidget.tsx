@@ -11,25 +11,26 @@ type Equipment = Partial<Record<Slot, { item: { id: string; slot: Slot; rarity: 
 /** Widget personnage du lobby : aperçu pixel art du héros équipé → /collection. */
 export function LobbyCharacterWidget() {
   const router = useRouter()
-  const [equipment, setEquipment] = useState<Equipment | null>(null)
+  // On démarre avec un équipement vide -> le widget est TOUJOURS rendu (jamais
+  // absent pendant le chargement), puis on l'enrichit dès que la collection arrive.
+  const [equipment, setEquipment] = useState<Equipment>({})
 
   useEffect(() => {
     getCollection().then((res) => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       if ((res as any)?.success && (res as any).data) setEquipment((res as any).data.equipment ?? {})
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       else if ((res as any)?.equipment) setEquipment((res as any).equipment)
-      else setEquipment({})
-    }).catch(() => setEquipment({}))
+    }).catch(() => {})
   }, [])
 
-  if (equipment === null) return null
   const count = (['casque', 'armure', 'anneau', 'artefact'] as Slot[]).filter((s) => equipment[s]).length
 
   return (
     <button
       type="button"
       onClick={() => router.push('/collection')}
-      className="hero-live-card group flex shrink-0 items-center gap-0 px-2 py-2 text-left transition-transform hover:-translate-y-0.5 sm:gap-3 sm:px-4 sm:py-3"
+      className="hero-live-card group flex flex-1 items-center justify-center gap-0 px-2 py-2 text-left transition-transform hover:-translate-y-0.5 sm:flex-none sm:justify-start sm:gap-3 sm:px-4 sm:py-3"
     >
       <div className="shrink-0">
         <CharacterAvatar equipment={equipment} size={44} compact />

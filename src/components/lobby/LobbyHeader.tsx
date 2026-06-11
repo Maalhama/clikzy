@@ -93,8 +93,9 @@ export const LobbyHeader = memo(function LobbyHeader({
 
           {/* Coffres + stats */}
           <div className="flex flex-col items-stretch gap-3 sm:items-end">
-          {/* Récompense du jour (calendrier) + coffres, côte à côte */}
-          <div className="flex items-stretch justify-end gap-2 sm:gap-3">
+          {/* Récompense du jour (calendrier) + coffres, côte à côte.
+              Mobile : pleine largeur, 3 widgets répartis (flex-1). Desktop : auto, alignés à droite. */}
+          <div className="flex w-full items-stretch gap-2 sm:w-auto sm:justify-end sm:gap-3">
           {/* Widget personnage — aperçu du héros équipé → collection */}
           {onCalendarClick && <LobbyCharacterWidget />}
           {/* Widget récompense du jour — ouvre le calendrier */}
@@ -102,7 +103,7 @@ export const LobbyHeader = memo(function LobbyHeader({
             <button
               type="button"
               onClick={onCalendarClick}
-              className="hero-live-card group flex shrink-0 items-center gap-0 px-2 py-2 text-left transition-transform hover:-translate-y-0.5 sm:gap-3 sm:px-4 sm:py-3"
+              className="hero-live-card group flex flex-1 items-center justify-center gap-0 px-2 py-2 text-left transition-transform hover:-translate-y-0.5 sm:flex-none sm:justify-start sm:gap-3 sm:px-4 sm:py-3"
             >
               <div className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-neon-purple/30 bg-neon-purple/10 sm:h-[46px] sm:w-[46px]">
                 <svg className="h-6 w-6 text-neon-purple" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.7} strokeLinecap="round" strokeLinejoin="round">
@@ -136,7 +137,7 @@ export const LobbyHeader = memo(function LobbyHeader({
             <button
               type="button"
               onClick={onChestsClick}
-              className="hero-live-card group flex shrink-0 items-center gap-0 px-2 py-2 text-left transition-transform hover:-translate-y-0.5 sm:gap-3 sm:px-4 sm:py-3"
+              className="hero-live-card group flex flex-1 items-center justify-center gap-0 px-2 py-2 text-left transition-transform hover:-translate-y-0.5 sm:flex-none sm:justify-start sm:gap-3 sm:px-4 sm:py-3"
             >
               <div className="relative flex h-9 w-9 shrink-0 items-center justify-center sm:h-[46px] sm:w-[46px]">
                 <NeonChest rarity={chestInfo.count > 0 ? chestInfo.bestRarity : 'common'} size={38} />

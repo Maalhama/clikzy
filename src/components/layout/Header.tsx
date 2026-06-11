@@ -148,28 +148,26 @@ export function Header({ profile }: HeaderProps) {
   const router = useRouter()
   const pathname = usePathname()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const [menuClosing, setMenuClosing] = useState(false)
-  const [panelIn, setPanelIn] = useState(false)
+  const [mounted, setMounted] = useState(false)
   const { credits } = useCredits()
 
-  // Transition d'OUVERTURE fiable : on monte le panneau fermé (translateX -100%)
-  // puis on bascule à ouvert au frame suivant -> la transition CSS joue.
+  // Le panneau reste TOUJOURS monté (après hydratation) : l'animation slide
+  // se joue de façon fiable dans les deux sens car l'élément est déjà dans le
+  // DOM et seul `transform` change. Fini les soucis d'animation au montage.
   useEffect(() => {
-    if (mobileMenuOpen && !menuClosing) {
-      const r = requestAnimationFrame(() => setPanelIn(true))
-      return () => cancelAnimationFrame(r)
-    }
-  }, [mobileMenuOpen, menuClosing])
+    setMounted(true)
+  }, [])
 
-  const closeMenu = () => {
-    if (menuClosing) return
-    setMenuClosing(true)
-    setPanelIn(false)
-    setTimeout(() => {
-      setMobileMenuOpen(false)
-      setMenuClosing(false)
-    }, 300)
-  }
+  // Verrouille le scroll du body quand le menu est ouvert
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      const prev = document.body.style.overflow
+      document.body.style.overflow = 'hidden'
+      return () => { document.body.style.overflow = prev }
+    }
+  }, [mobileMenuOpen])
+
+  const closeMenu = () => setMobileMenuOpen(false)
 
   async function handleSignOut() {
     closeMenu()
@@ -335,9 +333,21 @@ export function Header({ profile }: HeaderProps) {
       {/* Espace sous le header fixe */}
       <div className="h-14 lg:h-[68px]" />
 
-      {/* Menu mobile (portal) */}
-      {typeof window !== 'undefined' && mobileMenuOpen && createPortal(
-        <div className="lg:hidden" style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 999999 }}>
+      {/* Menu mobile (portal) — toujours monté, animé via transform */}
+      {mounted && createPortal(
+        <div
+          className="lg:hidden"
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            zIndex: 999999,
+            pointerEvents: mobileMenuOpen ? 'auto' : 'none',
+          }}
+          aria-hidden={!mobileMenuOpen}
+        >
           <div
             onClick={closeMenu}
             style={{
@@ -348,8 +358,9 @@ export function Header({ profile }: HeaderProps) {
               bottom: 0,
               backgroundColor: 'rgba(0, 0, 0, 0.6)',
               backdropFilter: 'blur(4px)',
-              opacity: panelIn ? 1 : 0,
+              opacity: mobileMenuOpen ? 1 : 0,
               transition: 'opacity 0.25s ease-out',
+              pointerEvents: mobileMenuOpen ? 'auto' : 'none',
             }}
           />
 
@@ -364,9 +375,9 @@ export function Header({ profile }: HeaderProps) {
               backgroundColor: '#0B0F1A',
               borderRight: '1px solid rgba(155, 92, 255, 0.35)',
               borderTop: '1px solid rgba(155, 92, 255, 0.2)',
-              transform: panelIn ? 'translateX(0)' : 'translateX(-100%)',
+              transform: mobileMenuOpen ? 'translateX(0)' : 'translateX(-100%)',
               transition: 'transform 0.3s cubic-bezier(0.22, 1, 0.36, 1)',
-              boxShadow: panelIn ? '0 0 60px rgba(155,92,255,0.4), 10px 10px 40px rgba(0,0,0,0.8)' : 'none',
+              boxShadow: mobileMenuOpen ? '0 0 60px rgba(155,92,255,0.4), 10px 10px 40px rgba(0,0,0,0.8)' : 'none',
             }}
           >
             {/* En-tête du menu */}

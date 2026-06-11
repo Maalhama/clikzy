@@ -96,6 +96,17 @@ export function LobbyClient({
 
   const calendarClaimable = !!calendarData?.some((d) => d.claimable)
 
+  // Ouverture du calendrier : si les données ne sont pas encore chargées
+  // (réseau lent / fetch initial raté sur mobile), on les récupère à la volée
+  // pour que le modal s'ouvre toujours au clic.
+  const handleCalendarClick = useCallback(async () => {
+    setShowCalendar(true)
+    if (!calendarData) {
+      const res = await getCalendarMonth()
+      if (res.success && res.data) setCalendarData(res.data)
+    }
+  }, [calendarData])
+
   // Pull to refresh handler
   const handleRefresh = useCallback(async () => {
     // Refresh the page data using Next.js router
@@ -260,7 +271,7 @@ export function LobbyClient({
         chestInfo={chestInfo}
         onChestsClick={() => setShowChests(true)}
         calendarAvailable={calendarClaimable}
-        onCalendarClick={() => setShowCalendar(true)}
+        onCalendarClick={handleCalendarClick}
       />
 
       {/* Bandeau gamification (rappel coffres/progression) — masqué si non connecté */}
