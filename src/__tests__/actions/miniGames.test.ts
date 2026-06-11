@@ -92,7 +92,7 @@ describe('playMiniGame — intégrité économique', () => {
         const res = await playMiniGame(game)
         expect(res.success).toBe(true)
         // L'index renvoyé au client pointe la bonne valeur
-        const idx = (res.data as Record<string, number>)[idxKey]
+        const idx = (res.data as unknown as Record<string, number>)[idxKey]
         expect(idx).toBe(targetIndex)
         expect(res.data?.creditsWon).toBe(table[targetIndex])
         // Et le RPC a crédité exactement ce montant (si > 0)
