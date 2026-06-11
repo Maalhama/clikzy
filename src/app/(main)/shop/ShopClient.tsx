@@ -60,15 +60,20 @@ export function ShopClient({ currentCredits }: ShopClientProps) {
       <div className="px-4 md:px-6">
         <div className="max-w-4xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
-            {CREDIT_PACKS.map((pack) => (
+            {CREDIT_PACKS.map((pack, packIndex) => {
+              // Identité visuelle par tier : bleu / violet-rose / or
+              const tier = packIndex === 2
+                ? { ring: 'border-[#FFD700]/40', glow: 'shadow-[0_0_44px_-8px_rgba(255,215,0,0.35)]', coin: 'from-[#FFB800] to-[#FFD700]', coinShadow: 'shadow-[0_8px_24px_-6px_rgba(255,184,0,0.5)]', text: 'text-[#0B0F1A]' }
+                : pack.popular
+                ? { ring: 'border-neon-purple/40', glow: 'shadow-[0_0_44px_-8px_rgba(155,92,255,0.45)]', coin: 'from-neon-purple to-neon-pink', coinShadow: 'shadow-[0_8px_24px_-6px_rgba(155,92,255,0.55)]', text: 'text-white' }
+                : { ring: 'border-neon-blue/30', glow: 'shadow-[0_0_36px_-10px_rgba(60,203,255,0.3)]', coin: 'from-[#1B6E8C] to-[#3CCBFF]', coinShadow: 'shadow-[0_8px_24px_-6px_rgba(60,203,255,0.45)]', text: 'text-white' }
+              return (
               <div
                 key={pack.id}
                 className={`
-                  relative rounded-2xl p-6 transition-all
-                  ${pack.popular
-                    ? 'bg-gradient-to-br from-neon-purple/20 to-neon-pink/20 border-2 border-neon-purple/40 shadow-[0_0_40px_rgba(155,92,255,0.2)]'
-                    : 'panel panel-hover'
-                  }
+                  group relative rounded-2xl border-2 bg-bg-secondary/60 p-6 transition-all duration-300 hover:-translate-y-1.5
+                  ${tier.ring} ${tier.glow}
+                  ${pack.popular ? 'bg-gradient-to-br from-neon-purple/15 to-neon-pink/10 lg:scale-[1.04]' : ''}
                 `}
               >
                 {/* Popular badge */}
@@ -84,18 +89,17 @@ export function ShopClient({ currentCredits }: ShopClientProps) {
                 <div className="text-center pt-2">
                   {/* Credits */}
                   <div className={`
-                    w-20 h-20 mx-auto rounded-2xl flex flex-col items-center justify-center mb-4
-                    ${pack.popular
-                      ? 'bg-gradient-to-br from-neon-purple to-neon-pink shadow-lg shadow-neon-purple/30'
-                      : 'bg-gradient-to-br from-neon-blue/20 to-neon-purple/20 border border-white/10'
-                    }
+                    relative mx-auto mb-4 flex h-24 w-24 flex-col items-center justify-center rounded-full
+                    bg-gradient-to-br ${tier.coin} ${tier.coinShadow}
+                    transition-transform duration-300 group-hover:scale-105 group-hover:-translate-y-1
                   `}>
-                    <span className="text-white stat-numeral text-2xl leading-none">{pack.credits}</span>
-                    <span className="text-white/70 text-xs uppercase">crédits</span>
+                    <span className="absolute inset-1.5 rounded-full border border-white/30" aria-hidden />
+                    <span className={`stat-numeral text-2xl leading-none ${tier.text}`}>{pack.credits}</span>
+                    <span className={`text-[0.6rem] uppercase tracking-wider ${tier.text} opacity-70`}>crédits</span>
                   </div>
 
                   {/* Pack name */}
-                  <h3 className="text-xl font-bold text-white mb-1">{pack.name}</h3>
+                  <h3 className="font-display text-xl font-bold text-white mb-1">{pack.name}</h3>
 
                   {/* Bonus percentage */}
                   <div className="text-sm mb-6">
@@ -116,15 +120,18 @@ export function ShopClient({ currentCredits }: ShopClientProps) {
                     onClick={() => handlePurchase(pack.id)}
                     disabled={loadingPack !== null}
                     className={`
-                      w-full py-3 rounded-xl font-display font-semibold uppercase tracking-wide text-sm transition-all
-                      ${pack.popular
-                        ? 'bg-gradient-to-r from-neon-purple to-neon-pink text-white hover:opacity-90'
+                      relative w-full overflow-hidden py-3 [clip-path:polygon(0_0,100%_0,100%_calc(100%-8px),calc(100%-8px)_100%,0_100%)] font-display font-semibold uppercase tracking-wide text-sm transition-all
+                      ${packIndex === 2
+                        ? 'bg-gradient-to-r from-[#FFB800] to-[#FFD700] text-[#0B0F1A] hover:drop-shadow-[0_0_16px_rgba(255,184,0,0.5)]'
+                        : pack.popular
+                        ? 'bg-gradient-to-r from-neon-purple to-neon-pink text-white hover:drop-shadow-[0_0_16px_rgba(155,92,255,0.55)]'
                         : 'bg-white/10 text-white hover:bg-white/20'
                       }
                       disabled:opacity-50 disabled:cursor-not-allowed
                       active:scale-95
                     `}
                   >
+                    {pack.popular && <span aria-hidden className="cta-sheen" />}
                     {loadingPack === pack.id ? (
                       <span className="flex items-center justify-center gap-2">
                         <svg className="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
@@ -139,7 +146,7 @@ export function ShopClient({ currentCredits }: ShopClientProps) {
                   </button>
                 </div>
               </div>
-            ))}
+            )})}
           </div>
 
           {/* Error message */}

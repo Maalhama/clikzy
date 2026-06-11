@@ -72,6 +72,9 @@ export function GameClient({
   const [isVip, setIsVip] = useState(false)
   const [vipLoading, setVipLoading] = useState(false)
   const [clickAnimation, setClickAnimation] = useState(false)
+  // Bursts de particules : un par clic, auto-purgés
+  const [bursts, setBursts] = useState<number[]>([])
+  const burstSeq = useRef(0)
   const [creditsAnimation, setCreditsAnimation] = useState(false)
 
   const { timeLeft, isUrgent, isEnded } = useTimer({ endTime: game.end_time ?? 0 })
@@ -183,6 +186,9 @@ export function GameClient({
     trackGameClick(game.id, game.item.name)
     setClickAnimation(true)
     setCreditsAnimation(true)
+    const burstId = ++burstSeq.current
+    setBursts((prev) => [...prev.slice(-3), burstId])
+    setTimeout(() => setBursts((prev) => prev.filter((b) => b !== burstId)), 600)
     setTimeout(() => setClickAnimation(false), 150)
     setTimeout(() => setCreditsAnimation(false), 300)
 
@@ -260,6 +266,7 @@ export function GameClient({
         {/* MOBILE LAYOUT */}
         <div className="lg:hidden max-w-2xl mx-auto">
           {/* Game Card */}
+          {isCritical && game.status !== 'ended' && <div className="arena-vignette" aria-hidden />}
           <div
             className={`rounded-2xl overflow-hidden backdrop-blur-sm ${isCritical ? 'animate-[shake_0.5s_ease-in-out_infinite]' : ''}`}
             style={borderStyle}
@@ -487,6 +494,24 @@ export function GameClient({
                 </button>
               )}
               {game.status !== 'ended' && hasCredits && (
+                <div className="relative">
+                {bursts.map((id) => (
+                  <span key={id} className="click-burst" aria-hidden>
+                    {Array.from({ length: 10 }, (_, i) => {
+                      const angle = (i / 10) * Math.PI * 2 + (id % 7) * 0.31
+                      const dist = 46 + ((id + i) % 4) * 14
+                      return (
+                        <i
+                          key={i}
+                          style={{
+                            '--bx': `${Math.cos(angle) * dist}px`,
+                            '--by': `${Math.sin(angle) * dist - 18}px`,
+                          } as React.CSSProperties}
+                        />
+                      )
+                    })}
+                  </span>
+                ))}
                 <button
                   onClick={handleClick}
                   disabled={!canClick || isPending}
@@ -544,6 +569,7 @@ export function GameClient({
                     </>
                   )}
                 </button>
+                </div>
               )}
 
               {error && (
