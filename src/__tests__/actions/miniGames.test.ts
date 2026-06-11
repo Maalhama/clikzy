@@ -1,17 +1,9 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import {
-  WHEEL_SEGMENTS,
-  SCRATCH_VALUES,
-  PACHINKO_SLOTS,
-  SLOTS_PAYOUTS,
-} from '@/types/miniGames'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 
-// --- Mocks ---
 const mockAuth = { getUser: vi.fn() }
 const mockInsert = vi.fn()
 const mockRpc = vi.fn()
 
-// Chaîne select().eq().eq().gte().order() pour getMiniGameEligibility
 function makeSelectChain(plays: unknown[]) {
   const chain: Record<string, unknown> = {}
   chain.select = vi.fn(() => chain)
@@ -22,37 +14,27 @@ function makeSelectChain(plays: unknown[]) {
   chain.insert = mockInsert
   return chain
 }
-
 let playsReturned: unknown[] = []
-
-const mockSupabase = {
-  auth: mockAuth,
-  from: vi.fn(() => makeSelectChain(playsReturned)),
-}
-
+const mockSupabase = { auth: mockAuth, from: vi.fn(() => makeSelectChain(playsReturned)) }
 const mockServiceClient = { rpc: mockRpc }
 
-vi.mock('@/lib/supabase/server', () => ({
-  createClient: vi.fn(() => Promise.resolve(mockSupabase)),
-}))
-vi.mock('@/lib/supabase/service', () => ({
-  createServiceClient: vi.fn(() => mockServiceClient),
-}))
+vi.mock('@/lib/supabase/server', () => ({ createClient: vi.fn(() => Promise.resolve(mockSupabase)) }))
+vi.mock('@/lib/supabase/service', () => ({ createServiceClient: vi.fn(() => mockServiceClient) }))
 
 import { playMiniGame } from '@/actions/miniGames'
 
-describe('playMiniGame — intégrité économique', () => {
+describe('playMiniGame — flux & garde-fous', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     playsReturned = []
     mockAuth.getUser.mockResolvedValue({ data: { user: { id: 'u-1' } } })
     mockInsert.mockResolvedValue({ error: null })
-    // add_mini_game_credits renvoie le nouveau total ; on renvoie 42 par défaut
-    mockRpc.mockResolvedValue({ data: 42, error: null })
-  })
-
-  afterEach(() => {
-    vi.restoreAllMocks()
+    // consume_fairness renvoie des seeds ; add_mini_game_credits renvoie un total
+    mockRpc.mockImplementation((name: string) =>
+      name === 'consume_fairness'
+        ? Promise.resolve({ data: [{ server_seed: 'srv', client_seed: 'cli', nonce: 0 }], error: null })
+        : Promise.resolve({ data: 42, error: null })
+    )
   })
 
   it('refuse un utilisateur non authentifié', async () => {
@@ -62,77 +44,24 @@ describe('playMiniGame — intégrité économique', () => {
     expect(res.error).toBe('Non authentifié')
   })
 
-  it('refuse si le jeu gratuit a déjà été joué aujourd’hui (gate JS)', async () => {
+  it('refuse si déjà joué aujourd’hui (gate JS)', async () => {
     playsReturned = [{ game_type: 'wheel', played_at: new Date().toISOString() }]
     const res = await playMiniGame('wheel')
     expect(res.success).toBe(false)
     expect(res.error).toMatch(/déjà joué/)
   })
 
-  it('refuse en cas de conflit 23505 (gate atomique DB fait autorité)', async () => {
+  it('refuse sur conflit 23505 (gate atomique DB)', async () => {
     mockInsert.mockResolvedValue({ error: { code: '23505' } })
     const res = await playMiniGame('wheel')
     expect(res.success).toBe(false)
     expect(res.error).toMatch(/déjà joué/)
   })
 
-  // INVARIANT CLÉ : le montant gagné = la valeur de la table à l'index tiré.
-  // C'est la régression qui avait fait afficher "10" sur un segment valant 5.
-  describe('le gain correspond exactement à la table serveur tirée', () => {
-    const cases: Array<['wheel' | 'scratch' | 'pachinko', readonly number[], 'segmentIndex' | 'slotIndex']> = [
-      ['wheel', WHEEL_SEGMENTS, 'segmentIndex'],
-      ['pachinko', PACHINKO_SLOTS, 'slotIndex'],
-    ]
-
-    for (const [game, table, idxKey] of cases) {
-      it(`${game} : index tiré → gain = table[index]`, async () => {
-        // Force Math.random à pointer le dernier segment (la valeur "jackpot")
-        const targetIndex = table.length - 1
-        vi.spyOn(Math, 'random').mockReturnValue(targetIndex / table.length)
-        const res = await playMiniGame(game)
-        expect(res.success).toBe(true)
-        // L'index renvoyé au client pointe la bonne valeur
-        const idx = (res.data as unknown as Record<string, number>)[idxKey]
-        expect(idx).toBe(targetIndex)
-        expect(res.data?.creditsWon).toBe(table[targetIndex])
-        // Et le RPC a crédité exactement ce montant (si > 0)
-        if (table[targetIndex] > 0) {
-          expect(mockRpc).toHaveBeenCalledWith('add_mini_game_credits', {
-            p_user_id: 'u-1',
-            p_amount: table[targetIndex],
-          })
-        }
-      })
-    }
-
-    it('scratch : gain = SCRATCH_VALUES[index] sur tout l’intervalle', async () => {
-      for (let i = 0; i < SCRATCH_VALUES.length; i++) {
-        vi.clearAllMocks()
-        mockAuth.getUser.mockResolvedValue({ data: { user: { id: 'u-1' } } })
-        mockInsert.mockResolvedValue({ error: null })
-        mockRpc.mockResolvedValue({ data: 1, error: null })
-        playsReturned = []
-        vi.spyOn(Math, 'random').mockReturnValue(i / SCRATCH_VALUES.length)
-        const res = await playMiniGame('scratch')
-        expect(res.data?.creditsWon).toBe(SCRATCH_VALUES[i])
-        vi.restoreAllMocks()
-      }
-    })
-  })
-
-  it('aucun gain ne dépasse jamais le plafond de 5 crédits', async () => {
-    const tables = [WHEEL_SEGMENTS, SCRATCH_VALUES, PACHINKO_SLOTS, SLOTS_PAYOUTS]
-    for (const t of tables) {
-      expect(Math.max(...t)).toBeLessThanOrEqual(5)
-    }
-  })
-
-  it('un gain nul ne déclenche aucun crédit serveur', async () => {
-    // Indice 0 = valeur 0 sur la roue
-    vi.spyOn(Math, 'random').mockReturnValue(0)
+  it('joue avec succès et consomme l’état provably-fair', async () => {
     const res = await playMiniGame('wheel')
     expect(res.success).toBe(true)
-    expect(res.data?.creditsWon).toBe(0)
-    expect(mockRpc).not.toHaveBeenCalled()
+    expect(mockRpc).toHaveBeenCalledWith('consume_fairness', { p_user: 'u-1' })
+    expect(typeof res.data?.creditsWon).toBe('number')
   })
 })

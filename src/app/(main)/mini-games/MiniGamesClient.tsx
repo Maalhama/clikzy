@@ -8,6 +8,7 @@ import confetti from 'canvas-confetti';
 
 import { WheelIcon, ScratchIcon, PachinkoIcon, CreditIcon, SlotsIcon, CoinFlipIcon, DiceIcon } from '@/components/mini-games/GameIcons';
 import { CreditPacksModal } from '@/components/modals/CreditPacksModal';
+import { FairnessPanel } from '@/components/mini-games/FairnessPanel'
 
 import { useCredits } from '@/contexts/CreditsContext';
 import { useCountdown } from '@/hooks/useCountdown';
@@ -372,6 +373,8 @@ export default function MiniGamesClient({ initialEligibility }: MiniGamesClientP
             />
           ))}
         </div>
+
+        <FairnessPanel />
       </div>
 
       {/* Credit Packs Modal */}
@@ -728,7 +731,7 @@ function GameCard({ config, eligibility, onPlayFree, onPlayPaid, hasEnoughCredit
             <Clock size={16} />
             <div className="flex flex-col items-start">
               <span className="text-[10px] uppercase tracking-wider opacity-60">Prochain gratuit</span>
-              <span className="font-mono font-bold tracking-widest">
+              <span suppressHydrationWarning className="font-mono font-bold tracking-widest">
                 {countdown.formatted}
               </span>
             </div>

@@ -2,6 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { createServiceClient } from '@/lib/supabase/service'
+import { computeMiniGameOutcome, makeFairGenerator } from '@/lib/provablyFair'
 import {
   MiniGameType,
   MiniGameEligibility,
@@ -119,69 +120,15 @@ export async function playMiniGame(gameType: MiniGameType): Promise<ActionResult
     return { success: false, error: 'Vous avez déjà joué à ce jeu aujourd\'hui. Revenez demain !' }
   }
 
-  // Calculate result based on game type
-  let creditsWon: number
-  let segmentIndex: number | undefined
-  let slotIndex: number | undefined
-  let slotsSymbols: number[] | undefined
-  let coinResult: 'heads' | 'tails' | undefined
-  let diceResults: [number, number] | undefined
-
-  switch (gameType) {
-    case 'wheel': {
-      segmentIndex = Math.floor(Math.random() * WHEEL_SEGMENTS.length)
-      creditsWon = WHEEL_SEGMENTS[segmentIndex]
-      break
-    }
-    case 'scratch': {
-      const valueIndex = Math.floor(Math.random() * SCRATCH_VALUES.length)
-      creditsWon = SCRATCH_VALUES[valueIndex]
-      break
-    }
-    case 'pachinko': {
-      slotIndex = Math.floor(Math.random() * PACHINKO_SLOTS.length)
-      creditsWon = PACHINKO_SLOTS[slotIndex]
-      break
-    }
-    case 'slots': {
-      // Generate 3 random symbol indices
-      slotsSymbols = [
-        Math.floor(Math.random() * SLOTS_SYMBOLS.length),
-        Math.floor(Math.random() * SLOTS_SYMBOLS.length),
-        Math.floor(Math.random() * SLOTS_SYMBOLS.length),
-      ]
-      // Random payout from distribution
-      const slotsPayoutIndex = Math.floor(Math.random() * SLOTS_PAYOUTS.length)
-      creditsWon = SLOTS_PAYOUTS[slotsPayoutIndex]
-      break
-    }
-    case 'coinflip': {
-      // 10% chance to win (heads), 90% chance to lose (tails)
-      const isWin = Math.random() < 0.1
-      coinResult = isWin ? 'heads' : 'tails'
-      creditsWon = isWin ? 5 : 0
-      break
-    }
-    case 'dice': {
-      // Generate 2 dice values (1-6)
-      diceResults = [
-        Math.floor(Math.random() * 6) + 1,
-        Math.floor(Math.random() * 6) + 1,
-      ]
-      // Gains selon la somme des 2 dés (barème resserré, max 5 crédits)
-      const diceSum = diceResults[0] + diceResults[1]
-      // 2-3: 0, 4-7: 1, 8-9: 2, 10-11: 3, 12 (double 6): 5
-      if (diceSum <= 3) creditsWon = 0
-      else if (diceSum <= 5) creditsWon = 1
-      else if (diceSum <= 7) creditsWon = 1
-      else if (diceSum <= 9) creditsWon = 2
-      else if (diceSum <= 11) creditsWon = 3
-      else creditsWon = 5 // Double 6 !
-      break
-    }
-    default:
-      creditsWon = 0
-  }
+  // Résultat provably-fair (commit-reveal) : seeds consommés côté serveur,
+  // résultat déterministe vérifiable = HMAC(server_seed, client_seed:nonce:cursor).
+  const fairAdmin = createServiceClient()
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: fairRows } = await (fairAdmin.rpc as any)('consume_fairness', { p_user: user.id })
+  const fair = Array.isArray(fairRows) ? fairRows[0] : fairRows
+  const fairNonce: number = fair?.nonce ?? 0
+  const { creditsWon, segmentIndex, slotIndex, slotsSymbols, coinResult, diceResults } =
+    computeMiniGameOutcome(gameType, makeFairGenerator(fair?.server_seed ?? '', fair?.client_seed ?? '', fairNonce))
 
   // Enregistrement ATOMIQUE de la partie gratuite : l'index unique partiel
   // (user_id, game_type, play_day) WHERE is_free_play sérialise les requêtes
@@ -195,6 +142,7 @@ export async function playMiniGame(gameType: MiniGameType): Promise<ActionResult
       game_type: gameType,
       credits_won: creditsWon,
       is_free_play: true,
+      fair_nonce: fairNonce,
     })
 
   if (insertError) {
@@ -298,68 +246,15 @@ export async function playMiniGamePaid(gameType: MiniGameType): Promise<ActionRe
     return { success: false, error: 'Erreur lors du débit des crédits' }
   }
 
-  // Calculate result based on game type
-  let creditsWon: number
-  let segmentIndex: number | undefined
-  let slotIndex: number | undefined
-  let slotsSymbols: number[] | undefined
-  let coinResult: 'heads' | 'tails' | undefined
-  let diceResults: [number, number] | undefined
-
-  switch (gameType) {
-    case 'wheel': {
-      segmentIndex = Math.floor(Math.random() * WHEEL_SEGMENTS.length)
-      creditsWon = WHEEL_SEGMENTS[segmentIndex]
-      break
-    }
-    case 'scratch': {
-      const valueIndex = Math.floor(Math.random() * SCRATCH_VALUES.length)
-      creditsWon = SCRATCH_VALUES[valueIndex]
-      break
-    }
-    case 'pachinko': {
-      slotIndex = Math.floor(Math.random() * PACHINKO_SLOTS.length)
-      creditsWon = PACHINKO_SLOTS[slotIndex]
-      break
-    }
-    case 'slots': {
-      slotsSymbols = [
-        Math.floor(Math.random() * SLOTS_SYMBOLS.length),
-        Math.floor(Math.random() * SLOTS_SYMBOLS.length),
-        Math.floor(Math.random() * SLOTS_SYMBOLS.length),
-      ]
-      const slotsPayoutIndex = Math.floor(Math.random() * SLOTS_PAYOUTS.length)
-      creditsWon = SLOTS_PAYOUTS[slotsPayoutIndex]
-      break
-    }
-    case 'coinflip': {
-      // 10% chance to win (heads), 90% chance to lose (tails)
-      const isWin = Math.random() < 0.1
-      coinResult = isWin ? 'heads' : 'tails'
-      creditsWon = isWin ? 5 : 0
-      break
-    }
-    case 'dice': {
-      // Generate 2 dice values (1-6)
-      diceResults = [
-        Math.floor(Math.random() * 6) + 1,
-        Math.floor(Math.random() * 6) + 1,
-      ]
-      // Calculate credits based on dice sum (min 2, max 10)
-      const diceSumPaid = diceResults[0] + diceResults[1]
-      // Map sum (2-12) to credits (2-10)
-      // 2-3: 2, 4-5: 3, 6-7: 4, 8-9: 6, 10-11: 8, 12: 10
-      if (diceSumPaid <= 3) creditsWon = 0
-      else if (diceSumPaid <= 5) creditsWon = 1
-      else if (diceSumPaid <= 7) creditsWon = 1
-      else if (diceSumPaid <= 9) creditsWon = 2
-      else if (diceSumPaid <= 11) creditsWon = 3
-      else creditsWon = 5 // Double 6!
-      break
-    }
-    default:
-      creditsWon = 0
-  }
+  // Résultat provably-fair (commit-reveal) : seeds consommés côté serveur,
+  // résultat déterministe vérifiable = HMAC(server_seed, client_seed:nonce:cursor).
+  const fairAdmin = createServiceClient()
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: fairRows } = await (fairAdmin.rpc as any)('consume_fairness', { p_user: user.id })
+  const fair = Array.isArray(fairRows) ? fairRows[0] : fairRows
+  const fairNonce: number = fair?.nonce ?? 0
+  const { creditsWon, segmentIndex, slotIndex, slotsSymbols, coinResult, diceResults } =
+    computeMiniGameOutcome(gameType, makeFairGenerator(fair?.server_seed ?? '', fair?.client_seed ?? '', fairNonce))
 
   // Insert play record (paid play - for history tracking)
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -370,6 +265,7 @@ export async function playMiniGamePaid(gameType: MiniGameType): Promise<ActionRe
       game_type: gameType,
       credits_won: creditsWon,
       is_free_play: false,
+      fair_nonce: fairNonce,
     })
 
   // Add winnings to earned_credits (permanent) via service_role
