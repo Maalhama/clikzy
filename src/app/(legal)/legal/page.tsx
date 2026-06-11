@@ -91,6 +91,14 @@ export default function LegalPage() {
           Pour toute question concernant ces mentions légales, contactez-nous à : <a href="mailto:contact@cleekzy.com" className="text-neon-purple hover:underline">contact@cleekzy.com</a>
         </p>
       </section>
+
+      <section className="mb-8">
+        <h2 className="text-xl font-bold text-neon-purple mb-4">Crédits & ressources tierces</h2>
+        <p className="text-white/70">
+          Icônes d&apos;objets et de personnage : <a href="https://game-icons.net" target="_blank" rel="noopener noreferrer" className="text-neon-purple hover:underline">game-icons.net</a> (Lorc, Delapouite),
+          sous licence <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank" rel="noopener noreferrer" className="text-neon-purple hover:underline">CC BY 3.0</a>, recolorées pour la direction artistique de Cleekzy.
+        </p>
+      </section>
     </article>
   )
 }

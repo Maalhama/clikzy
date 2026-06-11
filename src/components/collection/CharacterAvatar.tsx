@@ -1,155 +1,109 @@
 'use client'
 
 import { ItemIcon } from '@/components/collection/ItemIcon'
+import { GAME_ICON_PATHS } from './gameIconPaths'
 
 type Slot = 'casque' | 'armure' | 'anneau' | 'artefact'
 type EquippedItem = { id: string; slot: Slot; rarity: string; name: string }
 type Equipment = Partial<Record<Slot, { item: EquippedItem }>>
 
 const RARITY_HEX: Record<string, string> = {
-  common: '#B9C2D8',
-  rare: '#3CCBFF',
-  epic: '#9B5CFF',
-  legendary: '#FFD700',
-  mythic: '#FF4FD8',
+  common: '#B9C2D8', rare: '#3CCBFF', epic: '#9B5CFF', legendary: '#FFD700', mythic: '#FF4FD8',
+}
+const RARITY_RANK: Record<string, number> = { common: 0, rare: 1, epic: 2, legendary: 3, mythic: 4 }
+const SLOT_LABEL: Record<Slot, string> = { casque: 'Casque', armure: 'Armure', anneau: 'Anneau', artefact: 'Artefact' }
+
+// Médaillons placés autour du présentoir (en % du conteneur)
+const SLOT_POS: Record<Slot, { top: string; left: string }> = {
+  casque: { top: '2%', left: '50%' },    // au-dessus de la tête
+  armure: { top: '50%', left: '8%' },    // flanc gauche (torse)
+  anneau: { top: '50%', left: '92%' },   // flanc droit (main)
+  artefact: { top: '92%', left: '50%' }, // dessous (relique)
 }
 
-const RARITY_RANK: Record<string, number> = {
-  common: 0, rare: 1, epic: 2, legendary: 3, mythic: 4,
-}
-
-// Position d'ancrage de chaque slot sur le mannequin (en % du conteneur)
-const ANCHOR: Record<Slot, { top: string; left: string; size: number }> = {
-  casque: { top: '6%', left: '50%', size: 0.30 },   // au-dessus de la tête
-  armure: { top: '42%', left: '50%', size: 0.34 },  // sur le torse
-  anneau: { top: '58%', left: '76%', size: 0.20 },  // près de la main droite
-  artefact: { top: '30%', left: '20%', size: 0.22 },// en orbite, flanc gauche
+function Medallion({ slot, eq, size }: { slot: Slot; eq?: EquippedItem; size: number }) {
+  const color = eq ? RARITY_HEX[eq.rarity] ?? RARITY_HEX.common : '#3A465E'
+  const pos = SLOT_POS[slot]
+  return (
+    <div
+      className="absolute -translate-x-1/2 -translate-y-1/2"
+      style={{ top: pos.top, left: pos.left }}
+      title={eq ? eq.name : `${SLOT_LABEL[slot]} — vide`}
+    >
+      <div
+        className="flex items-center justify-center rounded-full border-2 transition-transform duration-300 hover:scale-110"
+        style={{
+          width: size, height: size,
+          borderColor: eq ? color : 'rgba(255,255,255,0.12)',
+          borderStyle: eq ? 'solid' : 'dashed',
+          background: eq
+            ? `radial-gradient(circle at 50% 35%, ${color}26, rgba(11,15,26,0.95) 72%)`
+            : 'rgba(255,255,255,0.03)',
+          boxShadow: eq ? `0 0 16px -2px ${color}, inset 0 0 12px -6px ${color}` : 'none',
+        }}
+      >
+        {eq ? (
+          <ItemIcon itemId={eq.id} slot={eq.slot} rarity={eq.rarity} size={Math.round(size * 0.62)} />
+        ) : (
+          <span style={{ opacity: 0.3 }}>
+            <ItemIcon slot={slot} rarity="common" size={Math.round(size * 0.5)} />
+          </span>
+        )}
+      </div>
+      <p className="mt-1 text-center text-[0.55rem] uppercase tracking-wider" style={{ color: eq ? color : 'rgba(255,255,255,0.3)' }}>
+        {SLOT_LABEL[slot]}
+      </p>
+    </div>
+  )
 }
 
 /**
- * Personnage paper-doll : un mannequin néon arcade sur lequel les items
- * équipés s'affichent à leur position anatomique. L'aura globale prend la
- * couleur de la rareté la plus haute équipée.
+ * Présentoir de personnage : buste-avatar dans un cadre hologramme circulaire,
+ * entouré des 4 médaillons d'équipement sertis (couleur = rareté). L'aura
+ * globale prend la teinte de la meilleure rareté équipée.
  */
-export function CharacterAvatar({
-  equipment,
-  size = 240,
-}: {
-  equipment: Equipment
-  size?: number
-}) {
+export function CharacterAvatar({ equipment, size = 260 }: { equipment: Equipment; size?: number }) {
   const equipped = (['casque', 'armure', 'anneau', 'artefact'] as Slot[])
     .map((s) => equipment[s]?.item)
     .filter(Boolean) as EquippedItem[]
-
   const topRarity = equipped.reduce(
     (best, it) => (RARITY_RANK[it.rarity] > RARITY_RANK[best] ? it.rarity : best),
     'common'
   )
-  const auraColor = RARITY_HEX[topRarity] ?? RARITY_HEX.common
+  const aura = RARITY_HEX[topRarity] ?? RARITY_HEX.common
+  const med = Math.round(size * 0.26)        // taille médaillon
+  const ring = size * 0.62                    // diamètre du présentoir
 
   return (
-    <div
-      className="relative mx-auto"
-      style={{ width: size, height: size * 1.16 }}
-    >
-      {/* Aura de sol */}
+    <div className="relative mx-auto" style={{ width: size, height: size * 1.08 }}>
+      {/* Présentoir hologramme centré */}
       <div
-        className="absolute left-1/2 bottom-[4%] -translate-x-1/2 rounded-[50%] blur-xl opacity-70"
+        className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-full border-2"
         style={{
-          width: size * 0.6,
-          height: size * 0.12,
-          background: `radial-gradient(ellipse at center, ${auraColor}, transparent 70%)`,
+          width: ring, height: ring,
+          borderColor: `${aura}77`,
+          background: `radial-gradient(circle at 50% 30%, ${aura}1f, #0B0F1A 75%)`,
+          boxShadow: `0 0 32px -6px ${aura}, inset 0 0 26px -8px ${aura}`,
         }}
-        aria-hidden
-      />
-
-      {/* Halo respirant derrière le perso (couleur de la meilleure rareté) */}
-      <div
-        className="character-breathe absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full blur-3xl"
-        style={{
-          width: size * 0.8,
-          height: size * 0.8,
-          background: `radial-gradient(circle, ${auraColor}33, transparent 65%)`,
-        }}
-        aria-hidden
-      />
-
-      {/* Mannequin néon arcade */}
-      <svg
-        viewBox="0 0 200 232"
-        className="character-float absolute inset-0 h-full w-full"
-        fill="none"
-        aria-hidden
       >
-        <defs>
-          <linearGradient id="charBody" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#1B2540" />
-            <stop offset="100%" stopColor="#0E1424" />
-          </linearGradient>
-          <linearGradient id="charEdge" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stopColor="#9B5CFF" />
-            <stop offset="55%" stopColor="#FF4FD8" />
-            <stop offset="100%" stopColor="#3CCBFF" />
-          </linearGradient>
-        </defs>
+        {/* anneau de scan animé */}
+        <div className="character-breathe absolute inset-0 rounded-full" style={{ boxShadow: `inset 0 0 0 1px ${aura}55` }} aria-hidden />
+        {/* buste-avatar sombre, centré */}
+        <svg viewBox="0 0 512 512" className="character-float absolute left-1/2 top-[14%] -translate-x-1/2" width={ring * 0.82} height={ring * 0.82} preserveAspectRatio="xMidYMid meet" aria-hidden>
+          <defs>
+            <linearGradient id="char-body" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#34406A" />
+              <stop offset="100%" stopColor="#11182B" />
+            </linearGradient>
+          </defs>
+          <path d={GAME_ICON_PATHS.character} fill="url(#char-body)" stroke={`${aura}88`} strokeWidth={5} />
+        </svg>
+      </div>
 
-        <g
-          stroke="url(#charEdge)"
-          strokeWidth={2.4}
-          strokeLinejoin="round"
-          strokeLinecap="round"
-          fill="url(#charBody)"
-          style={{ filter: 'drop-shadow(0 0 6px rgba(155,92,255,0.45))' }}
-        >
-          {/* Tête */}
-          <path d="M100 20 C112 20 120 30 120 43 C120 56 112 66 100 66 C88 66 80 56 80 43 C80 30 88 20 100 20 Z" />
-          {/* Visière néon */}
-          <path d="M86 42 L114 42" strokeWidth={3} stroke="#3CCBFF" style={{ filter: 'drop-shadow(0 0 4px #3CCBFF)' }} />
-          {/* Cou */}
-          <path d="M92 66 L92 76 M108 66 L108 76" />
-          {/* Torse (trapèze épaules larges) */}
-          <path d="M70 78 L130 78 L122 150 L78 150 Z" />
-          {/* Ligne d'énergie centrale */}
-          <path d="M100 86 L100 142" strokeWidth={1.5} stroke="#FF4FD8" opacity={0.6} />
-          {/* Épaulières */}
-          <path d="M70 78 C60 80 56 92 60 102 L72 96 Z" />
-          <path d="M130 78 C140 80 144 92 140 102 L128 96 Z" />
-          {/* Bras gauche */}
-          <path d="M62 100 L52 142 L62 146 L74 108 Z" />
-          {/* Bras droit (main = porte l'anneau) */}
-          <path d="M138 100 L148 142 L138 146 L126 108 Z" />
-          {/* Mains */}
-          <circle cx="56" cy="150" r="7" />
-          <circle cx="144" cy="150" r="7" />
-          {/* Ceinture */}
-          <path d="M78 150 L122 150 L120 162 L80 162 Z" />
-          {/* Jambes */}
-          <path d="M84 162 L80 214 L94 214 L98 164 Z" />
-          <path d="M116 162 L120 214 L106 214 L102 164 Z" />
-          {/* Bottes */}
-          <path d="M78 214 L96 214 L96 224 L78 224 Z" />
-          <path d="M104 214 L122 214 L122 224 L104 224 Z" />
-        </g>
-      </svg>
-
-      {/* Items équipés superposés aux ancrages anatomiques */}
-      {(['artefact', 'armure', 'casque', 'anneau'] as Slot[]).map((slot) => {
-        const eq = equipment[slot]?.item
-        if (!eq) return null
-        const a = ANCHOR[slot]
-        const itemSize = Math.round(size * a.size)
-        return (
-          <div
-            key={slot}
-            className={`absolute -translate-x-1/2 -translate-y-1/2 ${slot === 'artefact' ? 'character-orbit' : ''}`}
-            style={{ top: a.top, left: a.left }}
-            title={eq.name}
-          >
-            <ItemIcon itemId={eq.id} slot={eq.slot} rarity={eq.rarity} size={itemSize} />
-          </div>
-        )
-      })}
+      {/* Médaillons d'équipement autour */}
+      {(['casque', 'armure', 'anneau', 'artefact'] as Slot[]).map((slot) => (
+        <Medallion key={slot} slot={slot} eq={equipment[slot]?.item} size={med} />
+      ))}
     </div>
   )
 }
