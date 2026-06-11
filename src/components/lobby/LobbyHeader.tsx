@@ -4,6 +4,7 @@ import { memo, useEffect, useState } from 'react'
 import { NeonChest } from '@/components/collection/NeonChest'
 import { LobbyCharacterWidget } from '@/components/lobby/LobbyCharacterWidget'
 import { MidnightCountdown } from '@/components/lobby/MidnightCountdown'
+import { JackpotWidget } from '@/components/jackpot/JackpotWidget'
 
 interface LobbyHeaderProps {
   credits: number
@@ -169,6 +170,8 @@ export const LobbyHeader = memo(function LobbyHeader({
 
           {/* Stats pills */}
           <div className="flex flex-wrap gap-2">
+            {/* Jackpot communautaire */}
+            <JackpotWidget variant="pill" />
             {/* Active games */}
             <div className="panel flex items-center gap-2 px-3.5 py-2">
               <span className="relative flex h-2 w-2">

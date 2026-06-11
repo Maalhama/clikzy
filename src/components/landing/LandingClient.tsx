@@ -579,7 +579,7 @@ export function LandingClient({
       </section>
 
       {/* === DESKTOP HERO === */}
-      <section className="hidden md:flex relative min-h-[88vh] items-center pt-6 overflow-hidden">
+      <section className="hidden md:flex relative min-h-[84vh] items-center pt-2 overflow-hidden">
         {/* Click Pulse Effect */}
         <ClickPulse enabled={true} intensity="medium" />
 
@@ -614,6 +614,7 @@ export function LandingClient({
                 <span className="text-neon-purple">Nouveaux produits toutes les 3 h</span>
               </span>
             </p>
+
 
             {/* CTA */}
             <div className="hero-cta reveal reveal-3 flex flex-col gap-4 mb-12">
@@ -675,6 +676,7 @@ export function LandingClient({
 
           {/* Right — la vraie partie en direct (fallback : lots flottants) */}
           <div className="hero-prize reveal reveal-3 relative hidden lg:block">
+            <div className="mb-3 -mt-10 flex justify-center"><JackpotWidget variant="inline" /></div>
             <HeroLiveCard games={heroGames} />
           </div>
         </div>
@@ -1509,3 +1511,4 @@ export function LandingClient({
     </>
   )
 }
+import { JackpotWidget } from '@/components/jackpot/JackpotWidget'

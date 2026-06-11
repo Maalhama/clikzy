@@ -94,7 +94,29 @@ export async function GET(request: NextRequest) {
 
     console.log(`Reset daily credits: ${usersToReset.length} users → ${DAILY_FREE_CREDITS} credits each`)
 
+    // Jackpot communautaire : croissance quotidienne + distribution le 8 (Europe/Paris)
+    let jackpot: unknown = null
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await (supabase.rpc as any)('grow_jackpot', { p_amount: 30 })
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data: dist } = await (supabase.rpc as any)('distribute_jackpot')
+      const row = Array.isArray(dist) ? dist[0] : dist
+      jackpot = row
+      if (row?.distributed) {
+        broadcastPush({
+          title: 'Jackpot distribué !',
+          body: `${row.winner} remporte ${row.won} crédits du jackpot communautaire.`,
+          url: '/lobby',
+          tag: 'jackpot',
+        }).catch(() => {})
+      }
+    } catch (e) {
+      console.error('[CRON] jackpot step failed:', e)
+    }
+
     return NextResponse.json({
+      jackpot,
       message: `Reset daily credits for ${usersToReset.length} users`,
       resetCount: usersToReset.length,
       creditsAmount: DAILY_FREE_CREDITS,
