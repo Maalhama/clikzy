@@ -17,6 +17,7 @@ import { generateDeterministicUsername } from '@/lib/bots/usernameGenerator'
 import { getProductImageWithFallback } from '@/lib/utils/productImages'
 import { CreditPacksModal } from '@/components/modals/CreditPacksModal'
 import { ShareWinButtons } from '@/components/game/ShareWinButtons'
+import { ShareNearMissButtons } from '@/components/game/ShareNearMissButtons'
 import { GameClicksFeed } from '@/components/game/GameClicksFeed'
 import VIPSubscriptionModal from '@/components/modals/VIPSubscriptionModal'
 import { trackGameClick, trackGameWin } from '@/lib/analytics'
@@ -73,6 +74,8 @@ export function GameClient({
   const [isVip, setIsVip] = useState(false)
   const [vipLoading, setVipLoading] = useState(false)
   const [clickAnimation, setClickAnimation] = useState(false)
+  // A cliqué au moins une fois dans cette partie (pour proposer le partage near-miss en cas de défaite)
+  const [hasParticipated, setHasParticipated] = useState(false)
   // Bursts de particules : un par clic, auto-purgés
   const [bursts, setBursts] = useState<number[]>([])
   const burstSeq = useRef(0)
@@ -187,6 +190,7 @@ export function GameClient({
     trackGameClick(game.id, game.item.name)
     setClickAnimation(true)
     setCreditsAnimation(true)
+    setHasParticipated(true)
     const burstId = ++burstSeq.current
     setBursts((prev) => [...prev.slice(-3), burstId])
     setTimeout(() => setBursts((prev) => prev.filter((b) => b !== burstId)), 600)
@@ -397,6 +401,7 @@ export function GameClient({
                     )}
                   </div>
                   {isWinner && <ShareWinButtons itemName={game.item.name} itemValue={game.item.retail_value ?? 0} username={username} />}
+                  {!isWinner && hasParticipated && <ShareNearMissButtons itemName={game.item.name} username={username} />}
                 </div>
               ) : (
                 <div className={`p-4 rounded-xl mb-5 transition-all ${isUrgent ? 'bg-danger/20 border border-danger/30' : 'hero-live-card'}`}>
@@ -787,6 +792,7 @@ export function GameClient({
                     )}
                   </div>
                   {isWinner && <ShareWinButtons itemName={game.item.name} itemValue={game.item.retail_value ?? 0} username={username} />}
+                  {!isWinner && hasParticipated && <ShareNearMissButtons itemName={game.item.name} username={username} />}
                 </div>
               ) : (
                 <div className={`p-5 rounded-2xl transition-all ${isUrgent ? 'bg-danger/20 border border-danger/40' : 'hero-live-card'}`}>
