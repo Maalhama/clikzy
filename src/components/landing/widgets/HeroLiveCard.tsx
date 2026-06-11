@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { formatTime, calculateTimeLeft } from '@/lib/utils/timer'
@@ -118,6 +118,27 @@ export function HeroLiveCard({ games, compact = false }: HeroLiveCardProps) {
     return null
   }, [game])
 
+  // Tilt 3D subtil au survol (desktop pointer fine uniquement) — appliqué sur
+  // un wrapper externe pour ne pas entrer en conflit avec l'animation float.
+  const tiltRef = useRef<HTMLDivElement>(null)
+  const onTiltMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    const el = tiltRef.current
+    if (!el || !window.matchMedia('(pointer: fine)').matches) return
+    const inner = el.firstElementChild as HTMLElement | null
+    if (!inner) return
+    const r = el.getBoundingClientRect()
+    const x = (e.clientX - r.left) / r.width - 0.5
+    const y = (e.clientY - r.top) / r.height - 0.5
+    inner.style.transition = 'transform 0.18s ease-out'
+    inner.style.transform = `rotateY(${x * 5}deg) rotateX(${-y * 5}deg)`
+  }, [])
+  const onTiltLeave = useCallback(() => {
+    const inner = tiltRef.current?.firstElementChild as HTMLElement | null
+    if (!inner) return
+    inner.style.transition = 'transform 0.5s ease-out'
+    inner.style.transform = 'rotateY(0deg) rotateX(0deg)'
+  }, [])
+
   // Coquille stable côté serveur tant qu'aucune partie n'est affichable
   if (!game || timeLeft < 0) {
     return (
@@ -135,6 +156,14 @@ export function HeroLiveCard({ games, compact = false }: HeroLiveCardProps) {
   const isUrgent = timeLeft > 0 && timeLeft <= 90000
 
   return (
+    <div
+      ref={tiltRef}
+      onMouseMove={onTiltMove}
+      onMouseLeave={onTiltLeave}
+      style={{ perspective: '1100px' }}
+    >
+    {/* Couche tilt séparée : l'animation float vit sur le Link, le tilt ici */}
+    <div style={{ transformStyle: 'preserve-3d' }}>
     <Link
       href={isDemo ? '/lobby' : `/game/${game.id}`}
       className={`hero-live-card hero-live-card-float group block overflow-hidden ${compact ? 'p-4' : 'p-6'}`}
@@ -228,5 +257,7 @@ export function HeroLiveCard({ games, compact = false }: HeroLiveCardProps) {
       </div>
       </div>
     </Link>
+    </div>
+    </div>
   )
 }

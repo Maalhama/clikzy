@@ -2161,3 +2161,96 @@ body::after {
   box-shadow: 0 0 10px rgba(155, 92, 255, 0.7);
   pointer-events: none;
 }
+
+/* ============================================
+   WOAW PASS — LP + LOBBY
+   ============================================ */
+
+/* Sheen automatique périodique (CTA majeurs) — span dédié, indépendant
+   des pseudo-éléments de .btn-arena */
+.cta-sheen {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(105deg, transparent 38%, rgba(255, 255, 255, 0.3) 50%, transparent 62%);
+  transform: translateX(-130%) skewX(-12deg);
+  animation: cta-sheen 4.2s ease-in-out infinite;
+}
+
+@keyframes cta-sheen {
+  0%, 55% { transform: translateX(-130%) skewX(-12deg); }
+  90%, 100% { transform: translateX(130%) skewX(-12deg); }
+}
+
+/* Flottement doux des produits mis en scène */
+@keyframes prize-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-7px); }
+}
+
+.prize-float {
+  animation: prize-float 5s ease-in-out infinite;
+  will-change: transform;
+}
+
+/* Fond d'arène du lobby : grille + halo + formes, CSS pur */
+.arena-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.arena-backdrop::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(155, 92, 255, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(155, 92, 255, 0.045) 1px, transparent 1px);
+  background-size: 56px 56px;
+  -webkit-mask-image: radial-gradient(ellipse 95% 75% at 50% 0%, black 25%, transparent 78%);
+  mask-image: radial-gradient(ellipse 95% 75% at 50% 0%, black 25%, transparent 78%);
+}
+
+.arena-backdrop::after {
+  content: '';
+  position: absolute;
+  top: -22%;
+  left: 50%;
+  width: 950px;
+  height: 620px;
+  transform: translateX(-50%);
+  background: radial-gradient(ellipse at center, rgba(155, 92, 255, 0.14), rgba(255, 79, 216, 0.06) 45%, transparent 72%);
+  filter: blur(42px);
+  animation: arena-halo 14s ease-in-out infinite;
+}
+
+@keyframes arena-halo {
+  0%, 100% { opacity: 0.85; transform: translateX(-50%) scale(1); }
+  50% { opacity: 1; transform: translateX(-52%) scale(1.06); }
+}
+
+.arena-shape {
+  position: absolute;
+  border: 1px solid rgba(155, 92, 255, 0.16);
+  animation: arena-drift 19s ease-in-out infinite;
+}
+
+.arena-shape--blue { border-color: rgba(60, 203, 255, 0.14); animation-delay: -7s; }
+.arena-shape--pink { border-color: rgba(255, 79, 216, 0.13); animation-delay: -13s; }
+
+@keyframes arena-drift {
+  0%, 100% { transform: translateY(0) rotate(12deg); }
+  50% { transform: translateY(-26px) rotate(18deg); }
+}
+
+/* Timer critique : lueur rouge dramatique */
+.timer-critical {
+  text-shadow: 0 0 18px rgba(255, 71, 87, 0.9), 0 0 42px rgba(255, 71, 87, 0.45);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cta-sheen, .prize-float, .arena-backdrop::after, .arena-shape { animation: none; }
+}

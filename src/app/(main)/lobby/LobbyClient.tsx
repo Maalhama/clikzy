@@ -235,6 +235,13 @@ export function LobbyClient({
         className="min-h-screen pb-20"
         {...pullHandlers}
       >
+        {/* Fond d'arène : grille + halo + formes dérivantes (CSS pur) */}
+        <div className="arena-backdrop" aria-hidden>
+          <span className="arena-shape left-[8%] top-[22%] h-24 w-24 rotate-12 rounded-lg" />
+          <span className="arena-shape--blue arena-shape right-[6%] top-[14%] h-16 w-16 rounded-full" />
+          <span className="arena-shape--pink arena-shape left-[55%] top-[60%] h-20 w-20 rotate-45 rounded-lg" />
+        </div>
+
         {/* Header with stats */}
         <LobbyHeader
         credits={credits}

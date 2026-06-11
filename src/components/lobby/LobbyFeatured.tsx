@@ -50,8 +50,9 @@ export function LobbyFeatured({ game }: LobbyFeaturedProps) {
       className="hero-live-card group relative block overflow-hidden p-5 lg:p-6"
     >
       <div className="flex items-center gap-6">
-        {/* Produit */}
+        {/* Produit sur scène : halo + sol perspective + flottement */}
         <div className="relative h-32 w-32 shrink-0 lg:h-40 lg:w-40">
+          <div className="hero-stage-floor absolute -bottom-2 left-1/2 h-8 w-[130%] -translate-x-1/2" aria-hidden />
           <div
             className="absolute inset-0 rounded-full opacity-70 blur-2xl"
             style={{
@@ -64,7 +65,7 @@ export function LobbyFeatured({ game }: LobbyFeaturedProps) {
             alt={game.item.name}
             fill
             sizes="160px"
-            className="object-contain drop-shadow-[0_0_28px_rgba(155,92,255,0.5)] transition-transform duration-500 group-hover:scale-105"
+            className="prize-float object-contain drop-shadow-[0_0_28px_rgba(155,92,255,0.5)] transition-transform duration-500 group-hover:scale-105"
             priority
             unoptimized
             onError={() => !imgError && setImgError(true)}
@@ -105,7 +106,7 @@ export function LobbyFeatured({ game }: LobbyFeaturedProps) {
             </div>
             <div
               suppressHydrationWarning
-              className={`stat-numeral text-4xl ${isUrgent ? 'animate-pulse text-danger' : 'text-neon-blue'}`}
+              className={`stat-numeral text-4xl ${isUrgent ? 'animate-pulse text-danger timer-critical' : 'text-neon-blue'}`}
             >
               {formatTime(timeLeft)}
             </div>

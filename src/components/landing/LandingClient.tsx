@@ -623,6 +623,7 @@ export function LandingClient({
                   disabled={isNavigating}
                   className="btn-arena group px-10 py-5 text-base disabled:opacity-80"
                 >
+                  <span aria-hidden className="cta-sheen" />
                   <span className="relative z-10 flex items-center justify-center gap-2.5">
                     {isNavigating ? (
                       <>

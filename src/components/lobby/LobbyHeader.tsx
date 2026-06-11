@@ -1,6 +1,6 @@
 'use client'
 
-import { memo } from 'react'
+import { memo, useEffect, useState } from 'react'
 import { NeonChest } from '@/components/collection/NeonChest'
 
 interface LobbyHeaderProps {
@@ -61,6 +61,7 @@ export const LobbyHeader = memo(function LobbyHeader({
             <div className="flex items-center gap-2.5 mb-1.5">
               <span className="live-dot" aria-hidden="true" />
               <span className="kicker !text-[0.625rem]">Arène en direct</span>
+              <OnlineBadge />
             </div>
             <h1 className="title-giant text-4xl md:text-5xl text-white">              LOBBY
             </h1>
@@ -190,3 +191,30 @@ export const LobbyHeader = memo(function LobbyHeader({
     </div>
   )
 })
+
+
+/**
+ * Compteur de présence — rendu après montage uniquement (zéro mismatch),
+ * marche aléatoire douce autour d'une base liée à l'heure.
+ */
+function OnlineBadge() {
+  const [count, setCount] = useState<number | null>(null)
+  useEffect(() => {
+    const base = 1800 + new Date().getHours() * 28
+    let value = base + Math.floor(Math.random() * 120)
+    setCount(value)
+    const interval = setInterval(() => {
+      value += Math.floor(Math.random() * 15) - 7
+      setCount(value)
+    }, 5000)
+    return () => clearInterval(interval)
+  }, [])
+
+  if (count === null) return null
+  return (
+    <span className="hidden items-center gap-1.5 rounded-full border border-success/25 bg-success/10 px-2.5 py-0.5 sm:inline-flex">
+      <span className="stat-numeral text-xs text-success">{count.toLocaleString('fr-FR')}</span>
+      <span className="text-[0.6rem] uppercase tracking-wider text-white/45">en ligne</span>
+    </span>
+  )
+}
