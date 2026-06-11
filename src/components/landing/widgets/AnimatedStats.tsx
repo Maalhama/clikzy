@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useState, useEffect, ComponentType } from 'react'
+import { useRef, useState, useEffect, ComponentType, memo } from 'react'
 import { CoinsIcon, GamepadIcon, UsersIcon } from '@/components/ui/GamingIcons'
 import { useIsMobile } from '@/hooks/useIsMobile'
 
@@ -20,7 +20,7 @@ interface AnimatedStatsProps {
   className?: string
 }
 
-export function AnimatedStats({
+function AnimatedStatsImpl({
   totalWinnings = 125000,
   totalGames = 1250,
   playersOnline = 42,
@@ -247,3 +247,5 @@ export function AnimatedStats({
     </div>
   )
 }
+
+export const AnimatedStats = memo(AnimatedStatsImpl)

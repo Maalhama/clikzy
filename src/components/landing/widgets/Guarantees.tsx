@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useState, useEffect } from 'react'
+import { useRef, useState, useEffect, memo } from 'react'
 import Image from 'next/image'
 import { useIsMobile } from '@/hooks/useIsMobile'
 
@@ -61,7 +61,7 @@ const DELIVERY_PROOFS = [
   { id: 4, image: '/delivery-proofs/delivery-proof-airpods.jpg', username: 'Bilal_69', item: 'AirPods Pro 3' },
 ]
 
-export function Guarantees({ className = '' }: GuaranteesProps) {
+function GuaranteesImpl({ className = '' }: GuaranteesProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const [isVisible, setIsVisible] = useState(false)
   const [imageErrors, setImageErrors] = useState<Record<number, boolean>>({})
@@ -324,3 +324,5 @@ export function Guarantees({ className = '' }: GuaranteesProps) {
     </div>
   )
 }
+
+export const Guarantees = memo(GuaranteesImpl)

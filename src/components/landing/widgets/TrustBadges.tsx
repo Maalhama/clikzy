@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useState, useEffect, ComponentType } from 'react'
+import { useRef, useState, useEffect, ComponentType, memo } from 'react'
 import { ShieldIcon, GiftIcon, LightningIcon, UsersIcon } from '@/components/ui/GamingIcons'
 import { useIsMobile } from '@/hooks/useIsMobile'
 
@@ -80,7 +80,7 @@ const getColorStyles = (color: Badge['color']) => {
   }
 }
 
-export function TrustBadges({ className = '', variant = 'horizontal' }: TrustBadgesProps) {
+function TrustBadgesImpl({ className = '', variant = 'horizontal' }: TrustBadgesProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const [isVisible, setIsVisible] = useState(false)
   const isMobile = useIsMobile()
@@ -246,3 +246,5 @@ export function TrustBadges({ className = '', variant = 'horizontal' }: TrustBad
     </div>
   )
 }
+
+export const TrustBadges = memo(TrustBadgesImpl)

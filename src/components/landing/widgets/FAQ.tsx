@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, memo } from 'react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useIsMobile } from '@/hooks/useIsMobile'
@@ -112,7 +112,7 @@ function FAQItemComponent({ item, isOpen, onToggle, index, isMobile }: {
   )
 }
 
-export function FAQ({ className = '' }: FAQProps) {
+function FAQImpl({ className = '' }: FAQProps) {
   const [openIndex, setOpenIndex] = useState<number | null>(0)
   const isMobile = useIsMobile()
 
@@ -165,3 +165,5 @@ export function FAQ({ className = '' }: FAQProps) {
     </div>
   )
 }
+
+export const FAQ = memo(FAQImpl)

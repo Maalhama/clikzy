@@ -1,5 +1,7 @@
 'use client'
 
+import { memo } from 'react'
+
 import {
   siApple,
   siSamsung,
@@ -83,7 +85,7 @@ function BrandLogo({ brand }: { brand: BrandIcon }) {
   )
 }
 
-export function BrandMarquee() {
+function BrandMarqueeImpl() {
   // Doubler les logos pour le scroll infini
   const allLogos = [...BRAND_LOGOS, ...BRAND_LOGOS]
 
@@ -111,3 +113,5 @@ export function BrandMarquee() {
     </section>
   )
 }
+
+export const BrandMarquee = memo(BrandMarqueeImpl)
