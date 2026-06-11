@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useRouter, usePathname } from 'next/navigation'
@@ -149,11 +149,22 @@ export function Header({ profile }: HeaderProps) {
   const pathname = usePathname()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [menuClosing, setMenuClosing] = useState(false)
+  const [panelIn, setPanelIn] = useState(false)
   const { credits } = useCredits()
+
+  // Transition d'OUVERTURE fiable : on monte le panneau fermé (translateX -100%)
+  // puis on bascule à ouvert au frame suivant -> la transition CSS joue.
+  useEffect(() => {
+    if (mobileMenuOpen && !menuClosing) {
+      const r = requestAnimationFrame(() => setPanelIn(true))
+      return () => cancelAnimationFrame(r)
+    }
+  }, [mobileMenuOpen, menuClosing])
 
   const closeMenu = () => {
     if (menuClosing) return
     setMenuClosing(true)
+    setPanelIn(false)
     setTimeout(() => {
       setMobileMenuOpen(false)
       setMenuClosing(false)
@@ -329,7 +340,6 @@ export function Header({ profile }: HeaderProps) {
         <div className="lg:hidden" style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 999999 }}>
           <div
             onClick={closeMenu}
-            className={menuClosing ? 'menu-overlay-out' : 'menu-overlay-in'}
             style={{
               position: 'fixed',
               top: '3.5rem',
@@ -337,12 +347,14 @@ export function Header({ profile }: HeaderProps) {
               right: 0,
               bottom: 0,
               backgroundColor: 'rgba(0, 0, 0, 0.6)',
-              backdropFilter: 'blur(4px)'
+              backdropFilter: 'blur(4px)',
+              opacity: panelIn ? 1 : 0,
+              transition: 'opacity 0.25s ease-out',
             }}
           />
 
           <div
-            className={`${menuClosing ? 'menu-panel-out' : 'menu-panel-in'} overflow-y-auto`}
+            className="overflow-y-auto"
             style={{
               position: 'fixed',
               top: '3.5rem',
@@ -352,6 +364,9 @@ export function Header({ profile }: HeaderProps) {
               backgroundColor: '#0B0F1A',
               borderRight: '1px solid rgba(155, 92, 255, 0.35)',
               borderTop: '1px solid rgba(155, 92, 255, 0.2)',
+              transform: panelIn ? 'translateX(0)' : 'translateX(-100%)',
+              transition: 'transform 0.3s cubic-bezier(0.22, 1, 0.36, 1)',
+              boxShadow: panelIn ? '0 0 60px rgba(155,92,255,0.4), 10px 10px 40px rgba(0,0,0,0.8)' : 'none',
             }}
           >
             {/* En-tête du menu */}
