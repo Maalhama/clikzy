@@ -2384,3 +2384,16 @@ body::after {
 @media (prefers-reduced-motion: reduce) {
   .trail-particle, .frame-flames, .frame-cosmic::before { animation: none; }
 }
+
+/* Keyframe manquant référencé par tailwind.config (animate-fade-in overlay) */
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+/* Menu mobile : animations dédiées garanties (noms uniques, hors conflit) */
+.menu-overlay-in { animation: menuOverlayIn 0.22s ease-out forwards; }
+.menu-overlay-out { animation: menuOverlayOut 0.25s ease-in forwards; }
+.menu-panel-in { animation: menuPanelIn 0.3s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+.menu-panel-out { animation: menuPanelOut 0.28s cubic-bezier(0.4, 0, 1, 1) forwards; }
+@keyframes menuOverlayIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes menuOverlayOut { from { opacity: 1; } to { opacity: 0; } }
+@keyframes menuPanelIn { from { transform: translateX(-100%); opacity: 0.4; } to { transform: translateX(0); opacity: 1; } }
+@keyframes menuPanelOut { from { transform: translateX(0); opacity: 1; } to { transform: translateX(-100%); opacity: 0.4; } }

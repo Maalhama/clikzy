@@ -329,7 +329,7 @@ export function Header({ profile }: HeaderProps) {
         <div className="lg:hidden" style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 999999 }}>
           <div
             onClick={closeMenu}
-            className={menuClosing ? 'animate-fade-out' : 'animate-fade-in'}
+            className={menuClosing ? 'menu-overlay-out' : 'menu-overlay-in'}
             style={{
               position: 'fixed',
               top: '3.5rem',
@@ -342,7 +342,7 @@ export function Header({ profile }: HeaderProps) {
           />
 
           <div
-            className={`${menuClosing ? 'animate-menu-slide-out' : 'animate-menu-slide-in'} overflow-y-auto`}
+            className={`${menuClosing ? 'menu-panel-out' : 'menu-panel-in'} overflow-y-auto`}
             style={{
               position: 'fixed',
               top: '3.5rem',

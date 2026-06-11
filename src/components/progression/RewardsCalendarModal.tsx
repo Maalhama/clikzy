@@ -71,7 +71,7 @@ export function RewardsCalendarModal({
         initial={{ opacity: 0, y: 24, scale: 0.96 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ type: 'spring', stiffness: 260, damping: 22 }}
-        className="relative max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-white/10 bg-bg-secondary p-6"
+        className="relative max-h-[92vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-white/10 bg-bg-secondary p-4 sm:p-6"
       >
         <button onClick={onClose} aria-label="Fermer" className="absolute top-3 right-3 z-10 text-white/40 hover:text-white">
           <X size={20} />
@@ -85,12 +85,12 @@ export function RewardsCalendarModal({
         </p>
 
         {/* Grille */}
-        <div className="mb-1 grid grid-cols-7 gap-1.5 text-center">
+        <div className="mb-1 grid grid-cols-7 gap-1 text-center sm:gap-1.5">
           {DOW_LABELS.map((l, i) => (
             <span key={i} className="font-display text-[0.6rem] font-semibold uppercase tracking-wider text-white/55">{l}</span>
           ))}
         </div>
-        <div className="grid grid-cols-7 gap-1.5">
+        <div className="grid grid-cols-7 gap-1 sm:gap-1.5">
           {Array.from({ length: offset }).map((_, i) => <span key={`o-${i}`} />)}
           {localDays.map((d) => {
             const n = Number(d.day.slice(-2))
