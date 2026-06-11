@@ -103,24 +103,5 @@ $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = pg_catalog, public;
 REVOKE EXECUTE ON FUNCTION equip_cosmetic(text) FROM PUBLIC;
 GRANT EXECUTE ON FUNCTION equip_cosmetic(text) TO authenticated;
 
--- Protège les colonnes cosmétiques d'une écriture PostgREST directe :
--- on étend le trigger existant en bloquant aussi ces colonnes pour les
--- rôles non-DEFINER. (Le trigger protect_profile_sensitive_columns gère
--- déjà credits/xp/etc ; on ajoute la garde cosmétique.)
-CREATE OR REPLACE FUNCTION protect_cosmetic_columns()
-RETURNS TRIGGER AS $$
-BEGIN
-  IF current_setting('role', true) NOT IN ('service_role', 'supabase_admin')
-     AND session_user NOT IN ('postgres', 'supabase_admin') THEN
-    IF NEW.cosmetic_cursor IS DISTINCT FROM OLD.cosmetic_cursor
-       OR NEW.cosmetic_trail IS DISTINCT FROM OLD.cosmetic_trail
-       OR NEW.cosmetic_frame IS DISTINCT FROM OLD.cosmetic_frame THEN
-      RAISE EXCEPTION 'cosmetic columns are managed via equip_cosmetic()';
-    END IF;
-  END IF;
-  RETURN NEW;
-END;
-$$ LANGUAGE plpgsql SECURITY INVOKER SET search_path = pg_catalog, public;
-DROP TRIGGER IF EXISTS trg_protect_cosmetic ON profiles;
-CREATE TRIGGER trg_protect_cosmetic BEFORE UPDATE ON profiles
-  FOR EACH ROW EXECUTE FUNCTION protect_cosmetic_columns();
+-- Note : pas de trigger de protection dédié (enjeu cosmétique faible) ; la
+-- validation du déblocage est faite par equip_cosmetic (DEFINER, fait autorité).
