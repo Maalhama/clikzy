@@ -306,9 +306,30 @@ export function useLobbyFilters(games: GameWithFinalPhaseTracking[], options: Us
     }
   }, [currentPage])
 
+  // Horloge des stats : null au SSR ET au premier render client (déterministe,
+  // donc zéro hydration mismatch), puis temps réel après montage.
+  const [statsNow, setStatsNow] = useState<number | null>(null)
+  useEffect(() => {
+    setStatsNow(Date.now())
+    const interval = setInterval(() => setStatsNow(Date.now()), 15000)
+    return () => clearInterval(interval)
+  }, [])
+
   // Stats for header
   const stats = useMemo(() => {
-    const now = Date.now()
+    // Avant montage : classement par statut serveur uniquement (déterministe).
+    if (statsNow === null) {
+      const activeCount = games.filter((g) => g.status === 'active').length
+      const urgentCount = games.filter((g) => g.status === 'final_phase').length
+      const soonCount = games.filter((g) => g.status === 'waiting').length
+      const highValueCount = games.filter(
+        (g) => (g.item?.retail_value ?? 0) >= HIGH_VALUE_THRESHOLD
+      ).length
+      const endedCount = games.filter((g) => g.status === 'ended').length
+      const favoritesCount = games.filter((g) => favorites.includes(g.id)).length
+      return { activeCount, urgentCount, soonCount, highValueCount, endedCount, favoritesCount }
+    }
+    const now = statsNow
 
     // Active = timer > 1 minute (NOT in final phase, NOT ended, NOT waiting)
     const activeCount = games.filter((g) => {
@@ -348,7 +369,7 @@ export function useLobbyFilters(games: GameWithFinalPhaseTracking[], options: Us
     const favoritesCount = games.filter((g) => favorites.includes(g.id)).length
 
     return { activeCount, urgentCount, soonCount, highValueCount, endedCount, favoritesCount }
-  }, [games, favorites])
+  }, [games, favorites, statsNow])
 
   return {
     currentFilter,

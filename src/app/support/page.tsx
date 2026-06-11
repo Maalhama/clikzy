@@ -138,7 +138,7 @@ export default function SupportPage() {
         <div className="text-center mb-12 md:mb-16">
           <span className="kicker mb-4">Support 24/7</span>
           <h1 className="title-giant text-3xl md:text-5xl mb-4 mt-3">
-            <span className="text-white">Comment pouvons-nous</span> <span className="text-neon-purple neon-text">t'aider</span> <span className="text-neon-pink">?</span>
+            <span className="text-white">Comment pouvons-nous</span>{' '}<span className="whitespace-nowrap"><span className="text-neon-purple neon-text">t'aider</span>&nbsp;<span className="text-neon-pink">?</span></span>
           </h1>
           <p className="text-white/60 text-lg max-w-xl mx-auto">
             Notre équipe est là pour répondre à toutes tes questions. Temps de réponse moyen : moins de 2 heures.

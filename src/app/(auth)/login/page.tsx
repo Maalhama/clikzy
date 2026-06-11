@@ -75,7 +75,7 @@ export default function LoginPage() {
 
         <div className="relative z-10 max-w-md">
           <Logo size="lg" animated={true} href="/" />
-          <h1 className="text-3xl font-bold text-white mt-6 mb-3">Content de te revoir !</h1>
+          <h1 className="font-display text-3xl font-bold text-white mt-6 mb-3">Content de te revoir !</h1>
           <p className="text-text-secondary text-lg mb-10">
             Connecte-toi pour accéder à tes parties et tes récompenses.
           </p>
@@ -117,7 +117,7 @@ export default function LoginPage() {
 
           {/* Header */}
           <div className="text-center lg:text-left mb-6">
-            <h2 className="text-2xl font-bold text-white mb-2">Se connecter</h2>
+            <h2 className="font-display text-2xl font-bold text-white mb-2">Se connecter</h2>
             <p className="text-sm text-text-secondary">
               Accède à ton compte pour jouer
             </p>

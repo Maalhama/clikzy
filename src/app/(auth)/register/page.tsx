@@ -113,7 +113,7 @@ export default function RegisterPage() {
             </div>
           </div>
 
-          <h1 className="text-2xl font-bold text-white mb-3">Compte créé !</h1>
+          <h1 className="font-display text-2xl font-bold text-white mb-3">Compte créé !</h1>
           <p className="text-text-secondary mb-6">
             Un email de confirmation a été envoyé à{' '}
             <strong className="text-neon-purple block mt-1">{formData.email}</strong>
@@ -144,7 +144,7 @@ export default function RegisterPage() {
 
         <div className="relative z-10 max-w-md">
           <Logo size="lg" animated={true} href="/" />
-          <h1 className="text-3xl font-bold text-white mt-6 mb-3">Rejoins l&apos;aventure</h1>
+          <h1 className="font-display text-3xl font-bold text-white mt-6 mb-3">Rejoins l&apos;aventure</h1>
           <p className="text-text-secondary text-lg mb-10">
             Crée ton compte et reçois 10 crédits gratuits pour commencer à jouer.
           </p>
@@ -197,7 +197,7 @@ export default function RegisterPage() {
 
           {/* Header */}
           <div className="text-center lg:text-left mb-6">
-            <h2 className="text-2xl font-bold text-white mb-2">Créer un compte</h2>
+            <h2 className="font-display text-2xl font-bold text-white mb-2">Créer un compte</h2>
             <p className="text-sm text-text-secondary">
               Inscris-toi et reçois{' '}
               <span className="inline-flex items-center gap-1 text-success font-semibold">

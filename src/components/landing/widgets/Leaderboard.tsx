@@ -325,7 +325,7 @@ export function Leaderboard({
               {/* Username & wins */}
               <div className="flex-1 min-w-0">
                 <div className="font-bold truncate group-hover/row:text-white transition-colors">{entry.username}</div>
-                <div className="text-xs text-white/50">{entry.wins} victoires</div>
+                <div className="text-xs text-white/50">{entry.wins} victoire{entry.wins > 1 ? 's' : ''}</div>
               </div>
 
               {/* Total value with glow */}
