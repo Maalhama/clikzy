@@ -87,6 +87,16 @@ const NAV_ITEMS: NavItem[] = [
     ),
   },
   {
+    href: '/clans',
+    label: 'Clans',
+    accent: '#9B5CFF',
+    icon: (
+      <svg {...navIconProps}>
+        <path d="M12 2l2.5 5 5.5.8-4 3.9.9 5.5L12 19.8 7.6 22.2l.9-5.5-4-3.9L10 7z" />
+      </svg>
+    ),
+  },
+  {
     href: '/shop',
     label: 'Boutique',
     accent: '#FF4FD8',
