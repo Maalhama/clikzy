@@ -24,7 +24,7 @@ const trophy = (
 
 /** Widget jackpot — variantes : `inline` (au-dessus du mockup LP) ou `pill`
  *  (compact, dans les stats du lobby). Toujours cliquable → modal explicatif. */
-export function JackpotWidget({ variant }: { variant: 'inline' | 'pill' }) {
+export function JackpotWidget({ variant }: { variant: 'inline' | 'pill' | 'stat' }) {
   const [jp, setJp] = useState<JackpotState | null>(null)
   const [open, setOpen] = useState(false)
 
@@ -32,7 +32,12 @@ export function JackpotWidget({ variant }: { variant: 'inline' | 'pill' }) {
   if (!jp || jp.amount <= 0) return null
   const next = nextEighth()
 
-  const trigger = variant === 'pill' ? (
+  const trigger = variant === 'stat' ? (
+    <button onClick={() => setOpen(true)} className="pl-8 text-left transition-opacity hover:opacity-90" title="Jackpot communautaire">
+      <div className="text-2xl lg:text-3xl stat-numeral text-yellow-300">{jp.amount.toLocaleString('fr-FR')}</div>
+      <div className="mt-1 text-[0.65rem] uppercase tracking-[0.2em] text-white/40">Jackpot · le 8</div>
+    </button>
+  ) : variant === 'pill' ? (
     <button
       onClick={() => setOpen(true)}
       title="Jackpot communautaire"

@@ -579,7 +579,7 @@ export function LandingClient({
       </section>
 
       {/* === DESKTOP HERO === */}
-      <section className="hidden md:flex relative min-h-[84vh] items-center pt-2 overflow-hidden">
+      <section className="hidden md:flex relative min-h-[82vh] items-center pt-0 overflow-hidden">
         {/* Click Pulse Effect */}
         <ClickPulse enabled={true} intensity="medium" />
 
@@ -667,16 +667,16 @@ export function LandingClient({
                 <div className="text-2xl lg:text-3xl stat-numeral text-neon-purple">+100</div>
                 <div className="text-[0.65rem] text-white/40 uppercase tracking-[0.2em] mt-1">Lots</div>
               </div>
-              <div className="pl-8">
+              <div className="px-8">
                 <div className="text-2xl lg:text-3xl stat-numeral text-neon-pink">10<span className="text-base text-white/40">/jour</span></div>
                 <div className="text-[0.65rem] text-white/40 uppercase tracking-[0.2em] mt-1">Clics gratuits</div>
               </div>
+              <JackpotWidget variant="stat" />
             </div>
           </div>
 
           {/* Right — la vraie partie en direct (fallback : lots flottants) */}
           <div className="hero-prize reveal reveal-3 relative hidden lg:block">
-            <div className="mb-3 -mt-10 flex justify-center"><JackpotWidget variant="inline" /></div>
             <HeroLiveCard games={heroGames} />
           </div>
         </div>
