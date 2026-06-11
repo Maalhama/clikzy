@@ -17,6 +17,7 @@ import { generateDeterministicUsername } from '@/lib/bots/usernameGenerator'
 import { getProductImageWithFallback } from '@/lib/utils/productImages'
 import { CreditPacksModal } from '@/components/modals/CreditPacksModal'
 import { ShareWinButtons } from '@/components/game/ShareWinButtons'
+import { GameClicksFeed } from '@/components/game/GameClicksFeed'
 import VIPSubscriptionModal from '@/components/modals/VIPSubscriptionModal'
 import { trackGameClick, trackGameWin } from '@/lib/analytics'
 import { createVIPCheckoutSession, checkVIPStatus } from '@/actions/stripe'
@@ -61,7 +62,7 @@ export function GameClient({
 }: GameClientProps) {
   const router = useRouter()
   // useGame now provides recentClicks from DB (synced with lobby)
-  const { game, isConnected, optimisticUpdate, addClick, removeClick } = useGame(initialGame)
+  const { game, recentClicks, isConnected, optimisticUpdate, addClick, removeClick } = useGame(initialGame)
   const { credits, decrementCredits } = useCredits()
   const { showBadgeNotifications } = useBadgeNotification()
 
@@ -603,6 +604,11 @@ export function GameClient({
             </div>
           </div>
 
+          {/* Mobile: derniers clics */}
+          <div className="lg:hidden">
+            <GameClicksFeed clicks={recentClicks} />
+          </div>
+
           {/* Mobile: Game Rules */}
           <div className="mt-6 panel overflow-hidden">
             <div className="px-4 py-3 border-b border-white/10">
@@ -949,6 +955,9 @@ export function GameClient({
                   {error}
                 </div>
               )}
+
+              {/* Derniers clics - Desktop */}
+              <GameClicksFeed clicks={recentClicks} />
 
               {/* Game Rules - Desktop Compact */}
               <div className="rounded-xl bg-bg-secondary/30 border border-white/10 overflow-hidden">

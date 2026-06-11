@@ -354,29 +354,45 @@ export default function VIPPage() {
             </motion.h2>
 
             <div className="grid md:grid-cols-3 gap-6">
-              {VIP_TIERS.map((tier, index) => (
+              {VIP_TIERS.map((tier, index) => {
+                const isGold = tier.name === 'Gold'
+                return (
                 <motion.div
                   key={tier.name}
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.1 }}
-                  className={`relative p-6 rounded-2xl ${tier.bgColor} border ${tier.borderColor} backdrop-blur-sm`}
+                  className={`group relative rounded-2xl border-2 bg-bg-secondary/60 p-6 backdrop-blur-sm transition-all duration-300 hover:-translate-y-1.5 ${tier.borderColor} ${isGold ? 'lg:scale-[1.04]' : ''}`}
+                  style={{ boxShadow: `0 0 ${isGold ? 48 : 34}px -10px ${tier.hex}55` }}
                 >
-                  {/* Tier header */}
-                  <div className="flex items-center gap-3 mb-4">
+                  {/* Trophée : emblème sur piédestal lumineux */}
+                  <div className="relative mb-5 flex flex-col items-center pt-2">
+                    <div className="hero-stage-floor absolute bottom-0 left-1/2 h-7 w-32 -translate-x-1/2" aria-hidden />
                     <div
-                      className="flex h-14 w-14 items-center justify-center rounded-full border-2 bg-bg-primary"
-                      style={{ borderColor: tier.hex, boxShadow: `0 0 18px -2px ${tier.hex}` }}
+                      className="relative flex h-20 w-20 items-center justify-center rounded-full border-2 bg-bg-primary transition-transform duration-300 group-hover:scale-105 group-hover:-translate-y-1"
+                      style={{ borderColor: tier.hex, boxShadow: `0 0 24px -2px ${tier.hex}, inset 0 0 14px -6px ${tier.hex}` }}
                     >
+                      <span
+                        className="absolute inset-1.5 rounded-full border"
+                        style={{ borderColor: `${tier.hex}44` }}
+                        aria-hidden
+                      />
                       <tier.icon />
                     </div>
-                    <div>
-                      <h3 className={`text-xl font-bold ${tier.textColor}`}>
-                        {tier.name}
-                      </h3>
-                      <p className="text-sm text-text-secondary">{tier.duration}</p>
-                    </div>
+                  </div>
+
+                  {/* Nom + durée */}
+                  <div className="mb-5 text-center">
+                    <h3 className={`font-display text-2xl font-bold ${tier.textColor}`}>
+                      {tier.name}
+                    </h3>
+                    <span
+                      className="mt-1.5 inline-block rounded-full border px-3 py-0.5 text-[0.65rem] font-semibold uppercase tracking-wider text-white/60"
+                      style={{ borderColor: `${tier.hex}40`, background: `${tier.hex}14` }}
+                    >
+                      {tier.duration}
+                    </span>
                   </div>
 
                   {/* Benefits list */}
@@ -389,7 +405,7 @@ export default function VIPPage() {
                     ))}
                   </ul>
                 </motion.div>
-              ))}
+              )})}
             </div>
           </div>
         </section>

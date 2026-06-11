@@ -75,7 +75,7 @@ export function CollectionClient() {
       )}
 
       {/* Coffres */}
-      <section className="panel p-5">
+      <section className="panel reveal reveal-2 p-5">
         <div className="mb-4 flex items-center gap-2">
           <Gift className="h-5 w-5 text-neon-purple" />
           <h2 className="text-lg font-display font-semibold text-white">Coffres</h2>
@@ -129,7 +129,7 @@ export function CollectionClient() {
       </section>
 
       {/* Personnage + bonus */}
-      <section className="panel p-5">
+      <section className="panel reveal reveal-3 p-5">
         <div className="mb-4 flex items-center gap-2">
           <Sparkles className="h-5 w-5 text-yellow-400" />
           <h2 className="text-lg font-display font-semibold text-white">Ton personnage</h2>
@@ -171,7 +171,7 @@ export function CollectionClient() {
       </section>
 
       {/* Inventaire */}
-      <section className="panel p-5">
+      <section className="panel reveal reveal-4 p-5">
         <h2 className="mb-4 text-lg font-display font-semibold text-white">Inventaire <span className="text-sm font-normal text-white/40">({data.inventory.length})</span></h2>
         {data.inventory.length === 0 ? (
           <p className="py-6 text-center text-sm text-white/40">Ouvre des coffres pour récupérer des pièces d&apos;équipement.</p>
@@ -200,7 +200,7 @@ export function CollectionClient() {
 
       {/* Derniers drops */}
       {data.history.length > 0 && (
-        <section className="panel p-5">
+        <section className="panel reveal reveal-5 p-5">
           <div className="mb-4 flex items-center gap-2">
             <History className="h-5 w-5 text-neon-blue" />
             <h2 className="text-lg font-display font-semibold text-white">Derniers drops</h2>

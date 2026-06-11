@@ -658,7 +658,7 @@ function GameCard({ config, eligibility, onPlayFree, onPlayPaid, hasEnoughCredit
       viewport={{ once: true }}
       transition={{ delay: index * 0.1, duration: 0.5 }}
       whileHover={{ y: -10 }}
-      className="group relative glass rounded-2xl p-8 border border-[var(--bg-tertiary)] flex flex-col items-center text-center transition-all duration-300 hover:border-[var(--neon-purple)]/50 overflow-hidden"
+      className="group relative glass rounded-2xl p-8 border border-[var(--bg-tertiary)] flex flex-col items-center text-center transition-all duration-300 hover:border-[var(--neon-purple)]/50 hover:shadow-[0_0_38px_-10px_rgba(155,92,255,0.45)] overflow-hidden"
     >
       {/* Decorative Corner Badge - Shows "Gratuit" only if free play available */}
       {isFreeAvailable && (
@@ -674,14 +674,21 @@ function GameCard({ config, eligibility, onPlayFree, onPlayPaid, hasEnoughCredit
       {/* Max Reward Badge */}
       <div className="absolute top-4 left-4 flex items-center gap-1.5 px-3 py-1.5 bg-black/60 rounded-full border border-[#FFB800]/30 backdrop-blur-sm">
         <CreditIcon className="w-4 h-4" />
-        <span className="text-[10px] font-bold text-[#FFB800] uppercase tracking-tighter">Max: 10</span>
+        <span className="text-[10px] font-bold text-[#FFB800] uppercase tracking-tighter">Max : 5 crédits</span>
       </div>
 
-      <div className={`w-24 h-24 my-8 transition-transform duration-500 group-hover:scale-110`}>
-        <config.IconComponent className="w-full h-full" animate={true} />
+      <div className="relative my-8 flex flex-col items-center">
+        <div
+          className={`absolute inset-0 -m-4 rounded-full bg-gradient-to-br ${config.gradient} opacity-25 blur-2xl transition-opacity duration-500 group-hover:opacity-45`}
+          aria-hidden
+        />
+        <div className="hero-stage-floor absolute -bottom-3 left-1/2 h-6 w-36 -translate-x-1/2" aria-hidden />
+        <div className="relative h-24 w-24 transition-transform duration-500 group-hover:scale-110 group-hover:-translate-y-1">
+          <config.IconComponent className="w-full h-full" animate={true} />
+        </div>
       </div>
 
-      <h3 className={`text-2xl font-black mb-3 ${config.textClass}`}>
+      <h3 className={`font-display text-2xl font-black mb-3 ${config.textClass}`}>
         {config.title}
       </h3>
 
