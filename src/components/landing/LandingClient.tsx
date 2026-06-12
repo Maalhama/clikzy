@@ -173,7 +173,6 @@ export function LandingClient({
   const mainRef = useRef<HTMLElement>(null)
   const router = useRouter()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const [menuClosing, setMenuClosing] = useState(false)
   const [isMounted, setIsMounted] = useState(false)
   const [isNavigating, setIsNavigating] = useState(false)
   const { hasConsented } = useCookieConsent()
@@ -212,14 +211,7 @@ export function LandingClient({
     }
   }, [isLoggedIn, router])
 
-  const closeMenu = () => {
-    if (menuClosing) return
-    setMenuClosing(true)
-    setTimeout(() => {
-      setMobileMenuOpen(false)
-      setMenuClosing(false)
-    }, 300)
-  }
+  const closeMenu = () => setMobileMenuOpen(false)
 
   const { playerCount, recentWinners } = useLandingRealtime(
     initialWinners,
@@ -1391,8 +1383,8 @@ export function LandingClient({
       </footer>
     </main>
 
-    {/* Mobile Menu Portal - rendu directement dans document.body via createPortal */}
-    {isMounted && mobileMenuOpen && createPortal(
+    {/* Mobile Menu Portal — toujours monté, animé via transform (ouverture ET fermeture fiables) */}
+    {isMounted && createPortal(
       <div
         className="md:hidden"
         style={{
@@ -1402,13 +1394,13 @@ export function LandingClient({
           right: 0,
           bottom: 0,
           zIndex: 999999,
-          pointerEvents: 'auto'
+          pointerEvents: mobileMenuOpen ? 'auto' : 'none'
         }}
+        aria-hidden={!mobileMenuOpen}
       >
         {/* Backdrop */}
         <div
           onClick={closeMenu}
-          className={menuClosing ? 'animate-fade-out' : 'animate-fade-in'}
           style={{
             position: 'fixed',
             top: '3.5rem',
@@ -1416,12 +1408,14 @@ export function LandingClient({
             right: 0,
             bottom: 0,
             backgroundColor: 'rgba(0, 0, 0, 0.6)',
-            backdropFilter: 'blur(4px)'
+            backdropFilter: 'blur(4px)',
+            opacity: mobileMenuOpen ? 1 : 0,
+            transition: 'opacity 0.25s ease-out',
+            pointerEvents: mobileMenuOpen ? 'auto' : 'none'
           }}
         />
         {/* Menu Panel */}
         <div
-          className={menuClosing ? 'animate-slide-out-left' : 'animate-slide-in-left'}
           style={{
             position: 'fixed',
             top: '3.5rem',
@@ -1431,7 +1425,9 @@ export function LandingClient({
             border: '2px solid rgba(155, 92, 255, 0.5)',
             borderLeft: 'none',
             borderRadius: '0 1rem 1rem 0',
-            boxShadow: menuClosing ? 'none' : '0 0 60px rgba(155, 92, 255, 0.4), 0 0 100px rgba(255, 79, 216, 0.2), 10px 10px 40px rgba(0, 0, 0, 0.8)'
+            transform: mobileMenuOpen ? 'translateX(0)' : 'translateX(-100%)',
+            transition: 'transform 0.3s cubic-bezier(0.22, 1, 0.36, 1)',
+            boxShadow: mobileMenuOpen ? '0 0 60px rgba(155, 92, 255, 0.4), 0 0 100px rgba(255, 79, 216, 0.2), 10px 10px 40px rgba(0, 0, 0, 0.8)' : 'none'
           }}
         >
           {/* Menu Header */}

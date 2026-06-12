@@ -63,8 +63,8 @@ export function BattlePassRail({ onClaimed }: { onClaimed?: () => void }) {
   }
 
   return (
-    <div className="mt-5 rounded-xl border border-yellow-400/25 bg-gradient-to-br from-yellow-400/[0.06] to-transparent p-4">
-      <div className="mb-3 flex items-center justify-between gap-2">
+    <div className="mt-4 rounded-xl border border-yellow-400/25 bg-gradient-to-br from-yellow-400/[0.06] to-transparent p-3 sm:p-4">
+      <div className="mb-2 flex items-center justify-between gap-2 sm:mb-3">
         <div className="flex items-center gap-2">
           <Crown className="h-4 w-4 text-yellow-400" />
           <span className="font-display text-sm font-semibold text-white">Passe d&apos;Arène</span>

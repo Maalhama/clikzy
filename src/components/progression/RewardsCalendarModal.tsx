@@ -71,15 +71,15 @@ export function RewardsCalendarModal({
         initial={{ opacity: 0, y: 24, scale: 0.96 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ type: 'spring', stiffness: 260, damping: 22 }}
-        className="relative max-h-[92vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-white/10 bg-bg-secondary p-4 sm:p-6"
+        className="relative max-h-[94vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-white/10 bg-bg-secondary p-4 sm:p-6"
       >
         <button onClick={onClose} aria-label="Fermer" className="absolute top-3 right-3 z-10 text-white/40 hover:text-white">
           <X size={20} />
         </button>
 
         <span className="kicker !text-[0.6rem]">Récompenses du mois</span>
-        <h3 className="mt-2 mb-1 font-display text-2xl font-semibold text-white">{monthTitle}</h3>
-        <p className="mb-5 text-xs text-white/50">
+        <h3 className="mt-1.5 mb-1 font-display text-xl font-semibold text-white sm:text-2xl">{monthTitle}</h3>
+        <p className="mb-3 text-xs text-white/50 sm:mb-5">
           Reviens chaque jour réclamer ta récompense. Les <span className="font-semibold text-white/80">samedis</span> = coffres,
           de plus en plus rares au fil du mois !
         </p>
@@ -125,7 +125,7 @@ export function RewardsCalendarModal({
         </div>
 
         {/* CTA du jour */}
-        <div className="mt-5 text-center">
+        <div className="mt-4 text-center">
           {result ? (
             <div className="flex flex-col items-center gap-2">
               <p className="text-sm font-semibold text-success">
@@ -138,7 +138,7 @@ export function RewardsCalendarModal({
               <button onClick={onClose} className="btn-arena px-7 py-2.5 text-xs">Continuer</button>
             </div>
           ) : today ? (
-            <button onClick={claim} disabled={claiming} className="btn-arena px-8 py-3 text-sm disabled:opacity-60">
+            <button onClick={claim} disabled={claiming} className="btn-arena px-6 py-2.5 text-xs disabled:opacity-60 sm:px-8 sm:py-3 sm:text-sm">
               {claiming ? 'Récupération…' : 'Réclamer la récompense du jour'}
             </button>
           ) : (
