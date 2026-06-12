@@ -2140,9 +2140,14 @@ body::after {
   animation: page-enter 0.32s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
+/* OPACITY SEULE — le translateY animé créait DEUX bugs majeurs :
+   1) le wrapper devenait containing block des position:fixed descendants
+      (fond d'arène, widgets) pendant l'animation ;
+   2) l'animation non-composited faisait compter le déplacement du halo
+      plein écran comme layout shift (0,44 de CLS sur le lobby, mesuré). */
 @keyframes page-enter {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 @media (prefers-reduced-motion: reduce) {
