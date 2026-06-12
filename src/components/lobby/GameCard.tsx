@@ -15,6 +15,8 @@ interface GameCardProps {
   index?: number
   isFavorite?: boolean
   onToggleFavorite?: (gameId: string) => void
+  /** Tuile bento large (2 colonnes) : image panoramique, hauteur de rangée conservée. */
+  wide?: boolean
 }
 
 // Helper to format duration since entering final phase
@@ -39,7 +41,7 @@ function formatTimeAgo(ms: number): string {
   return `il y a ${days}j`
 }
 
-export const GameCard = memo(function GameCard({ game, index = 0, isFavorite = false, onToggleFavorite }: GameCardProps) {
+export const GameCard = memo(function GameCard({ game, index = 0, isFavorite = false, onToggleFavorite, wide = false }: GameCardProps) {
   const [timeLeft, setTimeLeft] = useState(() =>
     game.end_time ? calculateTimeLeft(game.end_time) : 0
   )
@@ -234,7 +236,7 @@ export const GameCard = memo(function GameCard({ game, index = 0, isFavorite = f
     <Link
       ref={cardRef}
       href={(isEnded || isWaiting) ? '#' : `/game/${game.id}`}
-      className={cardClasses}
+      className={`${cardClasses} ${wide ? 'sm:col-span-2' : ''}`}
       style={{ animationDelay, ...borderStyle }}
       onClick={(isEnded || isWaiting) ? (e) => e.preventDefault() : undefined}
     >
@@ -346,7 +348,7 @@ export const GameCard = memo(function GameCard({ game, index = 0, isFavorite = f
       )}
 
       {/* Image section */}
-      <div className={`relative aspect-[4/3] bg-gradient-to-br from-bg-tertiary to-bg-secondary overflow-hidden ${isEnded ? 'grayscale-[30%]' : ''}`}>
+      <div className={`relative ${wide ? 'aspect-[21/10] sm:aspect-[11/4]' : 'aspect-[4/3]'} bg-gradient-to-br from-bg-tertiary to-bg-secondary overflow-hidden ${isEnded ? 'grayscale-[30%]' : ''}`}>
         {/* Glow effect on hover */}
         {!isEnded && (
           <div

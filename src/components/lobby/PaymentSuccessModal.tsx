@@ -109,7 +109,7 @@ export function PaymentSuccessModal({ credits, kind = 'credits', onClose }: Paym
           {/* CTA Button */}
           <button
             onClick={onClose}
-            className="w-full py-3 sm:py-4 rounded-xl font-bold text-white bg-gradient-to-r from-neon-purple to-neon-pink active:scale-95 transition-transform"
+            className="btn-arena w-full py-3 text-sm sm:py-4"
           >
             {KIND_COPY[kind].cta}
           </button>

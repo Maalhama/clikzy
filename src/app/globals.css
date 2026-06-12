@@ -1732,6 +1732,61 @@ body::after {
   }
 }
 
+/* ============================================
+   SYSTÈME DE BOUTONS — 3 variants, point final.
+   - .btn-arena          PRIMARY   : l'action principale (1 par vue max)
+   - .btn-arena-outline  SECONDARY : action alternative visible
+   - .btn-arena-ghost    TERTIARY  : actions discrètes (quitter, annuler)
+   Exceptions sémantiques assumées : doré = V.I.P/Passe, rouge = FONCE.
+   Tout nouveau bouton DOIT utiliser un de ces variants (pas d'inline ad hoc).
+   ============================================ */
+.btn-arena-outline {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-family: var(--font-display);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--neon-purple);
+  background: rgba(155, 92, 255, 0.07);
+  border: 1px solid rgba(155, 92, 255, 0.55);
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%);
+  transition: all 0.25s ease;
+}
+
+@media (hover: hover) {
+  .btn-arena-outline:hover {
+    color: #fff;
+    background: rgba(155, 92, 255, 0.16);
+    border-color: var(--neon-purple);
+    box-shadow: 0 0 24px rgba(155, 92, 255, 0.3);
+  }
+}
+
+.btn-arena-outline:active {
+  transform: scale(0.97);
+}
+
+.btn-arena-outline:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ============================================
+   ÉLÉVATIONS — 3 paliers de surface (dark UI).
+   En dark, la profondeur = ÉCLAIRCISSEMENT de la surface, pas l'ombre.
+   - .surface-1  panneaux de page (sections inline)
+   - .surface-2  cards/widgets posés sur un panneau
+   - .surface-3  modals/dropdowns (le plus proche de l'œil = le plus clair)
+   Les bordures white/10 deviennent un APPOINT, plus le seul indice de relief.
+   ============================================ */
+.surface-1 { background: #11162A; }
+.surface-2 { background: #161D33; }
+.surface-3 { background: #1B2340; }
+
 /* ---- Reveals en cascade (entrée de page) ---- */
 @keyframes arcade-reveal {
   from {

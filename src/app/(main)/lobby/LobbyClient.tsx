@@ -396,16 +396,20 @@ export function LobbyClient({
                   )}
 
                   {/* Desktop/Tablet: Grid */}
-                  <div className="hidden sm:grid sm:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-6">
+                  {/* Grille bento : tuile large en tête (et une 2e en milieu
+                      de page) pour casser l'uniformité — grid-flow-dense comble
+                      les trous avec les cartes suivantes. */}
+                  <div className="hidden sm:grid sm:grid-cols-2 xl:grid-cols-3 grid-flow-dense gap-4 md:gap-6">
                     {filteredGames
                       .filter((game) => game.id !== featuredLobbyGame?.id)
-                      .map((game, index) => (
+                      .map((game, index, arr) => (
                       <GameCard
                         key={game.id}
                         game={game}
                         index={index}
                         isFavorite={isFavorite(game.id)}
                         onToggleFavorite={toggleFavorite}
+                        wide={index === 0 || (index === 5 && arr.length >= 8)}
                       />
                     ))}
                   </div>

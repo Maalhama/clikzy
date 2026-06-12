@@ -69,7 +69,7 @@ export function InstallBanner() {
             </div>
             <button
               onClick={handleInstall}
-              className="shrink-0 rounded-lg bg-gradient-to-r from-neon-purple to-neon-pink px-3.5 py-1.5 text-xs font-bold text-white transition-all hover:shadow-lg hover:shadow-neon-purple/30"
+              className="btn-arena shrink-0 px-3.5 py-1.5 text-[0.65rem]"
             >
               Installer
             </button>

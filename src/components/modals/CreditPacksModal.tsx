@@ -48,7 +48,7 @@ export function CreditPacksModal({ isOpen, onClose }: CreditPacksModalProps) {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
             transition={{ type: 'spring', duration: 0.4 }}
-            className="relative z-10 w-full max-w-md rounded-2xl bg-bg-secondary border border-white/10 overflow-hidden"
+            className="relative z-10 w-full max-w-md rounded-2xl surface-3 border border-white/10 overflow-hidden"
           >
             {/* Close button */}
             <button

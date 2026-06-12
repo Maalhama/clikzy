@@ -69,7 +69,7 @@ export function RewardsCalendarModal({
         initial={{ opacity: 0, y: 24, scale: 0.96 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ type: 'spring', stiffness: 260, damping: 22 }}
-        className="relative max-h-[94vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-white/10 bg-bg-secondary p-4 sm:p-6"
+        className="relative max-h-[94vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-white/10 surface-3 p-4 sm:p-6"
       >
         <button onClick={onClose} aria-label="Fermer" className="absolute top-3 right-3 z-10 text-white/40 hover:text-white">
           <X size={20} />

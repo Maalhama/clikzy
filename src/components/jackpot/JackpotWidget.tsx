@@ -101,7 +101,7 @@ export function JackpotWidget({ variant }: { variant: 'inline' | 'pill' | 'stat'
           className="fixed inset-0 max-sm:min-h-[100lvh] z-[110] flex items-center justify-center bg-black/85 p-4 backdrop-blur-sm"
           onClick={() => setOpen(false)}
         >
-          <div className="relative w-full max-w-md overflow-hidden rounded-2xl border border-yellow-400/25 bg-bg-secondary p-6" onClick={(e) => e.stopPropagation()}>
+          <div className="relative w-full max-w-md overflow-hidden rounded-2xl border border-yellow-400/25 surface-3 p-6" onClick={(e) => e.stopPropagation()}>
             <button onClick={() => setOpen(false)} aria-label="Fermer" className="absolute right-3 top-3 text-white/40 hover:text-white"><X size={20} /></button>
             <div className="mb-4 flex flex-col items-center text-center">
               <span className="mb-3 flex h-14 w-14 items-center justify-center rounded-2xl border border-yellow-400/40 bg-yellow-400/10"><span className="h-7 w-7">{trophy}</span></span>

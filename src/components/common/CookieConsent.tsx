@@ -61,13 +61,13 @@ export function CookieConsent() {
             <div className="flex gap-2 mt-4">
               <button
                 onClick={handleRefuse}
-                className="flex-1 py-2.5 rounded-xl bg-white/5 text-white/70 font-semibold text-sm hover:bg-white/10 transition-colors"
+                className="btn-arena-ghost flex-1 py-2.5 text-xs"
               >
                 Refuser
               </button>
               <button
                 onClick={handleAccept}
-                className="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-neon-purple to-neon-pink text-white font-bold text-sm hover:shadow-lg hover:shadow-neon-purple/30 transition-all"
+                className="btn-arena flex-1 py-2.5 text-xs"
               >
                 Accepter
               </button>
