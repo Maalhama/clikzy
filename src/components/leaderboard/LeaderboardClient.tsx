@@ -61,9 +61,20 @@ function LeaderboardBody({ loading, rows, me, period }: { loading: boolean; rows
       {me && me.total > 0 && (
         <div className="panel rounded-2xl px-5 py-4 text-center">
           <p className="text-sm text-white/60">Ton classement</p>
-          <p className="text-2xl stat-numeral text-white">
-            {me.rank}<span className="text-base font-semibold text-white/50"> e sur {me.total.toLocaleString('fr-FR')} joueurs</span>
-          </p>
+          {/* « 13e sur 13 » est démotivant à faible volume : sous 50 joueurs,
+              on affiche le rang seul ; au-delà, rang + top % (motivant). */}
+          {me.total >= 50 ? (
+            <p className="text-2xl stat-numeral text-white">
+              {me.rank}
+              <span className="text-base font-semibold text-white/50">
+                {' '}e · top {Math.max(1, Math.ceil((me.rank / me.total) * 100))}%
+              </span>
+            </p>
+          ) : (
+            <p className="text-2xl stat-numeral text-white">
+              {me.rank}<span className="text-base font-semibold text-white/50"> e place</span>
+            </p>
+          )}
         </div>
       )}
 

@@ -8,6 +8,7 @@ import { signOut } from '@/actions/auth'
 import { Avatar } from '@/components/ui/Avatar'
 import { Logo } from '@/components/ui/Logo'
 import { useCredits } from '@/contexts/CreditsContext'
+import { AnimatedNumber } from '@/components/ui/AnimatedNumber'
 import type { Profile } from '@/types/database'
 
 interface HeaderProps {
@@ -218,7 +219,7 @@ export function Header({ profile }: HeaderProps) {
           {profile ? (
             <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-neon-purple/10 border border-neon-purple/30">
               <span className="text-neon-purple">{creditsIcon}</span>
-              <span className="text-sm stat-numeral text-neon-purple">{credits}</span>
+              <AnimatedNumber value={credits} className="text-sm stat-numeral text-neon-purple" />
             </div>
           ) : (
             <Link
@@ -295,7 +296,7 @@ export function Header({ profile }: HeaderProps) {
               <>
                 <div className="flex items-center gap-2 px-3.5 py-2 rounded-full bg-neon-purple/10 border border-neon-purple/30 hover:border-neon-purple/50 transition-colors">
                   <span className="text-neon-purple">{creditsIcon}</span>
-                  <span className="stat-numeral text-neon-purple">{credits}</span>
+                  <AnimatedNumber value={credits} className="stat-numeral text-neon-purple" />
                   <span className="text-white/40 text-xs uppercase tracking-wider">crédits</span>
                 </div>
 

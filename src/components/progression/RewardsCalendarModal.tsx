@@ -106,14 +106,14 @@ export function RewardsCalendarModal({
                 } ${!d.claimed && !d.claimable ? 'opacity-55' : ''}`}
                 style={d.kind === 'chest' && !d.claimed ? { borderColor: `${chestColor}66` } : undefined}
               >
-                <span className="stat-numeral absolute left-1 top-0.5 text-[0.55rem] text-white/55">{n}</span>
+                <span className="stat-numeral absolute left-1 top-0.5 text-[0.65rem] text-white/60">{n}</span>
                 {d.claimed ? (
                   <Check className="h-4 w-4 text-success" />
                 ) : (
                   <>
                     {cellIcon(d)}
                     {d.kind !== 'chest' && (
-                      <span className="stat-numeral text-[0.55rem] leading-none text-white/45">{d.amount}</span>
+                      <span className="stat-numeral text-[0.65rem] leading-none text-white/55">{d.amount}</span>
                     )}
                   </>
                 )}

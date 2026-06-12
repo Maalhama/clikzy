@@ -92,7 +92,7 @@ export function CustomizationSection() {
                       {!unlocked && (
                         <span className="absolute inset-0 flex flex-col items-center justify-center gap-0.5 rounded-xl bg-black/55 text-white/70">
                           <Lock className="h-3.5 w-3.5" />
-                          <span className="text-[0.55rem] font-semibold">Niv. {c.unlockLevel}</span>
+                          <span className="text-[0.65rem] font-semibold">Niv. {c.unlockLevel}</span>
                         </span>
                       )}
                     </button>
