@@ -490,7 +490,7 @@ export function GameClient({
               {game.status !== 'ended' && !hasCredits && (
                 <button
                   onClick={() => setShowCreditModal(true)}
-                  className="w-full py-4 [clip-path:polygon(0_0,100%_0,100%_calc(100%-10px),calc(100%-10px)_100%,0_100%)] font-display font-semibold uppercase tracking-wide text-base transition-all flex items-center justify-center gap-2 bg-gradient-to-r from-neon-purple to-neon-pink text-white drop-shadow-[0_0_12px_rgba(155,92,255,0.45)] hover:drop-shadow-[0_0_18px_rgba(155,92,255,0.65)] active:scale-[0.98]"
+                  className="btn-arena w-full py-4 text-base"
                 >
                   <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />

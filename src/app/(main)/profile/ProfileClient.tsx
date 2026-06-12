@@ -316,7 +316,7 @@ export function ProfileClient({ profile, wins, gamesPlayed, totalValueWon, gameH
               </div>
             </div>
           </div>
-          <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-neon-purple to-neon-pink text-white font-bold text-sm group-hover:scale-105 transition-transform">
+          <div className="btn-arena px-4 py-2 text-xs group-hover:scale-105">
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
             </svg>
@@ -408,7 +408,7 @@ export function ProfileClient({ profile, wins, gamesPlayed, totalValueWon, gameH
         >
           <Link
             href="/lobby"
-            className="inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-gradient-to-r from-neon-purple to-neon-pink text-white font-bold hover:shadow-lg hover:shadow-neon-purple/30 transition-all hover:scale-105"
+            className="btn-arena px-8 py-4 text-sm"
           >
             <GamepadIcon className="w-5 h-5" />
             Jouer maintenant
@@ -541,7 +541,7 @@ function EmptyWinsState() {
       </p>
       <Link
         href="/lobby"
-        className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-gradient-to-r from-neon-purple to-neon-pink text-white font-semibold text-sm hover:shadow-lg hover:shadow-neon-purple/30 transition-all"
+        className="btn-arena px-5 py-2.5 text-xs"
       >
         <GamepadIcon className="w-4 h-4" />
         Commencer à jouer

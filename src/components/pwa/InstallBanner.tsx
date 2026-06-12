@@ -138,7 +138,7 @@ export function InstallBanner() {
 
               <button
                 onClick={() => setShowIOSGuide(false)}
-                className="w-full mt-6 py-3 rounded-xl bg-white/10 text-white font-bold transition-colors hover:bg-white/20"
+                className="btn-arena-ghost w-full mt-6 py-3 text-sm"
               >
                 Compris !
               </button>

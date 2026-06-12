@@ -210,13 +210,7 @@ export function ShippingAddressForm({ initialData, onSuccess, compact = false }:
       <button
         type="submit"
         disabled={isSubmitting}
-        className={`
-          w-full py-3 rounded-xl font-bold transition-all
-          bg-gradient-to-r from-neon-purple to-neon-pink text-white
-          hover:shadow-lg hover:shadow-neon-purple/30
-          disabled:opacity-50 disabled:cursor-not-allowed
-          ${compact ? 'py-2.5 text-sm' : ''}
-        `}
+        className={`btn-arena w-full py-3 text-sm ${compact ? '!py-2.5 text-xs' : ''}`}
       >
         {isSubmitting ? (
           <span className="flex items-center justify-center gap-2">
