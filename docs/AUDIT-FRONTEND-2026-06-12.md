@@ -166,8 +166,12 @@ appartient à Mehdi :
 
 ## 7. Plan d'action priorisé
 
-> **État au 12/06 soir : P0 exécuté en intégralité + P1 partiel** (commits
-> ca697d1 + 92d4b86). Mesures post-fix : a11y 86→93 (lobby), LCP 7,0→4,7 s.
+> **État au 12/06 soir : P0 exécuté en intégralité + P1 majoritaire** (commits
+> ca697d1 → 484aede). **Mesures finales lobby : perf 51→77, CLS 0,355→0,152,
+> LCP 7,0→4,4 s, Speed Index 6,4→3,6 s, a11y 86→93.** Cause racine du CLS :
+> le translateY de .page-enter (containing block + animation non-composited)
+> -> transition en opacity seule. Reste 1 shift de 0,15 (insertion au-dessus
+> des filtres lobby, à instrumenter avec web-vitals attribution).
 > Fait : unoptimized supprimés (98 PNG/24MB enfin compressés), placeholders
 > anti-CLS (jackpot/online/countdown), will-change sur le halo arena (62% du
 > CLS = animation non-composited), triggers GSAP scopés desktop (step cards
