@@ -326,8 +326,10 @@ export function LobbyClient({
       <div className="px-4 md:px-6">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col lg:flex-row gap-6">
-            {/* Games */}
-            <div className="flex-1">
+            {/* Games — min-w-0 OBLIGATOIRE : sans lui, un nom d'item long dans
+                la carte « À la une » élargit la colonne et décale la sidebar
+                des derniers gagnants à chaque rotation. */}
+            <div className="flex-1 min-w-0">
               {filteredGames.length > 0 ? (
                 <>
                   {/* Mobile: Horizontal scroll, snap centré (espaces égaux G/D) */}

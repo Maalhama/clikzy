@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback, useRef } from 'react'
+import { createPortal } from 'react-dom'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useSounds } from '@/hooks/useSounds'
@@ -204,7 +205,12 @@ export function FloatingTimer({
     return isCritical ? 'CLIQUE MAINTENANT!' : isUrgent ? 'PARTICIPER VITE!' : 'PARTICIPER'
   }
 
-  return (
+  // PORTAL OBLIGATOIRE : le widget est rendu dans des wrappers animés par
+  // transform (.page-enter, sections reveal/GSAP). Un ancêtre transformé
+  // devient le containing block des position:fixed -> le widget se retrouvait
+  // décalé/coupé à droite. Dans document.body, fixed = toujours le viewport.
+  if (typeof window === 'undefined') return null
+  return createPortal(
     <AnimatePresence mode="wait">
       <motion.div
         key={currentProduct}
@@ -235,7 +241,7 @@ export function FloatingTimer({
           stiffness: 400,
           damping: 25,
         }}
-        className="fixed bottom-3 md:bottom-6 right-2 md:right-6 z-50 max-w-[calc(100vw-1rem)]"
+        className="fixed bottom-3 md:bottom-6 right-4 md:right-12 z-50 max-w-[calc(100vw-2rem)]"
       >
         {/* MOBILE VERSION */}
         <div className="md:hidden">
@@ -377,6 +383,7 @@ export function FloatingTimer({
           </div>
         </div>
       </motion.div>
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body
   )
 }
