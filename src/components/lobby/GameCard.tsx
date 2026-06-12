@@ -426,9 +426,9 @@ export const GameCard = memo(function GameCard({ game, index = 0, isFavorite = f
       {/* Content */}
       <div className="p-4">
         {/* Title — une seule ligne, hauteur stable quel que soit le nom */}
-        <h3 className={`font-bold text-lg mb-1 truncate transition-colors ${isEnded ? 'text-white/60' : 'text-white group-hover:text-neon-purple'}`}>
+        <h2 className={`font-bold text-lg mb-1 truncate transition-colors ${isEnded ? 'text-white/60' : 'text-white group-hover:text-neon-purple'}`}>
           {game.item.name}
-        </h3>
+        </h2>
         {/* Description toujours rendue (1 ligne, hauteur fixe) : sans elle les
             cartes n'avaient pas toutes la même hauteur dans la grille. */}
         {!isEnded && (

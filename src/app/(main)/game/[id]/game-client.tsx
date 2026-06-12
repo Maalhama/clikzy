@@ -320,7 +320,6 @@ export function GameClient({
                         : 'drop-shadow-[0_0_20px_rgba(155,92,255,0.4)]'
                     }`}
                     priority
-                    unoptimized
                     onError={() => !imgError && setImgError(true)}
                   />
                 </div>
@@ -665,9 +664,12 @@ export function GameClient({
         {/* DESKTOP LAYOUT - Compact */}
         <div className="hidden lg:block max-w-5xl mx-auto">
           <div className={`grid grid-cols-[1fr,1.2fr] gap-6 ${isCritical ? 'animate-[shake_0.5s_ease-in-out_infinite]' : ''}`}>
-            {/* LEFT COLUMN - Product Showcase */}
+            {/* LEFT COLUMN - Product Showcase.
+                self-start : sans lui la grille étire la carte à la hauteur de
+                la colonne droite -> grand rectangle vide encadré sous l'info
+                produit. sticky : la carte suit le scroll, plus de zone morte. */}
             <div
-              className="rounded-2xl overflow-hidden backdrop-blur-sm"
+              className="self-start lg:sticky lg:top-24 rounded-2xl overflow-hidden backdrop-blur-sm"
               style={borderStyle}
             >
               <div className={`relative aspect-[4/3] bg-gradient-to-br from-bg-tertiary to-bg-secondary overflow-hidden ${game.status === 'ended' ? 'grayscale-[30%]' : ''}`}>
@@ -703,7 +705,6 @@ export function GameClient({
                           : 'drop-shadow-[0_0_25px_rgba(155,92,255,0.4)]'
                       }`}
                       priority
-                      unoptimized
                       onError={() => !imgError && setImgError(true)}
                     />
                   </div>
@@ -1014,32 +1015,8 @@ export function GameClient({
             </div>
           </div>
 
-          {/* Desktop: Bottom Row - Rules (Compact) */}
-          <div className="mt-6 p-4 rounded-xl bg-bg-secondary/30 border border-white/5">
-            <div className="flex items-center gap-6 text-sm">
-              <span className="text-white/40 font-medium">Règles:</span>
-              <div className="flex items-center gap-2 text-white/60">
-                <svg className="w-4 h-4 text-neon-purple" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                1 clic = 1 crédit
-              </div>
-              <span className="text-white/20">•</span>
-              <div className="flex items-center gap-2 text-white/60">
-                <svg className="w-4 h-4 text-neon-blue" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
-                </svg>
-                Le dernier clic gagne
-              </div>
-              <span className="text-white/20">•</span>
-              <div className="flex items-center gap-2 text-white/60">
-                <svg className="w-4 h-4 text-neon-pink" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-                Phase finale: reset 1min30
-              </div>
-            </div>
-          </div>
+          {/* (Bandeau règles supprimé : il dupliquait mot pour mot le panneau
+              « Règles du jeu » affiché juste au-dessus dans la colonne droite.) */}
         </div>
       </div>
 

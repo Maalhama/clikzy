@@ -357,6 +357,7 @@ export function Header({ profile }: HeaderProps) {
             pointerEvents: mobileMenuOpen ? 'auto' : 'none',
           }}
           aria-hidden={!mobileMenuOpen}
+          inert={!mobileMenuOpen}
         >
           <div
             onClick={closeMenu}

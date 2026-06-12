@@ -228,11 +228,15 @@ export function LandingClient({
       if (!mainRef.current || isMobileDevice) return
 
       const ctx = gsap.context(() => {
-        // How it works - stagger from sides
-        gsap.from('.step-card:nth-child(odd)', {
+        // How it works - stagger from sides.
+        // IMPORTANT : scoper au conteneur DESKTOP. Deux sections portent
+        // .how-section (mobile cachée + desktop) : le trigger résolvait la
+        // version mobile en display:none -> positions incalculables -> les
+        // cards desktop restaient figées semi-transparentes.
+        gsap.from('#how-it-works-desktop .step-card:nth-child(odd)', {
           scrollTrigger: {
-            trigger: '.how-section',
-            start: 'top 70%',
+            trigger: '#how-it-works-desktop',
+            start: 'top 75%',
           },
           x: -100,
           opacity: 0,
@@ -240,10 +244,10 @@ export function LandingClient({
           stagger: 0.2,
         })
 
-        gsap.from('.step-card:nth-child(even)', {
+        gsap.from('#how-it-works-desktop .step-card:nth-child(even)', {
           scrollTrigger: {
-            trigger: '.how-section',
-            start: 'top 70%',
+            trigger: '#how-it-works-desktop',
+            start: 'top 75%',
           },
           x: 100,
           opacity: 0,
@@ -251,11 +255,12 @@ export function LandingClient({
           stagger: 0.2,
         })
 
-        // Winners feed
-        gsap.from('.winner-item', {
+        // Winners feed — même scoping : #gagnants est la section desktop,
+        // .winners-section seule matchait d'abord la version mobile cachée.
+        gsap.from('#gagnants .winner-item', {
           scrollTrigger: {
-            trigger: '.winners-section',
-            start: 'top 70%',
+            trigger: '#gagnants',
+            start: 'top 75%',
           },
           x: -50,
           opacity: 0,
@@ -547,7 +552,7 @@ export function LandingClient({
           </button>
 
           {/* Reassurance message */}
-          <p className="text-[10px] text-white/40 text-center mb-6">
+          <p className="text-[11px] text-white/55 text-center mb-6">
             Jeu 100% gratuit • Aucun paiement requis • Lots réels
           </p>
 
@@ -555,15 +560,15 @@ export function LandingClient({
           <div className="hero-stats reveal reveal-4 flex justify-between gap-2">
             <div className="panel flex-1 py-3 px-2 text-center">
               <div className="text-lg stat-numeral text-neon-blue">+{stats.totalWinningsValue.toLocaleString()}€</div>
-              <div className="text-[9px] text-white/40 uppercase">Récompenses</div>
+              <div className="text-[10px] text-white/55 uppercase">Récompenses</div>
             </div>
             <div className="panel flex-1 py-3 px-2 text-center">
               <div className="text-lg stat-numeral text-neon-purple">+100</div>
-              <div className="text-[9px] text-white/40 uppercase">Lots</div>
+              <div className="text-[10px] text-white/55 uppercase">Lots</div>
             </div>
             <div className="panel flex-1 py-3 px-2 text-center">
               <div className="text-lg stat-numeral text-neon-pink">10c</div>
-              <div className="text-[9px] text-white/40 uppercase">Gratuits/jour</div>
+              <div className="text-[10px] text-white/55 uppercase">Gratuits/jour</div>
             </div>
           </div>
         </div>
@@ -935,7 +940,7 @@ export function LandingClient({
             {/* Mini stats */}
             <div className="text-right">
               <div className="text-lg font-black text-success">{stats.totalWinningsValue.toLocaleString()}€</div>
-              <div className="text-[9px] text-white/40 uppercase">Distribués</div>
+              <div className="text-[10px] text-white/55 uppercase">Distribués</div>
             </div>
           </div>
 
@@ -1397,6 +1402,7 @@ export function LandingClient({
           pointerEvents: mobileMenuOpen ? 'auto' : 'none'
         }}
         aria-hidden={!mobileMenuOpen}
+        inert={!mobileMenuOpen}
       >
         {/* Backdrop */}
         <div

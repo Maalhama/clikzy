@@ -67,7 +67,6 @@ export function LobbyFeatured({ game }: LobbyFeaturedProps) {
             sizes="160px"
             className="prize-float object-contain drop-shadow-[0_0_28px_rgba(155,92,255,0.5)] transition-transform duration-500 group-hover:scale-105"
             priority
-            unoptimized
             onError={() => !imgError && setImgError(true)}
           />
         </div>

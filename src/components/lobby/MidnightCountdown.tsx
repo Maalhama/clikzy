@@ -20,7 +20,9 @@ export function MidnightCountdown() {
     const i = setInterval(tick, 1000)
     return () => clearInterval(i)
   }, [])
-  if (ms === null) return <span suppressHydrationWarning>--:--:--</span>
+  // Même classe que le rendu final (stat-numeral = chiffres tabulaires) :
+  // largeur identique avant/après montage, zéro micro-shift.
+  if (ms === null) return <span suppressHydrationWarning className="stat-numeral">--:--:--</span>
   const total = Math.max(0, Math.floor(ms / 1000))
   const h = String(Math.floor(total / 3600)).padStart(2, '0')
   const m = String(Math.floor((total % 3600) / 60)).padStart(2, '0')

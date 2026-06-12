@@ -49,7 +49,19 @@ export function JackpotWidget({ variant }: { variant: 'inline' | 'pill' | 'stat'
     return () => cancelAnimationFrame(raf)
   }, [jp])
 
-  if (!jp || jp.amount <= 0) return null
+  // Pendant le fetch : placeholder INVISIBLE aux mêmes dimensions que la pill
+  // finale -> zéro layout shift quand le montant arrive (CLS lobby).
+  if (!jp) {
+    if (variant !== 'pill') return null
+    return (
+      <div aria-hidden className="panel invisible flex items-center gap-2 px-3.5 py-2">
+        <span className="h-4 w-4" />
+        <span className="stat-numeral text-sm">8 888</span>
+        <span className="text-xs">jackpot</span>
+      </div>
+    )
+  }
+  if (jp.amount <= 0) return null
   const next = nextEighth()
   const shown = display.toLocaleString('fr-FR')
 
@@ -65,8 +77,8 @@ export function JackpotWidget({ variant }: { variant: 'inline' | 'pill' | 'stat'
       className="panel flex items-center gap-2 px-3.5 py-2 transition-colors hover:border-yellow-400/40"
     >
       <span className="h-4 w-4">{trophy}</span>
-      <span className="stat-numeral text-sm text-yellow-300">{shown}</span>
-      <span className="text-xs text-white/50">jackpot</span>
+      <span className="stat-numeral text-sm text-white">{shown}</span>
+      <span className="text-xs text-white/55">jackpot</span>
     </button>
   ) : (
     <button

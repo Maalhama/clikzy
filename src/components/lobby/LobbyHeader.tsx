@@ -103,6 +103,7 @@ export const LobbyHeader = memo(function LobbyHeader({
             <button
               type="button"
               onClick={onCalendarClick}
+              aria-label="Récompense du jour : ouvrir le calendrier"
               className="hero-live-card group flex flex-1 items-center justify-center gap-0 px-2 py-2 text-left transition-transform hover:-translate-y-0.5 sm:flex-none sm:justify-start sm:gap-3 sm:px-4 sm:py-3"
             >
               <div className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-neon-purple/30 bg-neon-purple/10 sm:h-[46px] sm:w-[46px]">
@@ -137,6 +138,7 @@ export const LobbyHeader = memo(function LobbyHeader({
             <button
               type="button"
               onClick={onChestsClick}
+              aria-label="Mes coffres : ouvrir"
               className="hero-live-card group flex flex-1 items-center justify-center gap-0 px-2 py-2 text-left transition-transform hover:-translate-y-0.5 sm:flex-none sm:justify-start sm:gap-3 sm:px-4 sm:py-3"
             >
               <div className="relative flex h-9 w-9 shrink-0 items-center justify-center sm:h-[46px] sm:w-[46px]">
@@ -180,7 +182,7 @@ export const LobbyHeader = memo(function LobbyHeader({
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-neon-purple" />
               </span>
               <span className="text-white stat-numeral text-sm">{activeCount}</span>
-              <span className="text-white/50 text-xs">en jeu</span>
+              <span className="text-white/55 text-xs">en jeu</span>
             </div>
 
             {/* Ended/Won count */}
@@ -194,12 +196,12 @@ export const LobbyHeader = memo(function LobbyHeader({
               >
                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
-              <span className="text-success stat-numeral text-sm">{endedCount}</span>
-              <span className="text-white/50 text-xs">remportés</span>
+              <span className="text-white stat-numeral text-sm">{endedCount}</span>
+              <span className="text-white/55 text-xs">remportés</span>
             </div>
 
             {/* Urgent count */}
-            <div className={`panel flex items-center gap-2 px-3.5 py-2 ${urgentCount > 0 ? 'animate-pulse' : ''}`}>
+            <div className="panel flex items-center gap-2 px-3.5 py-2">
               <svg
                 className="w-4 h-4 text-danger"
                 fill="none"
@@ -209,10 +211,10 @@ export const LobbyHeader = memo(function LobbyHeader({
               >
                 <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
               </svg>
-              <span className="text-danger stat-numeral text-sm">
+              <span className="text-white stat-numeral text-sm">
                 {urgentCount}
               </span>
-              <span className="text-white/50 text-xs">phase finale</span>
+              <span className="text-white/55 text-xs">phase finale</span>
             </div>
 
             {/* Credits */}
@@ -230,8 +232,8 @@ export const LobbyHeader = memo(function LobbyHeader({
                   d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
                 />
               </svg>
-              <span className="text-neon-blue stat-numeral text-sm">{credits}</span>
-              <span className="text-white/50 text-xs">crédits</span>
+              <span className="text-white stat-numeral text-sm">{credits}</span>
+              <span className="text-white/55 text-xs">crédits</span>
             </div>
           </div>
           </div>
@@ -259,11 +261,12 @@ function OnlineBadge() {
     return () => clearInterval(interval)
   }, [])
 
-  if (count === null) return null
+  // Toujours rendu (invisible avant montage) : l'apparition tardive décalait
+  // le titre LOBBY et tout le contenu en dessous (layout shift).
   return (
-    <span className="hidden items-center gap-1.5 rounded-full border border-success/25 bg-success/10 px-2.5 py-0.5 sm:inline-flex">
-      <span className="stat-numeral text-xs text-success">{count.toLocaleString('fr-FR')}</span>
-      <span className="text-[0.6rem] uppercase tracking-wider text-white/45">en ligne</span>
+    <span className={`hidden items-center gap-1.5 rounded-full border border-success/25 bg-success/10 px-2.5 py-0.5 sm:inline-flex ${count === null ? 'invisible' : ''}`}>
+      <span className="stat-numeral text-xs text-success">{(count ?? 1888).toLocaleString('fr-FR')}</span>
+      <span className="text-[0.6rem] uppercase tracking-wider text-white/55">en ligne</span>
     </span>
   )
 }

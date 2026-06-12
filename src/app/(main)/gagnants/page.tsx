@@ -42,7 +42,7 @@ export default async function GagnantsPage() {
             return (
               <div key={w.id} className="panel panel-hover overflow-hidden p-3">
                 <div className="relative mb-2 aspect-square overflow-hidden rounded-xl bg-bg-primary/50">
-                  <Image src={w.itemImage} alt={w.itemName} fill sizes="200px" unoptimized className="object-contain p-2" />
+                  <Image src={w.itemImage} alt={w.itemName} fill sizes="200px" className="object-contain p-2" />
                   <span className={`absolute left-1.5 top-1.5 rounded-md border px-1.5 py-0.5 text-[0.55rem] font-semibold ${st.cls}`}>
                     {st.label}
                   </span>

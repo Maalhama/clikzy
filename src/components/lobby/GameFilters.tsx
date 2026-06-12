@@ -216,6 +216,7 @@ export const GameFilters = memo(function GameFilters({
                   <path strokeLinecap="round" strokeLinejoin="round" d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" />
                 </svg>
                 <select
+                  aria-label="Trier les parties"
                   value={currentSort}
                   onChange={(e) => onSortChange(e.target.value as SortType)}
                   className="
@@ -378,6 +379,7 @@ export const GameFilters = memo(function GameFilters({
                 <path strokeLinecap="round" strokeLinejoin="round" d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" />
               </svg>
               <select
+                aria-label="Trier les parties"
                 value={currentSort}
                 onChange={(e) => onSortChange(e.target.value as SortType)}
                 className="

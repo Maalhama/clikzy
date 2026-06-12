@@ -31,6 +31,7 @@ export function LobbyCharacterWidget() {
       <button
         type="button"
         onClick={() => setOpen(true)}
+        aria-label="Mon personnage : ouvrir"
         className="hero-live-card group flex flex-1 items-center justify-center gap-0 px-2 py-2 text-left transition-transform hover:-translate-y-0.5 sm:flex-none sm:justify-start sm:gap-3 sm:px-4 sm:py-3"
       >
         <div className="shrink-0">

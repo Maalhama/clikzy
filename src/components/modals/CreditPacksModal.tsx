@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { Dices, Target, Users } from 'lucide-react'
 import { CREDIT_PACKS, type CreditPackId } from '@/lib/stripe/config'
 import { createCheckoutSession } from '@/actions/stripe'
 
@@ -164,16 +165,16 @@ export function CreditPacksModal({ isOpen, onClose }: CreditPacksModalProps) {
               </div>
               <div className="grid grid-cols-3 gap-2 text-center">
                 <a href="/mini-games" className="rounded-lg border border-white/10 bg-white/[0.03] px-2 py-2 transition-colors hover:border-neon-purple/40 hover:bg-neon-purple/10">
-                  <div className="text-sm" aria-hidden>🎰</div>
-                  <div className="mt-0.5 text-[10px] font-medium text-white/70">Mini-jeux gratuits</div>
+                  <Dices className="mx-auto h-4 w-4 text-neon-purple" aria-hidden />
+                  <div className="mt-1 text-[10px] font-medium text-white/70">Mini-jeux gratuits</div>
                 </a>
                 <a href="/lobby" className="rounded-lg border border-white/10 bg-white/[0.03] px-2 py-2 transition-colors hover:border-neon-purple/40 hover:bg-neon-purple/10">
-                  <div className="text-sm" aria-hidden>🎯</div>
-                  <div className="mt-0.5 text-[10px] font-medium text-white/70">Quêtes du jour</div>
+                  <Target className="mx-auto h-4 w-4 text-neon-purple" aria-hidden />
+                  <div className="mt-1 text-[10px] font-medium text-white/70">Quêtes du jour</div>
                 </a>
                 <a href="/profile" className="rounded-lg border border-white/10 bg-white/[0.03] px-2 py-2 transition-colors hover:border-neon-purple/40 hover:bg-neon-purple/10">
-                  <div className="text-sm" aria-hidden>🤝</div>
-                  <div className="mt-0.5 text-[10px] font-medium text-white/70">Parrainage +10</div>
+                  <Users className="mx-auto h-4 w-4 text-neon-purple" aria-hidden />
+                  <div className="mt-1 text-[10px] font-medium text-white/70">Parrainage +10</div>
                 </a>
               </div>
             </div>

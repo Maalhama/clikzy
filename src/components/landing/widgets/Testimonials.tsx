@@ -213,8 +213,11 @@ export function Testimonials({
               setCurrentIndex(index)
               setProgress(0)
             }}
+            aria-label={`Témoignage ${index + 1}`}
+            aria-current={index === currentIndex ? 'true' : undefined}
             className={`
               relative h-2 rounded-full transition-all duration-300 overflow-hidden
+              before:absolute before:-inset-2 before:content-['']
               ${index === currentIndex
                 ? 'w-10 bg-white/20'
                 : 'w-2 bg-white/20 hover:bg-white/40'

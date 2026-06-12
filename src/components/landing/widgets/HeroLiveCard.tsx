@@ -199,7 +199,6 @@ export function HeroLiveCard({ games, compact = false }: HeroLiveCardProps) {
           sizes={compact ? '144px' : '208px'}
           className="object-contain drop-shadow-[0_0_30px_rgba(155,92,255,0.45)] transition-transform duration-500 group-hover:scale-105"
           priority
-          unoptimized
           onError={() => !imgError && setImgError(true)}
         />
       </div>

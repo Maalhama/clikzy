@@ -49,7 +49,6 @@ function TileImage({ name, url, sizes, className }: { name: string; url: string;
       fill
       sizes={sizes}
       className={className}
-      unoptimized
       onError={() => !err && setErr(true)}
     />
   )
