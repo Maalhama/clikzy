@@ -166,7 +166,18 @@ appartient à Mehdi :
 
 ## 7. Plan d'action priorisé
 
-### P0 — Discipline visuelle + perf (le plus gros ROI)
+> **État au 12/06 soir : P0 exécuté en intégralité + P1 partiel** (commits
+> ca697d1 + 92d4b86). Mesures post-fix : a11y 86→93 (lobby), LCP 7,0→4,7 s.
+> Fait : unoptimized supprimés (98 PNG/24MB enfin compressés), placeholders
+> anti-CLS (jackpot/online/countdown), will-change sur le halo arena (62% du
+> CLS = animation non-composited), triggers GSAP scopés desktop (step cards
+> réparées), carte produit jeu self-start+sticky, bandeau règles dupliqué
+> supprimé, pills stats neutralisées (discipline néon), émojis→Lucide,
+> aria-labels/inert/h2/contrastes, footer app 18+, lobby compacté.
+> Restent (P1/P2) : système de boutons unifié, élévations par paliers de
+> surface, heros unifiés, bento lobby, page Clans, grain, juice onde radiale.
+
+### P0 — Discipline visuelle + perf (le plus gros ROI) — ✅ FAIT
 1. **Passe « discipline néon »** : pills stats lobby en monochrome (blanc/gris + icône
    colorée), glow permanent → conditionnel, rose réservé aux rewards. 1 journée, transforme
    la perception premium du site entier.
