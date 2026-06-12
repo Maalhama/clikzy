@@ -4,10 +4,30 @@ import { useEffect, useState } from 'react'
 
 interface PaymentSuccessModalProps {
   credits: number
+  /** Type d'achat : crédits (défaut), abonnement V.I.P ou Passe d'Arène. */
+  kind?: 'credits' | 'vip' | 'pass'
   onClose: () => void
 }
 
-export function PaymentSuccessModal({ credits, onClose }: PaymentSuccessModalProps) {
+const KIND_COPY = {
+  credits: {
+    headline: (credits: number) => `+${credits} crédits`,
+    subtitle: 'Tes crédits sont disponibles immédiatement.',
+    cta: 'Jouer maintenant',
+  },
+  vip: {
+    headline: () => 'V.I.P activé',
+    subtitle: 'Ton abonnement est actif : +10 crédits bonus à récolter chaque jour sur ton espace V.I.P.',
+    cta: 'Voir mes avantages',
+  },
+  pass: {
+    headline: () => 'Passe d’Arène débloqué',
+    subtitle: 'Tes paliers de récompenses sont déverrouillés. Réclame-les dans le calendrier du lobby.',
+    cta: 'Voir mes paliers',
+  },
+} as const
+
+export function PaymentSuccessModal({ credits, kind = 'credits', onClose }: PaymentSuccessModalProps) {
   const [progress, setProgress] = useState(100)
 
   // Auto-dismiss after 5 seconds with progress bar
@@ -74,14 +94,14 @@ export function PaymentSuccessModal({ credits, onClose }: PaymentSuccessModalPro
             Merci pour ton achat !
           </h2>
 
-          {/* Credits amount */}
+          {/* Headline (montant ou produit) */}
           <div className="text-3xl sm:text-4xl font-black text-success sm:neon-text-success mb-3 sm:mb-4">
-            +{credits} crédits
+            {KIND_COPY[kind].headline(credits)}
           </div>
 
           {/* Subtitle */}
           <p className="text-sm sm:text-base text-white/60 mb-6 sm:mb-8">
-            Tes crédits sont disponibles immédiatement.
+            {KIND_COPY[kind].subtitle}
             <br />
             Bonne chance !
           </p>
@@ -91,7 +111,7 @@ export function PaymentSuccessModal({ credits, onClose }: PaymentSuccessModalPro
             onClick={onClose}
             className="w-full py-3 sm:py-4 rounded-xl font-bold text-white bg-gradient-to-r from-neon-purple to-neon-pink active:scale-95 transition-transform"
           >
-            Jouer maintenant
+            {KIND_COPY[kind].cta}
           </button>
 
           {/* Progress bar */}

@@ -16,6 +16,8 @@ import { PaymentSuccessModal } from '@/components/lobby/PaymentSuccessModal'
 import { LobbyGamificationBar } from '@/components/progression/LobbyGamificationBar'
 import { RewardsCalendarModal } from '@/components/progression/RewardsCalendarModal'
 import { getCalendarMonth, type CalendarDay } from '@/actions/calendar'
+import { applyReferralCode } from '@/actions/referral'
+import { readPendingReferral, clearPendingReferral } from '@/lib/referralPending'
 import type { WinnerData } from '@/actions/winners'
 import { FloatingTimer } from '@/components/landing/widgets/FloatingTimer'
 import { useLobbyFilters } from '@/hooks/lobby/useLobbyFilters'
@@ -49,7 +51,7 @@ export function LobbyClient({
   const [calendarData, setCalendarData] = useState<CalendarDay[] | null>(null)
   const [showCalendar, setShowCalendar] = useState(false)
   const [showChests, setShowChests] = useState(false)
-  const [paymentSuccess, setPaymentSuccess] = useState<{ show: boolean; credits: number }>({ show: false, credits: 0 })
+  const [paymentSuccess, setPaymentSuccess] = useState<{ show: boolean; credits: number; kind: 'credits' | 'vip' | 'pass' }>({ show: false, credits: 0, kind: 'credits' })
 
   // Favorites
   const { favorites, isFavorite, toggleFavorite } = useFavorites()
@@ -61,7 +63,7 @@ export function LobbyClient({
   const router = useRouter()
   const searchParams = useSearchParams()
 
-  // Handle payment success from URL params
+  // Handle payment success from URL params (crédits, V.I.P, Passe d'Arène)
   useEffect(() => {
     const payment = searchParams.get('payment')
     const creditsParam = searchParams.get('credits')
@@ -69,14 +71,28 @@ export function LobbyClient({
     if (payment === 'success' && creditsParam) {
       const purchasedCredits = parseInt(creditsParam, 10)
       if (purchasedCredits > 0) {
-        setPaymentSuccess({ show: true, credits: purchasedCredits })
-        // Refresh credits from database
+        setPaymentSuccess({ show: true, credits: purchasedCredits, kind: 'credits' })
         creditsContext?.refreshCredits()
-        // Clean URL params
         router.replace('/lobby', { scroll: false })
       }
+    } else if (searchParams.get('vip') === 'success') {
+      setPaymentSuccess({ show: true, credits: 0, kind: 'vip' })
+      creditsContext?.refreshCredits()
+      router.replace('/lobby', { scroll: false })
+    } else if (searchParams.get('pass') === 'success') {
+      setPaymentSuccess({ show: true, credits: 0, kind: 'pass' })
+      router.replace('/lobby', { scroll: false })
     }
   }, [searchParams, router, creditsContext])
+
+  // Filet de sécurité parrainage : applique le code ?ref= capté sur /register
+  // (le flow OAuth perd les query params, le code attend en localStorage).
+  useEffect(() => {
+    if (!progression) return // visiteur non connecté
+    const pending = readPendingReferral()
+    if (!pending) return
+    applyReferralCode(pending).finally(() => clearPendingReferral())
+  }, [progression])
 
   // Calendrier des récompenses : charge les données + pop une fois/jour (Paris)
   useEffect(() => {
@@ -229,7 +245,8 @@ export function LobbyClient({
       {paymentSuccess.show && (
         <PaymentSuccessModal
           credits={paymentSuccess.credits}
-          onClose={() => setPaymentSuccess({ show: false, credits: 0 })}
+          kind={paymentSuccess.kind}
+          onClose={() => setPaymentSuccess({ show: false, credits: 0, kind: 'credits' })}
         />
       )}
 

@@ -1,8 +1,11 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import Link from 'next/link'
+import { Crown, Sparkles, Check } from 'lucide-react'
 import { CREDIT_PACKS, type CreditPackId } from '@/lib/stripe/config'
-import { createCheckoutSession } from '@/actions/stripe'
+import { createCheckoutSession, createPassCheckoutSession } from '@/actions/stripe'
+import { getPassState } from '@/actions/battlePass'
 
 interface ShopClientProps {
   currentCredits: number
@@ -11,6 +14,28 @@ interface ShopClientProps {
 export function ShopClient({ currentCredits }: ShopClientProps) {
   const [loadingPack, setLoadingPack] = useState<CreditPackId | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [passPurchased, setPassPurchased] = useState<boolean | null>(null)
+  const [passLoading, setPassLoading] = useState(false)
+
+  useEffect(() => {
+    getPassState().then((res) => {
+      if (res.success && res.data) setPassPurchased(res.data.purchased)
+      else setPassPurchased(false)
+    }).catch(() => setPassPurchased(false))
+  }, [])
+
+  const handleBuyPass = async () => {
+    if (passLoading || passPurchased) return
+    setPassLoading(true)
+    setError(null)
+    const res = await createPassCheckoutSession()
+    if (res.success && res.data?.url) {
+      window.location.href = res.data.url
+      return
+    }
+    setError(res.error || 'Une erreur est survenue')
+    setPassLoading(false)
+  }
 
   const handlePurchase = async (packId: CreditPackId) => {
     setLoadingPack(packId)
@@ -155,6 +180,62 @@ export function ShopClient({ currentCredits }: ShopClientProps) {
               {error}
             </div>
           )}
+
+          {/* Cross-sell : Passe d'Arène + V.I.P */}
+          <div className="mt-12">
+            <div className="mb-5 text-center">
+              <span className="kicker !text-[0.6rem]">Pour aller plus loin</span>
+            </div>
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6">
+              {/* Passe d'Arène */}
+              <div className="relative rounded-2xl border-2 border-yellow-400/30 bg-gradient-to-br from-yellow-400/[0.08] to-transparent p-6">
+                <div className="mb-3 flex items-center gap-2">
+                  <Sparkles className="h-5 w-5 text-yellow-400" aria-hidden />
+                  <h3 className="font-display text-lg font-bold text-white">Passe d&apos;Arène</h3>
+                  <span className="rounded-md border border-yellow-400/40 bg-yellow-400/10 px-1.5 py-0.5 font-display text-[0.55rem] font-bold uppercase tracking-wider text-yellow-300">
+                    Premium
+                  </span>
+                </div>
+                <p className="mb-4 text-sm text-white/55">
+                  5 paliers de récompenses liés à ton assiduité : coffres rare, épique et légendaire,
+                  25 crédits et un artefact exclusif. Achat unique, valable à vie.
+                </p>
+                <div className="mb-4 text-2xl stat-numeral text-white">4,99€</div>
+                {passPurchased ? (
+                  <div className="flex items-center justify-center gap-2 rounded-xl border border-success/30 bg-success/10 py-3 text-sm font-semibold text-success">
+                    <Check className="h-4 w-4" aria-hidden /> Déjà débloqué
+                  </div>
+                ) : (
+                  <button
+                    onClick={handleBuyPass}
+                    disabled={passLoading || passPurchased === null}
+                    className="w-full rounded-xl bg-gradient-to-r from-[#FFB800] to-[#FFD700] py-3 font-display text-sm font-semibold uppercase tracking-wide text-[#0B0F1A] transition-all hover:drop-shadow-[0_0_16px_rgba(255,184,0,0.5)] active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    {passLoading ? 'Redirection…' : 'Débloquer le Passe'}
+                  </button>
+                )}
+              </div>
+
+              {/* V.I.P */}
+              <div className="relative rounded-2xl border-2 border-neon-purple/30 bg-gradient-to-br from-neon-purple/[0.08] to-transparent p-6">
+                <div className="mb-3 flex items-center gap-2">
+                  <Crown className="h-5 w-5 text-yellow-400" aria-hidden />
+                  <h3 className="font-display text-lg font-bold text-white">Abonnement V.I.P</h3>
+                </div>
+                <p className="mb-4 text-sm text-white/55">
+                  +10 crédits bonus chaque jour, badge doré exclusif et accès aux parties V.I.P
+                  réservées aux membres. Sans engagement.
+                </p>
+                <div className="mb-4 text-2xl stat-numeral text-white">9,99€<span className="text-sm text-white/50">/mois</span></div>
+                <Link
+                  href="/vip"
+                  className="block w-full rounded-xl bg-gradient-to-r from-neon-purple to-neon-pink py-3 text-center font-display text-sm font-semibold uppercase tracking-wide text-white transition-all hover:drop-shadow-[0_0_16px_rgba(155,92,255,0.55)] active:scale-95"
+                >
+                  Découvrir le V.I.P
+                </Link>
+              </div>
+            </div>
+          </div>
 
           {/* Trust badges */}
           <div className="mt-12 flex flex-wrap items-center justify-center gap-6 text-white/50 text-sm">

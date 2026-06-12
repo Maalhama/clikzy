@@ -1,12 +1,14 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { signUp, signInWithOAuth, signInWithPassword } from '@/actions/auth'
+import { applyReferralCode } from '@/actions/referral'
 import { Button } from '@/components/ui/button'
 import { Logo } from '@/components/ui/Logo'
 import { trackSignup } from '@/lib/analytics'
+import { storePendingReferral, clearPendingReferral } from '@/lib/referralPending'
 
 function getPasswordStrength(password: string): { score: number; label: string; color: string } {
   let score = 0
@@ -34,6 +36,18 @@ export default function RegisterPage() {
   const [isOAuthLoading, setIsOAuthLoading] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
+  const [refCode, setRefCode] = useState<string | null>(null)
+
+  // Capte le code parrain ?ref=CODE et le garde aussi en localStorage :
+  // le flow OAuth (Google) passe par un redirect qui perd les query params.
+  useEffect(() => {
+    const ref = new URLSearchParams(window.location.search).get('ref')
+    if (ref && ref.trim().length >= 4) {
+      const code = ref.trim().toUpperCase()
+      setRefCode(code)
+      storePendingReferral(code)
+    }
+  }, [])
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     setFormData(prev => ({
@@ -65,6 +79,11 @@ export default function RegisterPage() {
       const loginResult = await signInWithPassword(loginData)
 
       if (loginResult.success) {
+        // Applique le code parrain maintenant qu'on est connecté
+        if (refCode) {
+          await applyReferralCode(refCode).catch(() => null)
+          clearPendingReferral()
+        }
         // Auto-login successful, redirect to lobby
         router.push('/lobby')
         return
@@ -197,6 +216,14 @@ export default function RegisterPage() {
 
           {/* Header */}
           <div className="text-center lg:text-left mb-6">
+            {refCode && (
+              <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-success/30 bg-success/10 px-3 py-1.5 text-xs text-success">
+                <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+                Code parrain <span className="font-bold">{refCode}</span> : +5 crédits offerts
+              </div>
+            )}
             <h2 className="font-display text-2xl font-bold text-white mb-2">Créer un compte</h2>
             <p className="text-sm text-text-secondary">
               Inscris-toi et reçois{' '}
