@@ -2228,6 +2228,10 @@ body::after {
   background: radial-gradient(ellipse at center, rgba(155, 92, 255, 0.14), rgba(255, 79, 216, 0.06) 45%, transparent 72%);
   filter: blur(42px);
   animation: arena-halo 14s ease-in-out infinite;
+  /* Promotion en layer compositée : sans elle, le blur force l'animation
+     transform sur le main thread et Chrome compte CHAQUE frame du halo
+     comme un layout shift (62% du CLS du lobby mesuré par Lighthouse). */
+  will-change: transform, opacity;
 }
 
 @keyframes arena-halo {

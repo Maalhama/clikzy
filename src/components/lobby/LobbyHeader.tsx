@@ -30,7 +30,7 @@ export const LobbyHeader = memo(function LobbyHeader({
   onCalendarClick,
 }: LobbyHeaderProps) {
   return (
-    <div className="relative py-6 md:py-8 px-4 md:px-6">
+    <div className="relative py-4 md:py-5 px-4 md:px-6">
       <div className="max-w-7xl mx-auto">
         {/* Credits reset notification */}
         {wasReset && (
@@ -70,7 +70,7 @@ export const LobbyHeader = memo(function LobbyHeader({
               <span className="kicker !text-[0.625rem]">Arène en direct</span>
               <OnlineBadge />
             </div>
-            <h1 className="title-giant text-4xl md:text-5xl text-white">              LOBBY
+            <h1 className="title-giant text-3xl md:text-4xl text-white">              LOBBY
             </h1>
             <p className="text-white/50 text-sm mt-1.5">
               Dernier clic = gagnant. Choisis ta cible.

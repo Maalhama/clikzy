@@ -3,6 +3,7 @@ import { Header } from '@/components/layout/Header'
 import { BackgroundEffects } from '@/components/ui/BackgroundEffects'
 import { ClientProviders } from '@/components/providers/ClientProviders'
 import { InstallBanner } from '@/components/pwa/InstallBanner'
+import { AppFooter } from '@/components/layout/AppFooter'
 import { CosmeticsProvider } from '@/components/cosmetics/CosmeticsProvider'
 import type { Profile } from '@/types/database'
 
@@ -60,6 +61,9 @@ export default async function MainLayout({
         <main className="flex-1 relative z-10">
           {children}
         </main>
+
+        {/* Footer minimal : légal + jeu responsable, ancre les pages courtes */}
+        <AppFooter />
 
         {/* Cosmétiques globaux : curseur + traînée de clic */}
         {profile && (
