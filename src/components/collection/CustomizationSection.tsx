@@ -12,7 +12,7 @@ const TYPE_ORDER = ['cursor', 'trail', 'frame'] as const
 function Preview({ c }: { c: Cosmetic }) {
   if (c.type === 'cursor') {
     const css = CURSOR_CSS[c.id]
-    const fill = c.id === 'cursor_default' ? '#C7D0E4' : (css.match(/fill='([^']+)'/)?.[1] ?? '#C7D0E4')
+    const fill = c.id === 'cursor_default' ? '#C7D0E4' : (css?.match(/fill='([^']+)'/)?.[1] ?? '#C7D0E4')
     return (
       <svg width="26" height="26" viewBox="0 0 24 24"><path d="M5 3l14 9-7 2-3 7-4-18z" fill={fill} stroke="white" strokeWidth="1.4" strokeLinejoin="round" /></svg>
     )

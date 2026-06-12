@@ -13,6 +13,7 @@ export const CURSOR_CSS: Record<string, string> = {
   cursor_cyan: cursorArrow('#3CCBFF'),
   cursor_gold: cursorArrow('#FFD700'),
   cursor_void: cursorArrow('#9B5CFF'),
+  cursor_arena: cursorArrow('#FF8C42'),   // exclusif Passe d'Arène
 }
 
 // --- Traînées de clic : palette de particules ---
@@ -22,6 +23,7 @@ export const TRAIL_COLORS: Record<string, string[]> = {
   trail_cyan: ['#3CCBFF', '#7FE0FF'],
   trail_gold: ['#FFD700', '#FF8C00'],
   trail_rainbow: ['#9B5CFF', '#FF4FD8', '#3CCBFF', '#00FF88'],
+  trail_arena: ['#FFD700', '#FF8C42', '#FF4FD8'],   // exclusif Passe d'Arène
 }
 
 // --- Cadres d'avatar : classes/styles du ring ---
@@ -33,6 +35,7 @@ export const AVATAR_FRAMES: Record<string, FrameStyle> = {
   frame_gold: { ring: '#FFD700', glow: '0 0 14px -2px #FFD700' },
   frame_flames: { ring: '#FF8C00', glow: '0 0 18px -1px #FF4757, 0 0 8px #FFB800', extra: 'frame-flames' },
   frame_cosmic: { ring: 'transparent', glow: '0 0 20px -2px #FF4FD8', extra: 'frame-cosmic' },
+  frame_arena: { ring: '#FF8C42', glow: '0 0 18px -1px #FFD700, 0 0 8px #FF4FD8' },   // exclusif Passe d'Arène
 }
 
 export const RARITY_HEX: Record<string, string> = {
