@@ -178,8 +178,11 @@ appartient à Mehdi :
 > réparées), carte produit jeu self-start+sticky, bandeau règles dupliqué
 > supprimé, pills stats neutralisées (discipline néon), émojis→Lucide,
 > aria-labels/inert/h2/contrastes, footer app 18+, lobby compacté.
-> Restent (P1/P2) : système de boutons unifié, élévations par paliers de
-> surface, heros unifiés, bento lobby, page Clans, grain, juice onde radiale.
+> Refactors P1 livrés (bd87e05) : système de boutons 3 variants (.btn-arena /
+> -outline / -ghost, doc + migrations), élévations .surface-1/2/3 (modals en
+> surface-3), lobby bento (tuile large col-span-2, aspect calibré 11/4).
+> Restent (P2) : heros unifiés (choix de goût à valider), grain déjà présent
+> (body::after), migration exhaustive des boutons restants page par page.
 
 ### P0 — Discipline visuelle + perf (le plus gros ROI) — ✅ FAIT
 1. **Passe « discipline néon »** : pills stats lobby en monochrome (blanc/gris + icône
