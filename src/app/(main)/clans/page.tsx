@@ -15,7 +15,7 @@ export default async function ClansPage() {
     <main className="relative z-10 mx-auto max-w-3xl px-4 py-6">
       <div className="mb-5 reveal reveal-1">
         <span className="kicker mb-2">Communauté</span>
-        <h1 className="font-display text-2xl font-bold text-white sm:text-3xl">Clans</h1>
+        <h1 className="title-giant text-4xl text-white md:text-5xl">Clans</h1>
         <p className="text-sm text-white/55">Rejoins une équipe, cumulez vos XP et grimpez ensemble au classement.</p>
       </div>
       <ClansClient />

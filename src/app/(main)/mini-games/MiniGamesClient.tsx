@@ -341,9 +341,9 @@ export default function MiniGamesClient({ initialEligibility }: MiniGamesClientP
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="title-giant text-5xl md:text-7xl text-white"
+            className="title-giant text-4xl md:text-5xl text-white"
           >
-            Mini-Jeux <span className="gradient-text">Quotidiens</span>
+            Mini-Jeux <span className="text-neon-purple neon-text">Quotidiens</span>
           </motion.h1>
 
           <motion.p

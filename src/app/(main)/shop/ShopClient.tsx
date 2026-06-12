@@ -60,7 +60,7 @@ export function ShopClient({ currentCredits }: ShopClientProps) {
           <span className="kicker mb-4">Boutique</span>
 
           <h1 className="title-giant text-4xl md:text-5xl text-white mb-3">
-            Achète des <span className="text-electric">crédits</span>
+            Achète des <span className="text-neon-purple neon-text">crédits</span>
           </h1>
           <p className="text-white/50 max-w-md mx-auto">
             Plus de crédits = plus de temps de jeu. Les crédits n'augmentent pas tes chances : seul le timing compte.

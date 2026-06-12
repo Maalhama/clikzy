@@ -25,7 +25,7 @@ export default async function GagnantsPage() {
     <main className="relative z-10 mx-auto max-w-5xl px-4 py-8">
       <div className="mb-6 text-center reveal reveal-1">
         <span className="kicker">Preuve de confiance</span>
-        <h1 className="mt-2 font-display text-3xl font-bold text-white sm:text-4xl">Mur des gagnants</h1>
+        <h1 className="title-giant mt-2 text-4xl text-white md:text-5xl">Mur des <span className="text-neon-purple neon-text">gagnants</span></h1>
         <p className="mt-2 text-sm text-white/55">
           Ils ont cliqué en dernier, ils ont gagné, et on livre. {delivered > 0 && (
             <span className="font-semibold text-success">{delivered} lots déjà expédiés ou livrés.</span>
