@@ -181,8 +181,17 @@ appartient à Mehdi :
 > Refactors P1 livrés (bd87e05) : système de boutons 3 variants (.btn-arena /
 > -outline / -ghost, doc + migrations), élévations .surface-1/2/3 (modals en
 > surface-3), lobby bento (tuile large col-span-2, aspect calibré 11/4).
-> Restent (P2) : heros unifiés (choix de goût à valider), grain déjà présent
-> (body::after), migration exhaustive des boutons restants page par page.
+> Migration boutons TERMINÉE (9b1ff44) : 13 CTA migrés au total, inventaire
+> exhaustif par agent, familles hors périmètre documentées (icon-buttons,
+> chips/pagination, tuiles, exceptions doré/rouge).
+> CLS instrumenté (PerformanceObserver buffered + Lighthouse local) :
+> desktop réel ~0,0005, mobile local 0,087 (< 0,1 ✓). Prod : perf 77,
+> LCP 4,2 s, variance CLS 0,09-0,16 selon les runs.
+> PNG sources : 800x800, poids dû aux dégradés néon — recompression écartée
+> (risque de banding, Next sert déjà l'AVIF dérivé).
+> Restent (P2, à valider avec Mehdi) : heros unifiés (goût), LCP < 2,5 s
+> (CDN images ou redesign des fonds néon), shift mobile résiduel ~0,06
+> (probablement swap de la font display).
 
 ### P0 — Discipline visuelle + perf (le plus gros ROI) — ✅ FAIT
 1. **Passe « discipline néon »** : pills stats lobby en monochrome (blanc/gris + icône
