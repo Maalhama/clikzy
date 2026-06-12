@@ -1,6 +1,7 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
+import { RARITY_HEX, RARITY_LABEL } from '@/lib/cosmetics'
 import { createPortal } from 'react-dom'
 import { X, Zap, Coins, Sparkles, Dices } from 'lucide-react'
 import { motion } from 'framer-motion'
@@ -15,12 +16,6 @@ const SLOTS = [
   { key: 'artefact', label: 'Artefact' },
 ] as const
 
-const RARITY_HEX: Record<string, string> = {
-  common: '#B9C2D8', rare: '#3CCBFF', epic: '#9B5CFF', legendary: '#FFD700', mythic: '#FF4FD8',
-}
-const RARITY_LABEL: Record<string, string> = {
-  common: 'Commun', rare: 'Rare', epic: 'Épique', legendary: 'Légendaire', mythic: 'Mythique',
-}
 
 /** Modal personnage du lobby : aperçu du héros équipé + slots + bonus actifs. */
 export function LobbyCharacterModal({

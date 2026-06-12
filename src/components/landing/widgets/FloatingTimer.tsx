@@ -208,16 +208,18 @@ export function FloatingTimer({
     <AnimatePresence mode="wait">
       <motion.div
         key={currentProduct}
-        initial={isMobile ? false : { opacity: 0, x: 300 }}
+        // Animation VERTICALE (y/opacity) : un slide horizontal laissait le
+        // widget hors viewport à droite pendant les transitions (toast coupé).
+        initial={isMobile ? false : { opacity: 0, y: 40 }}
         animate={isEnding ? {
           opacity: 0,
-          x: isMobile ? 0 : 300,
+          y: isMobile ? 0 : 40,
         } : {
           opacity: 1,
-          x: 0,
+          y: 0,
           scale: isCritical && !isMobile ? [1, 1.02, 1] : 1,
         }}
-        exit={isMobile ? { opacity: 0 } : { opacity: 0, x: 300 }}
+        exit={isMobile ? { opacity: 0 } : { opacity: 0, y: 40 }}
         transition={isMobile ? { duration: 0.15 } : isEnding ? {
           duration: 0.4,
           ease: 'easeIn',
@@ -227,13 +229,13 @@ export function FloatingTimer({
             repeat: Infinity,
             ease: 'easeInOut',
           },
-          x: { type: 'spring', stiffness: 400, damping: 25 },
+          y: { type: 'spring', stiffness: 400, damping: 25 },
         } : {
           type: 'spring',
           stiffness: 400,
           damping: 25,
         }}
-        className="fixed bottom-3 md:bottom-6 right-2 md:right-6 z-50"
+        className="fixed bottom-3 md:bottom-6 right-2 md:right-6 z-50 max-w-[calc(100vw-1rem)]"
       >
         {/* MOBILE VERSION */}
         <div className="md:hidden">

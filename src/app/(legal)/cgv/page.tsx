@@ -143,7 +143,7 @@ export default function CGVPage() {
         <p className="text-white/70">
           En cas de litige, vous pouvez recourir gratuitement au service de médiation de la consommation.{' '}
           {MEDIATEUR ? (
-            <>Médiateur compétent : {MEDIATEUR.name} — <a href={MEDIATEUR.url} className="text-neon-purple underline" target="_blank" rel="noopener noreferrer">{MEDIATEUR.url}</a>.</>
+            <>Médiateur compétent : {MEDIATEUR.name} · <a href={MEDIATEUR.url} className="text-neon-purple underline" target="_blank" rel="noopener noreferrer">{MEDIATEUR.url}</a>.</>
           ) : (
             <>Les coordonnées du médiateur de la consommation compétent sont communiquées sur simple demande à contact@cleekzy.com.</>
           )}

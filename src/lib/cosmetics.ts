@@ -38,3 +38,7 @@ export const AVATAR_FRAMES: Record<string, FrameStyle> = {
 export const RARITY_HEX: Record<string, string> = {
   common: '#B9C2D8', rare: '#3CCBFF', epic: '#9B5CFF', legendary: '#FFD700', mythic: '#FF4FD8',
 }
+
+export const RARITY_LABEL: Record<string, string> = {
+  common: 'Commun', rare: 'Rare', epic: 'Épique', legendary: 'Légendaire', mythic: 'Mythique',
+}

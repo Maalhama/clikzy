@@ -2,7 +2,10 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { CollectionClient } from '@/components/collection/CollectionClient'
 
-export const metadata = { title: 'Collection · Cleekzy' }
+export const metadata = {
+  title: 'Ma Collection',
+  description: 'Ouvre tes coffres, équipe ton personnage et active tes bonus : casque, armure, anneau et artefact.',
+}
 
 export default async function CollectionPage() {
   const supabase = await createClient()

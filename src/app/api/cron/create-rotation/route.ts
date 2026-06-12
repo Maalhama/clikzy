@@ -37,11 +37,14 @@ async function executeWithRetry(
       console.log(`Cleaned up ${endedCount} ended games`)
     }
 
-    // 2. Supprimer les anciens jeux en attente (garder la place pour la nouvelle rotation)
+    // 2. Supprimer les anciens jeux en attente (garder la place pour la nouvelle
+    // rotation) — UNIQUEMENT ceux de plus de 30 min : un jeu waiting fraîchement
+    // créé qui n'a pas encore été activé (cron bot-clicks en retard) est préservé.
     const { data: deletedWaiting } = await supabase
       .from('games')
       .delete()
       .eq('status', 'waiting')
+      .lt('created_at', new Date(Date.now() - 30 * 60 * 1000).toISOString())
       .select('id')
 
     const waitingCount = deletedWaiting?.length || 0
@@ -91,7 +94,7 @@ async function executeWithRetry(
     const shuffled = freeItems.sort(() => Math.random() - 0.5)
     const selectedItems = shuffled.slice(0, Math.min(GAMES_PER_ROTATION, shuffled.length))
 
-    // Créer les jeux en status 'waiting' (seront activés par activate-games)
+    // Créer les jeux en status 'waiting' (activés par le cron bot-clicks)
     // end_time ÉCHELONNÉ par partie : durée de base (1h) + décalage aléatoire de 0 à 90 min.
     // Les 18 parties d'une rotation se terminent ainsi à des moments différents
     // (~1 toutes les 5 min) au lieu de toutes ensemble. La bataille finale (30min-1h59)

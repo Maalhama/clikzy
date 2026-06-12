@@ -33,23 +33,39 @@ export async function GET(request: NextRequest) {
   try {
     const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
-    // Get today's midnight in Paris timezone
-    const now = new Date()
-    const parisFormatter = new Intl.DateTimeFormat('fr-FR', {
-      timeZone: 'Europe/Paris',
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-    })
-    const [day, month, year] = parisFormatter.format(now).split('/')
-    // Create a date at midnight Paris time (expressed in UTC)
-    const todayMidnightParis = new Date(`${year}-${month}-${day}T00:00:00+01:00`) // Winter time
-    // Adjust for summer time if needed
-    const parisOffset = now.toLocaleString('en-US', { timeZone: 'Europe/Paris', timeZoneName: 'shortOffset' })
-    const isSummerTime = parisOffset.includes('+02')
-    const todayMidnight = isSummerTime
-      ? new Date(`${year}-${month}-${day}T00:00:00+02:00`)
-      : todayMidnightParis
+    // Minuit Paris : la RPC SQL paris_midnight() est la source unique de vérité
+    // (DST géré par Postgres). Fallback JS uniquement si la RPC échoue.
+    let todayMidnight: Date
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: midnightData, error: midnightError } = await (supabase.rpc as any)('paris_midnight')
+    if (!midnightError && midnightData) {
+      todayMidnight = new Date(midnightData as string)
+    } else {
+      const now = new Date()
+      const parisFormatter = new Intl.DateTimeFormat('fr-FR', {
+        timeZone: 'Europe/Paris',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+      })
+      const [day, month, year] = parisFormatter.format(now).split('/')
+      const parisOffset = now.toLocaleString('en-US', { timeZone: 'Europe/Paris', timeZoneName: 'shortOffset' })
+      const isSummerTime = parisOffset.includes('+02')
+      todayMidnight = new Date(`${year}-${month}-${day}T00:00:00${isSummerTime ? '+02:00' : '+01:00'}`)
+    }
+
+    // Expiration V.I.P : désactive les abonnements arrivés à échéance
+    // (le webhook Stripe gère les annulations, ceci couvre les échecs/oublis).
+    const { data: expiredVips } = await supabase
+      .from('profiles')
+      .update({ is_vip: false })
+      .eq('is_vip', true)
+      .not('vip_expires_at', 'is', null)
+      .lt('vip_expires_at', new Date().toISOString())
+      .select('id')
+    if (expiredVips && expiredVips.length > 0) {
+      console.log(`[CRON] Expired ${expiredVips.length} VIP subscription(s)`)
+    }
 
     // Find users who:
     // - have NOT purchased credits (has_purchased_credits = false)

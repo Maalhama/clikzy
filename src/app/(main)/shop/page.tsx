@@ -4,8 +4,9 @@ import { createClient } from '@/lib/supabase/server'
 import { ShopClient } from './ShopClient'
 
 export const metadata: Metadata = {
-  title: 'Boutique | Cleekzy',
-  description: 'Achète des crédits pour jouer et gagner des produits tech premium.',
+  title: 'Boutique - Crédits, Passe d\'Arène et V.I.P',
+  description: 'Achète des crédits pour jouer, débloque le Passe d\'Arène ou passe V.I.P. Paiement sécurisé Stripe, crédits instantanés.',
+  alternates: { canonical: '/shop' },
 }
 
 async function getCredits(): Promise<number> {

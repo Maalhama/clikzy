@@ -27,7 +27,7 @@ export default function MainError({
       </div>
       <h2 className="text-2xl font-bold text-white">Une erreur est survenue</h2>
       <p className="mt-2 max-w-md text-white/60">
-        Quelque chose s&apos;est mal passé de notre côté. Ta progression est sauvegardée — tu peux réessayer.
+        Quelque chose s&apos;est mal passé de notre côté. Ta progression est sauvegardée : tu peux réessayer.
       </p>
       <button
         onClick={reset}

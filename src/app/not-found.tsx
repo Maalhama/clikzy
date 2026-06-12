@@ -28,7 +28,7 @@ export default function NotFound() {
         </h1>
 
         <p className="mx-auto mt-6 max-w-sm text-sm text-white/55">
-          Cette page n&apos;existe pas — ou quelqu&apos;un a cliqué en dernier dessus.
+          Cette page n&apos;existe pas. Ou quelqu&apos;un a cliqué en dernier dessus.
           L&apos;arène, elle, tourne toujours.
         </p>
 
@@ -42,7 +42,7 @@ export default function NotFound() {
 
         <div className="mt-5 flex flex-col justify-center gap-3 sm:flex-row">
           <Link href="/lobby" className="btn-arena px-8 py-3.5 text-sm">
-            Insérer un crédit — Lobby
+            Insérer un crédit · Lobby
           </Link>
           <Link href="/" className="btn-arena-ghost px-8 py-3.5 text-sm">
             Page d&apos;accueil

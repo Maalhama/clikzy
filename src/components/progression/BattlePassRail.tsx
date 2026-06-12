@@ -12,9 +12,9 @@ const PASS_TIERS = [5, 10, 15, 20, 25] as const
 const TIER_REWARD: Record<number, { kind: 'chest' | 'credits' | 'item'; rarity?: 'rare' | 'epic' | 'legendary'; label: string }> = {
   5: { kind: 'chest', rarity: 'rare', label: 'Coffre rare' },
   10: { kind: 'credits', label: '25 crédits' },
-  15: { kind: 'chest', rarity: 'epic', label: 'Coffre épique' },
-  20: { kind: 'item', label: 'Artefact exclusif' },
-  25: { kind: 'chest', rarity: 'legendary', label: 'Coffre légendaire' },
+  15: { kind: 'chest', rarity: 'epic', label: 'Coffre épique + Curseur d’Arène' },
+  20: { kind: 'item', label: 'Artefact exclusif + Sillage d’Arène' },
+  25: { kind: 'chest', rarity: 'legendary', label: 'Coffre légendaire + Aura d’Arène' },
 }
 
 /**

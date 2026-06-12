@@ -4,6 +4,12 @@ import { useEffect, useRef } from 'react'
 import { generateDeterministicUsername } from '@/lib/bots/usernameGenerator'
 import type { GameClick } from './useGame'
 
+// Logs de simulation visibles uniquement en dev : en prod ils révéleraient
+// le fonctionnement des bots dans la console du joueur.
+const debugLog = (...args: unknown[]) => {
+  if (process.env.NODE_ENV === 'development') console.log(...args)
+}
+
 /**
  * ============================================
  * SIMULATION FRONTEND DES BOTS CLEEKZY v6
@@ -133,7 +139,7 @@ export function useBotSimulation({
     if (!enabled) return
     if (status !== 'active' && status !== 'final_phase') return
 
-    console.log(`[BOT SIM] Starting simulation for game ${gameId}, status: ${status}`)
+    debugLog(`[BOT SIM] Starting simulation for game ${gameId}, status: ${status}`)
 
     // Premier clic rapide
     lastClickTimeRef.current = Date.now() - 50000
@@ -172,7 +178,7 @@ export function useBotSimulation({
 
         // Log le seuil pour debug (à supprimer plus tard)
         if (timeSinceLastClick < 2000) {
-          console.log(`[BOT SIM] Snipe threshold for this game: ${Math.floor(snipeThreshold/1000)}s, timer: ${Math.floor(timeLeft/1000)}s`)
+          debugLog(`[BOT SIM] Snipe threshold for this game: ${Math.floor(snipeThreshold/1000)}s, timer: ${Math.floor(timeLeft/1000)}s`)
         }
 
         if (timeLeft <= 8000) {
@@ -198,7 +204,7 @@ export function useBotSimulation({
           lastClickTimeRef.current = now
           lastUsernameRef.current = username
 
-          console.log(`[BOT SIM] URGENT SNIPE! ${username} stole at ${Math.floor(timeLeft/1000)}s`)
+          debugLog(`[BOT SIM] URGENT SNIPE! ${username} stole at ${Math.floor(timeLeft/1000)}s`)
           return
         } else if (timeLeft <= snipeThreshold) {
           // Timer atteint le seuil aléatoire - sniper avec probabilité
@@ -220,7 +226,7 @@ export function useBotSimulation({
               last_click_user_id: null,
             })
             lastClickTimeRef.current = now
-            console.log(`[BOT SIM] SNIPE! ${username} at ${Math.floor(timeLeft/1000)}s (threshold: ${Math.floor(snipeThreshold/1000)}s)`)
+            debugLog(`[BOT SIM] SNIPE! ${username} at ${Math.floor(timeLeft/1000)}s (threshold: ${Math.floor(snipeThreshold/1000)}s)`)
             return
           }
           // Sinon attendre le prochain cycle
@@ -297,12 +303,12 @@ export function useBotSimulation({
       lastClickTimeRef.current = now
       lastUsernameRef.current = username
 
-      console.log(`[BOT SIM] ${username} clicked (${currentStatus}, ${Math.floor(timeLeft/1000)}s left)`)
+      debugLog(`[BOT SIM] ${username} clicked (${currentStatus}, ${Math.floor(timeLeft/1000)}s left)`)
 
     }, 1000)
 
     return () => {
-      console.log(`[BOT SIM] Stopping simulation for game ${gameId}`)
+      debugLog(`[BOT SIM] Stopping simulation for game ${gameId}`)
       clearInterval(intervalId)
     }
   }, [enabled, gameId, status])

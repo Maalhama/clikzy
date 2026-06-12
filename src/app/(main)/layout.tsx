@@ -53,6 +53,9 @@ export default async function MainLayout({
         {/* Header */}
         <Header profile={profile} />
 
+        {/* PWA : bandeau d'installation fermable, juste sous le header */}
+        <InstallBanner />
+
         {/* Main content */}
         <main className="flex-1 relative z-10">
           {children}
@@ -66,8 +69,6 @@ export default async function MainLayout({
           />
         )}
 
-        {/* PWA Install Banner */}
-        <InstallBanner />
       </div>
     </ClientProviders>
   )

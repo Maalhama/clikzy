@@ -346,10 +346,18 @@ Les crons sont configurés sur **cron-job.org** (pas GitHub Actions) :
 | Bot Clicks (**cron combiné**) | `* * * * *` (chaque minute) | `/api/cron/bot-clicks` |
 | Create Rotation | `45 1,4,7,10,13,16,19,22 * * *` (toutes les 3 h à :45) | `/api/cron/create-rotation` |
 | Reset Credits | `0 0 * * *` (minuit Europe/Paris) | `/api/cron/reset-credits` |
+| Streak Reminder | `0 20 * * *` (20h Europe/Paris) | `/api/cron/streak-reminder` |
 
 > **Bot Clicks** est le cron unifié : il fait l'activation (waiting → active) +
 > les bots + la bataille finale + la fin de partie. Il n'y a donc **pas** de cron
-> `activate-games` planifié séparément (l'endpoint existe mais n'est pas appelé).
+> `activate-games` : l'endpoint a été supprimé (juin 2026), bot-clicks fait tout.
+
+> **Filet de sécurité Vercel** (`vercel.json`) : reset-credits (01:10 UTC) et
+> streak-reminder (18:00 UTC) sont AUSSI plannifiés en crons Vercel — les routes
+> sont idempotentes, un double passage est sans effet. Vercel envoie
+> automatiquement `Authorization: Bearer CRON_SECRET` (env var requise).
+> bot-clicks et create-rotation restent uniquement sur cron-job.org (fréquence
+> trop élevée pour les crons Vercel Hobby).
 
 Header requis : `Authorization: Bearer [CRON_SECRET]` (les routes sont fail-closed :
 elles refusent si le secret est absent ou ne correspond pas).

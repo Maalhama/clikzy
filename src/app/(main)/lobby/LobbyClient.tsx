@@ -12,6 +12,7 @@ import {
 } from '@/components/lobby'
 import { LobbyFeatured } from '@/components/lobby/LobbyFeatured'
 import { LobbyChestsModal } from '@/components/lobby/LobbyChestsModal'
+import { OnboardingModal } from '@/components/lobby/OnboardingModal'
 import { PaymentSuccessModal } from '@/components/lobby/PaymentSuccessModal'
 import { LobbyGamificationBar } from '@/components/progression/LobbyGamificationBar'
 import { RewardsCalendarModal } from '@/components/progression/RewardsCalendarModal'
@@ -102,7 +103,9 @@ export function LobbyClient({
         setCalendarData(res.data)
         const parisDay = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Paris' }).format(new Date())
         const key = `cleekzy-calendar-${parisDay}`
-        if (typeof window !== 'undefined' && !localStorage.getItem(key)) {
+        // Pas d'auto-pop par-dessus l'onboarding première visite
+        const onboarded = typeof window !== 'undefined' && !!localStorage.getItem('cleekzy-onboarding-done')
+        if (typeof window !== 'undefined' && onboarded && !localStorage.getItem(key)) {
           setShowCalendar(true)
           localStorage.setItem(key, '1')
         }
@@ -224,6 +227,9 @@ export function LobbyClient({
 
   return (
     <>
+      {/* Onboarding première visite (connecté uniquement, une seule fois) */}
+      {progression && <OnboardingModal />}
+
       {/* Modal coffres (ouverture depuis le lobby) */}
       {showChests && (
         <LobbyChestsModal onClose={() => { setShowChests(false); router.refresh() }} />

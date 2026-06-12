@@ -32,7 +32,7 @@ export function LobbyChestsModal({ onClose }: { onClose: () => void }) {
     const res = await claimDailyChest()
     if (res.success && res.data) {
       setFlash(res.data.already
-        ? 'Coffres du jour déjà récupérés — reviens après minuit !'
+        ? 'Coffres du jour déjà récupérés, reviens après minuit !'
         : `+${res.data.granted} coffres ajoutés !`)
       setTimeout(() => setFlash(null), 3000)
       await load()
@@ -85,7 +85,7 @@ export function LobbyChestsModal({ onClose }: { onClose: () => void }) {
                   <span className="transition-transform group-hover:scale-105"><NeonChest rarity="common" size={48} /></span>
                   <span className="flex-1 text-left">
                     <span className="block font-display text-sm font-semibold text-white">3 coffres gratuits t&apos;attendent !</span>
-                    <span className="block text-xs text-white/50">Raretés aléatoires — reset à minuit</span>
+                    <span className="block text-xs text-white/50">Raretés aléatoires, reset à minuit</span>
                   </span>
                   <span className="btn-arena px-4 py-2 text-xs">{busy ? '…' : 'Récupérer'}</span>
                 </button>

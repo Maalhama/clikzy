@@ -102,7 +102,7 @@ export function ClansClient() {
       <section className="panel reveal reveal-3 p-5">
         <h2 className="mb-4 flex items-center gap-2 font-display text-lg font-semibold text-white"><Users className="h-5 w-5 text-neon-pink" /> Classement des clans</h2>
         {board.length === 0 ? (
-          <p className="py-4 text-center text-sm text-white/40">Aucun clan pour l’instant — sois le premier à en fonder un !</p>
+          <p className="py-4 text-center text-sm text-white/40">Aucun clan pour l’instant : sois le premier à en fonder un !</p>
         ) : (
           <div className="space-y-1.5">
             {board.map((c) => {

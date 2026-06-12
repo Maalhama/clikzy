@@ -368,7 +368,7 @@ async function endGame(
       // Notification push de victoire (non-bloquant)
       sendPushToUser(winnerId, {
         title: 'Victoire !',
-        body: `Tu as remporté ${itemName} (${itemValue}€) — bravo !`,
+        body: `Tu as remporté ${itemName} (${itemValue}€), bravo !`,
         url: '/profile',
         tag: 'win',
       }).catch((err) => console.error('[CRON] Failed to send winner push:', err))

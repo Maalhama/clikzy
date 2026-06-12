@@ -1,6 +1,7 @@
 'use client'
 
 import { useMemo, useState } from 'react'
+import { RARITY_LABEL } from '@/lib/cosmetics'
 import { createPortal } from 'react-dom'
 import { X, Zap, Coins, Check } from 'lucide-react'
 import { motion } from 'framer-motion'
@@ -10,9 +11,6 @@ import { BattlePassRail } from '@/components/progression/BattlePassRail'
 
 const DOW_LABELS = ['L', 'M', 'M', 'J', 'V', 'S', 'D']
 
-const RARITY_LABEL: Record<string, string> = {
-  common: 'commun', rare: 'rare', epic: 'épique', legendary: 'légendaire',
-}
 
 /**
  * Calendrier mensuel des récompenses : une case par jour, réclamable le jour
@@ -98,7 +96,7 @@ export function RewardsCalendarModal({
             return (
               <div
                 key={d.day}
-                title={d.kind === 'chest' ? `Coffre ${RARITY_LABEL[d.rarity ?? 'common']}` : d.kind === 'credits' ? `+${d.amount} crédit${d.amount > 1 ? 's' : ''}` : `+${d.amount} XP`}
+                title={d.kind === 'chest' ? `Coffre ${RARITY_LABEL[d.rarity ?? 'common'].toLocaleLowerCase('fr-FR')}` : d.kind === 'credits' ? `+${d.amount} crédit${d.amount > 1 ? 's' : ''}` : `+${d.amount} XP`}
                 className={`relative flex aspect-square flex-col items-center justify-center gap-0.5 rounded-lg border transition-all ${
                   d.claimable
                     ? 'border-neon-purple bg-neon-purple/15 shadow-[0_0_16px_-4px_rgba(155,92,255,0.8)] animate-pulse'
@@ -130,7 +128,7 @@ export function RewardsCalendarModal({
             <div className="flex flex-col items-center gap-2">
               <p className="text-sm font-semibold text-success">
                 {result.kind === 'chest'
-                  ? `Coffre ${RARITY_LABEL[result.rarity ?? 'common']} ajouté à ta collection !`
+                  ? `Coffre ${RARITY_LABEL[result.rarity ?? 'common'].toLocaleLowerCase('fr-FR')} ajouté à ta collection !`
                   : result.kind === 'credits'
                   ? `+${result.amount} crédit${result.amount > 1 ? 's' : ''} !`
                   : `+${result.amount} XP !`}

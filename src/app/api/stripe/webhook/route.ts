@@ -245,5 +245,29 @@ export async function handleStripeEvent(event: Stripe.Event): Promise<HandlerRes
     }
   }
 
+  // Paiement échoué (renouvellement V.I.P ou paiement asynchrone) : prévenir
+  // le joueur pour qu'il mette à jour son moyen de paiement — sinon il croit
+  // avoir payé et découvre l'absence de crédits/avantages plus tard.
+  if (event.type === 'invoice.payment_failed' || event.type === 'checkout.session.async_payment_failed') {
+    const obj = event.data.object as { metadata?: Record<string, string>; subscription_details?: { metadata?: Record<string, string> } }
+    const userId = obj.metadata?.userId ?? obj.subscription_details?.metadata?.userId
+    if (userId) {
+      // import dynamique : push.ts est server-only (non résolvable dans les tests unitaires)
+      import('@/lib/push')
+        .then(({ sendPushToUser }) =>
+          sendPushToUser(userId, {
+            title: 'Paiement échoué',
+            body: 'Ton dernier paiement Cleekzy a été refusé. Vérifie ton moyen de paiement pour conserver tes avantages.',
+            url: '/shop',
+            tag: 'payment-failed',
+          })
+        )
+        .catch((err) => console.error('[WEBHOOK] Failed to send payment-failed push:', err))
+      console.log(`Payment failed notification queued for user ${userId} (${event.type})`)
+    } else {
+      console.error(`Payment failed event without userId metadata (${event.type})`)
+    }
+  }
+
   return { status: 200, body: { received: true } }
 }

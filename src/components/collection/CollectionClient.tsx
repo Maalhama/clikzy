@@ -40,9 +40,9 @@ export function CollectionClient() {
     const res = await claimDailyChest()
     if (res.success && res.data) {
       if (res.data.already) {
-        setFlash('Coffres du jour déjà récupérés — reviens après minuit !')
+        setFlash('Coffres du jour déjà récupérés, reviens après minuit !')
       } else {
-        setFlash(`+${res.data.granted} coffres ajoutés — ouvre-les !`)
+        setFlash(`+${res.data.granted} coffres ajoutés, ouvre-les !`)
       }
       setTimeout(() => setFlash(null), 3500)
       await load()
@@ -197,7 +197,7 @@ export function CollectionClient() {
                   key={inv.inventoryId}
                   onClick={() => !equipped && onEquip(inv.inventoryId)}
                   disabled={equipped || busy === inv.inventoryId}
-                  title={`${inv.item.name} — ${bonusLabel(inv.item.bonusKind, inv.item.bonusValue)}`}
+                  title={`${inv.item.name} · ${bonusLabel(inv.item.bonusKind, inv.item.bonusValue)}`}
                   className={`relative flex flex-col items-center gap-0.5 rounded-lg border bg-gradient-to-b p-2 transition-transform ${RARITY[inv.item.rarity].border} ${RARITY[inv.item.rarity].bg} ${equipped ? 'opacity-50' : 'hover:scale-105'}`}
                 >
                   {busy === inv.inventoryId ? <Loader2 className="h-7 w-7 animate-spin text-white/60" /> : <ItemIcon itemId={inv.item.id} slot={inv.item.slot} rarity={inv.item.rarity} size={28} />}

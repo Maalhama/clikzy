@@ -46,14 +46,18 @@ Crée les jeux pour la prochaine rotation (toutes les 3 heures).
 
 ### 4. Activate Games (BACKUP)
 
-Backup pour activer les jeux - normalement géré par bot-clicks.
+Rappel « streak en danger » : push aux joueurs (streak >= 3) qui n'ont pas
+réclamé leur bonus du jour. Aussi planifié en cron Vercel (filet, 18:00 UTC).
 
 | Paramètre | Valeur |
 |-----------|--------|
-| **URL** | `https://cleekzy.com/api/cron/activate-games` |
+| **URL** | `https://www.cleekzy.com/api/cron/streak-reminder` |
 | **Méthode** | `GET` ou `POST` |
-| **Fréquence** | Toutes les minutes (`* * * * *`) |
+| **Fréquence** | Tous les jours à 20h Paris (`0 20 * * *`) |
 | **Header** | `Authorization: Bearer [CRON_SECRET]` |
+
+> L'ancien endpoint `activate-games` a été supprimé (juin 2026) : bot-clicks
+> fait l'activation.
 
 ## Configuration sur cron-job.org
 

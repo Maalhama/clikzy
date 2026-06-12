@@ -46,40 +46,41 @@ export function InstallBanner() {
 
   return (
     <>
+      {/* Bandeau fermable DANS le flux, juste sous le header : il ne recouvre
+          plus les notifications en bas à droite. */}
       <AnimatePresence>
         <motion.div
-          initial={{ opacity: 0, y: 100 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: 100 }}
-          className="fixed bottom-20 left-4 right-4 z-40 md:left-auto md:right-4 md:w-80"
+          initial={{ opacity: 0, height: 0 }}
+          animate={{ opacity: 1, height: 'auto' }}
+          exit={{ opacity: 0, height: 0 }}
+          className="relative z-30 overflow-hidden border-b border-neon-purple/25 bg-gradient-to-r from-neon-purple/15 via-bg-secondary/90 to-neon-pink/15 backdrop-blur-sm"
         >
-          <div className="p-4 rounded-2xl bg-gradient-to-br from-bg-secondary to-bg-secondary/80 border border-neon-purple/30 shadow-xl shadow-black/50 backdrop-blur-sm">
-            <div className="flex items-start gap-3">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-neon-purple to-neon-pink flex items-center justify-center flex-shrink-0">
-                <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                </svg>
-              </div>
-              <div className="flex-1 min-w-0">
-                <h3 className="text-white font-bold text-sm">Installe CLEEKZY</h3>
-                <p className="text-white/50 text-xs mt-0.5">
-                  Accès rapide depuis ton écran d&apos;accueil
-                </p>
-              </div>
-              <button
-                onClick={handleDismiss}
-                className="p-1 -mt-1 -mr-1 text-white/40 hover:text-white transition-colors"
-              >
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
+          <div className="mx-auto flex max-w-7xl items-center gap-3 px-4 py-2.5 md:px-6">
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-neon-purple to-neon-pink">
+              <svg className="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+              </svg>
+            </div>
+            <div className="min-w-0 flex-1">
+              <span className="text-sm font-bold text-white">Installe CLEEKZY</span>
+              <span className="ml-2 hidden text-xs text-white/50 sm:inline">
+                Accès rapide depuis ton écran d&apos;accueil
+              </span>
             </div>
             <button
               onClick={handleInstall}
-              className="w-full mt-3 py-2.5 rounded-xl bg-gradient-to-r from-neon-purple to-neon-pink text-white font-bold text-sm hover:shadow-lg hover:shadow-neon-purple/30 transition-all"
+              className="shrink-0 rounded-lg bg-gradient-to-r from-neon-purple to-neon-pink px-3.5 py-1.5 text-xs font-bold text-white transition-all hover:shadow-lg hover:shadow-neon-purple/30"
             >
-              Installer l&apos;app
+              Installer
+            </button>
+            <button
+              onClick={handleDismiss}
+              aria-label="Fermer l'invitation d'installation"
+              className="shrink-0 p-1 text-white/40 transition-colors hover:text-white"
+            >
+              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
             </button>
           </div>
         </motion.div>

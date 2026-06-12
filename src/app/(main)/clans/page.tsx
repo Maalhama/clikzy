@@ -2,7 +2,10 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { ClansClient } from '@/components/clans/ClansClient'
 
-export const metadata = { title: 'Clans · Cleekzy' }
+export const metadata = {
+  title: 'Clans',
+  description: 'Crée ton clan ou rejoins-en un : le total d\'XP de ses membres le fait grimper au classement collectif.',
+}
 
 export default async function ClansPage() {
   const supabase = await createClient()

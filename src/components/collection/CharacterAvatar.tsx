@@ -1,16 +1,14 @@
 'use client'
 
 import { PixelSprite } from './PixelSprite'
+import { RARITY_HEX } from '@/lib/cosmetics'
+import type { Slot } from '@/types/equipment'
 import { BASE_HERO, helmetLayer, armorLayer } from './pixelHero'
 import { itemIconLayer } from './pixelItems'
 
-type Slot = 'casque' | 'armure' | 'anneau' | 'artefact'
 type EquippedItem = { id: string; slot: Slot; rarity: string; name: string }
 type Equipment = Partial<Record<Slot, { item: EquippedItem }>>
 
-const RARITY_HEX: Record<string, string> = {
-  common: '#B9C2D8', rare: '#3CCBFF', epic: '#9B5CFF', legendary: '#FFD700', mythic: '#FF4FD8',
-}
 const RARITY_RANK: Record<string, number> = { common: 0, rare: 1, epic: 2, legendary: 3, mythic: 4 }
 
 /** Personnage pixel art : héros + couches casque/armure portées (pixel-perfect),

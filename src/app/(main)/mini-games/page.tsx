@@ -4,8 +4,9 @@ import { getMiniGameEligibility } from '@/actions/miniGames'
 import MiniGamesClient from './MiniGamesClient'
 
 export const metadata = {
-  title: 'Mini-Jeux | Cleekzy',
-  description: 'Jouez à nos mini-jeux quotidiens et gagnez des crédits gratuits !',
+  title: 'Mini-Jeux quotidiens',
+  description: 'Roue de la fortune, cartes à gratter, pachinko : une partie gratuite par jour et par jeu, des crédits à gagner. Résultats provably-fair vérifiables.',
+  alternates: { canonical: '/mini-games' },
 }
 
 export default async function MiniGamesPage() {

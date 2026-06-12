@@ -157,6 +157,27 @@ export function CreditPacksModal({ isOpen, onClose }: CreditPacksModalProps) {
               )}
             </div>
 
+            {/* Alternatives gratuites : réengager plutôt que frustrer à 0 crédit */}
+            <div className="mx-4 mb-3 rounded-xl border border-white/10 bg-white/[0.03] p-3">
+              <div className="mb-2 text-center text-[10px] font-semibold uppercase tracking-wider text-white/40">
+                Ou gagne des crédits gratuitement
+              </div>
+              <div className="grid grid-cols-3 gap-2 text-center">
+                <a href="/mini-games" className="rounded-lg border border-white/10 bg-white/[0.03] px-2 py-2 transition-colors hover:border-neon-purple/40 hover:bg-neon-purple/10">
+                  <div className="text-sm" aria-hidden>🎰</div>
+                  <div className="mt-0.5 text-[10px] font-medium text-white/70">Mini-jeux gratuits</div>
+                </a>
+                <a href="/lobby" className="rounded-lg border border-white/10 bg-white/[0.03] px-2 py-2 transition-colors hover:border-neon-purple/40 hover:bg-neon-purple/10">
+                  <div className="text-sm" aria-hidden>🎯</div>
+                  <div className="mt-0.5 text-[10px] font-medium text-white/70">Quêtes du jour</div>
+                </a>
+                <a href="/profile" className="rounded-lg border border-white/10 bg-white/[0.03] px-2 py-2 transition-colors hover:border-neon-purple/40 hover:bg-neon-purple/10">
+                  <div className="text-sm" aria-hidden>🤝</div>
+                  <div className="mt-0.5 text-[10px] font-medium text-white/70">Parrainage +10</div>
+                </a>
+              </div>
+            </div>
+
             {/* Footer */}
             <div className="px-4 pb-4 pt-1 border-t border-white/5">
               <div className="flex items-center justify-center gap-2 text-white/50 text-[10px]">

@@ -42,7 +42,7 @@ export const viewport: Viewport = {
 }
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://cleekzy.com'),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://www.cleekzy.com'),
   title: {
     default: 'CLEEKZY - Le dernier clic gagne',
     template: '%s | CLEEKZY',
@@ -66,7 +66,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     locale: 'fr_FR',
-    url: 'https://cleekzy.com',
+    url: 'https://www.cleekzy.com',
     siteName: 'CLEEKZY',
     title: 'CLEEKZY - Le dernier clic gagne',
     description: 'Jeu gratuit en temps réel : le dernier à cliquer remporte le lot. 10 clics gratuits chaque jour. iPhone, PS5, MacBook et plus à gagner.',
@@ -87,7 +87,7 @@ const jsonLd = {
   '@type': 'WebApplication',
   name: 'CLEEKZY',
   description: 'Jeu gratuit en temps réel : le dernier à cliquer remporte le lot. 10 clics gratuits chaque jour.',
-  url: 'https://cleekzy.com',
+  url: 'https://www.cleekzy.com',
   applicationCategory: 'Game',
   operatingSystem: 'Web',
   offers: {
@@ -98,11 +98,11 @@ const jsonLd = {
   author: {
     '@type': 'Organization',
     name: 'CLEEKZY',
-    url: 'https://cleekzy.com',
+    url: 'https://www.cleekzy.com',
   },
   potentialAction: {
     '@type': 'PlayAction',
-    target: 'https://cleekzy.com/lobby',
+    target: 'https://www.cleekzy.com/lobby',
   },
 }
 

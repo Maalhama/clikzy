@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import Image from 'next/image'
 import { useRouter, usePathname } from 'next/navigation'
 import { createPortal } from 'react-dom'
 import { signOut } from '@/actions/auth'
@@ -235,7 +234,7 @@ export function Header({ profile }: HeaderProps) {
         <div className="hidden lg:flex relative max-w-7xl mx-auto px-6 py-3.5 items-center justify-between gap-4">
           <Logo size="md" animated={true} href="/" />
 
-          <nav className="flex items-center gap-1" aria-label="Navigation principale">
+          <nav className="flex items-center gap-0.5" aria-label="Navigation principale">
             {NAV_ITEMS.map((item) => {
               const active = isActive(item.href)
               return (
@@ -243,7 +242,7 @@ export function Header({ profile }: HeaderProps) {
                   key={item.href}
                   href={item.href}
                   aria-current={active ? 'page' : undefined}
-                  className={`relative flex items-center gap-1.5 px-2.5 py-2 rounded-xl font-medium transition-all group ${
+                  className={`relative flex items-center gap-1 px-2 py-2 rounded-xl font-medium transition-all group ${
                     active ? 'bg-white/[0.06]' : 'hover:bg-white/[0.05]'
                   }`}
                   style={{ ['--accent' as string]: item.accent }}
@@ -257,7 +256,7 @@ export function Header({ profile }: HeaderProps) {
                   </span>
                   {/* Texte coloré seulement au survol ou sur la section active */}
                   <span
-                    className={`text-[0.8rem] transition-colors ${active ? '' : 'text-white/70 group-hover:[color:var(--accent)]'}`}
+                    className={`text-[0.72rem] whitespace-nowrap transition-colors ${active ? '' : 'text-white/70 group-hover:[color:var(--accent)]'}`}
                     style={active ? { color: item.accent } : undefined}
                   >
                     {item.label}
@@ -277,14 +276,14 @@ export function Header({ profile }: HeaderProps) {
             <Link
               href="/vip"
               aria-current={isActive('/vip') ? 'page' : undefined}
-              className={`relative flex items-center gap-2 px-3.5 py-2 rounded-xl font-bold transition-all group ${
+              className={`relative flex items-center gap-1.5 px-2.5 py-2 rounded-xl font-bold transition-all group ${
                 isActive('/vip') ? 'bg-yellow-500/10' : 'hover:bg-yellow-500/[0.06]'
               }`}
             >
               <span className="w-[18px] h-[18px] text-yellow-400 drop-shadow-[0_0_6px_rgba(234,179,8,0.6)]">
                 {crownIcon}
               </span>
-              <span className="text-[0.9rem] bg-gradient-to-r from-yellow-300 to-amber-500 bg-clip-text text-transparent">
+              <span className="text-[0.8rem] bg-gradient-to-r from-yellow-300 to-amber-500 bg-clip-text text-transparent">
                 V.I.P
               </span>
             </Link>

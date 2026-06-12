@@ -41,7 +41,7 @@ export async function generateMetadata({ params }: { params: Promise<{ username:
   const decoded = decodeURIComponent(username)
   return {
     title: `${decoded} · Profil joueur`,
-    description: `Le profil de ${decoded} sur Cleekzy — le dernier clic gagne. Rejoins l'arène et défie-le !`,
+    description: `Le profil de ${decoded} sur Cleekzy, le dernier clic gagne. Rejoins l'arène et défie-le !`,
   }
 }
 

@@ -7,8 +7,16 @@ import { LobbyClient } from './LobbyClient'
 import { GameCardSkeleton } from '@/components/lobby'
 import { SOON_THRESHOLD, ROTATION_HOURS } from '@/lib/constants/rotation'
 import type { GameWithItem } from '@/types/database'
+import type { Metadata } from 'next'
 
 export const dynamic = 'force-dynamic'
+
+export const metadata: Metadata = {
+  title: 'Lobby - Parties en cours',
+  description:
+    'Choisis ta cible parmi les parties en cours : le dernier clic remporte le lot. Nouveaux produits tech toutes les 3 heures, 10 clics gratuits par jour.',
+  alternates: { canonical: '/lobby' },
+}
 
 /**
  * Get the time when ended games should start being shown

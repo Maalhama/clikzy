@@ -599,7 +599,7 @@ export function LandingClient({
             {/* Subtitle */}
             <p className="hero-subtitle reveal reveal-2 text-lg text-white/65 max-w-lg mb-10 leading-relaxed">
               Des lots réels, un timer, des milliers de joueurs.
-              Celui qui clique en dernier repart avec le lot — livré chez lui.
+              Celui qui clique en dernier repart avec le lot, livré chez lui.
               <span className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
                 <span className="font-semibold text-neon-blue">10 clics gratuits chaque jour</span>
                 <span className="text-white/25">•</span>

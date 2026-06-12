@@ -180,7 +180,7 @@ export default function VIPPage() {
         }
       } catch {
         // User is not VIP or not logged in
-        console.log('Not VIP or not logged in')
+        // non-VIP ou non connecté : état géré par l'UI
       } finally {
         setIsCheckingVIP(false)
       }

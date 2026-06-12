@@ -126,7 +126,7 @@ function LeaderboardBody({ loading, rows, me, period }: { loading: boolean; rows
               )}
               <div className="relative h-9 w-9 shrink-0 overflow-hidden rounded-full bg-white/10">
                 {r.avatarUrl ? (
-                  <Image src={r.avatarUrl} alt="" fill sizes="36px" className="object-cover" />
+                  <Image src={r.avatarUrl} alt={`Avatar de ${r.username}`} fill sizes="36px" className="object-cover" />
                 ) : (
                   <span className="flex h-full w-full items-center justify-center text-sm font-bold text-white/40">{r.username?.[0]?.toUpperCase() ?? '?'}</span>
                 )}

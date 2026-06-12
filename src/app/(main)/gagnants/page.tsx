@@ -3,8 +3,9 @@ import Link from 'next/link'
 import { getWinnersWall } from '@/actions/winners'
 
 export const metadata = {
-  title: 'Mur des gagnants · Cleekzy',
-  description: 'Ils ont cliqué en dernier, ils ont gagné — et on a livré. La preuve en direct.',
+  title: 'Mur des gagnants',
+  description: 'Ils ont cliqué en dernier, ils ont gagné, et on a livré. La preuve en direct : produits remportés, statuts de livraison, joueurs récompensés.',
+  alternates: { canonical: '/gagnants' },
 }
 export const revalidate = 120
 
@@ -26,7 +27,7 @@ export default async function GagnantsPage() {
         <span className="kicker">Preuve de confiance</span>
         <h1 className="mt-2 font-display text-3xl font-bold text-white sm:text-4xl">Mur des gagnants</h1>
         <p className="mt-2 text-sm text-white/55">
-          Ils ont cliqué en dernier, ils ont gagné — et on livre. {delivered > 0 && (
+          Ils ont cliqué en dernier, ils ont gagné, et on livre. {delivered > 0 && (
             <span className="font-semibold text-success">{delivered} lots déjà expédiés ou livrés.</span>
           )}
         </p>

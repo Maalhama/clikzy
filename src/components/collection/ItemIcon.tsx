@@ -1,9 +1,7 @@
 import { PixelSprite } from './PixelSprite'
+import { RARITY_HEX } from '@/lib/cosmetics'
 import { itemIconLayer } from './pixelItems'
 
-const RARITY_HEX: Record<string, string> = {
-  common: '#B9C2D8', rare: '#3CCBFF', epic: '#9B5CFF', legendary: '#FFD700', mythic: '#FF4FD8',
-}
 
 /**
  * Icône d'objet en pixel art : sprite du slot recoloré par rareté + glow néon.

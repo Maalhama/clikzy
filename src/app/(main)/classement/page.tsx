@@ -1,6 +1,10 @@
 import { LeaderboardClient } from '@/components/leaderboard/LeaderboardClient'
 
-export const metadata = { title: 'Classement · Cleekzy' }
+export const metadata = {
+  title: 'Classement des joueurs',
+  description: 'Le classement Cleekzy du jour, de la semaine, du mois et de tous les temps. Gagne de l\'XP à chaque clic et grimpe dans l\'arène.',
+  alternates: { canonical: '/classement' },
+}
 
 export default function ClassementPage() {
   return (

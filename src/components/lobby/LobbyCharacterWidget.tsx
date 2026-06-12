@@ -2,10 +2,10 @@
 
 import { useEffect, useState } from 'react'
 import { getCollection, type Collection } from '@/actions/collection'
+import { EQUIPMENT_SLOTS } from '@/types/equipment'
 import { CharacterAvatar } from '@/components/collection/CharacterAvatar'
 import { LobbyCharacterModal } from '@/components/lobby/LobbyCharacterModal'
 
-type Slot = 'casque' | 'armure' | 'anneau' | 'artefact'
 
 /** Widget personnage du lobby : aperçu pixel art du héros équipé → modal personnage. */
 export function LobbyCharacterWidget() {
@@ -24,7 +24,7 @@ export function LobbyCharacterWidget() {
     }).catch(() => {})
   }, [])
 
-  const count = (['casque', 'armure', 'anneau', 'artefact'] as Slot[]).filter((s) => equipment[s]).length
+  const count = EQUIPMENT_SLOTS.filter((s) => equipment[s]).length
 
   return (
     <>

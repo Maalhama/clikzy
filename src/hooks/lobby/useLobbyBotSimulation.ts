@@ -4,6 +4,12 @@ import { useEffect, useRef, useCallback } from 'react'
 import { generateDeterministicUsername } from '@/lib/bots/usernameGenerator'
 import type { GameWithItem } from '@/types/database'
 
+// Logs de simulation visibles uniquement en dev : en prod ils révéleraient
+// le fonctionnement des bots dans la console du joueur.
+const debugLog = (...args: unknown[]) => {
+  if (process.env.NODE_ENV === 'development') console.log(...args)
+}
+
 /**
  * ============================================
  * SIMULATION BOTS POUR LE LOBBY v2
@@ -128,7 +134,7 @@ export function useLobbyBotSimulation({
     // Mettre à jour le temps du dernier clic
     lastClickTimesRef.current.set(game.id, now)
 
-    console.log(`[LOBBY BOT] ${username} clicked on ${game.item?.name || game.id.substring(0, 8)}`)
+    debugLog(`[LOBBY BOT] ${username} clicked on ${game.item?.name || game.id.substring(0, 8)}`)
   }, [])
 
   useEffect(() => {
@@ -178,7 +184,7 @@ export function useLobbyBotSimulation({
             end_time: now + 90000,
           })
           lastClickTimesRef.current.set(game.id, now)
-          console.log(`[LOBBY BOT] URGENT SNIPE! ${username} at ${Math.floor(timeLeft/1000)}s`)
+          debugLog(`[LOBBY BOT] URGENT SNIPE! ${username} at ${Math.floor(timeLeft/1000)}s`)
           return
         }
 
@@ -197,7 +203,7 @@ export function useLobbyBotSimulation({
               end_time: now + 90000,
             })
             lastClickTimesRef.current.set(game.id, now)
-            console.log(`[LOBBY BOT] SNIPE! ${username} at ${Math.floor(timeLeft/1000)}s (threshold: ${Math.floor(snipeThreshold/1000)}s)`)
+            debugLog(`[LOBBY BOT] SNIPE! ${username} at ${Math.floor(timeLeft/1000)}s (threshold: ${Math.floor(snipeThreshold/1000)}s)`)
             return
           }
           return // Attendre le prochain cycle
@@ -215,7 +221,7 @@ export function useLobbyBotSimulation({
             end_time: now + 90000,
           })
           lastClickTimesRef.current.set(game.id, now)
-          console.log(`[LOBBY BOT] ENDGAME SNIPE! ${username}`)
+          debugLog(`[LOBBY BOT] ENDGAME SNIPE! ${username}`)
           return
         }
 
