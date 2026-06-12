@@ -241,7 +241,10 @@ export function FloatingTimer({
           stiffness: 400,
           damping: 25,
         }}
-        className="fixed bottom-3 md:bottom-6 right-4 md:right-12 z-50 max-w-[calc(100vw-2rem)]"
+        className="fixed bottom-3 md:bottom-6 right-5 md:right-14 z-50 max-w-[calc(100vw-2.5rem)]"
+        // Le pulse critique (scale 1.02) grandit depuis le coin bas-droit :
+        // il ne peut donc JAMAIS dépasser le bord droit de l'écran.
+        style={{ transformOrigin: 'bottom right' }}
       >
         {/* MOBILE VERSION */}
         <div className="md:hidden">
