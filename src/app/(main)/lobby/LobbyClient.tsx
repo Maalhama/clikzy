@@ -1,6 +1,6 @@
 'use client'
 
-import { Suspense, useMemo, useEffect, useState, useCallback, useRef } from 'react'
+import { Suspense, useMemo, useEffect, useState, useCallback, useRef, type MouseEvent } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import {
   LobbyHeader,
@@ -13,6 +13,7 @@ import {
 import { LobbyFeatured } from '@/components/lobby/LobbyFeatured'
 import { LobbyChestsModal } from '@/components/lobby/LobbyChestsModal'
 import { OnboardingModal } from '@/components/lobby/OnboardingModal'
+import { AnonTutorialModal } from '@/components/tutorial/AnonTutorialModal'
 import { PaymentSuccessModal } from '@/components/lobby/PaymentSuccessModal'
 import { LobbyGamificationBar } from '@/components/progression/LobbyGamificationBar'
 import { RewardsCalendarModal } from '@/components/progression/RewardsCalendarModal'
@@ -55,6 +56,7 @@ export function LobbyClient({
   const [showCalendar, setShowCalendar] = useState(false)
   const [showChests, setShowChests] = useState(false)
   const [paymentSuccess, setPaymentSuccess] = useState<{ show: boolean; credits: number; kind: 'credits' | 'vip' | 'pass' }>({ show: false, credits: 0, kind: 'credits' })
+  const [showAnonTutorial, setShowAnonTutorial] = useState(false)
 
   // Favorites
   const { favorites, isFavorite, toggleFavorite } = useFavorites()
@@ -127,6 +129,22 @@ export function LobbyClient({
       if (res.success && res.data) setCalendarData(res.data)
     }
   }, [calendarData])
+
+  // Visiteur non connecté : un clic sur une carte de partie ouvre le tuto
+  // d'accueil au lieu de naviguer (interception en phase de capture, donc
+  // avant le onClick de navigation du <Link> de la carte).
+  const handleAnonPlayCapture = useCallback(
+    (e: MouseEvent<HTMLDivElement>) => {
+      if (isLoggedIn) return
+      const link = (e.target as HTMLElement).closest('a[href*="/game/"]')
+      if (link) {
+        e.preventDefault()
+        e.stopPropagation()
+        setShowAnonTutorial(true)
+      }
+    },
+    [isLoggedIn]
+  )
 
   // Pull to refresh handler
   const handleRefresh = useCallback(async () => {
@@ -232,6 +250,9 @@ export function LobbyClient({
       {/* Onboarding première visite (connecté uniquement, une seule fois) */}
       {progression && <OnboardingModal />}
 
+      {/* Tuto d'accueil visiteur non connecté (déclenché au clic « jouer ») */}
+      <AnonTutorialModal open={showAnonTutorial} onClose={() => setShowAnonTutorial(false)} />
+
       {/* Modal coffres (ouverture depuis le lobby) */}
       {showChests && (
         <LobbyChestsModal onClose={() => { setShowChests(false); router.refresh() }} />
@@ -332,7 +353,7 @@ export function LobbyClient({
             {/* Games — min-w-0 OBLIGATOIRE : sans lui, un nom d'item long dans
                 la carte « À la une » élargit la colonne et décale la sidebar
                 des derniers gagnants à chaque rotation. */}
-            <div className="flex-1 min-w-0">
+            <div className="flex-1 min-w-0" onClickCapture={handleAnonPlayCapture}>
               {filteredGames.length > 0 ? (
                 <>
                   {/* Mobile: Horizontal scroll, snap centré (espaces égaux G/D) */}
