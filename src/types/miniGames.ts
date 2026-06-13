@@ -47,20 +47,22 @@ export interface MiniGameResult {
   newTotalCredits: number
 }
 
-// Wheel segments configuration (8 segments, moyenne: 2.25 crédits)
-// Barèmes resserrés (2026-06) : espérance ~1,2-1,5 crédit < coût replay (3)
-// -> les crédits restent rares, les packs restent la vraie source.
-export const WHEEL_SEGMENTS = [0, 0, 0, 1, 1, 2, 2, 5] as const
+// Barèmes mini-jeux — Phase 2 (2026-06) : −50% pour rendre les crédits rares
+// et faire des packs la vraie source (espérance ~0,6-0,8 crédit << coût replay 3).
+// Longueurs inchangées (les visuels roue/slots dépendent du nombre de segments).
 
-// Scratch card possible values weighted (10 valeurs, moyenne: 2.2 crédits)
-export const SCRATCH_VALUES = [0, 0, 0, 0, 1, 1, 1, 2, 2, 5] as const
+// Wheel segments (8 segments, espérance ~0,75)
+export const WHEEL_SEGMENTS = [0, 0, 0, 0, 1, 1, 1, 3] as const
 
-// Pachinko slots configuration (9 slots, moyenne: 2.0 crédits)
-export const PACHINKO_SLOTS = [0, 0, 1, 2, 5, 2, 1, 0, 0] as const
+// Scratch card (10 valeurs, espérance ~0,7)
+export const SCRATCH_VALUES = [0, 0, 0, 0, 0, 0, 1, 1, 2, 3] as const
 
-// Slot machine symbols and payouts (moyenne: 2.1 crédits)
+// Pachinko (9 slots, espérance ~0,56)
+export const PACHINKO_SLOTS = [0, 0, 0, 1, 3, 1, 0, 0, 0] as const
+
+// Slot machine (symboles + gains, espérance ~0,8)
 export const SLOTS_SYMBOLS = ['🍒', '🍋', '🍊', '🍇', '💎', '7️⃣'] as const
-export const SLOTS_PAYOUTS = [0, 0, 0, 1, 1, 1, 2, 2, 3, 5] as const
+export const SLOTS_PAYOUTS = [0, 0, 0, 0, 0, 1, 1, 1, 2, 3] as const
 
 // Game info for display
 export interface MiniGameInfo {

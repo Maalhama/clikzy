@@ -56,7 +56,7 @@ export function computeMiniGameOutcome(gameType: MiniGameType, next: () => numbe
     }
     case 'coinflip': {
       const isWin = next() < 0.1
-      return { creditsWon: isWin ? 5 : 0, coinResult: isWin ? 'heads' : 'tails' }
+      return { creditsWon: isWin ? 3 : 0, coinResult: isWin ? 'heads' : 'tails' }
     }
     case 'dice': {
       const diceResults: [number, number] = [
@@ -65,11 +65,11 @@ export function computeMiniGameOutcome(gameType: MiniGameType, next: () => numbe
       ]
       const sum = diceResults[0] + diceResults[1]
       let creditsWon: number
-      if (sum <= 3) creditsWon = 0
-      else if (sum <= 7) creditsWon = 1
-      else if (sum <= 9) creditsWon = 2
-      else if (sum <= 11) creditsWon = 3
-      else creditsWon = 5
+      // Phase 2 (−50%) : seuils relevés, top réduit
+      if (sum <= 6) creditsWon = 0
+      else if (sum <= 9) creditsWon = 1
+      else if (sum <= 11) creditsWon = 2
+      else creditsWon = 3
       return { creditsWon, diceResults }
     }
     default:
