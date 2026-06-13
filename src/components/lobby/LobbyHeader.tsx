@@ -97,7 +97,7 @@ export const LobbyHeader = memo(function LobbyHeader({
           <div className="flex flex-col items-stretch gap-3 sm:items-end">
           {/* Récompense du jour (calendrier) + coffres, côte à côte.
               Mobile : pleine largeur, 3 widgets répartis (flex-1). Desktop : auto, alignés à droite. */}
-          <div className="flex w-full items-stretch gap-2 sm:w-auto sm:justify-end sm:gap-3">
+          <div data-tour="rewards" className="flex w-full items-stretch gap-2 sm:w-auto sm:justify-end sm:gap-3">
           {/* Widget personnage — aperçu du héros équipé → collection (connecté uniquement) */}
           {isLoggedIn && <LobbyCharacterWidget />}
           {/* Widget récompense du jour — ouvre le calendrier (connecté uniquement) */}
@@ -174,7 +174,7 @@ export const LobbyHeader = memo(function LobbyHeader({
           </div>
 
           {/* Stats pills */}
-          <div className="flex flex-wrap gap-2">
+          <div data-tour="stats" className="flex flex-wrap gap-2">
             {/* Jackpot communautaire */}
             <JackpotWidget variant="pill" />
             {/* Active games */}
@@ -219,9 +219,9 @@ export const LobbyHeader = memo(function LobbyHeader({
               <span className="text-white/55 text-xs">phase finale</span>
             </div>
 
-            {/* Credits (connecté) ou CTA inscription (anon) */}
-            {isLoggedIn ? (
-              <div className="panel flex items-center gap-2 px-3.5 py-2">
+            {/* Solde crédits — connecté uniquement (aucun CTA d'inscription dans l'anon) */}
+            {isLoggedIn && (
+              <div data-tour="credits" className="panel flex items-center gap-2 px-3.5 py-2">
                 <svg
                   className="w-4 h-4 text-neon-blue"
                   fill="none"
@@ -238,10 +238,6 @@ export const LobbyHeader = memo(function LobbyHeader({
                 <span className="text-white stat-numeral text-sm">{credits}</span>
                 <span className="text-white/55 text-xs">crédits</span>
               </div>
-            ) : (
-              <a href="/register" className="btn-arena flex items-center gap-2 whitespace-nowrap px-4 py-2 text-sm">
-                Crée ton compte gratuit
-              </a>
             )}
           </div>
           </div>

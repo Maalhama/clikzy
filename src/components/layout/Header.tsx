@@ -276,6 +276,7 @@ export function Header({ profile }: HeaderProps) {
             {/* V.I.P — traitement doré dédié */}
             <Link
               href="/vip"
+              data-tour="vip"
               aria-current={isActive('/vip') ? 'page' : undefined}
               className={`relative flex items-center gap-1.5 px-2.5 py-2 rounded-xl font-bold transition-all group ${
                 isActive('/vip') ? 'bg-yellow-500/10' : 'hover:bg-yellow-500/[0.06]'
