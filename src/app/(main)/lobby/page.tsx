@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { checkAndResetDailyCredits } from '@/actions/credits'
 import { getProgression } from '@/actions/progression'
 import { getRecentWinners } from '@/actions/winners'
+import { getRecentComments } from '@/actions/comments'
 import { LobbyClient } from './LobbyClient'
 import { GameCardSkeleton } from '@/components/lobby'
 import { SOON_THRESHOLD, ROTATION_HOURS } from '@/lib/constants/rotation'
@@ -83,7 +84,7 @@ async function getLobbyData() {
   const soonThreshold = new Date(Date.now() + SOON_THRESHOLD).toISOString()
 
   // Run all queries in parallel for faster loading
-  const [creditsResult, activeGamesResult, soonGamesResult, endedGamesResult, winnersResult] = await Promise.all([
+  const [creditsResult, activeGamesResult, soonGamesResult, endedGamesResult, winnersResult, commentsResult] = await Promise.all([
     checkAndResetDailyCredits(),
     supabase
       .from('games')
@@ -105,7 +106,8 @@ async function getLobbyData() {
       .gte('end_time', endedGamesStartTime)
       .order('end_time', { ascending: false })
       .limit(100),
-    getRecentWinners(10)
+    getRecentWinners(10),
+    getRecentComments(20),
   ])
 
   // Total affiché = quotidiens + earned (cohérent avec le header)
@@ -151,7 +153,7 @@ async function getLobbyData() {
   const progressionResult = user ? await getProgression() : null
   const progression = progressionResult?.success ? progressionResult.data ?? null : null
 
-  return { games, credits, wasReset, winners, chestInfo, progression, isLoggedIn: !!user }
+  return { games, credits, wasReset, winners, comments: commentsResult, chestInfo, progression, isLoggedIn: !!user }
 }
 
 function LobbyLoading() {
@@ -200,7 +202,7 @@ function LobbyLoading() {
 }
 
 export default async function LobbyPage() {
-  const { games, credits, wasReset, winners, chestInfo, progression, isLoggedIn } = await getLobbyData()
+  const { games, credits, wasReset, winners, comments, chestInfo, progression, isLoggedIn } = await getLobbyData()
 
   return (
     <Suspense fallback={<LobbyLoading />}>
@@ -209,6 +211,7 @@ export default async function LobbyPage() {
         credits={credits}
         wasReset={wasReset}
         winners={winners}
+        comments={comments}
         chestInfo={chestInfo}
         progression={progression}
         isLoggedIn={isLoggedIn}

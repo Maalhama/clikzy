@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useTransition, useEffect, useMemo, useRef } from 'react'
 import { AnonGateModal } from '@/components/modals/AnonGateModal'
+import { GameComments } from '@/components/comments/GameComments'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useGame } from '@/hooks/useGame'
@@ -671,19 +672,21 @@ export function GameClient({
               </div>
             </div>
           </div>
+
+          {/* Discussion de la partie (mobile) */}
+          <GameComments gameId={game.id} userId={userId} />
         </div>
 
         {/* DESKTOP LAYOUT - Compact */}
         <div className="hidden lg:block max-w-5xl mx-auto">
           <div className={`grid grid-cols-[1fr,1.2fr] gap-6 ${isCritical ? 'animate-[shake_0.5s_ease-in-out_infinite]' : ''}`}>
-            {/* LEFT COLUMN - Product Showcase.
-                self-start : sans lui la grille étire la carte à la hauteur de
-                la colonne droite -> grand rectangle vide encadré sous l'info
-                produit. sticky : la carte suit le scroll, plus de zone morte. */}
-            <div
-              className="self-start lg:sticky lg:top-24 rounded-2xl overflow-hidden backdrop-blur-sm"
-              style={borderStyle}
-            >
+            {/* LEFT COLUMN - Card produit + discussion (comble l'espace libre
+                sous la carte, à gauche des derniers clics). */}
+            <div className="self-start space-y-4">
+              <div
+                className="rounded-2xl overflow-hidden backdrop-blur-sm"
+                style={borderStyle}
+              >
               <div className={`relative aspect-[4/3] bg-gradient-to-br from-bg-tertiary to-bg-secondary overflow-hidden ${game.status === 'ended' ? 'grayscale-[30%]' : ''}`}>
               <div className="hero-stage-floor opacity-70" aria-hidden="true" />
                 {/* Back to lobby button - top left */}
@@ -771,6 +774,9 @@ export function GameClient({
                   <p className="text-white/50 text-sm line-clamp-2">{game.item.description}</p>
                 )}
               </div>
+              </div>
+              {/* Discussion de la partie (comble l'espace sous la carte) */}
+              <GameComments gameId={game.id} userId={userId} />
             </div>
 
             {/* RIGHT COLUMN - Action Panel */}

@@ -13,6 +13,8 @@ import {
 import { LobbyFeatured } from '@/components/lobby/LobbyFeatured'
 import { LobbyChestsModal } from '@/components/lobby/LobbyChestsModal'
 import { LobbyTour } from '@/components/tutorial/LobbyTour'
+import { LobbyCommentsFeed } from '@/components/comments/LobbyCommentsFeed'
+import { type CommentFeedItem } from '@/actions/comments'
 import { PaymentSuccessModal } from '@/components/lobby/PaymentSuccessModal'
 import { LobbyGamificationBar } from '@/components/progression/LobbyGamificationBar'
 import { RewardsCalendarModal } from '@/components/progression/RewardsCalendarModal'
@@ -34,6 +36,7 @@ interface LobbyClientProps {
   credits: number
   wasReset: boolean
   winners: WinnerData[]
+  comments?: CommentFeedItem[]
   chestInfo?: { count: number; bestRarity: string; dailyAvailable: boolean } | null
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   progression?: any
@@ -45,6 +48,7 @@ export function LobbyClient({
   credits,
   wasReset,
   winners,
+  comments = [],
   chestInfo,
   progression,
   isLoggedIn = false,
@@ -435,17 +439,19 @@ export function LobbyClient({
               )}
             </div>
 
-            {/* Winners sidebar - desktop only */}
-            <div data-tour="winners" className="hidden lg:block w-80 flex-shrink-0">
-              <div className="sticky top-24">
+            {/* Winners sidebar + commentaires - desktop only */}
+            <div className="hidden lg:block w-80 flex-shrink-0 space-y-4">
+              <div data-tour="winners" className="sticky top-24">
                 <LastWinnersFeed winners={winners} />
               </div>
+              <LobbyCommentsFeed comments={comments} />
             </div>
           </div>
 
-          {/* Mobile winners feed */}
-          <div className="lg:hidden mt-8">
+          {/* Mobile winners feed + commentaires */}
+          <div className="lg:hidden mt-8 space-y-6">
             <LastWinnersFeed winners={winners} />
+            <LobbyCommentsFeed comments={comments} />
           </div>
         </div>
       </div>
