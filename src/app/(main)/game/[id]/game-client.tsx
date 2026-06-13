@@ -674,7 +674,7 @@ export function GameClient({
           </div>
 
           {/* Discussion de la partie (mobile) */}
-          <GameComments gameId={game.id} userId={userId} />
+          <GameComments gameId={game.id} userId={userId} itemName={game.item.name} />
         </div>
 
         {/* DESKTOP LAYOUT - Compact */}
@@ -776,7 +776,7 @@ export function GameClient({
               </div>
               </div>
               {/* Discussion de la partie (comble l'espace sous la carte) */}
-              <GameComments gameId={game.id} userId={userId} />
+              <GameComments gameId={game.id} userId={userId} itemName={game.item.name} />
             </div>
 
             {/* RIGHT COLUMN - Action Panel */}

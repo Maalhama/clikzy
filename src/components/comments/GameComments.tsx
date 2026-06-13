@@ -3,8 +3,9 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { postComment, getGameComments, type GameComment } from '@/actions/comments'
 import { avatarColor, timeAgo } from '@/components/comments/commentUtils'
+import { seedGameComments } from '@/lib/bots/commentGenerator'
 
-export function GameComments({ gameId, userId }: { gameId: string; userId: string | null }) {
+export function GameComments({ gameId, userId, itemName }: { gameId: string; userId: string | null; itemName?: string }) {
   const [comments, setComments] = useState<GameComment[]>([])
   const [content, setContent] = useState('')
   const [sending, setSending] = useState(false)
@@ -13,16 +14,20 @@ export function GameComments({ gameId, userId }: { gameId: string; userId: strin
 
   useEffect(() => {
     let active = true
+    const seeded = seedGameComments(gameId, itemName ?? '', 5, Date.now())
     getGameComments(gameId).then((c) => {
-      if (active) {
-        setComments(c)
-        setLoading(false)
-      }
+      if (!active) return
+      const seen = new Set(c.map((x) => x.id))
+      const merged = [...c, ...seeded.filter((s) => !seen.has(s.id))].sort((a, b) =>
+        a.created_at < b.created_at ? 1 : -1
+      )
+      setComments(merged)
+      setLoading(false)
     })
     return () => {
       active = false
     }
-  }, [gameId])
+  }, [gameId, itemName])
 
   const submit = async (e: FormEvent) => {
     e.preventDefault()

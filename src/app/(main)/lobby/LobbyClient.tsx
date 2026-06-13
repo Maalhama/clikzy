@@ -15,6 +15,7 @@ import { LobbyChestsModal } from '@/components/lobby/LobbyChestsModal'
 import { LobbyTour } from '@/components/tutorial/LobbyTour'
 import { LobbyCommentsFeed } from '@/components/comments/LobbyCommentsFeed'
 import { type CommentFeedItem } from '@/actions/comments'
+import { seedBotComments } from '@/lib/bots/commentGenerator'
 import { PaymentSuccessModal } from '@/components/lobby/PaymentSuccessModal'
 import { LobbyGamificationBar } from '@/components/progression/LobbyGamificationBar'
 import { RewardsCalendarModal } from '@/components/progression/RewardsCalendarModal'
@@ -59,6 +60,8 @@ export function LobbyClient({
   const [showCalendar, setShowCalendar] = useState(false)
   const [showChests, setShowChests] = useState(false)
   const [paymentSuccess, setPaymentSuccess] = useState<{ show: boolean; credits: number; kind: 'credits' | 'vip' | 'pass' }>({ show: false, credits: 0, kind: 'credits' })
+  // Commentaires d'ambiance émis par les bots (client-only, éphémères)
+  const [botComments, setBotComments] = useState<CommentFeedItem[]>([])
 
   // Favorites
   const { favorites, isFavorite, toggleFavorite } = useFavorites()
@@ -160,8 +163,17 @@ export function LobbyClient({
         }
       }
     }, [updateGame, addClickNotification, games]),
+    onBotComment: useCallback((c: CommentFeedItem) => {
+      setBotComments((prev) => [c, ...prev.filter((p) => p.id !== c.id)].slice(0, 20))
+    }, []),
     enabled: true,
   })
+
+  // Seed initial des commentaires bots (client-only -> pas de mismatch SSR)
+  useEffect(() => {
+    setBotComments(seedBotComments(initialGames, 9, Date.now()))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   // Filters, sorting and pagination
   const {
@@ -230,6 +242,17 @@ export function LobbyClient({
     stickyGameIdRef.current = sorted[0].id
     return sorted[0]
   }, [games])
+
+  // Feed lobby : commentaires réels + bots, fusionnés/dédupliqués/triés
+  const feedComments = useMemo<CommentFeedItem[]>(() => {
+    const seen = new Set<string>()
+    const merged = [...comments, ...botComments].filter((c) => {
+      if (seen.has(c.id)) return false
+      seen.add(c.id)
+      return true
+    })
+    return merged.sort((a, b) => (a.created_at < b.created_at ? 1 : -1)).slice(0, 18)
+  }, [comments, botComments])
 
   return (
     <>
@@ -444,14 +467,14 @@ export function LobbyClient({
               <div data-tour="winners" className="sticky top-24">
                 <LastWinnersFeed winners={winners} />
               </div>
-              <LobbyCommentsFeed comments={comments} />
+              <LobbyCommentsFeed comments={feedComments} />
             </div>
           </div>
 
           {/* Mobile winners feed + commentaires */}
           <div className="lg:hidden mt-8 space-y-6">
             <LastWinnersFeed winners={winners} />
-            <LobbyCommentsFeed comments={comments} />
+            <LobbyCommentsFeed comments={feedComments} />
           </div>
         </div>
       </div>

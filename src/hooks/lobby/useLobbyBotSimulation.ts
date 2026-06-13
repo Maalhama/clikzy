@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useCallback } from 'react'
 import { generateDeterministicUsername } from '@/lib/bots/usernameGenerator'
+import { buildBotComment, type BotComment } from '@/lib/bots/commentGenerator'
 import type { GameWithItem } from '@/types/database'
 
 // Logs de simulation visibles uniquement en dev : en prod ils révéleraient
@@ -33,6 +34,8 @@ interface UseLobbyBotSimulationProps {
     last_click_user_id?: string | null
     end_time?: number
   }) => void
+  /** ~10% des clics bots émettent un commentaire (ambiance). */
+  onBotComment?: (comment: BotComment) => void
   enabled?: boolean
 }
 
@@ -98,15 +101,21 @@ function shouldBotClickInBattle(gameId: string, battleProgress: number): boolean
 export function useLobbyBotSimulation({
   games,
   onGameUpdate,
+  onBotComment,
   enabled = true,
 }: UseLobbyBotSimulationProps) {
 
   const lastClickTimesRef = useRef<Map<string, number>>(new Map())
   const onGameUpdateRef = useRef(onGameUpdate)
+  const onBotCommentRef = useRef(onBotComment)
 
   useEffect(() => {
     onGameUpdateRef.current = onGameUpdate
   }, [onGameUpdate])
+
+  useEffect(() => {
+    onBotCommentRef.current = onBotComment
+  }, [onBotComment])
 
   // Fonction pour simuler un clic sur un jeu
   const simulateClick = useCallback((game: GameWithItem) => {
@@ -130,6 +139,16 @@ export function useLobbyBotSimulation({
       last_click_username: username,
       end_time: shouldResetTimer ? now + 90000 : (game.end_time ?? undefined),
     })
+
+    // ~10% des clics bots laissent un commentaire (ambiance du feed)
+    const emitComment = onBotCommentRef.current
+    if (emitComment && getDeterministicSeed(`${game.id}-${roundedTime}-cmt`, 0) % 10 === 0) {
+      const c = buildBotComment(game, String(roundedTime), now)
+      if (c) {
+        c.username = username
+        emitComment(c)
+      }
+    }
 
     // Mettre à jour le temps du dernier clic
     lastClickTimesRef.current.set(game.id, now)
