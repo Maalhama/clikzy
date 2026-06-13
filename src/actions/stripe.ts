@@ -80,6 +80,9 @@ export async function createCheckoutSession(
         },
       ],
       mode: 'payment',
+      // Le compte Stripe est « Frizaway. Inc. » (partagé Frizaway/Scanto/Cleekzy) :
+      // on force le libellé du relevé bancaire client à « CLEEKZY » pour les achats Cleekzy.
+      payment_intent_data: { statement_descriptor: 'CLEEKZY' },
       success_url: `${baseUrl}/lobby?payment=success&credits=${pack.credits}`,
       cancel_url: `${baseUrl}/lobby?payment=cancelled`,
       customer_email: user.email,
@@ -404,6 +407,8 @@ export async function createPassCheckoutSession(): Promise<ActionResult<{ url: s
         },
       ],
       mode: 'payment',
+      // Libellé « CLEEKZY » sur le relevé (compte Stripe partagé « Frizaway. Inc. »).
+      payment_intent_data: { statement_descriptor: 'CLEEKZY' },
       success_url: `${baseUrl}/lobby?pass=success`,
       cancel_url: `${baseUrl}/lobby?pass=cancelled`,
       customer_email: user.email,
