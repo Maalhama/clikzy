@@ -2,7 +2,6 @@
 
 import { useState, useCallback, useTransition, useEffect, useMemo, useRef } from 'react'
 import { AnonGateModal } from '@/components/modals/AnonGateModal'
-import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useGame } from '@/hooks/useGame'
@@ -62,7 +61,6 @@ export function GameClient({
   userId,
   recentClicks: _initialClicks,
 }: GameClientProps) {
-  const router = useRouter()
   // useGame now provides recentClicks from DB (synced with lobby)
   const { game, recentClicks, isConnected, optimisticUpdate, addClick, removeClick } = useGame(initialGame)
   const { credits, decrementCredits } = useCredits()
