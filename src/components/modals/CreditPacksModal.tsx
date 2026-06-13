@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Dices, Target, Users } from 'lucide-react'
 import { CREDIT_PACKS, type CreditPackId } from '@/lib/stripe/config'
 import { createCheckoutSession } from '@/actions/stripe'
+import { PackCard } from '@/components/shop/PackCard'
 
 interface CreditPacksModalProps {
   isOpen: boolean
@@ -75,75 +76,20 @@ export function CreditPacksModal({ isOpen, onClose }: CreditPacksModalProps) {
             {/* Packs - Compact cards */}
             <div className="px-4 pb-4 space-y-2">
               {CREDIT_PACKS.map((pack, index) => (
-                <motion.button
+                <motion.div
                   key={pack.id}
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: index * 0.1 }}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={() => handlePurchase(pack.id)}
-                  disabled={loadingPack !== null}
-                  className={`
-                    relative w-full p-3 rounded-xl transition-all flex items-center gap-3
-                    ${pack.popular
-                      ? 'bg-gradient-to-r from-neon-purple/20 to-neon-pink/20 border-2 border-neon-purple/40 shadow-[0_0_20px_rgba(155,92,255,0.15)]'
-                      : 'bg-white/5 border border-white/10 hover:border-white/20 hover:bg-white/[0.07]'
-                    }
-                    ${loadingPack === pack.id ? 'opacity-70' : ''}
-                    disabled:cursor-not-allowed
-                  `}
                 >
-                  {/* Credits badge */}
-                  <div className={`
-                    w-14 h-14 rounded-xl flex flex-col items-center justify-center flex-shrink-0
-                    ${pack.popular
-                      ? 'bg-gradient-to-br from-neon-purple to-neon-pink shadow-lg'
-                      : 'bg-gradient-to-br from-neon-blue/20 to-neon-purple/20 border border-white/10'
-                    }
-                  `}>
-                    <span className="text-white font-black text-lg leading-none">{pack.credits}</span>
-                    <span className="text-white/70 text-[9px] uppercase">crédits</span>
-                  </div>
-
-                  {/* Info */}
-                  <div className="flex-1 text-left min-w-0">
-                    <div className="flex items-center gap-2">
-                      <span className="font-semibold text-white">{pack.name}</span>
-                      {pack.popular && (
-                        <span className="px-1.5 py-0.5 rounded bg-neon-pink/20 text-neon-pink text-[10px] font-bold uppercase">
-                          Top
-                        </span>
-                      )}
-                    </div>
-                    <div className="text-xs">
-                      {pack.bonus > 0 ? (
-                        <span className="text-success font-medium">+{pack.bonus}% de valeur</span>
-                      ) : (
-                        <span className="text-white/40">Pack de base</span>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Price / Loading */}
-                  <div className="flex-shrink-0">
-                    {loadingPack === pack.id ? (
-                      <svg className="w-6 h-6 animate-spin text-neon-purple" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                      </svg>
-                    ) : (
-                      <div className={`
-                        px-3 py-1.5 rounded-lg font-bold text-sm
-                        ${pack.popular
-                          ? 'bg-gradient-to-r from-neon-purple to-neon-pink text-white'
-                          : 'bg-white/10 text-white'
-                        }
-                      `}>
-                        {pack.price.toFixed(2)}€
-                      </div>
-                    )}
-                  </div>
-                </motion.button>
+                  <PackCard
+                    pack={pack}
+                    loading={loadingPack === pack.id}
+                    disabled={loadingPack !== null}
+                    onBuy={handlePurchase}
+                    compact
+                  />
+                </motion.div>
               ))}
 
               {/* Error message */}

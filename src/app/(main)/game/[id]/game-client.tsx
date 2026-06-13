@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useCallback, useTransition, useEffect, useMemo, useRef } from 'react'
+import { AnonGateModal } from '@/components/modals/AnonGateModal'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
@@ -71,6 +72,7 @@ export function GameClient({
   const [error, setError] = useState<string | null>(null)
   const [showCreditModal, setShowCreditModal] = useState(false)
   const [showVIPModal, setShowVIPModal] = useState(false)
+  const [showAuthGate, setShowAuthGate] = useState(false)
   const [isVip, setIsVip] = useState(false)
   const [vipLoading, setVipLoading] = useState(false)
   const [clickAnimation, setClickAnimation] = useState(false)
@@ -172,7 +174,7 @@ export function GameClient({
   const handleClick = useCallback(() => {
     // Visiteur non connecté : on l'invite à créer un compte / se connecter
     if (!userId) {
-      router.push('/register')
+      setShowAuthGate(true)
       return
     }
 
@@ -232,7 +234,7 @@ export function GameClient({
         showBadgeNotifications(result.data.newBadges)
       }
     })
-  }, [userId, router, isPending, hasCredits, canClick, isPremiumProduct, isVip, playClick, triggerHaptic, username, game, optimisticUpdate, decrementCredits, addClick, removeClick, showBadgeNotifications])
+  }, [userId, isPending, hasCredits, canClick, isPremiumProduct, isVip, playClick, triggerHaptic, username, game, optimisticUpdate, decrementCredits, addClick, removeClick, showBadgeNotifications])
 
   // Border gradient style (same as lobby cards)
   const borderStyle = useMemo(() => {
@@ -486,8 +488,20 @@ export function GameClient({
                 </div>
               </div>
 
-              {/* Click button - shows "Buy credits" when no credits */}
-              {game.status !== 'ended' && !hasCredits && (
+              {/* Anon : inviter à créer un compte (pas d'achat sans compte) */}
+              {game.status !== 'ended' && !userId && (
+                <button
+                  onClick={() => setShowAuthGate(true)}
+                  className="btn-arena w-full py-4 text-base"
+                >
+                  <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                  Crée ton compte pour jouer
+                </button>
+              )}
+              {/* Connecté sans crédits : achat */}
+              {game.status !== 'ended' && userId && !hasCredits && (
                 <button
                   onClick={() => setShowCreditModal(true)}
                   className="btn-arena w-full py-4 text-base"
@@ -882,8 +896,20 @@ export function GameClient({
                 </div>
               </div>
 
-              {/* Click Button */}
-              {game.status !== 'ended' && !hasCredits && (
+              {/* Anon : inviter à créer un compte */}
+              {game.status !== 'ended' && !userId && (
+                <button
+                  onClick={() => setShowAuthGate(true)}
+                  className="w-full py-4 [clip-path:polygon(0_0,100%_0,100%_calc(100%-10px),calc(100%-10px)_100%,0_100%)] font-display font-semibold uppercase tracking-wide text-base transition-all flex items-center justify-center gap-2 bg-gradient-to-r from-neon-purple to-neon-pink text-white drop-shadow-[0_0_12px_rgba(155,92,255,0.45)] hover:drop-shadow-[0_0_18px_rgba(155,92,255,0.65)] hover:scale-[1.01] active:scale-[0.98]"
+                >
+                  <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                  Crée ton compte pour jouer
+                </button>
+              )}
+              {/* Connecté sans crédits : achat */}
+              {game.status !== 'ended' && userId && !hasCredits && (
                 <button
                   onClick={() => setShowCreditModal(true)}
                   className="w-full py-4 [clip-path:polygon(0_0,100%_0,100%_calc(100%-10px),calc(100%-10px)_100%,0_100%)] font-display font-semibold uppercase tracking-wide text-base transition-all flex items-center justify-center gap-2 bg-gradient-to-r from-neon-purple to-neon-pink text-white drop-shadow-[0_0_12px_rgba(155,92,255,0.45)] hover:drop-shadow-[0_0_18px_rgba(155,92,255,0.65)] hover:scale-[1.01] active:scale-[0.98]"
@@ -1033,6 +1059,9 @@ export function GameClient({
         onSubscribe={handleVIPSubscribe}
         isLoading={vipLoading}
       />
+
+      {/* Anon : modal d'invitation à l'inscription (au lieu de l'achat de crédits) */}
+      <AnonGateModal isOpen={showAuthGate} onClose={() => setShowAuthGate(false)} />
     </div>
   )
 }
