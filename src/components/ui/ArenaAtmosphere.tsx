@@ -16,7 +16,7 @@ interface BackgroundEffectsProps {
   simplified?: boolean
 }
 
-export function BackgroundEffects({ simplified = false }: BackgroundEffectsProps) {
+export function ArenaAtmosphere({ simplified = false }: BackgroundEffectsProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const [isMobile, setIsMobile] = useState(false)
 

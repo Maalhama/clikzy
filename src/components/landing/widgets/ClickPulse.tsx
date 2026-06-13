@@ -120,7 +120,7 @@ export function ClickPulse({
 
       {/* Activity indicator */}
       <div
-        className="absolute bottom-4 right-4 flex items-center gap-2 px-3 py-1.5 bg-bg-secondary/80 backdrop-blur-sm rounded-full border border-neon-purple/30"
+        className="absolute bottom-6 right-16 flex items-center gap-2 px-3 py-1.5 bg-bg-secondary/80 backdrop-blur-sm rounded-full border border-neon-purple/30"
         style={{ boxShadow: '0 0 15px rgba(155, 92, 255, 0.2)' }}
       >
         <span className="relative flex h-2 w-2">

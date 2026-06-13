@@ -1,7 +1,7 @@
 'use client'
 
 import { ReactNode } from 'react'
-import { BackgroundEffects } from '@/components/ui/BackgroundEffects'
+import { ArenaAtmosphere } from '@/components/ui/ArenaAtmosphere'
 
 interface AuthLayoutProps {
   children: ReactNode
@@ -14,7 +14,7 @@ export default function AuthLayout({ children }: AuthLayoutProps) {
       <div className="arcade-atmosphere" aria-hidden="true" />
 
       {/* Background Effects - same as landing page */}
-      <BackgroundEffects simplified />
+      <ArenaAtmosphere simplified />
 
       {/* Content - full screen, no extra padding */}
       <div className="relative z-10 h-full w-full">

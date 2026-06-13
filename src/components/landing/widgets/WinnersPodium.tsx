@@ -1,5 +1,7 @@
 'use client'
 
+import { PixelAvatar } from '@/components/ui/PixelAvatar'
+
 interface PodiumWinner {
   id: string
   username: string
@@ -57,12 +59,10 @@ export function WinnersPodium({ winners }: WinnersPodiumProps) {
                 </svg>
               )}
               <div
-                className={`flex items-center justify-center rounded-full bg-gradient-to-br from-neon-purple to-neon-pink font-display font-bold text-white ${
-                  first ? 'h-16 w-16 text-2xl' : 'h-12 w-12 text-lg'
-                }`}
+                className="rounded-full"
                 style={{ boxShadow: `0 0 0 3px ${color}66, 0 0 28px -4px ${color}` }}
               >
-                {w.username.charAt(0).toUpperCase()}
+                <PixelAvatar username={w.username} size={first ? 64 : 48} />
               </div>
             </div>
 

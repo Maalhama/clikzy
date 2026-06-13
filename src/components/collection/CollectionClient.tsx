@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from 'react'
 import { Loader2, Gift, Sparkles, Zap, Coins, MousePointerClick, Clover, History } from 'lucide-react'
 import { getCollection, equipItem, unequipSlot, claimDailyChest, type Collection, type ChestDrop } from '@/actions/collection'
-import { RARITY, SLOT_LABEL, SLOT_EMOJI, bonusLabel, type Rarity } from './rarity'
+import { RARITY, SLOT_LABEL, bonusLabel, type Rarity } from './rarity'
 import { CaseOpeningModal } from './CaseOpeningModal'
 import { NeonChest } from './NeonChest'
 import { ItemIcon } from './ItemIcon'

@@ -212,10 +212,10 @@ export const GameCard = memo(function GameCard({ game, index = 0, isFavorite = f
       }
     }
     if (isWaiting) {
-      // Purple gradient for waiting (Bientôt)
+      // Bientôt : bordure violette discrète (état d'attente, pas chaud)
       return {
-        background: `linear-gradient(${cardBg}, ${cardBg}) padding-box, linear-gradient(135deg, #9B5CFF, #7C3AED, #9B5CFF) border-box`,
-        border: '1.5px solid transparent',
+        background: cardBg,
+        border: '1.5px solid rgba(155, 92, 255, 0.25)',
       }
     }
     if (isCritical || isUrgent) {
@@ -225,10 +225,11 @@ export const GameCard = memo(function GameCard({ game, index = 0, isFavorite = f
         border: '1.5px solid transparent',
       }
     }
-    // Pink/purple neon gradient for active
+    // Active normale : bordure NEUTRE — la couleur est réservée aux états
+    // chauds (urgence, victoire). Le glow violet revient au hover (cardClasses).
     return {
-      background: `linear-gradient(${cardBg}, ${cardBg}) padding-box, linear-gradient(135deg, #FF4FD8, #9B5CFF, #3CCBFF) border-box`,
-      border: '1.5px solid transparent',
+      background: cardBg,
+      border: '1.5px solid rgba(255, 255, 255, 0.09)',
     }
   }, [isEnded, isWaiting, isCritical, isUrgent])
 

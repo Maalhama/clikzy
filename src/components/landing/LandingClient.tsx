@@ -31,13 +31,16 @@ import { TargetIcon, CursorClickIcon, TrophyIcon, GiftIcon } from '@/components/
 // Widgets - PrizeCarousel
 import { PrizeCarousel } from './widgets/PrizeCarousel'
 import { HeroLiveCard } from './widgets/HeroLiveCard'
+import { CURSOR_CSS } from '@/lib/cosmetics'
+import { PixelSprite } from '@/components/collection/PixelSprite'
+import { BASE_HERO } from '@/components/collection/pixelHero'
 import { LiveTickerBar } from './widgets/LiveTickerBar'
 import { PrizesBento } from './widgets/PrizesBento'
 import { WinnersPodium } from './widgets/WinnersPodium'
 
 // Background Effects - Lazy loaded (heavy 3D component)
-const BackgroundEffects = dynamic(
-  () => import('@/components/ui/BackgroundEffects').then(mod => mod.BackgroundEffects),
+const ArenaAtmosphere = dynamic(
+  () => import('@/components/ui/ArenaAtmosphere').then(mod => mod.ArenaAtmosphere),
   { ssr: false }
 )
 
@@ -288,7 +291,7 @@ export function LandingClient({
 
   return (
     <>
-    <main ref={mainRef} id="main-content" className="relative bg-bg-primary text-white overflow-hidden">
+    <main ref={mainRef} id="main-content" className="relative bg-bg-primary text-white overflow-hidden" style={{ cursor: CURSOR_CSS.cursor_void }}>
       {/* SCROLL PROGRESS BAR */}
       <ScrollProgressBar color="gradient" height={3} position="top" />
 
@@ -305,7 +308,7 @@ export function LandingClient({
 
       {/* DESKTOP ANIMATED BACKGROUND - Hidden on mobile for performance */}
       <div className="hidden md:block">
-        <BackgroundEffects />
+        <ArenaAtmosphere />
       </div>
 
       {/* FLOATING WIDGETS - Only show after cookie consent */}
@@ -633,7 +636,7 @@ export function LandingClient({
                       </>
                     ) : (
                       <>
-                        {isLoggedIn ? 'ENTRER DANS L’ARÈNE' : 'JOUER GRATUITEMENT'}
+                        <span className="whitespace-nowrap">{isLoggedIn ? 'ENTRER DANS L’ARÈNE' : 'JOUER GRATUITEMENT'}</span>
                         <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                         </svg>
@@ -674,7 +677,13 @@ export function LandingClient({
 
           {/* Right — la vraie partie en direct (fallback : lots flottants) */}
           <div className="hero-prize reveal reveal-3 relative hidden lg:block">
-            <HeroLiveCard games={heroGames} />
+            <div className="hero-ignite relative">
+              {/* Mascotte pixel : la signature Cleekzy, gardienne de l'arène */}
+              <div className="character-float absolute -top-[4.6rem] right-8 z-10 hidden lg:block" aria-hidden>
+                <PixelSprite size={72} layers={[BASE_HERO]} />
+              </div>
+              <HeroLiveCard games={heroGames} />
+            </div>
           </div>
         </div>
 
@@ -1230,7 +1239,7 @@ export function LandingClient({
                 </svg>
               </div>
               <div className="text-left">
-                <div className="text-success font-bold text-sm">0€ pour s'inscrire</div>
+                <div className="text-white font-bold text-sm">0€ pour s'inscrire</div>
                 <div className="text-white/40 text-xs">100% gratuit</div>
               </div>
             </div>
@@ -1241,7 +1250,7 @@ export function LandingClient({
                 </svg>
               </div>
               <div className="text-left">
-                <div className="text-neon-blue font-bold text-sm">100% légal</div>
+                <div className="text-white font-bold text-sm">100% légal</div>
                 <div className="text-white/40 text-xs">Conforme CNIL</div>
               </div>
             </div>
@@ -1252,7 +1261,7 @@ export function LandingClient({
                 </svg>
               </div>
               <div className="text-left">
-                <div className="text-neon-pink font-bold text-sm">Livraison offerte</div>
+                <div className="text-white font-bold text-sm">Livraison offerte</div>
                 <div className="text-white/40 text-xs">Partout en France</div>
               </div>
             </div>
@@ -1333,7 +1342,7 @@ export function LandingClient({
 
             {/* Navigation */}
             <div>
-              <h4 className="mb-5 flex items-center gap-2 font-display text-xs font-semibold uppercase tracking-[0.25em] text-neon-purple"><span className="h-px w-5 bg-neon-purple/60" />Navigation</h4>
+              <h4 className="mb-5 flex items-center gap-2 font-display text-xs font-semibold uppercase tracking-[0.25em] text-white/70"><span className="h-px w-5 bg-neon-purple/60" />Navigation</h4>
               <ul className="space-y-3">
                 <li><Link href="/lobby" className="text-white/50 hover:text-neon-purple transition-colors text-sm">Voir les lots</Link></li>
                 <li><a href="#how-it-works-desktop" className="text-white/50 hover:text-neon-purple transition-colors text-sm">Comment ça marche</a></li>
@@ -1344,7 +1353,7 @@ export function LandingClient({
 
             {/* Legal */}
             <div>
-              <h4 className="mb-5 flex items-center gap-2 font-display text-xs font-semibold uppercase tracking-[0.25em] text-neon-blue"><span className="h-px w-5 bg-neon-blue/60" />Légal</h4>
+              <h4 className="mb-5 flex items-center gap-2 font-display text-xs font-semibold uppercase tracking-[0.25em] text-white/70"><span className="h-px w-5 bg-neon-purple/60" />Légal</h4>
               <ul className="space-y-3">
                 <li><Link href="/terms" className="text-white/50 hover:text-neon-blue transition-colors text-sm">Conditions générales</Link></li>
                 <li><Link href="/privacy" className="text-white/50 hover:text-neon-blue transition-colors text-sm">Politique de confidentialité</Link></li>
@@ -1355,7 +1364,7 @@ export function LandingClient({
 
             {/* Contact */}
             <div>
-              <h4 className="mb-5 flex items-center gap-2 font-display text-xs font-semibold uppercase tracking-[0.25em] text-neon-pink"><span className="h-px w-5 bg-neon-pink/60" />Contact</h4>
+              <h4 className="mb-5 flex items-center gap-2 font-display text-xs font-semibold uppercase tracking-[0.25em] text-white/70"><span className="h-px w-5 bg-neon-purple/60" />Contact</h4>
               <ul className="space-y-3 mb-6">
                 <li><a href="mailto:contact@cleekzy.com" className="text-white/50 hover:text-neon-pink transition-colors text-sm">contact@cleekzy.com</a></li>
                 <li><span className="text-white/50 text-sm">Support 24h/24 - 7j/7</span></li>

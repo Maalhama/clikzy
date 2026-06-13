@@ -8,11 +8,6 @@ import {
   MiniGameEligibility,
   MiniGameResult,
   MiniGamePlay,
-  WHEEL_SEGMENTS,
-  SCRATCH_VALUES,
-  PACHINKO_SLOTS,
-  SLOTS_PAYOUTS,
-  SLOTS_SYMBOLS,
 } from '@/types/miniGames'
 
 type ActionResult<T = void> = {

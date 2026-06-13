@@ -1,5 +1,6 @@
 'use client'
 
+import { PixelAvatar } from '@/components/ui/PixelAvatar'
 import { useRef, useState, useEffect, useMemo } from 'react'
 import { CrownIcon } from '@/components/ui/GamingIcons'
 import { useIsMobile } from '@/hooks/useIsMobile'
@@ -317,9 +318,7 @@ export function Leaderboard({
               {/* Avatar with glow */}
               <div className="relative group/avatar">
                 <div className="absolute inset-0 bg-gradient-to-br from-neon-purple/50 to-neon-pink/50 rounded-lg blur-md opacity-0 group-hover/row:opacity-100 transition-opacity duration-300" />
-                <div className="relative w-10 h-10 rounded-lg bg-gradient-to-br from-neon-purple to-neon-pink flex items-center justify-center font-bold">
-                  {entry.username.charAt(0).toUpperCase()}
-                </div>
+                <PixelAvatar username={entry.username} size={40} />
               </div>
 
               {/* Username & wins */}

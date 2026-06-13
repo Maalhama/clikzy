@@ -121,7 +121,13 @@ export const GameClicksFeed = memo(function GameClicksFeed({ clicks }: { clicks:
       </div>
       <div className="space-y-1 p-2">
         {clicks.slice(0, 5).map((click, i) => (
-          <FeedRow key={click.id} click={click} isLeader={i === 0} isNew={newIds.has(click.id)} />
+          <div
+            key={click.id}
+            className="transition-opacity duration-500"
+            style={{ opacity: i === 0 ? 1 : Math.max(0.45, 1 - i * 0.16) }}
+          >
+            <FeedRow click={click} isLeader={i === 0} isNew={newIds.has(click.id)} />
+          </div>
         ))}
       </div>
     </div>

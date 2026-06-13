@@ -183,8 +183,10 @@ export function HeroLiveCard({ games, compact = false }: HeroLiveCardProps) {
         </span>
       </div>
 
-      {/* Produit */}
+      {/* Produit — mis en scène : god rays + halo + socle lumineux.
+          Le produit est la SOURCE de lumière de la carte (lumière diégétique). */}
       <div className={`relative mx-auto ${compact ? 'h-36 w-36' : 'h-52 w-52'} mb-4`}>
+        {!compact && <div className="god-rays" aria-hidden />}
         <div
           className="absolute inset-0 rounded-full opacity-70 blur-2xl"
           style={{
@@ -192,12 +194,20 @@ export function HeroLiveCard({ games, compact = false }: HeroLiveCardProps) {
               'radial-gradient(ellipse at center, rgba(255,79,216,0.55) 0%, rgba(155,92,255,0.4) 50%, transparent 75%)',
           }}
         />
+        <div
+          className="absolute -bottom-3 left-1/2 h-7 w-[120%] -translate-x-1/2 rounded-[50%] opacity-80 blur-md"
+          style={{
+            background:
+              'radial-gradient(ellipse at center, rgba(155,92,255,0.5) 0%, rgba(255,79,216,0.2) 45%, transparent 75%)',
+          }}
+          aria-hidden
+        />
         <Image
           src={imgError ? fallbackImage : productImage}
           alt={game.item_name}
           fill
           sizes={compact ? '144px' : '208px'}
-          className="object-contain drop-shadow-[0_0_30px_rgba(155,92,255,0.45)] transition-transform duration-500 group-hover:scale-105"
+          className="object-contain [filter:drop-shadow(0_0_30px_rgba(155,92,255,0.45))_drop-shadow(0_10px_20px_rgba(4,2,12,0.85))] transition-transform duration-500 group-hover:scale-105"
           priority
           onError={() => !imgError && setImgError(true)}
         />

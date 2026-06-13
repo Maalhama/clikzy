@@ -1,5 +1,6 @@
 'use client'
 
+import { PixelAvatar } from '@/components/ui/PixelAvatar'
 import { useEffect, useState } from 'react'
 import Image from 'next/image'
 import { Trophy } from 'lucide-react'
@@ -103,10 +104,10 @@ function LeaderboardBody({ loading, rows, me, period }: { loading: boolean; rows
               return (
                 <div key={r.userId} className="flex w-24 flex-col items-center">
                   <div
-                    className={`flex items-center justify-center rounded-full bg-gradient-to-br from-neon-purple to-neon-pink font-display font-bold text-white ${first ? 'h-12 w-12 text-lg' : 'h-9 w-9 text-sm'}`}
+                    className="rounded-full"
                     style={{ boxShadow: `0 0 0 2px ${hex}66, 0 0 16px -2px ${hex}` }}
                   >
-                    {r.username?.[0]?.toUpperCase() ?? '?'}
+                    <PixelAvatar username={r.username ?? '?'} size={first ? 48 : 36} />
                   </div>
                   <p className="mt-1.5 w-full truncate text-center text-xs font-semibold text-white">{r.username}</p>
                   <p className="stat-numeral text-[11px] text-neon-purple">{r.xp.toLocaleString('fr-FR')} XP</p>
@@ -139,7 +140,7 @@ function LeaderboardBody({ loading, rows, me, period }: { loading: boolean; rows
                 {r.avatarUrl ? (
                   <Image src={r.avatarUrl} alt={`Avatar de ${r.username}`} fill sizes="36px" className="object-cover" />
                 ) : (
-                  <span className="flex h-full w-full items-center justify-center text-sm font-bold text-white/40">{r.username?.[0]?.toUpperCase() ?? '?'}</span>
+                  <PixelAvatar username={r.username ?? '?'} size={36} />
                 )}
               </div>
               <div className="min-w-0 flex-1">
