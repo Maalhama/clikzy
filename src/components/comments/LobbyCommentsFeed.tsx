@@ -6,8 +6,6 @@ import { type CommentFeedItem } from '@/actions/comments'
 import { avatarColor, timeAgo } from '@/components/comments/commentUtils'
 
 export function LobbyCommentsFeed({ comments }: { comments: CommentFeedItem[] }) {
-  if (!comments || comments.length === 0) return null
-
   return (
     <div className="panel p-4">
       <div className="mb-3 flex items-center gap-2">
@@ -17,6 +15,11 @@ export function LobbyCommentsFeed({ comments }: { comments: CommentFeedItem[] })
         <h3 className="font-display text-sm font-bold uppercase tracking-wide text-white">Derniers messages</h3>
       </div>
 
+      {comments.length === 0 ? (
+        <p className="py-3 text-center text-xs leading-relaxed text-white/40">
+          Pas encore de message. Lance la discussion depuis une partie&nbsp;!
+        </p>
+      ) : (
       <ul className="space-y-3">
         {comments.map((c) => (
           <li key={c.id} className="flex gap-2.5">
@@ -48,6 +51,7 @@ export function LobbyCommentsFeed({ comments }: { comments: CommentFeedItem[] })
           </li>
         ))}
       </ul>
+      )}
     </div>
   )
 }
