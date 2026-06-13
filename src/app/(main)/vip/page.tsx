@@ -73,7 +73,7 @@ const VIP_TIERS = [
     bgColor: 'bg-amber-500/10',
     textColor: 'text-amber-400',
     benefits: [
-      '+10 crédits bonus V.I.P par jour (20 au total)',
+      '20 crédits/jour (×2), −10% sur les packs, 2× mini-jeux gratuits',
       'Accès aux produits premium (+1000€)',
       'Badge V.I.P Bronze',
       'Support prioritaire',
@@ -89,7 +89,7 @@ const VIP_TIERS = [
     bgColor: 'bg-slate-400/10',
     textColor: 'text-slate-300',
     benefits: [
-      '+10 crédits bonus V.I.P par jour (20 au total)',
+      '20 crédits/jour (×2), −10% sur les packs, 2× mini-jeux gratuits',
       'Tous les avantages Bronze',
       'Badge V.I.P Silver exclusif',
       'Accès anticipé aux nouveaux jeux',
@@ -105,7 +105,7 @@ const VIP_TIERS = [
     bgColor: 'bg-yellow-500/10',
     textColor: 'text-yellow-400',
     benefits: [
-      '+10 crédits bonus V.I.P par jour (20 au total)',
+      '20 crédits/jour (×2), −10% sur les packs, 2× mini-jeux gratuits',
       'Tous les avantages Silver',
       'Badge V.I.P Gold légendaire',
       'Accès aux événements exclusifs',
@@ -116,11 +116,11 @@ const VIP_TIERS = [
 const FAQ_ITEMS = [
   {
     question: 'Comment fonctionne l\'abonnement V.I.P ?',
-    answer: 'L\'abonnement V.I.P est un paiement mensuel de 9,99€. Il se renouvelle automatiquement chaque mois. Tu peux annuler à tout moment depuis ton profil.',
+    answer: 'L\'abonnement V.I.P est un paiement mensuel de 12,99€. Il se renouvelle automatiquement chaque mois. Tu peux annuler à tout moment depuis ton profil.',
   },
   {
     question: 'Comment fonctionnent les crédits V.I.P ?',
-    answer: 'En tant que V.I.P, tu reçois les 10 crédits gratuits quotidiens comme tout le monde, PLUS un bonus de +10 crédits à récupérer chaque jour sur ton dashboard V.I.P. Soit 20 crédits par jour au total !',
+    answer: 'En tant que V.I.P, tu reçois 20 crédits gratuits chaque jour (le double des 10 standards), crédités automatiquement — plus -10% sur tous les packs. Pour stocker davantage de crédits, les packs restent la solution.',
   },
   {
     question: 'Puis-je annuler mon abonnement ?',
@@ -330,7 +330,7 @@ export default function VIPPage() {
               <div className="inline-flex items-center gap-3 px-6 py-3 rounded-2xl bg-bg-secondary/50 border border-yellow-500/20 backdrop-blur-sm">
                 <span className="text-text-secondary">À partir de</span>
                 <span className="text-3xl font-bold bg-gradient-to-r from-yellow-400 to-amber-500 bg-clip-text text-transparent">
-                  9,99€
+                  12,99€
                 </span>
                 <span className="text-text-secondary">/mois</span>
               </div>
@@ -430,7 +430,7 @@ export default function VIPPage() {
             >
               <CrownIcon className="w-6 h-6" />
               <span>S&apos;abonner V.I.P</span>
-              <span className="text-sm font-normal opacity-75">9,99€/mois</span>
+              <span className="text-sm font-normal opacity-75">12,99€/mois</span>
             </button>
           </motion.div>
         </section>

@@ -53,17 +53,33 @@ export async function createCheckoutSession(
       return { success: false, error: 'Service de paiement non configuré' }
     }
 
-    // Get user profile for username
+    // Profil : username + statut VIP (pour la remise -10%)
     const { data: profileData } = await supabase
       .from('profiles')
-      .select('username')
+      .select('username, is_vip, vip_expires_at')
       .eq('id', user.id)
       .single()
 
-    const profile = profileData as { username: string } | null
+    const profile = profileData as { username: string; is_vip: boolean; vip_expires_at: string | null } | null
+
+    // Mini (monthlyLimit) : achetable 1×/mois. Pré-vérif UX — l'autorité reste grant_pack_credits.
+    if (pack.monthlyLimit) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data: monthState } = await (supabase.rpc as any)('get_pack_month_state', { p_user_id: user.id })
+      const already = (monthState as { pack_id: string }[] | null)?.some((r) => r.pack_id === pack.id)
+      if (already) {
+        return { success: false, error: 'Ce pack est limité à un achat par mois — reviens le mois prochain.' }
+      }
+    }
+
+    // Remise V.I.P -10% sur tous les packs (le VIP rentabilise l'achat au lieu de le remplacer)
+    const isVip = !!profile?.is_vip && (!profile.vip_expires_at || new Date(profile.vip_expires_at) > new Date())
+    const unitPrice = isVip ? pack.price * 0.9 : pack.price
+    const vipNote = isVip ? ' (-10% V.I.P)' : ''
+
     const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
 
-    // Create Stripe Checkout session directly
+    // x2 sur le 1er achat du mois géré côté serveur (grant_pack_credits) ; metadata = crédits de BASE.
     const session = await stripeInstance.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: [
@@ -72,16 +88,15 @@ export async function createCheckoutSession(
             currency: 'eur',
             product_data: {
               name: `${pack.credits} Crédits Cleekzy`,
-              description: `Pack ${pack.name} - ${pack.credits} crédits pour jouer`,
+              description: `Pack ${pack.name} — ${pack.credits} crédits${vipNote}`,
             },
-            unit_amount: Math.round(pack.price * 100), // Stripe uses cents
+            unit_amount: Math.round(unitPrice * 100), // centimes
           },
           quantity: 1,
         },
       ],
       mode: 'payment',
-      // Le compte Stripe est « Frizaway. Inc. » (partagé Frizaway/Scanto/Cleekzy) :
-      // on force le libellé du relevé bancaire client à « CLEEKZY » pour les achats Cleekzy.
+      // Compte Stripe « Frizaway. Inc. » (partagé) : libellé relevé forcé à « CLEEKZY ».
       payment_intent_data: { statement_descriptor: 'CLEEKZY' },
       success_url: `${baseUrl}/lobby?payment=success&credits=${pack.credits}`,
       cancel_url: `${baseUrl}/lobby?payment=cancelled`,
@@ -90,6 +105,7 @@ export async function createCheckoutSession(
         userId: user.id,
         packId: pack.id,
         credits: pack.credits.toString(),
+        monthlyLimit: pack.monthlyLimit ? '1' : '0',
         username: profile?.username || 'unknown',
       },
     })
@@ -153,9 +169,9 @@ export async function createVIPCheckoutSession(): Promise<ActionResult<{ url: st
             currency: 'eur',
             product_data: {
               name: 'Abonnement V.I.P Cleekzy',
-              description: 'Accès aux produits premium (+1000€), badge exclusif, support prioritaire',
+              description: '20 crédits/jour, -10% sur tous les packs, 2× parties mini-jeux, lots premium, badge & cosmétique exclusifs',
             },
-            unit_amount: 999, // 9.99€ in cents
+            unit_amount: 1299, // 12,99€/mois
             recurring: {
               interval: 'month',
             },

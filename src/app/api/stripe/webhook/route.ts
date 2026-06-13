@@ -129,9 +129,11 @@ export async function handleStripeEvent(event: Stripe.Event): Promise<HandlerRes
       return { status: 200, body: { received: true } }
     }
 
+    const packId = session.metadata?.packId
     const credits = parseInt(session.metadata?.credits || '0', 10)
+    const monthlyLimit = session.metadata?.monthlyLimit === '1'
 
-    if (!userId || credits <= 0) {
+    if (!userId || !packId || credits <= 0) {
       console.error('Invalid metadata in checkout session:', session.metadata)
       return { status: 400, body: { error: 'Invalid metadata' } }
     }
@@ -139,12 +141,15 @@ export async function handleStripeEvent(event: Stripe.Event): Promise<HandlerRes
     try {
       const supabase = getSupabaseAdmin()
 
-      // Crédit ATOMIQUE (incrément côté SQL) -> pas de lost-update entre deux
-      // paiements concurrents. RPC DEFINER réservée au service_role.
+      // grant_pack_credits : x2 ATOMIQUE sur le 1er achat de ce pack ce mois, crédits
+      // -> earned_credits (permanents), limite mensuelle (Mini). DEFINER service_role.
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { error: rpcError } = await (supabase.rpc as any)('add_purchased_credits', {
+      const { data: grantResult, error: rpcError } = await (supabase.rpc as any)('grant_pack_credits', {
         p_user_id: userId,
-        p_amount: credits,
+        p_pack_id: packId,
+        p_base_credits: credits,
+        p_session: session.id,
+        p_monthly_limit: monthlyLimit,
       })
 
       if (rpcError) {
@@ -152,7 +157,7 @@ export async function handleStripeEvent(event: Stripe.Event): Promise<HandlerRes
         return { status: 500, body: { error: 'Failed to credit account' } }
       }
 
-      console.log(`Successfully credited ${credits} to user ${userId}`)
+      console.log(`Pack ${packId} granted to user ${userId}:`, grantResult)
     } catch (error) {
       console.error('Error processing payment:', error)
       return { status: 500, body: { error: 'Payment processing failed' } }

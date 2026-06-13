@@ -42,13 +42,17 @@ describe('handleStripeEvent — logique métier des paiements', () => {
     it('crédite le montant exact issu de la metadata serveur', async () => {
       const res = await handleStripeEvent(
         evt('checkout.session.completed', {
-          metadata: { userId: 'u-1', credits: '150' },
+          id: 'cs_pack',
+          metadata: { userId: 'u-1', packId: 'popular', credits: '175', monthlyLimit: '0' },
         })
       )
       expect(res.status).toBe(200)
-      expect(mockRpc).toHaveBeenCalledWith('add_purchased_credits', {
+      expect(mockRpc).toHaveBeenCalledWith('grant_pack_credits', {
         p_user_id: 'u-1',
-        p_amount: 150,
+        p_pack_id: 'popular',
+        p_base_credits: 175,
+        p_session: 'cs_pack',
+        p_monthly_limit: false,
       })
     })
 
@@ -62,7 +66,7 @@ describe('handleStripeEvent — logique métier des paiements', () => {
 
     it('rejette un montant de crédits nul ou négatif', async () => {
       const res = await handleStripeEvent(
-        evt('checkout.session.completed', { metadata: { userId: 'u-1', credits: '0' } })
+        evt('checkout.session.completed', { metadata: { userId: 'u-1', packId: 'starter', credits: '0' } })
       )
       expect(res.status).toBe(400)
       expect(mockRpc).not.toHaveBeenCalled()
@@ -71,7 +75,7 @@ describe('handleStripeEvent — logique métier des paiements', () => {
     it('remonte une erreur 500 si le RPC de crédit échoue', async () => {
       mockRpc.mockResolvedValue({ error: { message: 'db down' } })
       const res = await handleStripeEvent(
-        evt('checkout.session.completed', { metadata: { userId: 'u-1', credits: '50' } })
+        evt('checkout.session.completed', { metadata: { userId: 'u-1', packId: 'starter', credits: '50', monthlyLimit: '0' } })
       )
       expect(res.status).toBe(500)
     })
@@ -91,7 +95,7 @@ describe('handleStripeEvent — logique métier des paiements', () => {
         p_session: 'cs_123',
       })
       // Ne crédite PAS de crédits par erreur
-      expect(mockRpc).not.toHaveBeenCalledWith('add_purchased_credits', expect.anything())
+      expect(mockRpc).not.toHaveBeenCalledWith('grant_pack_credits', expect.anything())
     })
 
     it('rejette un pass sans userId', async () => {

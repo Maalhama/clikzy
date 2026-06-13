@@ -12,6 +12,7 @@ const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
 
 const CRON_SECRET = process.env.CRON_SECRET
 const DAILY_FREE_CREDITS = 10
+const VIP_DAILY_CREDITS = 20 // VIP : allocation quotidienne doublée, NON cumulable
 
 export async function GET(request: NextRequest) {
   // Verify authentication
@@ -67,14 +68,12 @@ export async function GET(request: NextRequest) {
       console.log(`[CRON] Expired ${expiredVips.length} VIP subscription(s)`)
     }
 
-    // Find users who:
-    // - have NOT purchased credits (has_purchased_credits = false)
-    // - VIP users ARE included (they get reset + can collect bonus)
-    // - haven't been reset today (last_credits_reset < today midnight)
+    // Reset pour TOUS les users non encore reset aujourd'hui. Les crédits achetés
+    // vivent désormais dans earned_credits (jamais reset), donc plus de filtre
+    // has_purchased_credits. VIP -> 20/jour, sinon 10/jour (non cumulables).
     const { data: usersToResetData, error: fetchError } = await supabase
       .from('profiles')
-      .select('id, username, credits, last_credits_reset')
-      .eq('has_purchased_credits', false)
+      .select('id, is_vip, last_credits_reset')
       .lt('last_credits_reset', todayMidnight.toISOString())
 
     if (fetchError) {
@@ -94,21 +93,32 @@ export async function GET(request: NextRequest) {
 
     const resetTimestamp = new Date().toISOString()
 
-    // Reset daily credits to 10 for all users (except those who purchased)
-    const { error: resetError } = await supabase
-      .from('profiles')
-      .update({
-        credits: DAILY_FREE_CREDITS,
-        last_credits_reset: resetTimestamp,
-      })
-      .in('id', usersToReset.map(u => u.id))
+    // VIP -> 20 crédits/jour, sinon 10 (non cumulables). Deux updates groupés.
+    const vipIds = usersToReset.filter((u) => (u as { is_vip: boolean }).is_vip).map((u) => u.id)
+    const freeIds = usersToReset.filter((u) => !(u as { is_vip: boolean }).is_vip).map((u) => u.id)
 
-    if (resetError) {
-      console.error('Error resetting users credits:', resetError)
-      return NextResponse.json({ error: 'Failed to reset credits' }, { status: 500 })
+    if (freeIds.length > 0) {
+      const { error: e1 } = await supabase
+        .from('profiles')
+        .update({ credits: DAILY_FREE_CREDITS, last_credits_reset: resetTimestamp })
+        .in('id', freeIds)
+      if (e1) {
+        console.error('Error resetting free credits:', e1)
+        return NextResponse.json({ error: 'Failed to reset credits' }, { status: 500 })
+      }
+    }
+    if (vipIds.length > 0) {
+      const { error: e2 } = await supabase
+        .from('profiles')
+        .update({ credits: VIP_DAILY_CREDITS, last_credits_reset: resetTimestamp })
+        .in('id', vipIds)
+      if (e2) {
+        console.error('Error resetting VIP credits:', e2)
+        return NextResponse.json({ error: 'Failed to reset VIP credits' }, { status: 500 })
+      }
     }
 
-    console.log(`Reset daily credits: ${usersToReset.length} users → ${DAILY_FREE_CREDITS} credits each`)
+    console.log(`Reset daily credits: ${freeIds.length}×${DAILY_FREE_CREDITS} + ${vipIds.length}×${VIP_DAILY_CREDITS} (VIP)`)
 
     // Jackpot communautaire : croissance quotidienne + distribution le 8 (Europe/Paris)
     let jackpot: unknown = null

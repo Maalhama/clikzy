@@ -32,8 +32,6 @@ import { TargetIcon, CursorClickIcon, TrophyIcon, GiftIcon } from '@/components/
 import { PrizeCarousel } from './widgets/PrizeCarousel'
 import { HeroLiveCard } from './widgets/HeroLiveCard'
 import { CURSOR_CSS } from '@/lib/cosmetics'
-import { PixelSprite } from '@/components/collection/PixelSprite'
-import { BASE_HERO } from '@/components/collection/pixelHero'
 import { LiveTickerBar } from './widgets/LiveTickerBar'
 import { PrizesBento } from './widgets/PrizesBento'
 import { WinnersPodium } from './widgets/WinnersPodium'
@@ -678,10 +676,6 @@ export function LandingClient({
           {/* Right — la vraie partie en direct (fallback : lots flottants) */}
           <div className="hero-prize reveal reveal-3 relative hidden lg:block">
             <div className="hero-ignite relative">
-              {/* Mascotte pixel : la signature Cleekzy, gardienne de l'arène */}
-              <div className="character-float absolute -top-[4.6rem] right-8 z-10 hidden lg:block" aria-hidden>
-                <PixelSprite size={72} layers={[BASE_HERO]} />
-              </div>
               <HeroLiveCard games={heroGames} />
             </div>
           </div>

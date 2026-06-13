@@ -37,6 +37,7 @@ interface LobbyClientProps {
   chestInfo?: { count: number; bestRarity: string; dailyAvailable: boolean } | null
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   progression?: any
+  isLoggedIn?: boolean
 }
 
 export function LobbyClient({
@@ -46,6 +47,7 @@ export function LobbyClient({
   winners,
   chestInfo,
   progression,
+  isLoggedIn = false,
 }: LobbyClientProps) {
   // Search state
   const [searchQuery, setSearchQuery] = useState('')
@@ -259,7 +261,7 @@ export function LobbyClient({
       {/* Floating urgent timer */}
       <FloatingTimer
         enabled={true}
-        isLoggedIn={true}
+        isLoggedIn={isLoggedIn}
         gameId={urgentGame?.id}
         initialEndTime={urgentGame?.end_time ?? undefined}
         itemName={urgentGame?.item.name}
@@ -286,6 +288,7 @@ export function LobbyClient({
 
         {/* Header with stats */}
         <LobbyHeader
+        isLoggedIn={isLoggedIn}
         credits={credits}
         activeCount={stats.activeCount}
         urgentCount={stats.urgentCount}

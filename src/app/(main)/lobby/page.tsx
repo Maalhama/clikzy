@@ -151,7 +151,7 @@ async function getLobbyData() {
   const progressionResult = user ? await getProgression() : null
   const progression = progressionResult?.success ? progressionResult.data ?? null : null
 
-  return { games, credits, wasReset, winners, chestInfo, progression }
+  return { games, credits, wasReset, winners, chestInfo, progression, isLoggedIn: !!user }
 }
 
 function LobbyLoading() {
@@ -200,7 +200,7 @@ function LobbyLoading() {
 }
 
 export default async function LobbyPage() {
-  const { games, credits, wasReset, winners, chestInfo, progression } = await getLobbyData()
+  const { games, credits, wasReset, winners, chestInfo, progression, isLoggedIn } = await getLobbyData()
 
   return (
     <Suspense fallback={<LobbyLoading />}>
@@ -211,6 +211,7 @@ export default async function LobbyPage() {
         winners={winners}
         chestInfo={chestInfo}
         progression={progression}
+        isLoggedIn={isLoggedIn}
       />
     </Suspense>
   )

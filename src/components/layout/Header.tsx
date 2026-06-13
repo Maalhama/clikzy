@@ -331,7 +331,7 @@ export function Header({ profile }: HeaderProps) {
                 </Link>
                 <Link
                   href="/register"
-                  className="btn-arena px-5 py-2 text-sm"
+                  className="btn-arena whitespace-nowrap px-5 py-2 text-sm"
                 >
                   Jouer gratuitement
                 </Link>
