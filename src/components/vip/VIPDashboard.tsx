@@ -143,23 +143,23 @@ const TIER_CONFIG = {
   },
 }
 
-// Benefits by tier - VIP users get +10 bonus credits daily to collect
+// Benefits by tier - VIP : 20 crédits/jour automatiques (refonte 2026-06)
 const BENEFITS = {
   bronze: [
-    { icon: CreditIcon, title: '+10 Bonus quotidien', description: '20 crédits par jour au total (10 gratuits + 10 bonus)' },
+    { icon: CreditIcon, title: '20 crédits/jour', description: 'Le double des joueurs gratuits, crédités automatiquement.' },
     { icon: DiamondIcon, title: 'Produits Premium', description: 'Accès aux produits de +1000€' },
     { icon: StarIcon, title: 'Badge V.I.P Bronze', description: 'Badge exclusif sur ton profil' },
     { icon: RocketIcon, title: 'Support prioritaire', description: 'Réponses rapides de notre équipe' },
   ],
   silver: [
-    { icon: CreditIcon, title: '+10 Bonus quotidien', description: '20 crédits par jour au total (10 gratuits + 10 bonus)' },
+    { icon: CreditIcon, title: '20 crédits/jour', description: 'Le double des joueurs gratuits, crédités automatiquement.' },
     { icon: DiamondIcon, title: 'Produits Premium', description: 'Accès aux produits de +1000€' },
     { icon: StarIcon, title: 'Badge V.I.P Silver', description: 'Badge exclusif sur ton profil' },
     { icon: RocketIcon, title: 'Support prioritaire', description: 'Réponses rapides de notre équipe' },
     { icon: SparkleIcon, title: 'Accès anticipé', description: 'Joue aux nouveaux jeux en avant-première' },
   ],
   gold: [
-    { icon: CreditIcon, title: '+10 Bonus quotidien', description: '20 crédits par jour au total (10 gratuits + 10 bonus)' },
+    { icon: CreditIcon, title: '20 crédits/jour', description: 'Le double des joueurs gratuits, crédités automatiquement.' },
     { icon: DiamondIcon, title: 'Produits Premium', description: 'Accès aux produits de +1000€' },
     { icon: StarIcon, title: 'Badge V.I.P Gold', description: 'Badge légendaire sur ton profil' },
     { icon: RocketIcon, title: 'Support prioritaire', description: 'Réponses rapides de notre équipe' },
@@ -193,7 +193,7 @@ const itemVariants = {
   visible: { opacity: 1, y: 0 },
 }
 
-const VIP_DAILY_BONUS = 10
+const VIP_DAILY_BONUS = 20
 
 export function VIPDashboard({
   tier,
@@ -273,10 +273,10 @@ export function VIPDashboard({
               <div className="w-10 h-10 rounded-lg bg-neon-purple/20 flex items-center justify-center">
                 <CreditIcon className="w-5 h-5 text-neon-purple drop-shadow-[0_0_8px_rgba(155,92,255,0.6)]" />
               </div>
-              <span className="text-text-secondary text-sm">Bonus V.I.P</span>
+              <span className="text-text-secondary text-sm">Crédits quotidiens</span>
             </div>
             <div className="flex items-baseline gap-2">
-              <span className="text-3xl font-bold text-white">+{VIP_DAILY_BONUS}</span>
+              <span className="text-3xl font-bold text-white">{VIP_DAILY_BONUS}</span>
               <span className="text-text-secondary">crédits</span>
             </div>
             <div className="mt-3">
@@ -304,7 +304,7 @@ export function VIPDashboard({
               ) : (
                 <span className="inline-flex items-center gap-1.5 text-xs text-success">
                   <CheckIcon className="w-4 h-4" />
-                  Bonus récupéré ! Reviens demain
+                  Crédités automatiquement à minuit
                 </span>
               )}
             </div>

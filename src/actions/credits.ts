@@ -8,12 +8,6 @@ type ActionResult<T = void> = {
   error?: string
 }
 
-// Compare deux instants sur le jour calendaire Europe/Paris (DST-safe via Intl).
-function isSameParisDay(a: Date, b: Date): boolean {
-  const fmt = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Paris' })
-  return fmt.format(a) === fmt.format(b)
-}
-
 /**
  * Reset quotidien des crédits si nécessaire (10 crédits à minuit PARIS),
  * SAUF pour les utilisateurs ayant acheté des crédits.
@@ -135,14 +129,13 @@ export async function canCollectVIPBonus(): Promise<ActionResult<{ canCollect: b
     return { success: true, data: { canCollect: false, nextCollectTime: null } }
   }
 
-  const last = profile.last_vip_bonus_at ? new Date(profile.last_vip_bonus_at) : null
-  const canCollect = !last || !isSameParisDay(last, new Date())
-
+  // Bonus VIP « à récolter » déprécié (refonte 2026-06) : le VIP reçoit 20 crédits/jour
+  // automatiquement via reset_daily_credits — plus de bonus manuel à cliquer.
   return {
     success: true,
     data: {
-      canCollect,
-      nextCollectTime: canCollect ? null : new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+      canCollect: false,
+      nextCollectTime: null,
     },
   }
 }
