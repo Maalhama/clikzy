@@ -230,9 +230,14 @@ async function getLandingData() {
 
 export default async function LandingPage() {
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
 
-  const { winners, liveGames, featuredGame, featuredItem, prizes, stats } = await getLandingData()
+  // Auth + données du lobby en PARALLÈLE (évite un aller-retour bloquant -> le
+  // hero arrive plus vite au refresh).
+  const [{ data: { user } }, landingData] = await Promise.all([
+    supabase.auth.getUser(),
+    getLandingData(),
+  ])
+  const { winners, liveGames, featuredGame, featuredItem, prizes, stats } = landingData
 
   return (
     <LandingClient

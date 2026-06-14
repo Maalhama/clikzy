@@ -4,7 +4,7 @@ import type { Metadata } from 'next'
 export const metadata: Metadata = {
   title: 'V.I.P - Avantages exclusifs',
   description:
-    '+10 crédits bonus chaque jour, badge doré et accès aux parties V.I.P réservées. Abonnement mensuel sans engagement.',
+    '20 crédits chaque jour, -10% sur les packs, badge doré et accès aux parties V.I.P réservées. Abonnement mensuel sans engagement.',
   alternates: { canonical: '/vip' },
 }
 

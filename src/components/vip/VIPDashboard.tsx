@@ -100,9 +100,6 @@ interface VIPDashboardProps {
   daysUntilNextTier: number
   totalCreditsEarned: number
   currentCredits: number
-  canCollectBonus: boolean
-  isCollectingBonus?: boolean
-  onCollectBonus: () => void
   onManageSubscription: () => void
 }
 
@@ -201,9 +198,6 @@ export function VIPDashboard({
   daysUntilNextTier,
   totalCreditsEarned,
   currentCredits: _currentCredits,
-  canCollectBonus,
-  isCollectingBonus = false,
-  onCollectBonus,
   onManageSubscription,
 }: VIPDashboardProps) {
   const config = TIER_CONFIG[tier]
@@ -280,33 +274,10 @@ export function VIPDashboard({
               <span className="text-text-secondary">crédits</span>
             </div>
             <div className="mt-3">
-              {canCollectBonus ? (
-                <button
-                  onClick={onCollectBonus}
-                  disabled={isCollectingBonus}
-                  className="btn-arena w-full px-4 py-2.5 text-xs"
-                >
-                  {isCollectingBonus ? (
-                    <>
-                      <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                      </svg>
-                      Récupération...
-                    </>
-                  ) : (
-                    <>
-                      <SparkleIcon className="w-4 h-4" />
-                      Récupérer mon bonus
-                    </>
-                  )}
-                </button>
-              ) : (
-                <span className="inline-flex items-center gap-1.5 text-xs text-success">
-                  <CheckIcon className="w-4 h-4" />
-                  Crédités automatiquement à minuit
-                </span>
-              )}
+              <span className="inline-flex items-center gap-1.5 text-xs text-success">
+                <CheckIcon className="w-4 h-4" />
+                Crédités automatiquement à minuit
+              </span>
             </div>
           </div>
         </div>

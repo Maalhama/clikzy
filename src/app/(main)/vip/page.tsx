@@ -7,8 +7,6 @@ import { motion } from 'framer-motion'
 import { VIPDashboard } from '@/components/vip/VIPDashboard'
 import VIPSubscriptionModal from '@/components/modals/VIPSubscriptionModal'
 import { createVIPCheckoutSession, getVIPDetails, createBillingPortalSession, type VIPTier } from '@/actions/stripe'
-import { collectVIPDailyBonus, canCollectVIPBonus } from '@/actions/credits'
-import { useCredits } from '@/contexts/CreditsContext'
 import { Coins, Percent, Gamepad2, Gift, Sparkles, LifeBuoy } from 'lucide-react'
 
 // Neon Medal Icons for VIP tiers
@@ -156,10 +154,7 @@ export default function VIPPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [isCheckingVIP, setIsCheckingVIP] = useState(true)
   const [vipDetails, setVipDetails] = useState<VIPDetailsState>(null)
-  const [canCollect, setCanCollect] = useState(false)
-  const [isCollectingBonus, setIsCollectingBonus] = useState(false)
   const [actionError, setActionError] = useState<string | null>(null)
-  const { updateCredits } = useCredits()
   const router = useRouter()
 
   // Page personnelle : rediriger les visiteurs non connectés
@@ -173,20 +168,11 @@ export default function VIPPage() {
   useEffect(() => {
     async function checkVIP() {
       try {
-        const [vipResult, bonusResult] = await Promise.all([
-          getVIPDetails(),
-          canCollectVIPBonus()
-        ])
-
+        const vipResult = await getVIPDetails()
         if (vipResult.success && vipResult.data) {
           setVipDetails(vipResult.data)
         }
-
-        if (bonusResult.success && bonusResult.data) {
-          setCanCollect(bonusResult.data.canCollect)
-        }
       } catch {
-        // User is not VIP or not logged in
         // non-VIP ou non connecté : état géré par l'UI
       } finally {
         setIsCheckingVIP(false)
@@ -229,34 +215,6 @@ export default function VIPPage() {
     }
   }
 
-  const handleCollectBonus = async () => {
-    setIsCollectingBonus(true)
-    try {
-      const result = await collectVIPDailyBonus()
-      if (result.success && result.data) {
-        setCanCollect(false)
-        // Update current credits in vipDetails
-        if (vipDetails) {
-          setVipDetails({
-            ...vipDetails,
-            currentCredits: result.data.newTotal,
-            totalCreditsEarned: vipDetails.totalCreditsEarned + result.data.creditsAdded
-          })
-        }
-        // Instantly update header credits display
-        updateCredits(result.data.newTotal)
-      } else {
-        console.error('Failed to collect bonus:', result.error)
-        setActionError(result.error || 'Erreur lors de la récupération du bonus')
-      }
-    } catch (error) {
-      console.error('Error collecting bonus:', error)
-      setActionError('Erreur lors de la récupération du bonus')
-    } finally {
-      setIsCollectingBonus(false)
-    }
-  }
-
   // Loading state
   if (isCheckingVIP) {
     return (
@@ -280,9 +238,6 @@ export default function VIPPage() {
             daysUntilNextTier={vipDetails.daysUntilNextTier}
             totalCreditsEarned={vipDetails.totalCreditsEarned}
             currentCredits={vipDetails.currentCredits}
-            canCollectBonus={canCollect}
-            isCollectingBonus={isCollectingBonus}
-            onCollectBonus={handleCollectBonus}
             onManageSubscription={handleManageSubscription}
           />
         </div>

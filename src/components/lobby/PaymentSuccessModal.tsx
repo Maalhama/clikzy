@@ -17,7 +17,7 @@ const KIND_COPY = {
   },
   vip: {
     headline: () => 'V.I.P activé',
-    subtitle: 'Ton abonnement est actif : +10 crédits bonus à récolter chaque jour sur ton espace V.I.P.',
+    subtitle: 'Ton abonnement est actif : 20 crédits/jour crédités automatiquement, −10% sur les packs.',
     cta: 'Voir mes avantages',
   },
   pass: {

@@ -137,7 +137,7 @@ export function ShopClient({ currentCredits }: ShopClientProps) {
                 </div>
                 <p className="mb-4 text-sm text-white/55">
                   5 paliers de récompenses liés à ton assiduité : coffres rare, épique et légendaire,
-                  25 crédits et un artefact exclusif. Achat unique, valable à vie.
+                  25 crédits et un artefact exclusif. Un achat par mois, valable jusqu'à la fin du mois.
                 </p>
                 <div className="mb-4 text-2xl stat-numeral text-white">4,99€</div>
                 {passPurchased ? (

@@ -12,7 +12,7 @@ interface VIPSubscriptionModalProps {
 
 const VIP_BENEFITS = [
   'Accès aux produits premium (+1000€)',
-  '+10 crédits bonus par jour',
+  '20 crédits/jour, crédités automatiquement',
   'Badge V.I.P exclusif',
   'Support prioritaire',
 ]

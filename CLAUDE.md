@@ -34,19 +34,18 @@ Toutes les interactions avec la base de données passent par les outils appropri
 | Historique victoires | `winners` | JAMAIS | JAMAIS |
 | Parrainages | `profiles.referral_count` | JAMAIS | JAMAIS |
 | Mini-jeux joués | `mini_game_plays` | JAMAIS | JAMAIS |
-| Crédits quotidiens | `profiles.credits` | OUI (free only) | Non |
+| Crédits quotidiens | `profiles.credits` | OUI (tous : 10 free / 20 VIP) | Non |
 
-**Ce qui EST reset quotidiennement :**
-- `profiles.credits` → Reset à 10 pour les utilisateurs gratuits ET VIP
+**Ce qui EST reset quotidiennement (refonte 2026-06) :**
+- `profiles.credits` → Reset à **10 (gratuits) / 20 (VIP)** pour **TOUS** chaque minuit Paris (`reset_daily_credits`). Plus de distinction `has_purchased_credits` : le reset s'applique à tout le monde.
 - Compteur de parties gratuites mini-jeux (1/jour)
 
-**Qui N'EST PAS reset :**
-- Utilisateurs ayant acheté des crédits (`has_purchased_credits = true`) → Gardent leurs crédits à vie
+**Crédits achetés (packs) :**
+- Vont dans `earned_credits` (PERMANENTS, jamais reset) via `grant_pack_credits`, PAS dans `credits`. Le flag `has_purchased_credits` est **déprécié** (toujours false).
 
-**Bonus V.I.P :**
-- Les VIP reçoivent 10 crédits gratuits comme tout le monde (reset quotidien)
-- PLUS +10 crédits bonus à récolter manuellement sur leur dashboard VIP
-- Soit 20 crédits par jour au total (10 auto + 10 à cliquer)
+**Bonus V.I.P (refonte 2026-06) :**
+- Le VIP reçoit **20 crédits/jour AUTOMATIQUEMENT** via le reset (vs 10 gratuits). Plus de bonus manuel : `collect_vip_bonus` est déprécié (no-op), `canCollectVIPBonus` renvoie toujours false.
+- Avantages VIP : 20 cr/jour, −10% sur les packs, 2× mini-jeux gratuits, lots premium, badge & cosmétique.
 
 **Ce qui n'est JAMAIS reset :**
 - Tous les compteurs permanents (wins, clicks, earned_credits)
@@ -322,20 +321,17 @@ npm audit && npm run lint && npm run test:run && npm run build
 
 ## Système de crédits
 
-### Reset quotidien
-- **Utilisateurs gratuits** : Reset à 10 crédits chaque minuit
-- **Utilisateurs payants** : Pas de reset (gardent leurs crédits)
+### Reset quotidien (refonte 2026-06)
+- **TOUS les utilisateurs** : Reset de `profiles.credits` à **10 (gratuits) / 20 (VIP)** chaque minuit Paris via `reset_daily_credits`. Plus de distinction acheteur/non-acheteur.
+- Les crédits **achetés** vivent dans `earned_credits` (permanents, jamais reset). Dépensés APRÈS les `credits` quotidiens (`perform_click` : daily d'abord, puis earned).
 
-### Intégration paiement (Stripe ou autre)
-Quand un utilisateur achète des crédits, exécuter :
+### Intégration paiement (Stripe)
+L'achat passe par le webhook → RPC `grant_pack_credits` (DEFINER, service_role) qui :
+- ajoute aux `earned_credits` (permanents),
+- applique le **x2 sur le 1er achat de CHAQUE pack/mois** (table `pack_purchases`, atomique),
+- bloque le micro-pack (Étincelle) au-delà d'1×/mois.
 
-```sql
-UPDATE profiles
-SET has_purchased_credits = true, credits = credits + [NB_CREDITS_ACHETÉS]
-WHERE id = '[USER_ID]';
-```
-
-Le flag `has_purchased_credits = true` désactive le reset quotidien pour cet utilisateur.
+⚠️ NE PAS utiliser `add_purchased_credits` / `has_purchased_credits` (déprécié).
 
 ## Système de crons (cron-job.org)
 
