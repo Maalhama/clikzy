@@ -217,6 +217,33 @@ export async function getGameClicks(
   return { success: true, data: clicks as (Click & { username: string })[] }
 }
 
+/**
+ * Nombre de participants distincts récents sur une partie (« N en lice »).
+ * Preuve sociale minimaliste : déduplique les pseudos parmi les clics les plus
+ * récents (cap borné, pas de migration). Cohérent avec le reste de l'UI qui
+ * traite les bots comme des joueurs (feed, leader). Lecture publique de `clicks`.
+ */
+export async function getGameContenders(gameId: string): Promise<ActionResult<number>> {
+  try {
+    const supabase = await createClient()
+    const { data, error } = await supabase
+      .from('clicks')
+      .select('username')
+      .eq('game_id', gameId)
+      .order('clicked_at', { ascending: false })
+      .limit(400)
+    if (error) return { success: false, error: 'Erreur' }
+    const distinct = new Set(
+      ((data ?? []) as { username: string | null }[])
+        .map((r) => r.username)
+        .filter((u): u is string => !!u)
+    )
+    return { success: true, data: distinct.size }
+  } catch {
+    return { success: false, error: 'Erreur' }
+  }
+}
+
 // NOTE : l'ancienne Server Action `endGame` (clôture d'une partie côté client session) a été
 // SUPPRIMÉE — c'était du code MORT (jamais appelée) et un vecteur d'exploit (insertion arbitraire
 // d'un winner + fin de partie forcée + total_wins). La clôture est gérée EXCLUSIVEMENT par le cron

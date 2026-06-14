@@ -20,6 +20,7 @@ import { CreditPacksModal } from '@/components/modals/CreditPacksModal'
 import { ShareWinButtons } from '@/components/game/ShareWinButtons'
 import { ShareNearMissButtons } from '@/components/game/ShareNearMissButtons'
 import { BuyItNowGameOffer } from '@/components/game/BuyItNowGameOffer'
+import { GameContenders } from '@/components/game/GameContenders'
 import { GameClicksFeed } from '@/components/game/GameClicksFeed'
 import VIPSubscriptionModal from '@/components/modals/VIPSubscriptionModal'
 import { trackGameClick, trackGameWin } from '@/lib/analytics'
@@ -456,6 +457,7 @@ export function GameClient({
                     <div className={`font-semibold ${game.status === 'ended' ? 'text-success' : 'text-white'}`}>
                       {leaderName || '-'}
                     </div>
+                    <GameContenders gameId={game.id} status={game.status} />
                   </div>
                 </div>
                 <div className="text-right">
@@ -871,6 +873,7 @@ export function GameClient({
                     <div className={`font-semibold truncate ${game.status === 'ended' ? 'text-success' : 'text-white'}`}>
                       {leaderName || '-'}
                     </div>
+                    <GameContenders gameId={game.id} status={game.status} />
                   </div>
                 </div>
                 <div className="text-right">
