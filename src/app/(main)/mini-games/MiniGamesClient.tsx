@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Trophy, Clock, ChevronRight, X, Sparkles, Coins } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
-import { WheelIcon, ScratchIcon, PachinkoIcon, CreditIcon, SlotsIcon, CoinFlipIcon, DiceIcon } from '@/components/mini-games/GameIcons';
+import { WheelIcon, ScratchIcon, PachinkoIcon, SlotsIcon, CoinFlipIcon, DiceIcon, PixelCoin } from '@/components/pixel/PixelIcon';
 import { CreditPacksModal } from '@/components/modals/CreditPacksModal';
 import { FairnessPanel } from '@/components/mini-games/FairnessPanel'
 
@@ -92,7 +92,7 @@ const GAME_CONFIG = {
     id: 'wheel' as MiniGameType,
     title: 'Roue de la Fortune',
     IconComponent: WheelIcon,
-    description: 'Fais tourner la roue et tente de gagner jusqu\'à 5 crédits !',
+    description: 'Fais tourner la roue et tente de gagner jusqu\'à 3 crédits !',
     color: 'var(--neon-purple)',
     glowClass: 'neon-glow',
     textClass: 'neon-text',
@@ -608,7 +608,7 @@ export default function MiniGamesClient({ initialEligibility }: MiniGamesClientP
                           ? 'text-white'
                           : 'text-[var(--text-secondary)]'
                     }`}>
-                      <CreditIcon className="w-12 h-12 sm:w-16 sm:h-16" />
+                      <PixelCoin className="w-12 h-12 sm:w-16 sm:h-16" />
                       <span className="text-7xl sm:text-8xl font-black tracking-tight">
                         {result.creditsWon}
                       </span>
@@ -691,8 +691,8 @@ function GameCard({ config, eligibility, onPlayFree, onPlayPaid, hasEnoughCredit
 
       {/* Max Reward Badge */}
       <div className="absolute top-4 left-4 flex items-center gap-1.5 px-3 py-1.5 bg-black/60 rounded-full border border-[#FFB800]/30 backdrop-blur-sm">
-        <CreditIcon className="w-4 h-4" />
-        <span className="text-[10px] font-bold text-[#FFB800] uppercase tracking-tighter">Max : 5 crédits</span>
+        <PixelCoin className="w-4 h-4" />
+        <span className="text-[10px] font-bold text-[#FFB800] uppercase tracking-tighter">Max : 3 crédits</span>
       </div>
 
       <div className="relative my-8 flex flex-col items-center">
