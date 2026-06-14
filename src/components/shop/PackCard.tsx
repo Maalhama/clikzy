@@ -20,8 +20,6 @@ function tierVisual(pack: Pack) {
     return {
       aura: 'rgba(255,184,0,0.45)',
       border: 'border-[#FFD700]/40',
-      coinBg: 'radial-gradient(circle at 35% 28%, #FFF2C0 0%, #FFD700 42%, #B8860B 100%)',
-      coinText: 'text-[#3a2a00]',
       btn: 'bg-gradient-to-r from-[#FFB800] to-[#FFD700] text-[#0B0F1A] hover:drop-shadow-[0_0_18px_rgba(255,184,0,0.6)]',
     }
   }
@@ -29,16 +27,12 @@ function tierVisual(pack: Pack) {
     return {
       aura: 'rgba(155,92,255,0.55)',
       border: 'border-neon-purple/45',
-      coinBg: 'radial-gradient(circle at 35% 28%, #E9D5FF 0%, #9B5CFF 44%, #FF4FD8 115%)',
-      coinText: 'text-white',
       btn: 'bg-gradient-to-r from-neon-purple to-neon-pink text-white hover:drop-shadow-[0_0_18px_rgba(155,92,255,0.6)]',
     }
   }
   return {
     aura: 'rgba(60,203,255,0.4)',
     border: 'border-neon-blue/35',
-    coinBg: 'radial-gradient(circle at 35% 28%, #BDF0FF 0%, #3CCBFF 42%, #1B6E8C 100%)',
-    coinText: 'text-white',
     btn: 'bg-white/10 text-white hover:bg-white/20',
   }
 }
@@ -58,26 +52,62 @@ function Tag({ pack }: { pack: Pack }) {
   return <span className="text-white/35">Pack de base</span>
 }
 
-// Jeton de crédits — hexagone néon (angulaire, cohérent avec le bouton biseauté).
-// box-shadow ne suit pas un clip-path : la lueur passe par drop-shadow, les
-// reflets/rim par des couches en dégradé clippées au même polygone.
-const HEX_CLIP = 'polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)'
+// Jeton de crédits — poker chip en PIXEL ART (SVG, grille de pixels carrés).
+// La grille est calculée géométriquement (distance au centre) -> disque + 8
+// encoches de bord parfaitement symétriques, sans dessin à la main. Couleur par tier.
+const CHIP_R = 17
+const CHIP_CELLS: { x: number; y: number; t: 'rimA' | 'rimB' | 'body' | 'ring' | 'face' }[] = (() => {
+  const c = (CHIP_R - 1) / 2
+  const maxR = CHIP_R / 2
+  const cells: { x: number; y: number; t: 'rimA' | 'rimB' | 'body' | 'ring' | 'face' }[] = []
+  for (let y = 0; y < CHIP_R; y++) {
+    for (let x = 0; x < CHIP_R; x++) {
+      const dx = x - c, dy = y - c
+      const d = Math.sqrt(dx * dx + dy * dy)
+      if (d > maxR) continue
+      let t: 'rimA' | 'rimB' | 'body' | 'ring' | 'face'
+      if (d > maxR - 2) {
+        // 8 secteurs alternés -> encoches de bord du jeton
+        const sector = Math.floor((Math.atan2(dy, dx) + Math.PI) / (Math.PI / 4)) % 2
+        t = sector === 0 ? 'rimA' : 'rimB'
+      } else if (d > maxR * 0.58) t = 'body'
+      else if (d > maxR * 0.46) t = 'ring'
+      else t = 'face'
+      cells.push({ x, y, t })
+    }
+  }
+  return cells
+})()
 
-function CreditHex({ t, value, size }: { t: ReturnType<typeof tierVisual>; value: number; size: 'lg' | 'sm' }) {
+type ChipPalette = { rimA: string; rimB: string; body: string; ring: string; face: string; num: string; glow: string }
+function chipPalette(pack: Pack): ChipPalette {
+  if (pack.id === 'premium')
+    return { rimA: '#FFF6D5', rimB: '#9A6B00', body: '#FFD700', ring: '#B8860B', face: '#FFE680', num: '#3a2a00', glow: 'rgba(255,184,0,0.55)' }
+  if (pack.popular)
+    return { rimA: '#F0E0FF', rimB: '#6D28D9', body: '#9B5CFF', ring: '#FF4FD8', face: '#C79BFF', num: '#1a0b2e', glow: 'rgba(155,92,255,0.6)' }
+  return { rimA: '#D7F5FF', rimB: '#1B6E8C', body: '#3CCBFF', ring: '#1B6E8C', face: '#7FE0FF', num: '#06283b', glow: 'rgba(60,203,255,0.5)' }
+}
+
+function PixelChip({ pack, value, size }: { pack: Pack; value: number; size: 'lg' | 'sm' }) {
+  const p = chipPalette(pack)
   const lg = size === 'lg'
   return (
     <div
       className={`relative shrink-0 transition-transform duration-300 ${lg ? 'h-24 w-24 group-hover:-translate-y-1 group-hover:scale-105' : 'h-14 w-14'}`}
-      style={{ filter: `drop-shadow(0 ${lg ? 12 : 8}px ${lg ? 22 : 14}px ${t.aura})` }}
+      style={{ filter: `drop-shadow(0 ${lg ? 10 : 6}px ${lg ? 16 : 10}px ${p.glow})` }}
     >
-      {/* rim métallique clair */}
-      <div className="absolute inset-0" style={{ clipPath: HEX_CLIP, background: 'linear-gradient(155deg, rgba(255,255,255,0.6), rgba(255,255,255,0.04))' }} aria-hidden />
-      {/* fond néon du tier + chiffre */}
-      <div className="absolute inset-[3px] flex items-center justify-center" style={{ clipPath: HEX_CLIP, background: t.coinBg }}>
-        <span className={`stat-numeral font-black leading-none ${lg ? 'text-3xl' : 'text-lg'} ${t.coinText}`}>{value}</span>
-      </div>
-      {/* reflet glossy haut */}
-      <div className="pointer-events-none absolute inset-[3px] opacity-70" style={{ clipPath: HEX_CLIP, background: 'linear-gradient(180deg, rgba(255,255,255,0.5) 0%, transparent 42%)' }} aria-hidden />
+      <svg viewBox={`0 0 ${CHIP_R} ${CHIP_R}`} width="100%" height="100%" shapeRendering="crispEdges" className="block [image-rendering:pixelated]">
+        {CHIP_CELLS.map((cell, i) => (
+          <rect key={i} x={cell.x} y={cell.y} width={1.04} height={1.04} fill={p[cell.t]} />
+        ))}
+      </svg>
+      {/* Valeur superposée, lisible (le pixel-art reste sur le jeton) */}
+      <span
+        className={`absolute inset-0 flex items-center justify-center stat-numeral font-black leading-none ${lg ? 'text-xl' : 'text-[0.7rem]'}`}
+        style={{ color: p.num, textShadow: '0 1px 0 rgba(255,255,255,0.3)' }}
+      >
+        {value}
+      </span>
     </div>
   )
 }
@@ -96,7 +126,7 @@ export function PackCard({ pack, loading, disabled, onBuy, compact }: PackCardPr
         disabled={disabled || isLoading}
         className={`group relative flex w-full items-center gap-3 overflow-hidden rounded-xl border bg-white/[0.03] p-3 text-left transition-all hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60 ${t.border} ${pack.popular ? 'bg-gradient-to-r from-neon-purple/15 to-neon-pink/5' : ''}`}
       >
-        <CreditHex t={t} value={pack.credits} size="sm" />
+        <PixelChip pack={pack} value={pack.credits} size="sm" />
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
             <span className="font-semibold text-white">{pack.name}</span>
@@ -136,9 +166,9 @@ export function PackCard({ pack, loading, disabled, onBuy, compact }: PackCardPr
           </div>
         )}
 
-        {/* Jeton de crédits — hexagone néon */}
+        {/* Jeton de crédits — poker chip pixel-art */}
         <div className="mt-1 mb-4 flex justify-center">
-          <CreditHex t={t} value={pack.credits} size="lg" />
+          <PixelChip pack={pack} value={pack.credits} size="lg" />
         </div>
 
         <div className="text-center">
