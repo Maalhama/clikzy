@@ -201,3 +201,108 @@ export function DiceIcon({ className }: IconProps) {
     </PxSvg>
   )
 }
+
+const YL = '#FFE23B'
+// ---- Éclair (phase finale) ----
+export function PixelBolt({ className }: { className?: string }) {
+  return (
+    <PxSvg className={className} label="phase finale">
+      {px(7, 2, 3, 1, C.gdD, 0)}
+      {px(7, 2, 2, 1, YL, 1)}
+      {px(6, 3, 3, 1, YL, 2)}
+      {px(5, 4, 3, 1, YL, 3)}
+      {px(4, 5, 7, 1, C.gdD, 4)}
+      {px(4, 5, 7, 1, YL, 'cb')}
+      {px(8, 6, 3, 1, YL, 5)}
+      {px(7, 7, 3, 1, YL, 6)}
+      {px(6, 8, 3, 1, YL, 7)}
+      {px(5, 9, 3, 1, YL, 8)}
+      {px(5, 10, 2, 2, '#FFF6B0', 9)}
+    </PxSvg>
+  )
+}
+
+// ---- Trophée (remportés / classement) ----
+export function PixelTrophy({ className }: { className?: string }) {
+  return (
+    <PxSvg className={className} label="trophée">
+      {/* anses */}
+      {px(2, 3, 2, 3, C.gdD, 0)}
+      {px(12, 3, 2, 3, C.gdD, 1)}
+      {px(2, 3, 1, 3, YL, 'hl')}
+      {px(13, 3, 1, 3, YL, 'hr')}
+      {/* coupe */}
+      {px(4, 2, 8, 4, C.gd, 2)}
+      {px(4, 2, 8, 1, C.gdL, 3)}
+      {px(5, 6, 6, 1, C.gd, 4)}
+      {/* étoile */}
+      {px(7, 3, 2, 2, C.wt, 5)}
+      {/* pied */}
+      {px(7, 7, 2, 2, C.gdD, 6)}
+      {px(5, 9, 6, 1, C.gd, 7)}
+      {px(4, 10, 8, 2, C.gdD, 8)}
+      {px(4, 10, 8, 1, C.gd, 9)}
+    </PxSvg>
+  )
+}
+
+// ---- Flamme (streak) ----
+export function PixelFlame({ className }: { className?: string }) {
+  const OR = '#FF7A1A', ORD = '#C2410C', YO = '#FFC73B'
+  return (
+    <PxSvg className={className} label="série">
+      {px(7, 1, 2, 1, OR, 0)}
+      {px(6, 2, 3, 2, OR, 1)}
+      {px(5, 4, 5, 2, OR, 2)}
+      {px(4, 6, 7, 3, OR, 3)}
+      {px(4, 9, 7, 2, ORD, 4)}
+      {px(5, 11, 5, 1, ORD, 5)}
+      {/* cœur jaune */}
+      {px(7, 4, 2, 2, YO, 6)}
+      {px(6, 6, 3, 3, YO, 7)}
+      {px(6, 9, 3, 1, '#FFF0A0', 8)}
+    </PxSvg>
+  )
+}
+
+// ---- Couronne (jackpot / V.I.P) ----
+export function PixelCrown({ className }: { className?: string }) {
+  return (
+    <PxSvg className={className} label="jackpot">
+      {px(3, 4, 2, 4, C.gd, 0)}
+      {px(7, 2, 2, 6, C.gd, 1)}
+      {px(11, 4, 2, 4, C.gd, 2)}
+      {px(3, 6, 10, 1, C.gd, 3)}
+      {px(3, 7, 10, 2, C.gdD, 4)}
+      {px(3, 7, 10, 1, C.gdL, 'rim')}
+      {/* pointes */}
+      {px(3, 3, 2, 1, C.gdL, 5)}
+      {px(7, 1, 2, 1, C.gdL, 6)}
+      {px(11, 3, 2, 1, C.gdL, 7)}
+      {/* gemmes */}
+      {px(4, 7, 1, 1, C.pk, 8)}
+      {px(7, 7, 2, 1, C.pk, 9)}
+      {px(11, 7, 1, 1, C.pk, 10)}
+    </PxSvg>
+  )
+}
+
+// ---- Gemme (rareté) — couleur paramétrable ----
+export function PixelGem({ className, color = C.cy }: { className?: string; color?: string }) {
+  const light = '#FFFFFF'
+  return (
+    <PxSvg className={className} label="gemme">
+      {px(5, 3, 6, 1, C.dk, 0)}
+      {px(6, 2, 4, 1, color, 1)}
+      {px(5, 3, 6, 2, color, 2)}
+      {px(4, 5, 8, 1, color, 3)}
+      {px(5, 6, 6, 1, color, 4)}
+      {px(6, 7, 4, 1, color, 5)}
+      {px(7, 8, 2, 1, color, 6)}
+      {px(7, 9, 2, 1, color, 7)}
+      {/* facette claire */}
+      {px(6, 3, 1, 3, light, 8)}
+      {px(7, 2, 1, 1, light, 9)}
+    </PxSvg>
+  )
+}

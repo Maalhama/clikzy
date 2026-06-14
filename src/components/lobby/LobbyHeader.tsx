@@ -5,7 +5,7 @@ import { NeonChest } from '@/components/collection/NeonChest'
 import { LobbyCharacterWidget } from '@/components/lobby/LobbyCharacterWidget'
 import { MidnightCountdown } from '@/components/lobby/MidnightCountdown'
 import { JackpotWidget } from '@/components/jackpot/JackpotWidget'
-import { PixelCoin } from '@/components/pixel/PixelIcon'
+import { PixelCoin, PixelTrophy, PixelBolt } from '@/components/pixel/PixelIcon'
 
 interface LobbyHeaderProps {
   credits: number
@@ -190,30 +190,14 @@ export const LobbyHeader = memo(function LobbyHeader({
 
             {/* Ended/Won count */}
             <div className="panel flex items-center gap-2 px-3.5 py-2">
-              <svg
-                className="w-4 h-4 text-success"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={2}
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
+              <PixelTrophy className="h-[1.05rem] w-[1.05rem]" />
               <span className="text-white stat-numeral text-sm">{endedCount}</span>
               <span className="text-white/55 text-xs">remportés</span>
             </div>
 
             {/* Urgent count */}
             <div className="panel flex items-center gap-2 px-3.5 py-2">
-              <svg
-                className="w-4 h-4 text-danger"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={2}
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
-              </svg>
+              <PixelBolt className="h-[1.05rem] w-[1.05rem]" />
               <span className="text-white stat-numeral text-sm">
                 {urgentCount}
               </span>

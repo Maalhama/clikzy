@@ -5,6 +5,7 @@ import { createPortal } from 'react-dom'
 import Link from 'next/link'
 import { X, Trophy, Users, CalendarClock, Sparkles } from 'lucide-react'
 import { getJackpot, type JackpotState } from '@/actions/jackpot'
+import { PixelCrown } from '@/components/pixel/PixelIcon'
 
 function nextEighth(): { days: number; label: string } {
   const paris = new Date(new Date().toLocaleString('en-US', { timeZone: 'Europe/Paris' }))
@@ -16,11 +17,7 @@ function nextEighth(): { days: number; label: string } {
   return { days, label: target.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' }) }
 }
 
-const trophy = (
-  <svg className="text-yellow-400" viewBox="0 0 24 24" fill="currentColor">
-    <path d="M5 16L3 5l5.5 5L12 4l3.5 6L21 5l-2 11H5zm14 3c0 .6-.4 1-1 1H6c-.6 0-1-.4-1-1v-1h14v1z" />
-  </svg>
-)
+const trophy = <PixelCrown className="h-full w-full" />
 
 /** Widget jackpot — variantes : `inline` (au-dessus du mockup LP) ou `pill`
  *  (compact, dans les stats du lobby). Toujours cliquable → modal explicatif. */

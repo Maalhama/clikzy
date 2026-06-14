@@ -1,7 +1,8 @@
 'use client'
 
 import { useEffect, useState, useCallback } from 'react'
-import { Flame, Zap, Gift, Check, Loader2, Trophy } from 'lucide-react'
+import { Zap, Gift, Check, Loader2, Trophy } from 'lucide-react'
+import { PixelFlame } from '@/components/pixel/PixelIcon'
 import { getProgression, claimDailyLogin, claimQuest, type Progression } from '@/actions/progression'
 
 type Props = { compact?: boolean }
@@ -82,7 +83,7 @@ export function ProgressionCard({ compact = false }: Props) {
           </div>
         </div>
         <div className="flex items-center gap-1.5 rounded-full border border-orange-400/30 bg-orange-400/10 px-3 py-1.5">
-          <Flame className="h-4 w-4 text-orange-400" />
+          <PixelFlame className="h-4 w-4" />
           <span className="text-sm font-bold text-orange-300">{data.streak} j</span>
         </div>
       </div>

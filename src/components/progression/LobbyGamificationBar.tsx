@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { Flame, Zap, Gift, Trophy, ChevronRight } from 'lucide-react'
+import { Zap, Gift, Trophy, ChevronRight } from 'lucide-react'
+import { PixelFlame } from '@/components/pixel/PixelIcon'
 import { getProgression, type Progression } from '@/actions/progression'
 import { getCollection } from '@/actions/collection'
 
@@ -45,7 +46,7 @@ export function LobbyGamificationBar({ initialProg = null, initialChests = 0 }: 
         <div className="flex flex-wrap items-center gap-2 sm:contents">
         {/* Streak */}
         <div className="flex items-center gap-1 rounded-full border border-orange-400/30 bg-orange-400/10 px-2.5 py-1.5">
-          <Flame className="h-4 w-4 text-orange-400" />
+          <PixelFlame className="h-4 w-4" />
           <span className="text-sm font-bold text-orange-300">{prog.streak}</span>
         </div>
 
