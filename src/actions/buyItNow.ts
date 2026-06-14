@@ -50,6 +50,34 @@ export async function getBuyItNowOffers(): Promise<ActionResult<BuyItNowOffer[]>
   return { success: true, data: offers }
 }
 
+/** Offre de rachat pour UNE partie précise (null si non éligible). Utilisé à
+ *  l'écran de résultat d'enchère (le moment de la perte = pic de conversion). */
+export async function getBuyItNowOffer(gameId: string): Promise<ActionResult<BuyItNowOffer | null>> {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { success: false, error: 'Non authentifié' }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data, error } = await (supabase.rpc as any)('get_buy_it_now_offers', { p_user_id: user.id })
+  if (error) return { success: false, error: 'Erreur' }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const r = (data ?? []).find((x: any) => x.game_id === gameId)
+  if (!r) return { success: true, data: null }
+  return {
+    success: true,
+    data: {
+      gameId: r.game_id,
+      itemId: r.item_id,
+      itemName: r.item_name,
+      itemImage: r.item_image,
+      retailValue: Number(r.retail_value),
+      creditsSpent: Number(r.credits_spent),
+      price: Number(r.price),
+      expiresAt: r.expires_at,
+    },
+  }
+}
+
 /** Crée la session Stripe de rachat. Le prix est RECALCULÉ côté serveur (le client
  *  n'envoie que le gameId) -> impossible de manipuler le montant. */
 export async function createBuyItNowCheckout(gameId: string): Promise<ActionResult<{ url: string }>> {

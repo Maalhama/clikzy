@@ -11,6 +11,7 @@ import { GameHistorySection } from '@/components/profile/GameHistorySection'
 import { ReferralSection } from '@/components/profile/ReferralSection'
 import { BadgesSection } from '@/components/profile/BadgesSection'
 import { BuyItNowSection } from '@/components/profile/BuyItNowSection'
+import { BuyItNowResultToast } from '@/components/profile/BuyItNowResultToast'
 import { ProgressionCard } from '@/components/progression/ProgressionCard'
 import { getProductSvg } from '@/lib/utils/productImages'
 import type { Badge } from '@/actions/badges'
@@ -385,6 +386,7 @@ export function ProfileClient({ profile, wins, gamesPlayed, totalValueWon, gameH
         </div>
 
         {/* Rachat malin — racheter les enchères perdues à prix réduit */}
+        <BuyItNowResultToast />
         <div className="mt-8 mb-6"><BuyItNowSection /></div>
 
         {/* Badges Section */}

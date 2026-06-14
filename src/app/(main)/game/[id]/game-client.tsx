@@ -19,6 +19,7 @@ import { getProductImageWithFallback } from '@/lib/utils/productImages'
 import { CreditPacksModal } from '@/components/modals/CreditPacksModal'
 import { ShareWinButtons } from '@/components/game/ShareWinButtons'
 import { ShareNearMissButtons } from '@/components/game/ShareNearMissButtons'
+import { BuyItNowGameOffer } from '@/components/game/BuyItNowGameOffer'
 import { GameClicksFeed } from '@/components/game/GameClicksFeed'
 import VIPSubscriptionModal from '@/components/modals/VIPSubscriptionModal'
 import { trackGameClick, trackGameWin } from '@/lib/analytics'
@@ -402,6 +403,7 @@ export function GameClient({
                   </div>
                   {isWinner && <ShareWinButtons itemName={game.item.name} itemValue={game.item.retail_value ?? 0} username={username} />}
                   {!isWinner && hasParticipated && <ShareNearMissButtons itemName={game.item.name} username={username} />}
+                  {!isWinner && hasParticipated && <BuyItNowGameOffer gameId={game.id} />}
                 </div>
               ) : (
                 <div className={`p-4 rounded-xl mb-5 transition-all ${isUrgent ? 'bg-danger/20 border border-danger/30' : 'hero-live-card'}`}>
@@ -813,6 +815,7 @@ export function GameClient({
                   </div>
                   {isWinner && <ShareWinButtons itemName={game.item.name} itemValue={game.item.retail_value ?? 0} username={username} />}
                   {!isWinner && hasParticipated && <ShareNearMissButtons itemName={game.item.name} username={username} />}
+                  {!isWinner && hasParticipated && <BuyItNowGameOffer gameId={game.id} />}
                 </div>
               ) : (
                 <div className={`p-5 rounded-2xl transition-all ${isUrgent ? 'bg-danger/20 border border-danger/40' : 'hero-live-card'}`}>

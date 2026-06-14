@@ -5,12 +5,14 @@ import Image from 'next/image'
 import { getBuyItNowOffers, createBuyItNowCheckout, type BuyItNowOffer } from '@/actions/buyItNow'
 import { getProductImageWithFallback } from '@/lib/utils/productImages'
 
-function timeLeft(expiresAt: string): string {
-  const ms = new Date(expiresAt).getTime() - Date.now()
+function timeLeft(expiresAt: string, now: number): string {
+  const ms = new Date(expiresAt).getTime() - now
   if (ms <= 0) return 'expiré'
   const h = Math.floor(ms / 3_600_000)
   const m = Math.floor((ms % 3_600_000) / 60_000)
-  return h > 0 ? `${h} h ${String(m).padStart(2, '0')}` : `${m} min`
+  if (h > 0) return `${h} h ${String(m).padStart(2, '0')}`
+  const s = Math.floor((ms % 60_000) / 1000)
+  return `${m}:${String(s).padStart(2, '0')}`
 }
 
 function OfferImage({ name, url }: { name: string; url: string }) {
@@ -32,7 +34,7 @@ export function BuyItNowSection() {
   const [offers, setOffers] = useState<BuyItNowOffer[] | null>(null)
   const [busy, setBusy] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
-  const [, setTick] = useState(0)
+  const [now, setNow] = useState(() => Date.now())
 
   useEffect(() => {
     getBuyItNowOffers()
@@ -40,9 +42,9 @@ export function BuyItNowSection() {
       .catch(() => setOffers([]))
   }, [])
 
-  // Rafraîchit les comptes à rebours chaque minute.
+  // Rafraîchit les comptes à rebours chaque seconde (urgence sous l'heure).
   useEffect(() => {
-    const id = setInterval(() => setTick((t) => t + 1), 60_000)
+    const id = setInterval(() => setNow(Date.now()), 1000)
     return () => clearInterval(id)
   }, [])
 
@@ -81,6 +83,8 @@ export function BuyItNowSection() {
       <div className="grid gap-3 sm:grid-cols-2">
         {offers.map((o) => {
           const pct = o.retailValue > 0 ? Math.round((1 - o.price / o.retailValue) * 100) : 0
+          const save = Math.max(0, Math.round(o.retailValue - o.price))
+          const urgent = new Date(o.expiresAt).getTime() - now < 3 * 3_600_000
           return (
             <div
               key={o.gameId}
@@ -91,14 +95,17 @@ export function BuyItNowSection() {
               </div>
               <div className="min-w-0 flex-1">
                 <div className="truncate font-semibold text-white">{o.itemName}</div>
-                <div className="mt-0.5 flex items-baseline gap-2">
+                <div className="mt-0.5 flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
                   <span className="stat-numeral text-lg font-black text-neon-pink">{o.price}€</span>
                   <span className="text-xs text-white/40 line-through">{o.retailValue}€</span>
                   {pct > 0 && (
                     <span className="rounded bg-neon-pink/15 px-1.5 text-[0.65rem] font-bold text-neon-pink">-{pct}%</span>
                   )}
+                  {save > 0 && <span className="text-[0.65rem] text-white/55">tu économises {save}€</span>}
                 </div>
-                <div className="mt-0.5 text-[0.7rem] text-white/45">Expire dans {timeLeft(o.expiresAt)}</div>
+                <div className={`mt-0.5 text-[0.7rem] ${urgent ? 'font-semibold text-neon-pink' : 'text-white/45'}`}>
+                  Expire dans <span className="stat-numeral">{timeLeft(o.expiresAt, now)}</span>
+                </div>
               </div>
               <button
                 onClick={() => buy(o.gameId)}
