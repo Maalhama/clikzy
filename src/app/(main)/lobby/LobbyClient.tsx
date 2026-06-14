@@ -18,6 +18,7 @@ import { type CommentFeedItem } from '@/actions/comments'
 import { seedBotComments } from '@/lib/bots/commentGenerator'
 import { PaymentSuccessModal } from '@/components/lobby/PaymentSuccessModal'
 import { LobbyGamificationBar } from '@/components/progression/LobbyGamificationBar'
+import { BuyItNowLobbyBanner } from '@/components/profile/BuyItNowLobbyBanner'
 import { RewardsCalendarModal } from '@/components/progression/RewardsCalendarModal'
 import { getCalendarMonth, type CalendarDay } from '@/actions/calendar'
 import { applyReferralCode } from '@/actions/referral'
@@ -329,6 +330,9 @@ export function LobbyClient({
 
       {/* Bandeau gamification (rappel coffres/progression) — masqué si non connecté */}
       <LobbyGamificationBar initialProg={progression} initialChests={chestInfo?.count ?? 0} />
+
+      {/* Rappel « Rachat malin » (offres en attente) — masqué si anon / 0 offre */}
+      <BuyItNowLobbyBanner />
 
       {/* Filters */}
       <div className="px-4 md:px-6 mb-6">
