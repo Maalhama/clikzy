@@ -21,7 +21,6 @@ function tierVisual(pack: Pack) {
       aura: 'rgba(255,184,0,0.45)',
       border: 'border-[#FFD700]/40',
       coinBg: 'radial-gradient(circle at 35% 28%, #FFF2C0 0%, #FFD700 42%, #B8860B 100%)',
-      coinShadow: '0 14px 34px -8px rgba(255,184,0,0.6), inset 0 2px 6px rgba(255,255,255,0.55), inset 0 -7px 14px rgba(0,0,0,0.3)',
       coinText: 'text-[#3a2a00]',
       btn: 'bg-gradient-to-r from-[#FFB800] to-[#FFD700] text-[#0B0F1A] hover:drop-shadow-[0_0_18px_rgba(255,184,0,0.6)]',
     }
@@ -31,7 +30,6 @@ function tierVisual(pack: Pack) {
       aura: 'rgba(155,92,255,0.55)',
       border: 'border-neon-purple/45',
       coinBg: 'radial-gradient(circle at 35% 28%, #E9D5FF 0%, #9B5CFF 44%, #FF4FD8 115%)',
-      coinShadow: '0 14px 34px -8px rgba(155,92,255,0.6), inset 0 2px 6px rgba(255,255,255,0.4), inset 0 -7px 14px rgba(0,0,0,0.3)',
       coinText: 'text-white',
       btn: 'bg-gradient-to-r from-neon-purple to-neon-pink text-white hover:drop-shadow-[0_0_18px_rgba(155,92,255,0.6)]',
     }
@@ -40,7 +38,6 @@ function tierVisual(pack: Pack) {
     aura: 'rgba(60,203,255,0.4)',
     border: 'border-neon-blue/35',
     coinBg: 'radial-gradient(circle at 35% 28%, #BDF0FF 0%, #3CCBFF 42%, #1B6E8C 100%)',
-    coinShadow: '0 14px 34px -8px rgba(60,203,255,0.5), inset 0 2px 6px rgba(255,255,255,0.4), inset 0 -7px 14px rgba(0,0,0,0.3)',
     coinText: 'text-white',
     btn: 'bg-white/10 text-white hover:bg-white/20',
   }
@@ -61,6 +58,30 @@ function Tag({ pack }: { pack: Pack }) {
   return <span className="text-white/35">Pack de base</span>
 }
 
+// Jeton de crédits — hexagone néon (angulaire, cohérent avec le bouton biseauté).
+// box-shadow ne suit pas un clip-path : la lueur passe par drop-shadow, les
+// reflets/rim par des couches en dégradé clippées au même polygone.
+const HEX_CLIP = 'polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)'
+
+function CreditHex({ t, value, size }: { t: ReturnType<typeof tierVisual>; value: number; size: 'lg' | 'sm' }) {
+  const lg = size === 'lg'
+  return (
+    <div
+      className={`relative shrink-0 transition-transform duration-300 ${lg ? 'h-24 w-24 group-hover:-translate-y-1 group-hover:scale-105' : 'h-14 w-14'}`}
+      style={{ filter: `drop-shadow(0 ${lg ? 12 : 8}px ${lg ? 22 : 14}px ${t.aura})` }}
+    >
+      {/* rim métallique clair */}
+      <div className="absolute inset-0" style={{ clipPath: HEX_CLIP, background: 'linear-gradient(155deg, rgba(255,255,255,0.6), rgba(255,255,255,0.04))' }} aria-hidden />
+      {/* fond néon du tier + chiffre */}
+      <div className="absolute inset-[3px] flex items-center justify-center" style={{ clipPath: HEX_CLIP, background: t.coinBg }}>
+        <span className={`stat-numeral font-black leading-none ${lg ? 'text-3xl' : 'text-lg'} ${t.coinText}`}>{value}</span>
+      </div>
+      {/* reflet glossy haut */}
+      <div className="pointer-events-none absolute inset-[3px] opacity-70" style={{ clipPath: HEX_CLIP, background: 'linear-gradient(180deg, rgba(255,255,255,0.5) 0%, transparent 42%)' }} aria-hidden />
+    </div>
+  )
+}
+
 export function PackCard({ pack, loading, disabled, onBuy, compact }: PackCardProps) {
   const t = tierVisual(pack)
   const doubled = pack.credits * 2
@@ -75,13 +96,7 @@ export function PackCard({ pack, loading, disabled, onBuy, compact }: PackCardPr
         disabled={disabled || isLoading}
         className={`group relative flex w-full items-center gap-3 overflow-hidden rounded-xl border bg-white/[0.03] p-3 text-left transition-all hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60 ${t.border} ${pack.popular ? 'bg-gradient-to-r from-neon-purple/15 to-neon-pink/5' : ''}`}
       >
-        <div
-          className="relative flex h-14 w-14 shrink-0 items-center justify-center rounded-full"
-          style={{ background: t.coinBg, boxShadow: t.coinShadow }}
-        >
-          <span className="absolute inset-1.5 rounded-full border border-white/25" aria-hidden />
-          <span className={`stat-numeral text-lg font-black leading-none ${t.coinText}`}>{pack.credits}</span>
-        </div>
+        <CreditHex t={t} value={pack.credits} size="sm" />
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
             <span className="font-semibold text-white">{pack.name}</span>
@@ -121,13 +136,9 @@ export function PackCard({ pack, loading, disabled, onBuy, compact }: PackCardPr
           </div>
         )}
 
-        {/* Jeton de crédits */}
-        <div
-          className="relative mx-auto mt-1 mb-4 flex h-24 w-24 items-center justify-center rounded-full transition-transform duration-300 group-hover:scale-105 group-hover:-translate-y-1"
-          style={{ background: t.coinBg, boxShadow: t.coinShadow }}
-        >
-          <span className="absolute inset-2 rounded-full border border-white/25" aria-hidden />
-          <span className={`stat-numeral text-3xl font-black leading-none ${t.coinText}`}>{pack.credits}</span>
+        {/* Jeton de crédits — hexagone néon */}
+        <div className="mt-1 mb-4 flex justify-center">
+          <CreditHex t={t} value={pack.credits} size="lg" />
         </div>
 
         <div className="text-center">
