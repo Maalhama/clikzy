@@ -207,7 +207,7 @@ const YL = '#FFE23B'
 // ---- Éclair (phase finale) ----
 export function PixelBolt({ className }: { className?: string }) {
   return (
-    <PxSvg className={className} label="phase finale" vb="-0.5 -1 16 16">
+    <PxSvg className={className} label="phase finale" vb="4 2 7 10">
       {px(7, 2, 3, 1, C.gdD, 0)}
       {px(7, 2, 2, 1, YL, 1)}
       {px(6, 3, 3, 1, YL, 2)}
@@ -226,7 +226,7 @@ export function PixelBolt({ className }: { className?: string }) {
 // ---- Trophée (remportés / classement) ----
 export function PixelTrophy({ className }: { className?: string }) {
   return (
-    <PxSvg className={className} label="trophée" vb="0 -1 16 16">
+    <PxSvg className={className} label="trophée" vb="2 2 12 10">
       {/* anses */}
       {px(2, 3, 2, 3, C.gdD, 0)}
       {px(12, 3, 2, 3, C.gdD, 1)}
@@ -251,7 +251,7 @@ export function PixelTrophy({ className }: { className?: string }) {
 export function PixelFlame({ className }: { className?: string }) {
   const OR = '#FF7A1A', ORD = '#C2410C', YO = '#FFC73B'
   return (
-    <PxSvg className={className} label="série" vb="-0.5 -1.5 16 16">
+    <PxSvg className={className} label="série" vb="4 1 7 11">
       {px(7, 1, 2, 1, OR, 0)}
       {px(6, 2, 3, 2, OR, 1)}
       {px(5, 4, 5, 2, OR, 2)}
@@ -269,7 +269,7 @@ export function PixelFlame({ className }: { className?: string }) {
 // ---- Couronne (jackpot / V.I.P) ----
 export function PixelCrown({ className }: { className?: string }) {
   return (
-    <PxSvg className={className} label="jackpot" vb="0 -3 16 16">
+    <PxSvg className={className} label="jackpot" vb="3 1 10 8">
       {px(3, 4, 2, 4, C.gd, 0)}
       {px(7, 2, 2, 6, C.gd, 1)}
       {px(11, 4, 2, 4, C.gd, 2)}
@@ -292,7 +292,7 @@ export function PixelCrown({ className }: { className?: string }) {
 export function PixelGem({ className, color = C.cy }: { className?: string; color?: string }) {
   const light = '#FFFFFF'
   return (
-    <PxSvg className={className} label="gemme" vb="0 -2 16 16">
+    <PxSvg className={className} label="gemme" vb="4 2 8 8">
       {px(5, 3, 6, 1, C.dk, 0)}
       {px(6, 2, 4, 1, color, 1)}
       {px(5, 3, 6, 2, color, 2)}
@@ -312,7 +312,7 @@ export function PixelGem({ className, color = C.cy }: { className?: string; colo
 export function PixelCalendar({ className }: { className?: string }) {
   const P = '#9B5CFF', PD = '#6E36FF', PK = '#FF4FD8', DK = '#161D2E', WT = '#E9D5FF'
   return (
-    <PxSvg className={className} label="récompense du jour" vb="0 -0.5 16 16">
+    <PxSvg className={className} label="récompense du jour" vb="2 1 12 13">
       {px(5, 1, 1, 2, P, 'r1')}
       {px(10, 1, 1, 2, P, 'r2')}
       {px(2, 3, 12, 11, PD, 'frame')}
@@ -332,7 +332,7 @@ export function PixelCalendar({ className }: { className?: string }) {
 export function PixelGift({ className }: { className?: string }) {
   const P = '#9B5CFF', PD = '#7B3FDF', PL = '#C9A6FF', PK = '#FF4FD8'
   return (
-    <PxSvg className={className} label="cadeau" vb="0 -0.5 16 16">
+    <PxSvg className={className} label="cadeau" vb="2 2 12 12">
       {px(5, 2, 2, 2, PK, 'b1')}
       {px(9, 2, 2, 2, PK, 'b2')}
       {px(7, 3, 2, 1, PK, 'b3')}
