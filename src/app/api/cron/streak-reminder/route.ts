@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { sendPushToUser } from '@/lib/push'
+import { sendStreakReminderEmail } from '@/lib/email'
 
 // Rappel « streak en danger » — à planifier sur cron-job.org vers 20h Europe/Paris.
 // Cible : joueurs avec une streak >= 3 qui n'ont PAS encore réclamé leur bonus
@@ -40,6 +41,7 @@ export async function GET(request: NextRequest) {
 
     const users = atRisk || []
     let sent = 0
+    let emailed = 0
 
     // Envois séquencés par paquets : sendPushToUser ne notifie que les opt-in
     // (no-op silencieux sinon), donc pas de sur-notification.
@@ -57,10 +59,36 @@ export async function GET(request: NextRequest) {
       )
     }
 
+    // Fallback EMAIL : joueurs à risque SANS push (sinon ils ne sont jamais
+    // rappelés). Capé pour maîtriser le volume/coût Resend.
+    const EMAIL_CAP = 300
+    try {
+      const ids = users.map((u) => u.id)
+      const { data: subs } = await supabase
+        .from('push_subscriptions')
+        .select('user_id')
+        .in('user_id', ids)
+      const withPush = new Set((subs ?? []).map((s: { user_id: string }) => s.user_id))
+      const emailTargets = users.filter((u) => !withPush.has(u.id)).slice(0, EMAIL_CAP)
+      for (let i = 0; i < emailTargets.length; i += BATCH) {
+        await Promise.allSettled(
+          emailTargets.slice(i, i + BATCH).map(async (u) => {
+            const { data: userRes } = await supabase.auth.admin.getUserById(u.id)
+            const to = userRes?.user?.email
+            if (!to) return
+            if (await sendStreakReminderEmail(to, u.username || 'Joueur', u.streak_count)) emailed += 1
+          }),
+        )
+      }
+    } catch (e) {
+      console.error('[CRON] streak-reminder email fallback error:', e)
+    }
+
     return NextResponse.json({
       message: `Streak reminders processed`,
       eligible: users.length,
       pushAttempts: sent,
+      emailFallback: emailed,
     })
   } catch (error) {
     console.error('[CRON] streak-reminder error:', error)

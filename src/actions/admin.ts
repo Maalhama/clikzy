@@ -3,6 +3,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { createServiceClient } from '@/lib/supabase/service'
 import { checkAdminStatus } from '@/lib/auth/adminCheck'
+import { sendShippingEmail } from '@/lib/email'
 import { revalidatePath } from 'next/cache'
 import type { Profile, Game, Item, Winner } from '@/types/database'
 
@@ -248,6 +249,25 @@ export async function updateShippingStatus(
 
   if (error) {
     return { success: false, error: error.message }
+  }
+
+  // Email de suivi au gagnant à l'expédition (best-effort, non bloquant)
+  if (status === 'shipped' && trackingNumber) {
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data: w } = await (supabase as any)
+        .from('winners')
+        .select('user_id, username, item_name')
+        .eq('id', winnerId)
+        .single()
+      if (w?.user_id) {
+        const { data: userRes } = await supabase.auth.admin.getUserById(w.user_id)
+        const to = userRes?.user?.email
+        if (to) await sendShippingEmail(to, w.username || 'Joueur', w.item_name || 'Ton lot', trackingNumber)
+      }
+    } catch (e) {
+      console.error('[ADMIN] Envoi email de suivi échoué:', e)
+    }
   }
 
   revalidatePath('/admin')

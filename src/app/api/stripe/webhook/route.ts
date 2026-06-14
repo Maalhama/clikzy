@@ -284,6 +284,19 @@ export async function handleStripeEvent(event: Stripe.Event): Promise<HandlerRes
           })
         )
         .catch((err) => console.error('[WEBHOOK] Failed to send payment-failed push:', err))
+
+      // Email de relance (dunning) — en plus du push, pour les joueurs sans push activé
+      import('@/lib/email')
+        .then(async ({ sendVipPaymentFailedEmail }) => {
+          const admin = getSupabaseAdmin()
+          const { data: userRes } = await admin.auth.admin.getUserById(userId)
+          const to = userRes?.user?.email
+          if (!to) return
+          const { data: prof } = await admin.from('profiles').select('username').eq('id', userId).single()
+          await sendVipPaymentFailedEmail(to, (prof as { username?: string } | null)?.username ?? 'Joueur')
+        })
+        .catch((err) => console.error('[WEBHOOK] Failed to send payment-failed email:', err))
+
       console.log(`Payment failed notification queued for user ${userId} (${event.type})`)
     } else {
       console.error(`Payment failed event without userId metadata (${event.type})`)
