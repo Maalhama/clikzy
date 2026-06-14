@@ -33,7 +33,7 @@ export function CustomizationSection() {
   const [state, setState] = useState<CosmeticsState | null>(null)
   const [busy, setBusy] = useState<string | null>(null)
 
-  useEffect(() => { getCosmetics().then((r) => { if (r.success && r.data) setState(r.data) }) }, [])
+  useEffect(() => { getCosmetics().then((r) => { if (r.success && r.data) setState(r.data) }).catch(() => {}) }, [])
 
   if (!state) {
     return (

@@ -33,7 +33,7 @@ export function NotificationsCard() {
     navigator.serviceWorker.getRegistration().then(async (reg) => {
       const sub = await reg?.pushManager.getSubscription()
       setState(sub ? 'enabled' : 'idle')
-    })
+    }).catch(() => setState('idle'))
   }, [])
 
   const enable = useCallback(async () => {

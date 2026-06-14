@@ -159,9 +159,9 @@ export function PackCard({ pack, loading, disabled, onBuy, compact }: PackCardPr
       <div className={`relative flex h-full flex-col overflow-hidden rounded-3xl border bg-gradient-to-b from-white/[0.07] to-white/[0.015] p-6 backdrop-blur-xl transition-transform duration-300 group-hover:-translate-y-2 ${t.border} ${pack.popular ? 'lg:scale-[1.05]' : ''}`}>
         {/* liseré lumineux haut */}
         <span className="pointer-events-none absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent via-white/45 to-transparent" aria-hidden />
-        {/* Badge populaire */}
+        {/* Badge populaire — tag arcade angulaire, au-dessus du jeton (z-30) */}
         {pack.popular && (
-          <div className="absolute right-4 top-4 flex items-center gap-1 rounded-full bg-gradient-to-r from-neon-purple to-neon-pink px-2.5 py-1 text-[0.58rem] font-bold uppercase tracking-wider text-white shadow-[0_0_16px_-2px_rgba(155,92,255,0.7)]">
+          <div className="absolute right-3 top-3 z-30 flex items-center gap-1 bg-neon-pink px-2.5 py-1 font-display text-[0.58rem] font-black uppercase tracking-[0.16em] text-[#160a26] shadow-[0_5px_18px_-3px_rgba(255,79,216,0.9)] [clip-path:polygon(0_0,100%_0,100%_100%,7px_100%,0_calc(100%-7px))]">
             <Crown className="h-3 w-3" aria-hidden /> Populaire
           </div>
         )}

@@ -119,7 +119,7 @@ export function LobbyClient({
           localStorage.setItem(key, '1')
         }
       }
-    })
+    }).catch(() => {})
   }, [progression])
 
   const calendarClaimable = !!calendarData?.some((d) => d.claimable)
@@ -271,7 +271,7 @@ export function LobbyClient({
           onClose={() => setShowCalendar(false)}
           onClaimed={() => {
             creditsContext?.refreshCredits()
-            getCalendarMonth().then((res) => { if (res.success && res.data) setCalendarData(res.data) })
+            getCalendarMonth().then((res) => { if (res.success && res.data) setCalendarData(res.data) }).catch(() => {})
           }}
         />
       )}

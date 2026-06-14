@@ -23,7 +23,7 @@ export function GameComments({ gameId, userId, itemName }: { gameId: string; use
       )
       setComments(merged)
       setLoading(false)
-    })
+    }).catch(() => { if (active) setLoading(false) })
     return () => {
       active = false
     }

@@ -19,7 +19,7 @@ export function FairnessPanel() {
   const [busy, setBusy] = useState(false)
 
   useEffect(() => {
-    if (open && !state) getFairness().then((r) => { if (r.success && r.data) { setState(r.data); setClientSeedInput(r.data.clientSeed ?? '') } })
+    if (open && !state) getFairness().then((r) => { if (r.success && r.data) { setState(r.data); setClientSeedInput(r.data.clientSeed ?? '') } }).catch(() => {})
   }, [open, state])
 
   const rotate = async () => {

@@ -27,7 +27,7 @@ export function BattlePassRail({ onClaimed }: { onClaimed?: () => void }) {
   const [flash, setFlash] = useState<string | null>(null)
 
   useEffect(() => {
-    getPassState().then((res) => { if (res.success && res.data) setState(res.data) })
+    getPassState().then((res) => { if (res.success && res.data) setState(res.data) }).catch(() => {})
   }, [])
 
   if (!state) return null

@@ -114,7 +114,7 @@ export function GameClient({
         if (result.success && result.data) {
           setIsVip(result.data.isVip)
         }
-      })
+      }).catch(() => {})
     }
   }, [isPremiumProduct])
 

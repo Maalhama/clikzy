@@ -161,7 +161,7 @@ export default function VIPPage() {
   useEffect(() => {
     createBrowserClient().auth.getUser().then(({ data }) => {
       if (!data.user) router.replace('/login')
-    })
+    }).catch(() => {})
   }, [router])
 
   // Check VIP status on mount
