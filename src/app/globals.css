@@ -51,12 +51,13 @@ body {
 @layer base {
   h1, h2 {
     font-family: var(--font-display);
-    letter-spacing: -0.015em;
-    line-height: 1.05;
+    letter-spacing: 0;
+    line-height: 1.3;
   }
   h3 {
     font-family: var(--font-display);
-    letter-spacing: -0.01em;
+    letter-spacing: 0;
+    line-height: 1.35;
   }
 }
 
@@ -1632,9 +1633,9 @@ body::after {
   align-items: center;
   gap: 0.625rem;
   font-family: var(--font-display);
-  font-size: 0.6875rem;
+  font-size: 0.55rem;
   font-weight: 600;
-  letter-spacing: 0.32em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--neon-purple);
 }
@@ -1663,7 +1664,7 @@ body::after {
   font-family: var(--font-display);
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.02em;
   color: #fff;
   background: linear-gradient(135deg, #9B5CFF 0%, #7B3FDF 55%, #B14CE8 100%);
   clip-path: polygon(0 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%);
@@ -1715,7 +1716,7 @@ body::after {
   font-family: var(--font-display);
   font-weight: 500;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.02em;
   color: rgba(255, 255, 255, 0.75);
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.14);
@@ -1749,7 +1750,7 @@ body::after {
   font-family: var(--font-display);
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.02em;
   color: var(--neon-purple);
   background: rgba(155, 92, 255, 0.07);
   border: 1px solid rgba(155, 92, 255, 0.55);
@@ -1907,10 +1908,10 @@ body::after {
 
 /* ---- Chiffres d'affichage (timers, compteurs, stats) ---- */
 .stat-numeral {
-  font-family: var(--font-mono);
-  font-weight: 700;
+  font-family: var(--font-display);
+  font-weight: 400;
   font-variant-numeric: tabular-nums;
-  letter-spacing: -0.02em;
+  letter-spacing: 0;
 }
 
 /* ---- Pastille LIVE ---- */
@@ -1942,9 +1943,10 @@ body::after {
 /* ---- Titre géant hero (Unbounded, échelle fluide) ---- */
 .title-giant {
   font-family: var(--font-display);
-  font-weight: 800;
-  line-height: 0.92;
-  letter-spacing: -0.02em;
+  font-weight: 400;
+  font-size: clamp(1.4rem, 1rem + 3.2vw, 3rem);
+  line-height: 1.25;
+  letter-spacing: 0;
   text-transform: uppercase;
 }
 
