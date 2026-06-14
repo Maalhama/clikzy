@@ -216,18 +216,12 @@ export function Header({ profile }: HeaderProps) {
             <Logo size="md" animated={true} href="/" />
           </div>
 
-          {profile ? (
+          {/* Anon : pas de bouton Connexion ici (déjà dans le menu hamburger) */}
+          {profile && (
             <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-neon-purple/10 border border-neon-purple/30">
               <span className="text-neon-purple">{creditsIcon}</span>
               <AnimatedNumber value={credits} className="text-sm stat-numeral text-neon-purple" />
             </div>
-          ) : (
-            <Link
-              href="/login"
-              className="btn-arena-outline px-3 py-1.5 text-[0.7rem]"
-            >
-              Connexion
-            </Link>
           )}
         </div>
 
@@ -436,7 +430,7 @@ export function Header({ profile }: HeaderProps) {
                 <Link
                   href="/register"
                   onClick={closeMenu}
-                  className="btn-arena w-full px-4 py-3 text-sm"
+                  className="btn-arena w-full whitespace-nowrap px-4 py-3 text-sm"
                 >
                   Jouer gratuitement
                 </Link>

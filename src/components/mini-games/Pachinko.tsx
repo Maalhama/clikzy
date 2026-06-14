@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Trophy, Sparkles } from 'lucide-react'
 import { useMiniGameSounds } from '@/hooks/mini-games/useMiniGameSounds'
 import { ParticleManager } from '@/lib/particles/ParticleSystem'
+import { PACHINKO_SLOTS } from '@/types/miniGames'
 
 interface PachinkoProps {
   onComplete: (creditsWon: number) => void
@@ -12,8 +13,8 @@ interface PachinkoProps {
   disabled?: boolean
 }
 
-// MIROIR EXACT de PACHINKO_SLOTS (src/types/miniGames.ts) — le serveur renvoie un indice.
-export const SLOTS = [0, 0, 1, 2, 5, 2, 1, 0, 0]
+// Dérivé de PACHINKO_SLOTS (source unique serveur) -> jamais de divergence affiché ↔ gain réel.
+export const SLOTS: number[] = [...PACHINKO_SLOTS]
 // Responsive board dimensions
 const BOARD_WIDTH = 260
 const BOARD_HEIGHT = 320

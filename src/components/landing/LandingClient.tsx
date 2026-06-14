@@ -886,7 +886,7 @@ export function LandingClient({
         <div className="relative max-w-7xl mx-auto px-6">
           <div className="text-center mb-16">
             <span className="kicker mb-4">Lots premium</span>
-            <h2 className="title-giant text-5xl lg:text-6xl mb-4">
+            <h2 className="title-giant text-3xl sm:text-5xl lg:text-6xl mb-4 whitespace-nowrap">
               <span className="text-white">Lots</span> <span className="text-neon-pink neon-text-pink">à remporter</span>
             </h2>
             <p className="text-white/60 text-lg">Produits premium quotidiens</p>

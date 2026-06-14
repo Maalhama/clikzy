@@ -47,8 +47,8 @@ describe('computeMiniGameOutcome — invariant gain = table[index]', () => {
     }
   })
 
-  it('coinflip : <0.1 gagne 5, sinon 0', () => {
-    expect(computeMiniGameOutcome('coinflip', () => 0.05)).toMatchObject({ creditsWon: 5, coinResult: 'heads' })
+  it('coinflip : <0.1 gagne 3 (Phase 2), sinon 0', () => {
+    expect(computeMiniGameOutcome('coinflip', () => 0.05)).toMatchObject({ creditsWon: 3, coinResult: 'heads' })
     expect(computeMiniGameOutcome('coinflip', () => 0.5)).toMatchObject({ creditsWon: 0, coinResult: 'tails' })
   })
 })

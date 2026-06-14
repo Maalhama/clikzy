@@ -4,6 +4,7 @@ import React, { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence, useAnimation } from 'framer-motion'
 import { Trophy, Zap, Sparkles } from 'lucide-react'
 import { useMiniGameSounds } from '@/hooks/mini-games/useMiniGameSounds'
+import { WHEEL_SEGMENTS } from '@/types/miniGames'
 
 interface WheelOfFortuneProps {
   onComplete: (creditsWon: number) => void
@@ -11,19 +12,16 @@ interface WheelOfFortuneProps {
   disabled?: boolean
 }
 
-// Couleurs DA : alternance dark/neon avec dégradés (moyenne: 2.25 crédits)
-// MIROIR EXACT de WHEEL_SEGMENTS (src/types/miniGames.ts) : le serveur renvoie
-// un INDICE dans cette table — toute divergence = gain affiché mensonger.
-export const SEGMENTS = [
-  { value: 0, color: '#0B0F1A', text: '#4A5568', borderColor: '#1E2942' },
-  { value: 0, color: '#141B2D', text: '#4A5568', borderColor: '#1E2942' },
-  { value: 0, color: '#0B0F1A', text: '#4A5568', borderColor: '#1E2942' },
-  { value: 1, color: '#1A1033', text: '#9B5CFF', borderColor: '#9B5CFF' },
-  { value: 1, color: '#0B0F1A', text: '#9B5CFF', borderColor: '#1E2942' },
-  { value: 2, color: '#1A2A33', text: '#3CCBFF', borderColor: '#3CCBFF' },
-  { value: 2, color: '#2D1A3D', text: '#FF4FD8', borderColor: '#FF4FD8' },
-  { value: 5, color: '#FFB800', text: '#0B0F1A', borderColor: '#FFD700', isSpecial: true },
-]
+// Style PAR VALEUR. La valeur de chaque segment est DÉRIVÉE de WHEEL_SEGMENTS
+// (source unique côté serveur) -> il ne peut JAMAIS y avoir de divergence entre
+// le montant affiché et le gain réel (le serveur renvoie un indice dans la table).
+const STYLE_BY_VALUE: Record<number, { color: string; text: string; borderColor: string; isSpecial?: boolean }> = {
+  0: { color: '#0B0F1A', text: '#4A5568', borderColor: '#1E2942' },
+  1: { color: '#1A1033', text: '#9B5CFF', borderColor: '#9B5CFF' },
+  2: { color: '#1A2A33', text: '#3CCBFF', borderColor: '#3CCBFF' },
+  3: { color: '#FFB800', text: '#0B0F1A', borderColor: '#FFD700', isSpecial: true },
+}
+export const SEGMENTS = WHEEL_SEGMENTS.map((value) => ({ value, ...(STYLE_BY_VALUE[value] ?? STYLE_BY_VALUE[0]) }))
 
 
 export default function WheelOfFortune({

@@ -109,10 +109,10 @@ describe('Actions crédits (économie)', () => {
       expect(res.data?.canCollect).toBe(false)
     })
 
-    it('VIP jamais collecté → collectable', async () => {
+    it('VIP jamais collecté → NON collectable (bonus déprécié : 20/j auto)', async () => {
       mockProfileSelect({ is_vip: true, vip_expires_at: null, last_vip_bonus_at: null })
       const res = await canCollectVIPBonus()
-      expect(res.data?.canCollect).toBe(true)
+      expect(res.data?.canCollect).toBe(false)
     })
 
     it('déjà collecté il y a un instant (même jour Paris) → non collectable', async () => {
@@ -125,14 +125,14 @@ describe('Actions crédits (économie)', () => {
       expect(res.data?.canCollect).toBe(false)
     })
 
-    it('collecté il y a 48h (jour Paris différent garanti) → collectable', async () => {
+    it('collecté il y a 48h → toujours NON collectable (bonus déprécié)', async () => {
       mockProfileSelect({
         is_vip: true,
         vip_expires_at: null,
         last_vip_bonus_at: new Date(Date.now() - 48 * 3600_000).toISOString(),
       })
       const res = await canCollectVIPBonus()
-      expect(res.data?.canCollect).toBe(true)
+      expect(res.data?.canCollect).toBe(false)
     })
   })
 })

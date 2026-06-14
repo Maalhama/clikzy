@@ -157,6 +157,22 @@ export async function handleStripeEvent(event: Stripe.Event): Promise<HandlerRes
         return { status: 500, body: { error: 'Failed to credit account' } }
       }
 
+      // Erreur MÉTIER (ex: monthly_limit_reached via une race sur le pré-check) :
+      // l'utilisateur a payé mais reçoit 0 crédit -> remboursement automatique.
+      const grant = grantResult as { granted?: number; error?: string } | null
+      if (!grant || (grant.granted ?? 0) <= 0) {
+        console.error(`[STRIPE] PAYÉ MAIS 0 CRÉDIT — user ${userId}, pack ${packId}, session ${session.id}, raison:`, grant?.error)
+        try {
+          if (session.payment_intent) {
+            await getStripeInstance().refunds.create({ payment_intent: session.payment_intent as string })
+            console.log(`[STRIPE] Auto-remboursement émis pour la session ${session.id}`)
+          }
+        } catch (refundErr) {
+          console.error('[STRIPE] Auto-remboursement ÉCHOUÉ (remboursement manuel requis):', refundErr)
+        }
+        return { status: 200, body: { received: true, refunded: true, reason: grant?.error ?? 'no_credits' } }
+      }
+
       console.log(`Pack ${packId} granted to user ${userId}:`, grantResult)
     } catch (error) {
       console.error('Error processing payment:', error)

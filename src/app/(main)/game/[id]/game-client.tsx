@@ -491,9 +491,9 @@ export function GameClient({
               {game.status !== 'ended' && !userId && (
                 <button
                   onClick={() => setShowAuthGate(true)}
-                  className="btn-arena w-full py-4 text-base"
+                  className="btn-arena w-full whitespace-nowrap py-4 text-sm sm:text-base"
                 >
-                  <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                  <svg className="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M13 10V3L4 14h7v7l9-11h-7z" />
                   </svg>
                   Crée ton compte pour jouer
@@ -621,6 +621,9 @@ export function GameClient({
             </div>
           </div>
 
+          {/* Discussion de la partie (mobile) — placée AVANT les derniers clics */}
+          <GameComments gameId={game.id} userId={userId} itemName={game.item.name} />
+
           {/* Mobile: derniers clics */}
           <div className="lg:hidden">
             <GameClicksFeed clicks={recentClicks} />
@@ -673,8 +676,6 @@ export function GameClient({
             </div>
           </div>
 
-          {/* Discussion de la partie (mobile) */}
-          <GameComments gameId={game.id} userId={userId} itemName={game.item.name} />
         </div>
 
         {/* DESKTOP LAYOUT - Compact */}
