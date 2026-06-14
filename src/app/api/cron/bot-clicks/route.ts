@@ -50,6 +50,7 @@ interface GameData {
   total_clicks: number
   last_click_username: string | null
   last_click_user_id: string | null
+  last_click_at: string | null
   battle_start_time: string | null
   item: { name: string }[] | { name: string } | null
 }
@@ -139,7 +140,7 @@ export async function GET(request: NextRequest) {
       .from('games')
       .select(`
         id, item_id, status, end_time, total_clicks,
-        last_click_username, last_click_user_id, battle_start_time,
+        last_click_username, last_click_user_id, last_click_at, battle_start_time,
         item:items(name)
       `)
       .in('status', ['active', 'final_phase'])
@@ -269,6 +270,26 @@ export async function GET(request: NextRequest) {
           })
         }
 
+        // Push « on t'a dépassé » : un bot vient de reprendre le lead à un joueur
+        // réel ABSENT. Throttle naturel : on ne détecte l'outbid que si l'ancien
+        // leader était réel ; une fois dépassé il n'est plus leader, donc pas de
+        // re-push tant qu'il ne reclique pas. Le filtre last_click_at (>90s) évite
+        // de notifier un joueur encore actif (qui voit déjà qu'on le dépasse).
+        if (
+          game.last_click_user_id &&
+          updates.last_click_username === botUsername &&
+          updates.last_click_user_id === null &&
+          game.last_click_at &&
+          now - new Date(game.last_click_at).getTime() > 90000
+        ) {
+          sendPushToUser(game.last_click_user_id, {
+            title: 'On vient de te dépasser !',
+            body: `Quelqu'un a repris la tête sur ${getItemName(game.item)}. Reviens vite pour reprendre ton clic gagnant.`,
+            url: `/game/${game.id}`,
+            tag: `outbid-${game.id}`,
+          }).catch((err) => console.error('[CRON] Failed to send outbid push:', err))
+        }
+
         results.push({
           gameId: game.id,
           action
@@ -381,6 +402,35 @@ async function endGame(
         console.log(`[CRON] Winner email queued for ${winnerEmail}`)
       }
     }
+  }
+
+  // Push « offre de rachat » aux participants réels qui ont perdu (non-bloquant).
+  // Pointe vers /profile où la section « Rachat malin » affiche l'offre si éligible.
+  // endGame ne s'exécute qu'une fois par partie (garde atomique de statut) -> 1 push/perdant.
+  try {
+    const { data: participants } = await supabase
+      .from('clicks')
+      .select('user_id')
+      .eq('game_id', game.id)
+      .eq('is_bot', false)
+      .not('user_id', 'is', null)
+    const losers = [
+      ...new Set(
+        ((participants ?? []) as { user_id: string | null }[])
+          .map((r) => r.user_id)
+          .filter((id): id is string => !!id && id !== winnerId)
+      ),
+    ]
+    for (const uid of losers) {
+      sendPushToUser(uid, {
+        title: 'Tu y étais presque !',
+        body: `${itemName} t'a échappé de peu — récupère-le à prix réduit avant que l'offre n'expire.`,
+        url: '/profile',
+        tag: 'buy-it-now-offer',
+      }).catch((err) => console.error('[CRON] Failed to send buy-it-now push:', err))
+    }
+  } catch (e) {
+    console.error('[CRON] buy-it-now push error:', e)
   }
 
   return true
