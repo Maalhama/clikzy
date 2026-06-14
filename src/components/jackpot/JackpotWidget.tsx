@@ -46,15 +46,16 @@ export function JackpotWidget({ variant }: { variant: 'inline' | 'pill' | 'stat'
     return () => cancelAnimationFrame(raf)
   }, [jp])
 
-  // Pendant le fetch : placeholder INVISIBLE aux mêmes dimensions que la pill
-  // finale -> zéro layout shift quand le montant arrive (CLS lobby).
+  // Pendant le fetch : pill VISIBLE dès le 1er rendu (crown + skeleton du nombre)
+  // -> le badge jackpot apparaît EN MÊME TEMPS que les autres stats, le montant
+  // se remplit ensuite (zéro layout shift, pas de pop en retard).
   if (!jp) {
     if (variant !== 'pill') return null
     return (
-      <div aria-hidden className="panel invisible flex items-center gap-2 px-3.5 py-2">
-        <span className="h-4 w-4" />
-        <span className="stat-numeral text-sm">8 888</span>
-        <span className="text-xs">jackpot</span>
+      <div className="panel flex items-center gap-2 px-3.5 py-2">
+        <span className="inline-flex h-4 w-4 items-center justify-center">{trophy}</span>
+        <span className="h-3.5 w-9 animate-pulse rounded bg-white/15" aria-label="jackpot en cours de chargement" />
+        <span className="text-xs text-white/55">jackpot</span>
       </div>
     )
   }
@@ -73,7 +74,7 @@ export function JackpotWidget({ variant }: { variant: 'inline' | 'pill' | 'stat'
       title="Jackpot communautaire"
       className="panel flex items-center gap-2 px-3.5 py-2 transition-colors hover:border-yellow-400/40"
     >
-      <span className="h-4 w-4">{trophy}</span>
+      <span className="inline-flex h-4 w-4 items-center justify-center">{trophy}</span>
       <span className="stat-numeral text-sm text-white">{shown}</span>
       <span className="text-xs text-white/55">jackpot</span>
     </button>
@@ -82,7 +83,7 @@ export function JackpotWidget({ variant }: { variant: 'inline' | 'pill' | 'stat'
       onClick={() => setOpen(true)}
       className="group inline-flex items-center gap-2 rounded-full border border-yellow-400/30 bg-gradient-to-r from-yellow-400/[0.12] to-yellow-400/[0.04] px-3.5 py-1.5 transition-transform hover:-translate-y-0.5"
     >
-      <span className="h-4 w-4 shrink-0">{trophy}</span>
+      <span className="inline-flex h-4 w-4 shrink-0 items-center justify-center">{trophy}</span>
       <span className="font-display text-[0.55rem] font-semibold uppercase tracking-[0.18em] text-yellow-300/80">Jackpot</span>
       <span className="stat-numeral text-sm font-bold text-yellow-300">{jp.amount.toLocaleString('fr-FR')}</span>
       <span className="text-[0.7rem] text-white/50">· le 8 (dans {next.days}j)</span>
