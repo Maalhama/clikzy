@@ -288,6 +288,7 @@ export function LobbyClient({
       {/* Floating urgent timer */}
       <FloatingTimer
         enabled={true}
+        avoidSidebar
         isLoggedIn={isLoggedIn}
         gameId={urgentGame?.id}
         initialEndTime={urgentGame?.end_time ?? undefined}

@@ -29,6 +29,8 @@ interface FloatingTimerProps {
   initialEndTime?: number
   itemName?: string
   enabled?: boolean
+  /** Sur lg+, bascule le widget en bas-gauche pour ne pas recouvrir une sidebar à droite (lobby). */
+  avoidSidebar?: boolean
 }
 
 export function FloatingTimer({
@@ -37,6 +39,7 @@ export function FloatingTimer({
   initialEndTime,
   itemName,
   enabled = true,
+  avoidSidebar = false,
 }: FloatingTimerProps) {
   const [timeLeft, setTimeLeft] = useState<number>(0)
   const [isVisible, setIsVisible] = useState(false)
@@ -241,7 +244,7 @@ export function FloatingTimer({
           stiffness: 400,
           damping: 25,
         }}
-        className="fixed bottom-3 md:bottom-6 right-5 md:right-14 z-50 max-w-[calc(100vw-2.5rem)]"
+        className={`fixed bottom-3 md:bottom-6 right-5 md:right-14 z-50 max-w-[calc(100vw-2.5rem)] ${avoidSidebar ? 'lg:right-auto lg:left-6' : ''}`}
         // Le pulse critique (scale 1.02) grandit depuis le coin bas-droit :
         // il ne peut donc JAMAIS dépasser le bord droit de l'écran.
         style={{ transformOrigin: 'bottom right' }}
