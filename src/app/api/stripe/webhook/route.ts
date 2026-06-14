@@ -129,6 +129,30 @@ export async function handleStripeEvent(event: Stripe.Event): Promise<HandlerRes
       return { status: 200, body: { received: true } }
     }
 
+    // Rachat malin (Buy It Now) : enregistre l'achat (idempotent par session)
+    if (session.metadata?.type === 'buy_it_now') {
+      const gameId = session.metadata?.gameId
+      const price = parseFloat(session.metadata?.price || '0')
+      if (!userId || !gameId || !(price > 0)) {
+        console.error('Invalid buy_it_now metadata:', session.metadata)
+        return { status: 400, body: { error: 'Invalid metadata' } }
+      }
+      const supabase = getSupabaseAdmin()
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data: binResult, error: binError } = await (supabase.rpc as any)('record_buy_it_now', {
+        p_user_id: userId,
+        p_game_id: gameId,
+        p_price: price,
+        p_session: session.id,
+      })
+      if (binError) {
+        console.error('Error recording buy-it-now:', binError)
+        return { status: 500, body: { error: 'Failed to record purchase' } }
+      }
+      console.log(`Buy-it-now recorded for user ${userId}, game ${gameId}:`, binResult)
+      return { status: 200, body: { received: true } }
+    }
+
     const packId = session.metadata?.packId
     const credits = parseInt(session.metadata?.credits || '0', 10)
     const monthlyLimit = session.metadata?.monthlyLimit === '1'
