@@ -1,13 +1,13 @@
 import type { Metadata, Viewport } from 'next'
-import { Pixelify_Sans, Press_Start_2P, JetBrains_Mono } from 'next/font/google'
+import { Hanken_Grotesk, Unbounded, JetBrains_Mono } from 'next/font/google'
 import { SkipLink } from '@/components/ui/SkipLink'
 import { CookieConsent } from '@/components/common/CookieConsent'
 import { Analytics } from '@/components/common/Analytics'
 import { WebVitalsReporter } from '@/components/analytics/WebVitalsReporter'
 import './globals.css'
 
-// Body : police pixel LISIBLE (refonte full retro pixel) — supporte les accents FR
-const sans = Pixelify_Sans({
+// Body : grotesque moderne et lisible (remplace Inter)
+const sans = Hanken_Grotesk({
   subsets: ['latin'],
   variable: '--font-sans',
   display: 'swap',
@@ -15,10 +15,9 @@ const sans = Pixelify_Sans({
   fallback: ['system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
 })
 
-// Display : police bitmap « borne d'arcade » pour titres, wordmark et gros chiffres
-const display = Press_Start_2P({
+// Display : géométrique et énergique pour les titres, le wordmark et les gros chiffres
+const display = Unbounded({
   subsets: ['latin'],
-  weight: '400',
   variable: '--font-display',
   display: 'swap',
   preload: true,
