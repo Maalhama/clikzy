@@ -11,7 +11,10 @@ type CookieOptions = {
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url)
   const code = searchParams.get('code')
-  const next = searchParams.get('next') ?? '/lobby'
+  // Anti open-redirect : on n'autorise qu'un chemin interne (commence par "/"
+  // mais pas "//" ni "/\" qui ouvriraient vers un domaine externe).
+  const rawNext = searchParams.get('next') ?? '/lobby'
+  const next = /^\/(?![/\\])/.test(rawNext) ? rawNext : '/lobby'
 
   // Determine the redirect URL base
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://cleekzy.com'

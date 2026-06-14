@@ -1,5 +1,5 @@
-// Service Worker for Push Notifications - CLIKZY
-const CACHE_NAME = 'clikzy-v1'
+// Service Worker for Push Notifications - CLEEKZY
+const CACHE_NAME = 'cleekzy-v1'
 
 // Install event
 self.addEventListener('install', (event) => {
@@ -18,11 +18,11 @@ self.addEventListener('push', (event) => {
   console.log('[SW] Push received:', event)
 
   let data = {
-    title: 'CLIKZY',
+    title: 'CLEEKZY',
     body: 'Nouvelle notification',
     icon: '/icon',
     badge: '/icon',
-    tag: 'clikzy-notification',
+    tag: 'cleekzy-notification',
     data: { url: '/lobby' }
   }
 
@@ -39,7 +39,7 @@ self.addEventListener('push', (event) => {
     body: data.body,
     icon: data.icon || '/icon',
     badge: data.badge || '/icon',
-    tag: data.tag || 'clikzy-notification',
+    tag: data.tag || 'cleekzy-notification',
     vibrate: [200, 100, 200],
     requireInteraction: false,
     data: data.data || { url: '/lobby' },

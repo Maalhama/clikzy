@@ -73,10 +73,11 @@ const C = {
 
 type IconProps = { className?: string; animate?: boolean }
 
-function PxSvg({ className, label, children }: { className?: string; label: string; children: React.ReactNode }) {
+function PxSvg({ className, label, vb = '0 0 16 16', children }: { className?: string; label: string; vb?: string; children: React.ReactNode }) {
   return (
     <svg
-      viewBox="0 0 16 16"
+      viewBox={vb}
+      preserveAspectRatio="xMidYMid meet"
       className={`inline-block ${className ?? 'h-full w-full'}`}
       shapeRendering="crispEdges"
       role="img"
@@ -206,7 +207,7 @@ const YL = '#FFE23B'
 // ---- Éclair (phase finale) ----
 export function PixelBolt({ className }: { className?: string }) {
   return (
-    <PxSvg className={className} label="phase finale">
+    <PxSvg className={className} label="phase finale" vb="-0.5 -1 16 16">
       {px(7, 2, 3, 1, C.gdD, 0)}
       {px(7, 2, 2, 1, YL, 1)}
       {px(6, 3, 3, 1, YL, 2)}
@@ -225,7 +226,7 @@ export function PixelBolt({ className }: { className?: string }) {
 // ---- Trophée (remportés / classement) ----
 export function PixelTrophy({ className }: { className?: string }) {
   return (
-    <PxSvg className={className} label="trophée">
+    <PxSvg className={className} label="trophée" vb="0 -1 16 16">
       {/* anses */}
       {px(2, 3, 2, 3, C.gdD, 0)}
       {px(12, 3, 2, 3, C.gdD, 1)}
@@ -250,7 +251,7 @@ export function PixelTrophy({ className }: { className?: string }) {
 export function PixelFlame({ className }: { className?: string }) {
   const OR = '#FF7A1A', ORD = '#C2410C', YO = '#FFC73B'
   return (
-    <PxSvg className={className} label="série">
+    <PxSvg className={className} label="série" vb="-0.5 -1.5 16 16">
       {px(7, 1, 2, 1, OR, 0)}
       {px(6, 2, 3, 2, OR, 1)}
       {px(5, 4, 5, 2, OR, 2)}
@@ -268,7 +269,7 @@ export function PixelFlame({ className }: { className?: string }) {
 // ---- Couronne (jackpot / V.I.P) ----
 export function PixelCrown({ className }: { className?: string }) {
   return (
-    <PxSvg className={className} label="jackpot">
+    <PxSvg className={className} label="jackpot" vb="0 -3 16 16">
       {px(3, 4, 2, 4, C.gd, 0)}
       {px(7, 2, 2, 6, C.gd, 1)}
       {px(11, 4, 2, 4, C.gd, 2)}
@@ -291,7 +292,7 @@ export function PixelCrown({ className }: { className?: string }) {
 export function PixelGem({ className, color = C.cy }: { className?: string; color?: string }) {
   const light = '#FFFFFF'
   return (
-    <PxSvg className={className} label="gemme">
+    <PxSvg className={className} label="gemme" vb="0 -2 16 16">
       {px(5, 3, 6, 1, C.dk, 0)}
       {px(6, 2, 4, 1, color, 1)}
       {px(5, 3, 6, 2, color, 2)}
