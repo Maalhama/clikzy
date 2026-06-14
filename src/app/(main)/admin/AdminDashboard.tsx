@@ -2,9 +2,9 @@
 
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import type { AdminStats, AdminUser, AdminGame } from '@/actions/admin'
+import type { AdminStats, AdminUser, AdminGame, BuyItNowOrder } from '@/actions/admin'
 import type { Item, Winner } from '@/types/database'
-import { updateUserCredits, toggleUserAdmin, updateShippingStatus } from '@/actions/admin'
+import { updateUserCredits, toggleUserAdmin, updateShippingStatus, updateBuyItNowShipping } from '@/actions/admin'
 
 interface AdminDashboardProps {
   stats: AdminStats
@@ -12,11 +12,12 @@ interface AdminDashboardProps {
   games: AdminGame[]
   items: Item[]
   winners: Winner[]
+  buyItNowOrders: BuyItNowOrder[]
 }
 
-type Tab = 'overview' | 'users' | 'games' | 'items' | 'winners'
+type Tab = 'overview' | 'users' | 'games' | 'items' | 'winners' | 'buyitnow'
 
-export function AdminDashboard({ stats, users, games, items, winners }: AdminDashboardProps) {
+export function AdminDashboard({ stats, users, games, items, winners, buyItNowOrders }: AdminDashboardProps) {
   const [activeTab, setActiveTab] = useState<Tab>('overview')
 
   const tabs: { id: Tab; label: string; icon: React.ReactNode }[] = [
@@ -25,6 +26,7 @@ export function AdminDashboard({ stats, users, games, items, winners }: AdminDas
     { id: 'games', label: 'Parties', icon: <GameIcon /> },
     { id: 'items', label: 'Lots', icon: <GiftIcon /> },
     { id: 'winners', label: 'Gagnants', icon: <TrophyIcon /> },
+    { id: 'buyitnow', label: 'Rachat malin', icon: <GiftIcon /> },
   ]
 
   return (
@@ -74,6 +76,7 @@ export function AdminDashboard({ stats, users, games, items, winners }: AdminDas
           {activeTab === 'games' && <GamesTab games={games} />}
           {activeTab === 'items' && <ItemsTab items={items} />}
           {activeTab === 'winners' && <WinnersTab winners={winners} />}
+          {activeTab === 'buyitnow' && <BuyItNowOrdersTab orders={buyItNowOrders} />}
         </motion.div>
       </main>
     </div>
@@ -412,6 +415,91 @@ function WinnersTab({ winners }: { winners: Winner[] }) {
           </tbody>
         </table>
       </div>
+    </div>
+  )
+}
+
+function BuyItNowOrdersTab({ orders }: { orders: BuyItNowOrder[] }) {
+  const [updating, setUpdating] = useState<string | null>(null)
+  const [tracking, setTracking] = useState<Record<string, string>>({})
+
+  const statusColors: Record<string, string> = {
+    pending: 'bg-white/10 text-white/60',
+    processing: 'bg-neon-purple/20 text-neon-purple',
+    shipped: 'bg-neon-blue/20 text-neon-blue',
+    delivered: 'bg-success/20 text-success',
+  }
+  const statusLabels: Record<string, string> = {
+    pending: 'En attente',
+    processing: 'En préparation',
+    shipped: 'Expédié',
+    delivered: 'Livré',
+  }
+  const statusOptions: Array<'pending' | 'processing' | 'shipped' | 'delivered'> = ['pending', 'processing', 'shipped', 'delivered']
+
+  async function change(id: string, status: (typeof statusOptions)[number]) {
+    setUpdating(id)
+    await updateBuyItNowShipping(id, status, tracking[id]?.trim() || undefined)
+    setUpdating(null)
+  }
+
+  if (orders.length === 0) {
+    return (
+      <div className="rounded-xl border border-white/10 bg-bg-secondary/50 p-8 text-center text-white/50">
+        Aucun rachat malin pour l&apos;instant. Les achats apparaîtront ici dès qu&apos;un joueur rachète un lot perdu.
+      </div>
+    )
+  }
+
+  return (
+    <div className="rounded-xl bg-bg-secondary/50 border border-white/10 overflow-hidden">
+      <div className="overflow-x-auto">
+        <table className="w-full">
+          <thead className="bg-white/5">
+            <tr>
+              <th className="px-4 py-3 text-left text-xs font-medium text-white/60 uppercase">Acheteur</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-white/60 uppercase">Lot</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-white/60 uppercase">Prix payé</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-white/60 uppercase">Date</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-white/60 uppercase">N° de suivi</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-white/60 uppercase">Statut livraison</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-white/5">
+            {orders.map((o) => (
+              <tr key={o.id} className="hover:bg-white/5 transition-colors">
+                <td className="px-4 py-3 font-medium text-white">{o.username || 'Anonyme'}</td>
+                <td className="px-4 py-3 text-white">{o.item_name}</td>
+                <td className="px-4 py-3 font-bold text-neon-pink">{o.price_paid}€</td>
+                <td className="px-4 py-3 text-sm text-white/40">{new Date(o.created_at).toLocaleDateString('fr-FR')}</td>
+                <td className="px-4 py-3">
+                  <input
+                    defaultValue={o.tracking_number ?? ''}
+                    onChange={(e) => setTracking((t) => ({ ...t, [o.id]: e.target.value }))}
+                    placeholder="N° suivi"
+                    className="w-32 rounded border border-white/10 bg-white/5 px-2 py-1 text-xs text-white placeholder:text-white/30 focus:border-neon-purple/50 focus:outline-none"
+                  />
+                </td>
+                <td className="px-4 py-3">
+                  <select
+                    value={o.shipping_status}
+                    onChange={(e) => change(o.id, e.target.value as (typeof statusOptions)[number])}
+                    disabled={updating === o.id}
+                    className={`cursor-pointer rounded border-0 px-2 py-1 text-xs font-medium ${statusColors[o.shipping_status] ?? ''} disabled:opacity-50`}
+                  >
+                    {statusOptions.map((s) => (
+                      <option key={s} value={s}>{statusLabels[s]}</option>
+                    ))}
+                  </select>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p className="border-t border-white/5 px-4 py-3 text-xs text-white/40">
+        Astuce : saisis le n° de suivi PUIS passe le statut sur « Expédié » — un email avec le suivi part automatiquement à l&apos;acheteur.
+      </p>
     </div>
   )
 }

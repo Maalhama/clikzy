@@ -130,6 +130,91 @@ export async function getAdminWinners(limit: number = 50, offset: number = 0): P
   return (data as Winner[]) || []
 }
 
+export interface BuyItNowOrder {
+  id: string
+  user_id: string
+  game_id: string
+  item_name: string
+  price_paid: number
+  shipping_status: string
+  tracking_number: string | null
+  created_at: string
+  username: string | null
+}
+
+// Liste des achats « Rachat malin » à expédier (admin)
+export async function getBuyItNowOrders(limit = 50, offset = 0): Promise<BuyItNowOrder[]> {
+  const { isAdmin } = await checkAdminStatus()
+  if (!isAdmin) return []
+  const supabase = createServiceClient()
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data } = await (supabase as any)
+    .from('buy_it_now_purchases')
+    .select('id, user_id, game_id, item_name, price_paid, shipping_status, tracking_number, created_at, profiles:user_id(username)')
+    .order('created_at', { ascending: false })
+    .range(offset, offset + limit - 1)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return ((data as any[]) || []).map((r) => ({
+    id: r.id,
+    user_id: r.user_id,
+    game_id: r.game_id,
+    item_name: r.item_name,
+    price_paid: Number(r.price_paid),
+    shipping_status: r.shipping_status,
+    tracking_number: r.tracking_number,
+    created_at: r.created_at,
+    username: r.profiles?.username ?? null,
+  }))
+}
+
+// Met à jour le statut d'expédition d'un achat Rachat malin (+ email au suivi)
+export async function updateBuyItNowShipping(
+  purchaseId: string,
+  status: 'pending' | 'processing' | 'shipped' | 'delivered',
+  trackingNumber?: string,
+): Promise<{ success: boolean; error?: string }> {
+  const { isAdmin } = await checkAdminStatus()
+  if (!isAdmin) return { success: false, error: 'Non autorisé' }
+  const supabase = createServiceClient()
+
+  const updateData: Record<string, unknown> = { shipping_status: status }
+  if (status === 'shipped' && trackingNumber) {
+    updateData.tracking_number = trackingNumber
+    updateData.shipped_at = new Date().toISOString()
+  }
+  if (status === 'delivered') updateData.delivered_at = new Date().toISOString()
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { error } = await (supabase as any).from('buy_it_now_purchases').update(updateData).eq('id', purchaseId)
+  if (error) return { success: false, error: error.message }
+
+  // Email de suivi à l'expédition (best-effort, non bloquant)
+  if (status === 'shipped' && trackingNumber) {
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data: p } = await (supabase as any)
+        .from('buy_it_now_purchases')
+        .select('user_id, item_name')
+        .eq('id', purchaseId)
+        .single()
+      if (p?.user_id) {
+        const { data: userRes } = await supabase.auth.admin.getUserById(p.user_id)
+        const to = userRes?.user?.email
+        if (to) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const { data: prof } = await (supabase as any).from('profiles').select('username').eq('id', p.user_id).single()
+          await sendShippingEmail(to, prof?.username || 'Joueur', p.item_name || 'Ton lot', trackingNumber)
+        }
+      }
+    } catch (e) {
+      console.error('[ADMIN] Envoi email suivi rachat malin échoué:', e)
+    }
+  }
+
+  revalidatePath('/admin')
+  return { success: true }
+}
+
 // Update user credits
 export async function updateUserCredits(userId: string, credits: number): Promise<{ success: boolean; error?: string }> {
   const { isAdmin } = await checkAdminStatus()
