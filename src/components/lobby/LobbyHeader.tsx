@@ -5,7 +5,7 @@ import { NeonChest } from '@/components/collection/NeonChest'
 import { LobbyCharacterWidget } from '@/components/lobby/LobbyCharacterWidget'
 import { MidnightCountdown } from '@/components/lobby/MidnightCountdown'
 import { JackpotWidget } from '@/components/jackpot/JackpotWidget'
-import { PixelCoin, PixelTrophy, PixelBolt } from '@/components/pixel/PixelIcon'
+import { PixelCoin, PixelTrophy, PixelBolt, PixelCalendar } from '@/components/pixel/PixelIcon'
 
 interface LobbyHeaderProps {
   credits: number
@@ -110,12 +110,7 @@ export const LobbyHeader = memo(function LobbyHeader({
               className="hero-live-card group flex flex-1 items-center justify-center gap-0 px-2 py-2 text-left transition-transform hover:-translate-y-0.5 sm:flex-none sm:justify-start sm:gap-3 sm:px-4 sm:py-3"
             >
               <div className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-neon-purple/30 bg-neon-purple/10 sm:h-[46px] sm:w-[46px]">
-                <svg className="h-6 w-6 text-neon-purple" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.7} strokeLinecap="round" strokeLinejoin="round">
-                  <rect x="3" y="5" width="18" height="16" rx="2.5" />
-                  <path d="M3 10h18" />
-                  <path d="M8 3v3M16 3v3" />
-                  <path d="M12 12.4l1.1 2.25 2.48.32-1.82 1.7.46 2.45L12 17.9l-2.22 1.21.46-2.44-1.82-1.71 2.48-.32z" fill="currentColor" stroke="none" />
-                </svg>
+                <PixelCalendar className="h-6 w-6" />
                 {calendarAvailable && (
                   <span className="absolute -right-1.5 -top-1.5 flex h-3.5 w-3.5">
                     <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-success opacity-75" />

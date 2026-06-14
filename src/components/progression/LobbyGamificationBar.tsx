@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { Zap, Gift, Trophy, ChevronRight } from 'lucide-react'
-import { PixelFlame } from '@/components/pixel/PixelIcon'
+import { ChevronRight } from 'lucide-react'
+import { PixelFlame, PixelBolt, PixelGift, PixelTrophy } from '@/components/pixel/PixelIcon'
 import { getProgression, type Progression } from '@/actions/progression'
 import { getCollection } from '@/actions/collection'
 
@@ -36,7 +36,7 @@ export function LobbyGamificationBar({ initialProg = null, initialChests = 0 }: 
             {prog.level}
           </span>
           <span className="block min-w-0 flex-1 sm:flex-none sm:w-24">
-            <span className="flex items-center gap-1 text-[10px] text-white/50"><Zap className="h-3 w-3 text-cyan-400" />{prog.xpIntoLevel}/{prog.xpForLevel}</span>
+            <span className="flex items-center gap-1 text-[10px] text-white/50"><PixelBolt className="h-3 w-3" />{prog.xpIntoLevel}/{prog.xpForLevel}</span>
             <span className="mt-0.5 block h-1.5 w-full overflow-hidden rounded-full bg-white/10">
               <span className="block h-full rounded-full bg-gradient-to-r from-neon-purple to-cyan-400" style={{ width: `${pct}%` }} />
             </span>
@@ -57,14 +57,14 @@ export function LobbyGamificationBar({ initialProg = null, initialChests = 0 }: 
             chests > 0 ? 'border-neon-purple/40 bg-neon-purple/15 text-white hover:bg-neon-purple/25' : 'border-white/10 bg-white/5 text-white/50 hover:bg-white/10'
           }`}
         >
-          <Gift className="h-4 w-4" />
+          <PixelGift className="h-4 w-4" />
           <span>{chests > 0 ? `${chests} coffre${chests > 1 ? 's' : ''}` : 'Collection'}</span>
           {chests > 0 && <span className="absolute -right-1 -top-1 h-2.5 w-2.5 animate-pulse rounded-full bg-neon-pink" />}
         </Link>
 
         {/* Classement */}
         <Link href="/classement" style={{ marginLeft: 'auto' }} className="flex shrink-0 items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-sm font-semibold text-white/70 transition-colors hover:bg-white/10 hover:text-white">
-          <Trophy className="h-4 w-4 text-yellow-400" />
+          <PixelTrophy className="h-4 w-4" />
           <span className="hidden sm:inline">Classement</span>
         </Link>
 

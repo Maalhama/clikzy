@@ -307,3 +307,39 @@ export function PixelGem({ className, color = C.cy }: { className?: string; colo
     </PxSvg>
   )
 }
+
+// ---- Calendrier (récompense du jour) ----
+export function PixelCalendar({ className }: { className?: string }) {
+  const P = '#9B5CFF', PD = '#6E36FF', PK = '#FF4FD8', DK = '#161D2E', WT = '#E9D5FF'
+  return (
+    <PxSvg className={className} label="récompense du jour" vb="0 -0.5 16 16">
+      {px(5, 1, 1, 2, P, 'r1')}
+      {px(10, 1, 1, 2, P, 'r2')}
+      {px(2, 3, 12, 11, PD, 'frame')}
+      {px(3, 4, 10, 2, P, 'header')}
+      {px(3, 6, 10, 7, DK, 'body')}
+      {px(4, 8, 1, 1, WT, 'd1')}
+      {px(7, 8, 1, 1, WT, 'd2')}
+      {px(10, 8, 1, 1, WT, 'd3')}
+      {px(4, 10, 1, 1, WT, 'd4')}
+      {px(10, 10, 1, 1, WT, 'd5')}
+      {px(7, 10, 2, 2, PK, 'today')}
+    </PxSvg>
+  )
+}
+
+// ---- Cadeau (récompenses / quêtes) ----
+export function PixelGift({ className }: { className?: string }) {
+  const P = '#9B5CFF', PD = '#7B3FDF', PL = '#C9A6FF', PK = '#FF4FD8'
+  return (
+    <PxSvg className={className} label="cadeau" vb="0 -0.5 16 16">
+      {px(5, 2, 2, 2, PK, 'b1')}
+      {px(9, 2, 2, 2, PK, 'b2')}
+      {px(7, 3, 2, 1, PK, 'b3')}
+      {px(2, 5, 12, 2, PD, 'lid')}
+      {px(3, 7, 10, 7, P, 'box')}
+      {px(3, 7, 10, 1, PL, 'boxtop')}
+      {px(7, 5, 2, 9, PK, 'ribbon')}
+    </PxSvg>
+  )
+}
