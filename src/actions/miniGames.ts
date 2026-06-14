@@ -129,8 +129,9 @@ export async function playMiniGame(gameType: MiniGameType): Promise<ActionResult
   // (user_id, game_type, play_day) WHERE is_free_play sérialise les requêtes
   // parallèles (TOCTOU) -> un conflit 23505 = déjà joué aujourd'hui. C'est ce
   // gate, pas le check JS d'éligibilité ci-dessus, qui fait autorité.
+  // Écriture via service_role : plus aucune policy INSERT côté client (durcissement).
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { error: insertError } = await (supabase as any)
+  const { error: insertError } = await (fairAdmin as any)
     .from('mini_game_plays')
     .insert({
       user_id: user.id,
@@ -251,9 +252,10 @@ export async function playMiniGamePaid(gameType: MiniGameType): Promise<ActionRe
   const { creditsWon, segmentIndex, slotIndex, slotsSymbols, coinResult, diceResults } =
     computeMiniGameOutcome(gameType, makeFairGenerator(fair?.server_seed ?? '', fair?.client_seed ?? '', fairNonce))
 
-  // Insert play record (paid play - for history tracking)
+  // Insert play record (paid play - for history tracking).
+  // Écriture via service_role : plus aucune policy INSERT côté client (durcissement).
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  await (supabase as any)
+  const { error: paidInsertError } = await (fairAdmin as any)
     .from('mini_game_plays')
     .insert({
       user_id: user.id,
@@ -262,6 +264,10 @@ export async function playMiniGamePaid(gameType: MiniGameType): Promise<ActionRe
       is_free_play: false,
       fair_nonce: fairNonce,
     })
+  if (paidInsertError) {
+    // Crédits déjà débités/gagnés : on log pour audit sans bloquer le retour joueur.
+    console.error('[miniGamePaid] enregistrement de la partie échoué:', paidInsertError)
+  }
 
   // Add winnings to earned_credits (permanent) via service_role
   // (add_mini_game_credits révoquée de `authenticated`).

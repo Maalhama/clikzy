@@ -16,7 +16,9 @@ function makeSelectChain(plays: unknown[]) {
 }
 let playsReturned: unknown[] = []
 const mockSupabase = { auth: mockAuth, from: vi.fn(() => makeSelectChain(playsReturned)) }
-const mockServiceClient = { rpc: mockRpc }
+// Le service client gère l'insert de la partie (mini_game_plays) ET les RPC
+// (consume_fairness, add_mini_game_credits) — plus d'écriture via le client user.
+const mockServiceClient = { rpc: mockRpc, from: vi.fn(() => ({ insert: mockInsert })) }
 
 vi.mock('@/lib/supabase/server', () => ({ createClient: vi.fn(() => Promise.resolve(mockSupabase)) }))
 vi.mock('@/lib/supabase/service', () => ({ createServiceClient: vi.fn(() => mockServiceClient) }))
