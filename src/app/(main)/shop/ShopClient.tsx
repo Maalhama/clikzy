@@ -7,6 +7,7 @@ import { CREDIT_PACKS, type CreditPackId } from '@/lib/stripe/config'
 import { createCheckoutSession, createPassCheckoutSession } from '@/actions/stripe'
 import { getPassState } from '@/actions/battlePass'
 import { PackCard } from '@/components/shop/PackCard'
+import { PixelCoin } from '@/components/pixel/PixelIcon'
 
 interface ShopClientProps {
   currentCredits: number
@@ -70,9 +71,7 @@ export function ShopClient({ currentCredits }: ShopClientProps) {
           {/* Current credits */}
           <div className="mt-6 inline-flex items-center gap-3 px-5 py-3 panel rounded-2xl">
             <div className="w-10 h-10 rounded-xl bg-neon-blue/20 flex items-center justify-center">
-              <svg className="w-5 h-5 text-neon-blue" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
+              <PixelCoin className="h-6 w-6" />
             </div>
             <div className="text-left">
               <div className="text-xs text-white/50">Ton solde actuel</div>

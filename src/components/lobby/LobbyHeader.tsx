@@ -5,6 +5,7 @@ import { NeonChest } from '@/components/collection/NeonChest'
 import { LobbyCharacterWidget } from '@/components/lobby/LobbyCharacterWidget'
 import { MidnightCountdown } from '@/components/lobby/MidnightCountdown'
 import { JackpotWidget } from '@/components/jackpot/JackpotWidget'
+import { PixelCoin } from '@/components/pixel/PixelIcon'
 
 interface LobbyHeaderProps {
   credits: number
@@ -222,19 +223,7 @@ export const LobbyHeader = memo(function LobbyHeader({
             {/* Solde crédits — connecté uniquement (aucun CTA d'inscription dans l'anon) */}
             {isLoggedIn && (
               <div data-tour="credits" className="panel flex items-center gap-2 px-3.5 py-2">
-                <svg
-                  className="w-4 h-4 text-neon-blue"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
+                <PixelCoin className="h-[1.1rem] w-[1.1rem]" />
                 <span className="text-white stat-numeral text-sm">{credits}</span>
                 <span className="text-white/55 text-xs">crédits</span>
               </div>
