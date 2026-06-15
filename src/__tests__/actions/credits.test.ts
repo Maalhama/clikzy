@@ -12,14 +12,6 @@ vi.mock('@/lib/supabase/server', () => ({
 
 import { checkAndResetDailyCredits } from '@/actions/credits'
 
-function mockProfileSelect(profile: Record<string, unknown> | null) {
-  mockSupabase.from.mockReturnValue({
-    select: vi.fn().mockReturnThis(),
-    eq: vi.fn().mockReturnThis(),
-    single: vi.fn().mockResolvedValue({ data: profile }),
-  })
-}
-
 describe('Actions crédits (économie)', () => {
   beforeEach(() => {
     vi.clearAllMocks()
