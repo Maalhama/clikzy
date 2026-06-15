@@ -166,4 +166,73 @@ describe('handleStripeEvent — logique métier des paiements', () => {
     expect(res.status).toBe(200)
     expect(res.body).toEqual({ received: true })
   })
+
+  // Régressions des correctifs de l'audit 2026-06-15
+  describe('régressions audit 2026-06-15', () => {
+    it('P1.2 — replay idempotent (already_processed) : succès SANS remboursement', async () => {
+      mockRpc.mockResolvedValue({ data: { granted: 0, error: 'already_processed' } })
+      const res = await handleStripeEvent(
+        evt('checkout.session.completed', {
+          id: 'cs_replay',
+          metadata: { userId: 'u-1', packId: 'starter', credits: '50', monthlyLimit: '0' },
+        })
+      )
+      expect(res.status).toBe(200)
+      expect(res.body).toEqual({ received: true, duplicate: true })
+    })
+
+    it('crédit réussi : 200, ni remboursement ni duplicate', async () => {
+      mockRpc.mockResolvedValue({ data: { granted: 175 } })
+      const res = await handleStripeEvent(
+        evt('checkout.session.completed', {
+          id: 'cs_ok',
+          metadata: { userId: 'u-1', packId: 'popular', credits: '175', monthlyLimit: '0' },
+        })
+      )
+      expect(res.status).toBe(200)
+      expect(res.body).toEqual({ received: true })
+    })
+
+    it('P1.3 — Buy It Now non enregistré (ok:false) : remboursement auto', async () => {
+      mockRpc.mockResolvedValue({ data: { ok: false, error: 'game_not_found' } })
+      const res = await handleStripeEvent(
+        evt('checkout.session.completed', {
+          id: 'cs_bin',
+          metadata: { type: 'buy_it_now', userId: 'u-1', gameId: 'g-1', price: '25.00' },
+        })
+      )
+      expect(res.status).toBe(200)
+      expect(res.body).toMatchObject({ refunded: true, reason: 'game_not_found' })
+    })
+
+    it('Buy It Now enregistré (ok:true) : 200 sans remboursement', async () => {
+      mockRpc.mockResolvedValue({ data: { ok: true, recorded: true } })
+      const res = await handleStripeEvent(
+        evt('checkout.session.completed', {
+          id: 'cs_bin_ok',
+          metadata: { type: 'buy_it_now', userId: 'u-1', gameId: 'g-1', price: '25.00' },
+        })
+      )
+      expect(res.status).toBe(200)
+      expect(res.body).toEqual({ received: true })
+    })
+
+    it('P0 — VIP : lit current_period_end au niveau de l’item d’abonnement', async () => {
+      const res = await handleStripeEvent(
+        evt('customer.subscription.updated', {
+          id: 'sub_item',
+          status: 'active',
+          items: { data: [{ current_period_end: 1893456000 }] },
+          metadata: { type: 'vip_subscription', userId: 'u-1' },
+        })
+      )
+      expect(res.status).toBe(200)
+      expect(mockUpdate).toHaveBeenCalledWith(
+        expect.objectContaining({
+          is_vip: true,
+          vip_expires_at: new Date(1893456000 * 1000).toISOString(),
+        })
+      )
+    })
+  })
 })
