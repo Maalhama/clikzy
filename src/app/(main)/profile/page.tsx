@@ -27,11 +27,10 @@ export default async function ProfilePage() {
       .select('*')
       .eq('id', user.id)
       .single(),
-    supabase
-      .from('winners')
-      .select('*, item:items(*)')
-      .eq('user_id', user.id)
-      .order('won_at', { ascending: false }),
+    // RPC DEFINER : gains COMPLETS du joueur (avec tracking_number, masqué en grant
+    // colonne pour les autres). Items récupérés ensuite (table publique) pour l'embed.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (supabase.rpc as any)('get_my_winners'),
     supabase
       .from('clicks')
       .select('game_id', { count: 'exact', head: true })
@@ -50,7 +49,15 @@ export default async function ProfilePage() {
     redirect('/login')
   }
 
-  const wins = (winsResult.data as WinnerWithItem[] | null) || []
+  // get_my_winners() renvoie les lignes winners ; on rattache l'item (table publique)
+  // pour conserver le fallback retail_value affiché côté profil.
+  const winnerRows = (winsResult.data as Winner[] | null) || []
+  const itemIds = [...new Set(winnerRows.map((w) => w.item_id))]
+  const { data: itemsData } = itemIds.length > 0
+    ? await supabase.from('items').select('*').in('id', itemIds)
+    : { data: [] as Item[] }
+  const itemMap = new Map(((itemsData as Item[] | null) || []).map((it) => [it.id, it]))
+  const wins: WinnerWithItem[] = winnerRows.map((w) => ({ ...w, item: itemMap.get(w.item_id) as Item }))
   const gamesPlayed = gamesPlayedResult.count || 0
 
   // Calculate total value won
