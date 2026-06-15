@@ -44,6 +44,7 @@ export function ResponsibleGamingCard() {
         {OPTIONS.map((o) => (
           <button
             key={o.days}
+            aria-pressed={selected === o.days}
             onClick={() => { setSelected(o.days); setConfirming(false); setError(null) }}
             className={`rounded-xl border px-3 py-2.5 text-sm transition-colors ${
               selected === o.days

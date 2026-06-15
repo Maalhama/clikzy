@@ -76,7 +76,10 @@ export async function GET(request: NextRequest) {
     const { data: usersToResetData, error: fetchError } = await supabase
       .from('profiles')
       .select('id, is_vip, equip_daily_clicks, last_credits_reset')
-      .lt('last_credits_reset', todayMidnight.toISOString())
+      // Inclut last_credits_reset NULL (jamais reset) — sinon ces comptes ne sont
+      // jamais traités par le cron (NULL < x = NULL en SQL). Aligné sur la RPC
+      // reset_daily_credits (last_credits_reset IS NULL OR < paris_midnight()).
+      .or(`last_credits_reset.is.null,last_credits_reset.lt.${todayMidnight.toISOString()}`)
 
     if (fetchError) {
       console.error('Error fetching profiles:', fetchError)
