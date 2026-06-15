@@ -1,6 +1,7 @@
 'use server'
 
 import { getServerStripe } from '@/lib/stripe/server'
+import { selfExcludedUntil, selfExclusionError } from '@/lib/selfExclusion'
 import { createClient } from '@/lib/supabase/server'
 import { CREDIT_PACKS, GIFT_VIP_DAYS, GIFT_VIP_PRICE, type GiftCheckoutInput } from '@/lib/stripe/config'
 import { headers } from 'next/headers'
@@ -18,6 +19,9 @@ export async function createGiftCheckout(input: GiftCheckoutInput): Promise<Acti
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { success: false, error: 'Non authentifié' }
+
+  const excl = await selfExcludedUntil(supabase, user.id)
+  if (excl) return { success: false, error: selfExclusionError(excl) }
 
   const stripe = getServerStripe()
   if (!stripe) return { success: false, error: 'Service de paiement non configuré' }

@@ -13,6 +13,7 @@ import { BadgesSection } from '@/components/profile/BadgesSection'
 import { BuyItNowSection } from '@/components/profile/BuyItNowSection'
 import { BuyItNowResultToast } from '@/components/profile/BuyItNowResultToast'
 import { PrivacyCard } from '@/components/profile/PrivacyCard'
+import { ResponsibleGamingCard } from '@/components/profile/ResponsibleGamingCard'
 import { ProgressionCard } from '@/components/progression/ProgressionCard'
 import { getNeonImagePath } from '@/lib/utils/productImages'
 import type { Badge } from '@/actions/badges'
@@ -436,8 +437,11 @@ export function ProfileClient({ profile, wins, gamesPlayed, totalValueWon, gameH
           </Link>
         </motion.div>
 
+        {/* Jeu responsable : pause de compte */}
+        <div className="mt-8"><ResponsibleGamingCard /></div>
+
         {/* Confidentialité / RGPD */}
-        <div className="mt-8"><PrivacyCard /></div>
+        <div className="mt-6"><PrivacyCard /></div>
 
         {/* Member since */}
         <p className="text-center text-white/50 text-xs mt-6">

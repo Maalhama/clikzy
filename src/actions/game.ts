@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import { GAME_CONSTANTS } from '@/lib/constants'
 import { checkAndAwardBadges, type Badge } from '@/actions/badges'
 import { checkClickFraud, auditLog } from '@/lib/security'
+import { selfExcludedUntil, selfExclusionError } from '@/lib/selfExclusion'
 import type { Game, Click, Item, Profile } from '@/types/database'
 
 type GameWithItem = Game & {
@@ -33,6 +34,10 @@ export async function clickGame(gameId: string): Promise<ActionResult<{ newEndTi
   if (!user) {
     return { success: false, error: 'Non authentifié' }
   }
+
+  // Jeu responsable : compte en pause -> pas de clic.
+  const excl = await selfExcludedUntil(supabase, user.id)
+  if (excl) return { success: false, error: selfExclusionError(excl) }
 
   // Fraud detection check
   const fraudCheck = checkClickFraud(user.id, gameId, 'server-action')

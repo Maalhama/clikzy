@@ -66,6 +66,7 @@ describe('Game Actions', () => {
 
       mockEq.mockReturnValue({
         single: mockSingle,
+        maybeSingle: vi.fn().mockResolvedValue({ data: null }),
       })
 
       const result = await clickGame('game-id')
@@ -110,6 +111,7 @@ describe('Game Actions', () => {
 
       mockEq.mockReturnValue({
         single: mockSingle,
+        maybeSingle: vi.fn().mockResolvedValue({ data: null }),
       })
 
       const result = await clickGame('game-id')
@@ -148,7 +150,7 @@ describe('Game Actions', () => {
 
       mockSupabase.from.mockReturnValue({ select: mockSelect })
       mockSelect.mockReturnValue({ eq: mockEq })
-      mockEq.mockReturnValue({ single: mockSingle })
+      mockEq.mockReturnValue({ single: mockSingle, maybeSingle: vi.fn().mockResolvedValue({ data: null }) })
 
       mockSupabase.rpc.mockResolvedValue({
         data: [{ ok: true, new_total: 14, new_end_time: Date.now() + 90000, reason: 'ok' }],
@@ -200,7 +202,7 @@ describe('Game Actions', () => {
 
       mockSupabase.from.mockReturnValue({ select: mockSelect })
       mockSelect.mockReturnValue({ eq: mockEq })
-      mockEq.mockReturnValue({ single: mockSingle })
+      mockEq.mockReturnValue({ single: mockSingle, maybeSingle: vi.fn().mockResolvedValue({ data: null }) })
 
       mockSupabase.rpc.mockResolvedValue({
         data: [{ ok: true, new_total: 14, new_end_time: now + 90000, reason: 'ok' }],

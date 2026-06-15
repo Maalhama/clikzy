@@ -79,3 +79,34 @@ export async function deleteMyAccount(confirmation: string): Promise<Res> {
     return { success: false, error: 'Erreur lors de la suppression. Réessaie ou contacte le support.' }
   }
 }
+
+/** Jeu responsable : met le compte en pause (auto-exclusion) pour N jours et déconnecte. */
+export async function requestSelfExclusion(days: number): Promise<Res<{ until: string }>> {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { success: false, error: 'Non authentifié' }
+  if (![1, 7, 30, 90].includes(days)) return { success: false, error: 'Durée invalide' }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data, error } = await (supabase.rpc as any)('set_self_exclusion', { p_days: days })
+  if (error) {
+    console.error('[PRIVACY] set_self_exclusion error:', error)
+    return { success: false, error: 'Erreur lors de la mise en pause.' }
+  }
+  await supabase.auth.signOut()
+  return { success: true, data: { until: data as string } }
+}
+
+/** Date de fin d'auto-exclusion si active, sinon null. */
+export async function getSelfExclusion(): Promise<{ until: string | null }> {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { until: null }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data } = await (supabase as any)
+    .from('user_self_exclusion')
+    .select('excluded_until')
+    .eq('user_id', user.id)
+    .maybeSingle()
+  const until = data?.excluded_until ?? null
+  return { until: until && new Date(until).getTime() > Date.now() ? until : null }
+}

@@ -1,6 +1,7 @@
 'use server'
 
 import { getServerStripe } from '@/lib/stripe/server'
+import { selfExcludedUntil, selfExclusionError } from '@/lib/selfExclusion'
 import { createClient } from '@/lib/supabase/server'
 
 type ActionResult<T = void> = { success: boolean; data?: T; error?: string }
@@ -78,6 +79,9 @@ export async function createBuyItNowCheckout(gameId: string): Promise<ActionResu
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { success: false, error: 'Non authentifié' }
+
+  const excl = await selfExcludedUntil(supabase, user.id)
+  if (excl) return { success: false, error: selfExclusionError(excl) }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { data: quoteData, error: qErr } = await (supabase.rpc as any)('quote_buy_it_now', { p_user_id: user.id, p_game_id: gameId })

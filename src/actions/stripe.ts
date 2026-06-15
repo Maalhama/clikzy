@@ -1,6 +1,7 @@
 'use server'
 
 import { getServerStripe } from '@/lib/stripe/server'
+import { selfExcludedUntil, selfExclusionError } from '@/lib/selfExclusion'
 import { createClient } from '@/lib/supabase/server'
 import { CREDIT_PACKS, type CreditPackId } from '@/lib/stripe/config'
 
@@ -26,6 +27,9 @@ export async function createCheckoutSession(
   if (!user) {
     return { success: false, error: 'Non authentifié' }
   }
+
+  const excl = await selfExcludedUntil(supabase, user.id)
+  if (excl) return { success: false, error: selfExclusionError(excl) }
 
   // Find the pack
   const pack = CREDIT_PACKS.find((p) => p.id === packId)
@@ -122,6 +126,9 @@ export async function createVIPCheckoutSession(): Promise<ActionResult<{ url: st
   if (!user) {
     return { success: false, error: 'Non authentifié' }
   }
+
+  const excl = await selfExcludedUntil(supabase, user.id)
+  if (excl) return { success: false, error: selfExclusionError(excl) }
 
   // Check if user already has VIP
   const { data: profile } = await supabase
@@ -381,6 +388,9 @@ export async function createPassCheckoutSession(): Promise<ActionResult<{ url: s
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { success: false, error: 'Non authentifié' }
+
+  const excl = await selfExcludedUntil(supabase, user.id)
+  if (excl) return { success: false, error: selfExclusionError(excl) }
 
   try {
     const stripeInstance = getServerStripe()
