@@ -8,7 +8,6 @@ import {
   MiniGameType,
   MiniGameEligibility,
   MiniGameResult,
-  MiniGamePlay,
 } from '@/types/miniGames'
 
 type ActionResult<T = void> = {
@@ -305,28 +304,3 @@ export async function playMiniGamePaid(gameType: MiniGameType): Promise<ActionRe
   }
 }
 
-/**
- * Get user's mini-game history
- */
-export async function getMiniGameHistory(limit = 20): Promise<ActionResult<MiniGamePlay[]>> {
-  const supabase = await createClient()
-
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) {
-    return { success: false, error: 'Non authentifié' }
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data, error } = await (supabase as any)
-    .from('mini_game_plays')
-    .select('*')
-    .eq('user_id', user.id)
-    .order('played_at', { ascending: false })
-    .limit(limit)
-
-  if (error) {
-    return { success: false, error: 'Erreur lors de la récupération de l\'historique' }
-  }
-
-  return { success: true, data: data as MiniGamePlay[] }
-}

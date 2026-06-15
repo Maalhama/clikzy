@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { sendWelcomeEmail } from '@/lib/email'
+import { selfExcludedUntil, selfExclusionError } from '@/lib/selfExclusion'
 
 export type AuthResult = {
   success: boolean
@@ -44,6 +45,16 @@ export async function signInWithPassword(formData: FormData): Promise<AuthResult
     }
 
     return { success: false, error: error.message }
+  }
+
+  // Jeu responsable : un compte en pause (auto-exclusion) ne peut pas se reconnecter.
+  const { data: { user } } = await supabase.auth.getUser()
+  if (user) {
+    const until = await selfExcludedUntil(supabase, user.id)
+    if (until) {
+      await supabase.auth.signOut()
+      return { success: false, error: selfExclusionError(until) }
+    }
   }
 
   return { success: true }

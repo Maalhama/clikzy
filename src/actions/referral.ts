@@ -92,30 +92,3 @@ export async function applyReferralCode(code: string): Promise<ReferralResult> {
   revalidatePath('/profile')
   return { success: true, creditsAwarded: result.credits_awarded ?? REFERRAL_BONUS }
 }
-
-/**
- * Get referral link for sharing
- */
-export async function getReferralLink(): Promise<string | null> {
-  const supabase = await createClient()
-
-  const { data: { user } } = await supabase.auth.getUser()
-
-  if (!user) {
-    return null
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data: profile } = await (supabase as any)
-    .from('profiles')
-    .select('referral_code')
-    .eq('id', user.id)
-    .single()
-
-  if (!profile?.referral_code) {
-    return null
-  }
-
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://cleekzy.com'
-  return `${baseUrl}/register?ref=${profile.referral_code}`
-}

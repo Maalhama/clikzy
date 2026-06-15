@@ -84,6 +84,8 @@ export default function PrivacyPage() {
           <li><strong className="text-white">Supabase :</strong> pour l'hébergement des données</li>
           <li><strong className="text-white">Transporteurs :</strong> pour la livraison des lots</li>
           <li><strong className="text-white">Resend :</strong> pour l'envoi des emails</li>
+          <li><strong className="text-white">Umami :</strong> mesure d'audience respectueuse de la vie privée (sans cookie publicitaire), activée uniquement après votre consentement</li>
+          <li><strong className="text-white">Sentry :</strong> monitoring d'erreurs technique, pour détecter et corriger les bugs (intérêt légitime)</li>
         </ul>
         <p className="text-white/70 mt-4">
           Nous ne vendons jamais vos données à des tiers.
@@ -131,7 +133,11 @@ export default function PrivacyPage() {
           <li><strong className="text-white">Cookies de sécurité :</strong> pour protéger contre les attaques</li>
         </ul>
         <p className="text-white/70 mt-4">
-          Nous n'utilisons pas de cookies publicitaires ou de tracking tiers.
+          Nous n'utilisons <strong className="text-white">aucun cookie publicitaire</strong>. Avec votre consentement,
+          nous mesurons l'audience du site via <strong className="text-white">Umami</strong> (solution sans cookie
+          pisteur, respectueuse de la vie privée) ; vous pouvez refuser à tout moment via le bandeau de consentement.
+          Un outil de monitoring d'erreurs technique (<strong className="text-white">Sentry</strong>) est utilisé au
+          titre de l'intérêt légitime pour détecter les bugs ; il ne réalise pas de profilage publicitaire.
         </p>
       </section>
 

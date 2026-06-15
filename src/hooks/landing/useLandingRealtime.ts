@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useCallback, useRef } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { createClient } from '@/lib/supabase/browser'
 import type { RealtimeChannel } from '@supabase/supabase-js'
 
@@ -213,47 +213,4 @@ export function useLandingRealtime(
     error,
     isLoading,
   }
-}
-
-// Hook for simulated click notifications (for demo/showcase)
-export function useClickNotifications(enabled = true) {
-  const [notifications, setNotifications] = useState<
-    { id: string; username: string; timestamp: number }[]
-  >([])
-
-  const addNotification = useCallback((username: string) => {
-    const id = Math.random().toString(36).substring(7)
-    setNotifications((prev) => [...prev.slice(-4), { id, username, timestamp: Date.now() }])
-
-    // Auto-remove after 3 seconds
-    setTimeout(() => {
-      setNotifications((prev) => prev.filter((n) => n.id !== id))
-    }, 3000)
-  }, [])
-
-  // Simulate random clicks for demo effect
-  useEffect(() => {
-    if (!enabled) return
-
-    // Prenoms francais credibles
-    const firstNames = [
-      'Lucas', 'Hugo', 'Emma', 'Lea', 'Thomas', 'Maxime', 'Camille', 'Nathan',
-      'Chloe', 'Antoine', 'Julie', 'Quentin', 'Clara', 'Florian', 'Marion', 'Romain'
-    ]
-    const suffixes = ['', '75', '59', '69', '33', '_off', '_fr', '2k', '93', 'pro', '44']
-
-    const generateUsername = () => {
-      const name = firstNames[Math.floor(Math.random() * firstNames.length)]
-      const suffix = suffixes[Math.floor(Math.random() * suffixes.length)]
-      return Math.random() > 0.5 ? name.toLowerCase() + suffix : name + suffix
-    }
-
-    const interval = setInterval(() => {
-      addNotification(generateUsername())
-    }, 2000 + Math.random() * 5000)
-
-    return () => clearInterval(interval)
-  }, [enabled, addNotification])
-
-  return { notifications, addNotification }
 }
