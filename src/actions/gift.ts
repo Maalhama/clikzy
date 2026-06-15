@@ -3,6 +3,9 @@
 import { getServerStripe } from '@/lib/stripe/server'
 import { createClient } from '@/lib/supabase/server'
 import { CREDIT_PACKS, GIFT_VIP_DAYS, GIFT_VIP_PRICE, type GiftCheckoutInput } from '@/lib/stripe/config'
+import { headers } from 'next/headers'
+import { checkRateLimit } from '@/lib/rateLimit'
+import { getClientIP } from '@/lib/security/audit'
 
 type ActionResult<T = void> = { success: boolean; data?: T; error?: string }
 
@@ -91,6 +94,9 @@ export interface GiftDetails {
 /** Détails publics (non-PII) d'un code cadeau pour la page de réclamation. */
 export async function getGiftInfo(code: string): Promise<GiftDetails> {
   if (!code || !code.trim()) return { found: false }
+  // Rate-limit anti-brute-force (durcissement ; l'espace de codes est déjà énorme).
+  const rl = await checkRateLimit(`gift-lookup:${getClientIP(await headers())}`, 30, 60_000)
+  if (!rl.success) return { found: false }
   const supabase = await createClient()
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { data, error } = await (supabase.rpc as any)('get_gift_code', { p_code: code.trim() })

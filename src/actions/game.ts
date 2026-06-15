@@ -226,19 +226,12 @@ export async function getGameClicks(
 export async function getGameContenders(gameId: string): Promise<ActionResult<number>> {
   try {
     const supabase = await createClient()
-    const { data, error } = await supabase
-      .from('clicks')
-      .select('username')
-      .eq('game_id', gameId)
-      .order('clicked_at', { ascending: false })
-      .limit(400)
+    // RPC COUNT(DISTINCT) bornée (15 min) : un seul entier au lieu de 400 lignes
+    // ramenées et dédupliquées en JS à chaque tick × spectateur.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data, error } = await (supabase.rpc as any)('count_game_contenders', { p_game_id: gameId })
     if (error) return { success: false, error: 'Erreur' }
-    const distinct = new Set(
-      ((data ?? []) as { username: string | null }[])
-        .map((r) => r.username)
-        .filter((u): u is string => !!u)
-    )
-    return { success: true, data: distinct.size }
+    return { success: true, data: Number(data) || 0 }
   } catch {
     return { success: false, error: 'Erreur' }
   }

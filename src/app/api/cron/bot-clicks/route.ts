@@ -322,26 +322,30 @@ async function endGame(
   game: GameData,
   itemName: string
 ): Promise<boolean> {
-  const winnerId = game.last_click_user_id || null
-  const isBot = !winnerId
-  // Si pas de username, générer un pseudo de bot cohérent
-  const winnerUsername = game.last_click_username || generateDeterministicUsername(`${game.id}-winner`)
-
-  // Update avec protection contre les race conditions
-  const { data: updateResult } = await supabase
-    .from('games')
-    .update({
-      status: 'ended',
-      ended_at: new Date().toISOString(),
-      winner_id: winnerId,
-    })
-    .eq('id', game.id)
-    .in('status', ['active', 'final_phase'])
-    .select('id')
-
-  if (!updateResult || updateResult.length === 0) {
+  // Clôture ATOMIQUE verrouillée (anti-TOCTOU, P1.6) : la RPC revérifie end_time
+  // sous FOR UPDATE (le même verrou que perform_click) et renvoie le gagnant
+  // autoritaire. closed=false si un clic de dernière seconde a prolongé la partie
+  // ou si elle est déjà close -> on n'écrit ni winner ni récompense.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: rpcData, error: rpcError } = await (supabase.rpc as any)('end_game', { p_game_id: game.id })
+  const row = (Array.isArray(rpcData) ? rpcData[0] : rpcData) as {
+    closed: boolean
+    out_winner_id: string | null
+    out_winner_username: string | null
+    out_is_bot: boolean
+    out_item_id: string
+    out_total_clicks: number
+  } | null
+  if (rpcError || !row?.closed) {
     return false
   }
+
+  const winnerId = row.out_winner_id || null
+  const isBot = row.out_is_bot
+  // Si pas de username, générer un pseudo de bot cohérent
+  const winnerUsername = row.out_winner_username || generateDeterministicUsername(`${game.id}-winner`)
+  const itemId = row.out_item_id || game.item_id
+  const totalClicks = row.out_total_clicks ?? game.total_clicks ?? 0
 
   // Créer le record du gagnant
   let finalUsername = winnerUsername
@@ -362,19 +366,19 @@ async function endGame(
   const { data: itemData } = await supabase
     .from('items')
     .select('retail_value')
-    .eq('id', game.item_id)
+    .eq('id', itemId)
     .single()
   const itemValue = itemData?.retail_value || 0
 
-  if (game.total_clicks > 0 || winnerUsername) {
+  if (totalClicks > 0 || winnerUsername) {
     await supabase.from('winners').insert({
       game_id: game.id,
       user_id: winnerId,
       username: finalUsername,
-      item_id: game.item_id,
+      item_id: itemId,
       item_name: itemName,
       item_value: itemValue,
-      total_clicks_in_game: game.total_clicks || 0,
+      total_clicks_in_game: totalClicks,
       is_bot: isBot,
     })
 

@@ -829,7 +829,6 @@ export type Database = {
           equip_daily_clicks: number
           fair_client_seed: string | null
           fair_nonce: number
-          fair_server_seed: string | null
           fair_server_seed_hash: string | null
           has_purchased_credits: boolean | null
           id: string
@@ -875,7 +874,6 @@ export type Database = {
           equip_daily_clicks?: number
           fair_client_seed?: string | null
           fair_nonce?: number
-          fair_server_seed?: string | null
           fair_server_seed_hash?: string | null
           has_purchased_credits?: boolean | null
           id: string
@@ -921,7 +919,6 @@ export type Database = {
           equip_daily_clicks?: number
           fair_client_seed?: string | null
           fair_nonce?: number
-          fair_server_seed?: string | null
           fair_server_seed_hash?: string | null
           has_purchased_credits?: boolean | null
           id?: string
@@ -1173,6 +1170,32 @@ export type Database = {
             foreignKeyName: "user_equipment_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_fairness: {
+        Row: {
+          server_seed: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          server_seed: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          server_seed?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_fairness_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
@@ -1476,6 +1499,7 @@ export type Database = {
           server_seed: string
         }[]
       }
+      count_game_contenders: { Args: { p_game_id: string }; Returns: number }
       create_clan: {
         Args: { p_desc?: string; p_name: string; p_tag: string }
         Returns: {
@@ -1508,6 +1532,17 @@ export type Database = {
           distributed: boolean
           winner: string
           won: number
+        }[]
+      }
+      end_game: {
+        Args: { p_game_id: string }
+        Returns: {
+          closed: boolean
+          out_is_bot: boolean
+          out_item_id: string
+          out_total_clicks: number
+          out_winner_id: string
+          out_winner_username: string
         }[]
       }
       ensure_fairness: { Args: { p_user: string }; Returns: undefined }
