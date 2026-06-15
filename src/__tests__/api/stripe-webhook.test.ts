@@ -17,12 +17,20 @@ vi.mock('@supabase/supabase-js', () => ({
   createClient: vi.fn(() => mockAdmin),
 }))
 
-// Évite l'init Stripe réelle (clés absentes en test)
-vi.mock('stripe', () => ({ default: vi.fn(() => ({})) }))
+const { mockSessionsList } = vi.hoisted(() => ({ mockSessionsList: vi.fn() }))
+// Évite l'init Stripe réelle (clés absentes en test) ; classe constructible (getStripeInstance
+// fait `new Stripe(...)`) exposant checkout.sessions.list pour le handler de remboursement.
+vi.mock('stripe', () => ({
+  default: class MockStripe {
+    checkout = { sessions: { list: mockSessionsList } }
+    refunds = { create: vi.fn() }
+  },
+}))
 
-// getSupabaseAdmin() exige ces variables d'env
+// getSupabaseAdmin()/getStripeInstance() exigent ces variables d'env
 process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://test.supabase.co'
 process.env.SUPABASE_SERVICE_ROLE_KEY = 'test-service-role-key'
+process.env.STRIPE_SECRET_KEY = 'sk_test_dummy'
 
 import { handleStripeEvent } from '@/app/api/stripe/webhook/route'
 
@@ -135,16 +143,17 @@ describe('handleStripeEvent — logique métier des paiements', () => {
       expect(mockUpdate).not.toHaveBeenCalled()
     })
 
-    it('n’active pas le VIP si la souscription n’est pas active', async () => {
+    it('retire le VIP si la souscription passe en statut non-payant (past_due)', async () => {
       const res = await handleStripeEvent(
-        evt('customer.subscription.created', {
+        evt('customer.subscription.updated', {
           id: 'sub_3',
-          status: 'incomplete',
+          status: 'past_due',
           metadata: { type: 'vip_subscription', userId: 'u-1' },
         })
       )
       expect(res.status).toBe(200)
-      expect(mockUpdate).not.toHaveBeenCalled()
+      expect(res.body).toEqual({ received: true, downgraded: true })
+      expect(mockUpdate).toHaveBeenCalledWith(expect.objectContaining({ is_vip: false }))
     })
 
     it('désactive le VIP à la suppression de la souscription', async () => {
@@ -162,9 +171,43 @@ describe('handleStripeEvent — logique métier des paiements', () => {
   })
 
   it('ignore proprement un type d’événement non géré', async () => {
-    const res = await handleStripeEvent(evt('charge.refunded', {}))
+    const res = await handleStripeEvent(evt('payment_intent.succeeded', {}))
     expect(res.status).toBe(200)
     expect(res.body).toEqual({ received: true })
+  })
+
+  describe('remboursement / litige — reprise des crédits (anti-fraude)', () => {
+    it('charge.refunded TOTAL : retrouve la session et reprend les crédits', async () => {
+      mockSessionsList.mockResolvedValue({ data: [{ id: 'cs_pack' }] })
+      mockRpc.mockResolvedValue({ data: { ok: true, amount: 175 } })
+      const res = await handleStripeEvent(
+        evt('charge.refunded', { id: 'ch_1', payment_intent: 'pi_1', amount: 1999, amount_refunded: 1999, refunded: true })
+      )
+      expect(res.status).toBe(200)
+      expect(mockSessionsList).toHaveBeenCalledWith({ payment_intent: 'pi_1', limit: 1 })
+      expect(mockRpc).toHaveBeenCalledWith('clawback_pack_credits', { p_session: 'cs_pack' })
+      expect(res.body).toEqual({ received: true, clawed_back: 175 })
+    })
+
+    it('charge.refunded PARTIEL : pas de reprise auto (alerte admin manuelle)', async () => {
+      const res = await handleStripeEvent(
+        evt('charge.refunded', { id: 'ch_2', payment_intent: 'pi_2', amount: 1999, amount_refunded: 500, refunded: false })
+      )
+      expect(res.status).toBe(200)
+      expect(res.body).toEqual({ received: true, partial_refund: true })
+      expect(mockSessionsList).not.toHaveBeenCalled()
+    })
+
+    it('charge.dispute.created : reprise des crédits (chargeback)', async () => {
+      mockSessionsList.mockResolvedValue({ data: [{ id: 'cs_disp' }] })
+      mockRpc.mockResolvedValue({ data: { ok: true, amount: 50 } })
+      const res = await handleStripeEvent(
+        evt('charge.dispute.created', { id: 'dp_1', payment_intent: 'pi_3' })
+      )
+      expect(res.status).toBe(200)
+      expect(mockRpc).toHaveBeenCalledWith('clawback_pack_credits', { p_session: 'cs_disp' })
+      expect(res.body).toEqual({ received: true, clawed_back: 50 })
+    })
   })
 
   // Régressions des correctifs de l'audit 2026-06-15

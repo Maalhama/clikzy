@@ -281,9 +281,22 @@ export async function handleStripeEvent(event: Stripe.Event): Promise<HandlerRes
       return { status: 400, body: { error: 'Missing userId' } }
     }
 
-    // Only activate if subscription is active
-    if (subscription.status !== 'active') {
-      return { status: 200, body: { received: true } }
+    // Statut non-payant (past_due / unpaid / canceled / paused / incomplete*) : retire
+    // les avantages VIP IMMÉDIATEMENT. Sinon un abonné en défaut de paiement garde
+    // 20 cr/jour + remises jusqu'à la résiliation finale Stripe (dunning = potentiellement
+    // des semaines). 'trialing' conserve l'accès.
+    if (subscription.status !== 'active' && subscription.status !== 'trialing') {
+      const adminDb = getSupabaseAdmin()
+      const { error: downErr } = await adminDb
+        .from('profiles')
+        .update({ is_vip: false })
+        .eq('id', userId)
+      if (downErr) {
+        console.error('Error downgrading VIP (statut non-actif):', downErr)
+        return { status: 500, body: { error: 'Failed to downgrade VIP' } }
+      }
+      console.log(`VIP retiré pour user ${userId} (statut ${subscription.status})`)
+      return { status: 200, body: { received: true, downgraded: true } }
     }
 
     try {
@@ -295,9 +308,19 @@ export async function handleStripeEvent(event: Stripe.Event): Promise<HandlerRes
       const periodEnd =
         subscription.items?.data?.[0]?.current_period_end ??
         (subscription as unknown as { current_period_end?: number }).current_period_end
-      const expiresAt = periodEnd
-        ? new Date(periodEnd * 1000).toISOString()
-        : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
+      // Si la fin de période est introuvable (ne devrait pas arriver), fenêtre COURTE
+      // (48 h) + alerte admin, plutôt qu'un fail-open de 30 j « gratuits ».
+      let expiresAt: string
+      if (periodEnd) {
+        expiresAt = new Date(periodEnd * 1000).toISOString()
+      } else {
+        expiresAt = new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString()
+        import('@/lib/email')
+          .then(({ sendAdminAlertEmail }) =>
+            sendAdminAlertEmail('VIP sans current_period_end', `user ${userId}\nsub ${subscription.id}\nfenêtre 48h appliquée (vérifier la période réelle)`)
+          )
+          .catch((e) => console.error('[WEBHOOK] alerte admin VIP échouée:', e))
+      }
 
       const { error: updateError } = await supabase
         .from('profiles')
@@ -393,6 +416,59 @@ export async function handleStripeEvent(event: Stripe.Event): Promise<HandlerRes
       console.log(`Payment failed notification queued for user ${userId} (${event.type})`)
     } else {
       console.error(`Payment failed event without userId metadata (${event.type})`)
+    }
+  }
+
+  // Remboursement (admin) ou litige/chargeback : reprend les crédits permanents
+  // accordés pour ce paiement. Sans ça : acheter -> dépenser/cliquer -> se faire
+  // rembourser = crédits gardés ET argent rendu (vecteur de fraude).
+  if (event.type === 'charge.refunded' || event.type === 'charge.dispute.created') {
+    const obj = event.data.object as {
+      payment_intent?: string | null
+      amount?: number
+      amount_refunded?: number
+      refunded?: boolean
+      id?: string
+    }
+    const paymentIntent = typeof obj.payment_intent === 'string' ? obj.payment_intent : null
+
+    // Remboursement PARTIEL (charge.refunded) : reprise proportionnelle ambiguë ->
+    // alerte admin pour traitement manuel, pas de reprise automatique.
+    if (event.type === 'charge.refunded' && (!obj.refunded || (obj.amount_refunded ?? 0) < (obj.amount ?? 0))) {
+      import('@/lib/email')
+        .then(({ sendAdminAlertEmail }) =>
+          sendAdminAlertEmail('Remboursement partiel — reprise crédits manuelle', `charge ${obj.id}\npayment_intent ${paymentIntent}\nremboursé ${obj.amount_refunded}/${obj.amount}`)
+        )
+        .catch((e) => console.error('[WEBHOOK] alerte admin remboursement partiel échouée:', e))
+      return { status: 200, body: { received: true, partial_refund: true } }
+    }
+
+    if (!paymentIntent) return { status: 200, body: { received: true } }
+
+    try {
+      // Retrouve la session de checkout liée au paiement pour cibler le ledger.
+      const sessions = await getStripeInstance().checkout.sessions.list({ payment_intent: paymentIntent, limit: 1 })
+      const sessionId = sessions.data[0]?.id
+      if (!sessionId) return { status: 200, body: { received: true, no_session: true } }
+
+      const supabase = getSupabaseAdmin()
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data: clawData, error: clawErr } = await (supabase.rpc as any)('clawback_pack_credits', { p_session: sessionId })
+      if (clawErr) {
+        console.error('[STRIPE] clawback_pack_credits a échoué:', clawErr)
+        return { status: 500, body: { error: 'Clawback failed' } }
+      }
+      const r = clawData as { ok?: boolean; amount?: number; reason?: string; already?: boolean } | null
+      console.log(`[STRIPE] Reprise crédits (${event.type}) — PI ${paymentIntent}, session ${sessionId}:`, r)
+      import('@/lib/email')
+        .then(({ sendAdminAlertEmail }) =>
+          sendAdminAlertEmail(`Reprise crédits (${event.type})`, `payment_intent ${paymentIntent}\nsession ${sessionId}\nrésultat ${JSON.stringify(r)}`)
+        )
+        .catch((e) => console.error('[WEBHOOK] alerte admin reprise crédits échouée:', e))
+      return { status: 200, body: { received: true, clawed_back: r?.amount ?? 0 } }
+    } catch (e) {
+      console.error('[STRIPE] Erreur reprise crédits sur remboursement/litige:', e)
+      return { status: 500, body: { error: 'Refund handling failed' } }
     }
   }
 
