@@ -5,6 +5,7 @@ import { createPortal } from 'react-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { PixelSprite } from '@/components/collection/PixelSprite'
 import { BASE_HERO } from '@/components/collection/pixelHero'
+import { usePWAInstall } from '@/hooks/usePWAInstall'
 
 /* Icônes (héritent de currentColor) */
 const IcoShare = (
@@ -18,11 +19,15 @@ const IcoAddHome = (
     <path d="M12 8.5v7M8.5 12h7" />
   </svg>
 )
-const IcoDots = (
+const IcoSafari = (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.7} className="h-3.5 w-3.5">
+    <circle cx="12" cy="12" r="9" />
+    <path d="M15.5 8.5l-2.2 4.8-4.8 2.2 2.2-4.8 4.8-2.2z" fill="currentColor" stroke="none" />
+  </svg>
+)
+const IcoSparkle = (
   <svg viewBox="0 0 24 24" fill="currentColor" className="h-3.5 w-3.5">
-    <circle cx="5" cy="12" r="2" />
-    <circle cx="12" cy="12" r="2" />
-    <circle cx="19" cy="12" r="2" />
+    <path d="M12 2l1.6 5.4L19 9l-5.4 1.6L12 16l-1.6-5.4L5 9l5.4-1.6L12 2z" />
   </svg>
 )
 
@@ -35,7 +40,7 @@ type Step = {
   visual?: ReactNode
 }
 
-/* Visuel étape 2 : une fausse rangée de la feuille de partage iOS, mise en avant. */
+/* Visuel : fausse rangée « Sur l'écran d'accueil » de la feuille de partage iOS. */
 const ShareSheetRow = (
   <motion.div
     initial={{ opacity: 0, y: 6 }}
@@ -52,27 +57,61 @@ const ShareSheetRow = (
   </motion.div>
 )
 
-const STEPS: Step[] = [
+/* Vrai Safari : le bouton Partager est dans la barre du bas. */
+const SAFARI_STEPS: Step[] = [
   {
     accent: '#3CCBFF',
     eyebrow: 'Étape 1 sur 3',
-    title: 'Ouvre le menu (•••)',
+    title: 'Appuie sur « Partager »',
     body: (
       <>
-        Tout en bas à <span className="font-semibold text-white">droite</span> de ton navigateur, touche le bouton
-        menu (<span className="mx-0.5 inline-flex font-bold tracking-[0.1em] text-neon-blue">•••</span>).
+        Tout en bas de Safari, le petit carré avec une flèche qui monte (
+        <span className="mx-0.5 inline-flex translate-y-0.5 text-neon-blue">{IcoShare}</span>). Touche-le.
       </>
     ),
-    icon: IcoDots,
+    icon: IcoShare,
   },
   {
     accent: '#9B5CFF',
     eyebrow: 'Étape 2 sur 3',
-    title: 'Choisis « Partager »',
+    title: '« Sur l’écran d’accueil »',
+    body: <>Fais défiler (ou « Voir plus »), puis touche cette ligne :</>,
+    icon: IcoAddHome,
+    visual: ShareSheetRow,
+  },
+  {
+    accent: '#FFB800',
+    eyebrow: 'Dernière étape',
+    title: 'Et voilà, on y est !',
+    body: <>Touche « Ajouter » en haut à droite. Cleekzy débarque sur ton écran d&apos;accueil — je t&apos;y attends !</>,
+    icon: IcoSparkle,
+  },
+]
+
+/* Navigateur in-app (Insta, TikTok…) ou Chrome iOS : l'install ne marche que dans
+   Safari -> on guide d'abord vers Safari (via le menu •••). */
+const INAPP_STEPS: Step[] = [
+  {
+    accent: '#3CCBFF',
+    eyebrow: 'Étape 1 sur 3',
+    title: 'Ouvre dans Safari',
     body: (
       <>
-        Dans le menu qui s&apos;ouvre, touche <span className="font-semibold text-white">« Partager »</span> (
-        <span className="mx-0.5 inline-flex translate-y-0.5 text-neon-purple">{IcoShare}</span>).
+        Pour installer l&apos;app, touche le menu (
+        <span className="mx-0.5 inline-flex font-bold tracking-[0.1em] text-neon-blue">•••</span>) en bas à
+        <span className="font-semibold text-white"> droite</span>, puis « Ouvrir dans Safari ».
+      </>
+    ),
+    icon: IcoSafari,
+  },
+  {
+    accent: '#9B5CFF',
+    eyebrow: 'Étape 2 sur 3',
+    title: 'Dans Safari : « Partager »',
+    body: (
+      <>
+        Une fois dans Safari, touche le bouton Partager (
+        <span className="mx-0.5 inline-flex translate-y-0.5 text-neon-purple">{IcoShare}</span>) en bas, puis « Voir plus ».
       </>
     ),
     icon: IcoShare,
@@ -81,23 +120,20 @@ const STEPS: Step[] = [
     accent: '#FFB800',
     eyebrow: 'Dernière étape',
     title: '« Sur l’écran d’accueil »',
-    body: (
-      <>
-        Fais défiler (ou <span className="font-semibold text-white">« Voir plus »</span>), puis touche cette ligne.
-        Cleekzy débarque sur ton écran d&apos;accueil — je t&apos;y attends !
-      </>
-    ),
+    body: <>Touche cette ligne, puis « Ajouter ». Cleekzy arrive sur ton écran d&apos;accueil !</>,
     icon: IcoAddHome,
     visual: ShareSheetRow,
   },
 ]
 
 /**
- * Tuto d'installation iOS dans la DA Cleekzy : la mascotte Cleek guide l'user en
- * 3 étapes (Partager -> Sur l'écran d'accueil -> Ajouter), avec une flèche néon
- * qui rebondit vers la barre Safari. Iso-style du SpotlightTour du lobby.
+ * Tuto d'installation iOS dans la DA Cleekzy, ADAPTATIF : la mascotte Cleek guide
+ * en 3 étapes. En vrai Safari -> bouton Partager (barre du bas, flèche centrée).
+ * En navigateur in-app (réseaux) / Chrome iOS -> on guide d'abord vers Safari via
+ * le menu ••• (flèche en bas à droite), car l'install standalone n'y marche pas.
  */
 export function IOSInstallTour({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const { isInAppBrowser } = usePWAInstall()
   const [mounted, setMounted] = useState(false)
   const [step, setStep] = useState(0)
 
@@ -108,6 +144,7 @@ export function IOSInstallTour({ open, onClose }: { open: boolean; onClose: () =
 
   if (!mounted) return null
 
+  const STEPS = isInAppBrowser ? INAPP_STEPS : SAFARI_STEPS
   const s = STEPS[step]
   const last = step === STEPS.length - 1
   const goNext = () => (last ? onClose() : setStep(step + 1))
@@ -125,7 +162,7 @@ export function IOSInstallTour({ open, onClose }: { open: boolean; onClose: () =
           aria-modal="true"
           aria-label="Installer Cleekzy sur iPhone"
         >
-          {/* Bulle-mascotte, ancrée en haut pour laisser la barre Safari visible en bas */}
+          {/* Bulle-mascotte, ancrée en haut pour laisser la barre du navigateur visible */}
           <div className="mt-[9vh] w-full max-w-sm px-4">
             <AnimatePresence mode="wait">
               <motion.div
@@ -137,7 +174,6 @@ export function IOSInstallTour({ open, onClose }: { open: boolean; onClose: () =
                 className="surface-3 relative overflow-hidden rounded-2xl border p-4"
                 style={{ borderColor: `${s.accent}55` }}
               >
-                {/* Halo d'accent */}
                 <div
                   className="pointer-events-none absolute -right-10 -top-10 h-28 w-28 rounded-full blur-2xl"
                   style={{ background: `${s.accent}26` }}
@@ -152,7 +188,6 @@ export function IOSInstallTour({ open, onClose }: { open: boolean; onClose: () =
                   Passer
                 </button>
 
-                {/* Mascotte + en-tête */}
                 <div className="relative flex items-start gap-3">
                   <div className="relative flex-shrink-0">
                     <motion.div
@@ -185,7 +220,6 @@ export function IOSInstallTour({ open, onClose }: { open: boolean; onClose: () =
                 <p className="relative mt-2.5 text-sm leading-relaxed text-white/60">{s.body}</p>
                 {s.visual}
 
-                {/* Points de progression */}
                 <div className="mt-4 flex items-center justify-center gap-1.5">
                   {STEPS.map((st, i) => (
                     <button
@@ -199,7 +233,6 @@ export function IOSInstallTour({ open, onClose }: { open: boolean; onClose: () =
                   ))}
                 </div>
 
-                {/* Pied de page */}
                 <div className="mt-4 flex items-center gap-2.5">
                   {step > 0 && (
                     <button
@@ -217,21 +250,23 @@ export function IOSInstallTour({ open, onClose }: { open: boolean; onClose: () =
             </AnimatePresence>
           </div>
 
-          {/* Flèche néon qui pointe vers le bouton menu (•••), en bas à DROITE de la
-              barre du navigateur (étape 1) */}
+          {/* Flèche néon vers le point d'action de l'étape 1 : le menu ••• (bas-droite)
+              en in-app, le bouton Partager (bas-centre) en Safari. */}
           <AnimatePresence>
             {step === 0 && (
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="pointer-events-none absolute bottom-2 right-3 flex flex-col items-center gap-2"
+                className={`pointer-events-none absolute flex flex-col items-center gap-2 ${
+                  isInAppBrowser ? 'bottom-2 right-3' : 'inset-x-0 bottom-3'
+                }`}
               >
                 <span
                   className="rounded-full border border-neon-blue/40 bg-neon-blue/10 px-3 py-1 text-[0.7rem] font-bold uppercase tracking-[0.14em] text-neon-blue"
                   style={{ boxShadow: '0 0 20px -6px #3CCBFF' }}
                 >
-                  Le menu ••• est ici
+                  {isInAppBrowser ? 'Le menu ••• est ici' : 'Le bouton Partager est là'}
                 </span>
                 <motion.svg
                   viewBox="0 0 24 24"
