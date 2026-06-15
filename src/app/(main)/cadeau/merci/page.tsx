@@ -31,7 +31,14 @@ export default async function MerciPage({ searchParams }: { searchParams: Promis
             Tu peux aussi retrouver tes cadeaux à tout moment.
           </p>
           <div className="mt-6 flex flex-wrap justify-center gap-2">
-            <Link href="/cadeau/merci" className="btn-arena px-5 py-2.5 text-sm">Recharger</Link>
+            {/* <a> (pas <Link>) pour forcer un vrai rechargement du server component
+                avec la session conservée -> re-tente la création du code. */}
+            <a
+              href={session ? `/cadeau/merci?session=${encodeURIComponent(session)}` : '/cadeau/offrir'}
+              className="btn-arena px-5 py-2.5 text-sm"
+            >
+              Recharger
+            </a>
             <Link href="/lobby" className="btn-arena-outline px-5 py-2.5 text-sm">Retour à l&apos;arène</Link>
           </div>
         </div>

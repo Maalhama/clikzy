@@ -73,7 +73,7 @@ export async function GET(request: NextRequest) {
     // has_purchased_credits. VIP -> 20/jour, sinon 10/jour (non cumulables).
     const { data: usersToResetData, error: fetchError } = await supabase
       .from('profiles')
-      .select('id, is_vip, last_credits_reset')
+      .select('id, is_vip, equip_daily_clicks, last_credits_reset')
       .lt('last_credits_reset', todayMidnight.toISOString())
 
     if (fetchError) {
@@ -93,32 +93,32 @@ export async function GET(request: NextRequest) {
 
     const resetTimestamp = new Date().toISOString()
 
-    // VIP -> 20 crédits/jour, sinon 10 (non cumulables). Deux updates groupés.
-    const vipIds = usersToReset.filter((u) => (u as { is_vip: boolean }).is_vip).map((u) => u.id)
-    const freeIds = usersToReset.filter((u) => !(u as { is_vip: boolean }).is_vip).map((u) => u.id)
+    // credits = (20 VIP | 10) + equip_daily_clicks (bonus d'équipement, gagné en
+    // coffre/pass) — ALIGNÉ sur la RPC reset_daily_credits. Sans ce bonus, le cron
+    // (prioritaire à minuit) effaçait le perk chaque nuit. Regroupé par total pour
+    // des updates en bulk.
+    const groups = new Map<number, string[]>()
+    for (const u of usersToReset) {
+      const vip = (u as { is_vip: boolean }).is_vip
+      const equip = (u as { equip_daily_clicks: number | null }).equip_daily_clicks ?? 0
+      const total = (vip ? VIP_DAILY_CREDITS : DAILY_FREE_CREDITS) + equip
+      const ids = groups.get(total) ?? []
+      ids.push(u.id)
+      groups.set(total, ids)
+    }
 
-    if (freeIds.length > 0) {
-      const { error: e1 } = await supabase
+    for (const [total, ids] of groups) {
+      const { error: eGroup } = await supabase
         .from('profiles')
-        .update({ credits: DAILY_FREE_CREDITS, last_credits_reset: resetTimestamp })
-        .in('id', freeIds)
-      if (e1) {
-        console.error('Error resetting free credits:', e1)
+        .update({ credits: total, last_credits_reset: resetTimestamp })
+        .in('id', ids)
+      if (eGroup) {
+        console.error('Error resetting credits group:', eGroup)
         return NextResponse.json({ error: 'Failed to reset credits' }, { status: 500 })
       }
     }
-    if (vipIds.length > 0) {
-      const { error: e2 } = await supabase
-        .from('profiles')
-        .update({ credits: VIP_DAILY_CREDITS, last_credits_reset: resetTimestamp })
-        .in('id', vipIds)
-      if (e2) {
-        console.error('Error resetting VIP credits:', e2)
-        return NextResponse.json({ error: 'Failed to reset VIP credits' }, { status: 500 })
-      }
-    }
 
-    console.log(`Reset daily credits: ${freeIds.length}×${DAILY_FREE_CREDITS} + ${vipIds.length}×${VIP_DAILY_CREDITS} (VIP)`)
+    console.log(`Reset daily credits: ${usersToReset.length} users (${groups.size} paliers, bonus equip inclus)`)
 
     // Jackpot communautaire : croissance quotidienne + distribution le 8 (Europe/Paris)
     let jackpot: unknown = null

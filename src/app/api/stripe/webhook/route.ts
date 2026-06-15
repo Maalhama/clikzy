@@ -149,6 +149,21 @@ export async function handleStripeEvent(event: Stripe.Event): Promise<HandlerRes
         console.error('Error recording buy-it-now:', binError)
         return { status: 500, body: { error: 'Failed to record purchase' } }
       }
+      // Échec MÉTIER sans erreur SQL (ex: partie supprimée avant le paiement) :
+      // le client a payé mais rien n'est enregistré -> remboursement automatique.
+      const bin = binResult as { ok?: boolean; error?: string } | null
+      if (bin && bin.ok === false) {
+        console.error(`[STRIPE] Buy-It-Now NON enregistré — user ${userId}, game ${gameId}, session ${session.id}, raison:`, bin.error)
+        try {
+          if (session.payment_intent) {
+            await getStripeInstance().refunds.create({ payment_intent: session.payment_intent as string })
+            console.log(`[STRIPE] Auto-remboursement Buy-It-Now émis pour ${session.id}`)
+          }
+        } catch (refundErr) {
+          console.error('[STRIPE] Auto-remboursement Buy-It-Now ÉCHOUÉ (manuel requis):', refundErr)
+        }
+        return { status: 200, body: { received: true, refunded: true, reason: bin.error ?? 'not_recorded' } }
+      }
       console.log(`Buy-it-now recorded for user ${userId}, game ${gameId}:`, binResult)
       return { status: 200, body: { received: true } }
     }
@@ -202,6 +217,12 @@ export async function handleStripeEvent(event: Stripe.Event): Promise<HandlerRes
       // Erreur MÉTIER (ex: monthly_limit_reached via une race sur le pré-check) :
       // l'utilisateur a payé mais reçoit 0 crédit -> remboursement automatique.
       const grant = grantResult as { granted?: number; error?: string } | null
+      // Replay idempotent (même session déjà créditée sous un autre event.id) :
+      // succès silencieux — surtout NE PAS rembourser un achat déjà honoré.
+      if (grant?.error === 'already_processed') {
+        console.log(`[STRIPE] Pack déjà crédité (idempotent) — session ${session.id}`)
+        return { status: 200, body: { received: true, duplicate: true } }
+      }
       if (!grant || (grant.granted ?? 0) <= 0) {
         console.error(`[STRIPE] PAYÉ MAIS 0 CRÉDIT — user ${userId}, pack ${packId}, session ${session.id}, raison:`, grant?.error)
         try {
@@ -224,7 +245,7 @@ export async function handleStripeEvent(event: Stripe.Event): Promise<HandlerRes
 
   // Handle VIP subscription created/renewed
   if (event.type === 'customer.subscription.created' || event.type === 'customer.subscription.updated') {
-    const subscription = event.data.object as Stripe.Subscription & { current_period_end: number }
+    const subscription = event.data.object as Stripe.Subscription
 
     // Only process VIP subscriptions
     if (subscription.metadata?.type !== 'vip_subscription') {
@@ -245,8 +266,15 @@ export async function handleStripeEvent(event: Stripe.Event): Promise<HandlerRes
     try {
       const supabase = getSupabaseAdmin()
 
-      // Calculate expiration date (current period end)
-      const expiresAt = new Date(subscription.current_period_end * 1000).toISOString()
+      // current_period_end a migré sur l'ITEM d'abonnement (API Stripe 2025+) ;
+      // le lire sur la racine renvoie undefined -> NaN -> 500 en boucle (VIP jamais
+      // activé). Fallback racine (anciennes API) puis +30 j pour ne jamais bloquer.
+      const periodEnd =
+        subscription.items?.data?.[0]?.current_period_end ??
+        (subscription as unknown as { current_period_end?: number }).current_period_end
+      const expiresAt = periodEnd
+        ? new Date(periodEnd * 1000).toISOString()
+        : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
 
       const { error: updateError } = await supabase
         .from('profiles')
