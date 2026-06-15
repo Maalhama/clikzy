@@ -31,16 +31,18 @@ export async function getMyClan(): Promise<Res<MyClan | null>> {
   const { data: mine } = await sb.from('clan_members').select('clan_id, role').eq('user_id', user.id).single()
   if (!mine) return { success: true, data: null }
 
+  // Roster via RPC DEFINER (colonnes publiques) : profiles est en RLS own-row,
+  // un embed profiles(...) sur le client session renverrait null pour les autres.
   const [{ data: clan }, { data: members }] = await Promise.all([
     sb.from('clans').select('id, name, tag, description').eq('id', mine.clan_id).single(),
-    sb.from('clan_members').select('user_id, role, joined_at, profiles!clan_members_user_id_fkey ( username, level, xp )').eq('clan_id', mine.clan_id).order('joined_at'),
+    sb.rpc('get_clan_members', { p_clan_id: mine.clan_id }),
   ])
   if (!clan) return { success: true, data: null }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const mapped: ClanMember[] = (members ?? []).map((m: any) => ({
-    userId: m.user_id, username: m.profiles?.username ?? 'Joueur', level: m.profiles?.level ?? 1,
-    xp: m.profiles?.xp ?? 0, role: m.role,
+    userId: m.user_id, username: m.username ?? 'Joueur', level: m.level ?? 1,
+    xp: m.xp ?? 0, role: m.role,
   })).sort((a: ClanMember, b: ClanMember) => b.xp - a.xp)
 
   return {

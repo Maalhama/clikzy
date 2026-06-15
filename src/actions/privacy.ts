@@ -17,14 +17,24 @@ export async function exportMyData(): Promise<Res<string>> {
   const svc = createServiceClient()
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const sb = svc as any
-  const [{ data: profile }, { data: winners }, { data: purchases }, { data: gifts }, clicksRes] =
-    await Promise.all([
-      sb.from('profiles').select('*').eq('id', user.id).single(),
-      sb.from('winners').select('item_name, item_value, won_at, shipping_status').eq('user_id', user.id),
-      sb.from('buy_it_now_purchases').select('item_name, price_paid, created_at, shipping_status').eq('user_id', user.id),
-      sb.from('gift_codes').select('kind, credits, vip_days, created_at, redeemed_at').eq('gifter_id', user.id),
-      sb.from('clicks').select('id', { count: 'exact', head: true }).eq('user_id', user.id),
-    ])
+  const [
+    { data: profile }, { data: winners }, { data: purchases }, { data: gifts }, clicksRes,
+    { data: comments }, { data: packBuys }, { data: giftsReceived },
+    { data: selfExclusion }, { data: miniGamePlays }, { data: badges }, { data: clanMembership },
+  ] = await Promise.all([
+    sb.from('profiles').select('*').eq('id', user.id).single(),
+    sb.from('winners').select('item_name, item_value, won_at, shipping_status').eq('user_id', user.id),
+    sb.from('buy_it_now_purchases').select('item_name, price_paid, created_at, shipping_status').eq('user_id', user.id),
+    sb.from('gift_codes').select('kind, credits, vip_days, created_at, redeemed_at').eq('gifter_id', user.id),
+    sb.from('clicks').select('id', { count: 'exact', head: true }).eq('user_id', user.id),
+    sb.from('comments').select('content, game_id, created_at').eq('user_id', user.id),
+    sb.from('pack_purchases').select('*').eq('user_id', user.id),
+    sb.from('gift_codes').select('kind, credits, vip_days, redeemed_at').eq('redeemed_by', user.id),
+    sb.from('user_self_exclusion').select('excluded_until, created_at').eq('user_id', user.id),
+    sb.from('mini_game_plays').select('*').eq('user_id', user.id),
+    sb.from('user_badges').select('*').eq('user_id', user.id),
+    sb.from('clan_members').select('clan_id, role, joined_at').eq('user_id', user.id),
+  ])
 
   const payload = {
     exportedAt: new Date().toISOString(),
@@ -33,7 +43,14 @@ export async function exportMyData(): Promise<Res<string>> {
     totalClicks: (clicksRes as { count: number | null }).count ?? 0,
     winners: winners ?? [],
     purchases: purchases ?? [],
+    packPurchases: packBuys ?? [],
     giftsSent: gifts ?? [],
+    giftsReceived: giftsReceived ?? [],
+    comments: comments ?? [],
+    miniGamePlays: miniGamePlays ?? [],
+    badges: badges ?? [],
+    clanMembership: clanMembership ?? [],
+    selfExclusion: selfExclusion ?? [],
     note: "Tes paiements détaillés sont conservés chez notre prestataire Stripe conformément aux obligations comptables.",
   }
   return { success: true, data: JSON.stringify(payload, null, 2) }

@@ -1,6 +1,7 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
+import { selfExcludedUntil, selfExclusionError } from '@/lib/selfExclusion'
 
 export type CatalogItem = {
   id: string
@@ -98,6 +99,9 @@ export async function openChest(chestId: string): Promise<Res<ChestDrop>> {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { success: false, error: 'Non authentifié' }
+  // Jeu responsable : un compte en pause ne peut pas ouvrir de coffre (tirage hasard).
+  const excl = await selfExcludedUntil(supabase, user.id)
+  if (excl) return { success: false, error: selfExclusionError(excl) }
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { data, error } = await (supabase.rpc as any)('open_chest', { p_chest_id: chestId })
   if (error) return { success: false, error: 'Erreur ouverture' }

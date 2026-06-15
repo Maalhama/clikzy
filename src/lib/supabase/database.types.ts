@@ -1622,6 +1622,17 @@ export type Database = {
           total_xp: number
         }[]
       }
+      get_clan_members: {
+        Args: { p_clan_id: string }
+        Returns: {
+          joined_at: string
+          level: number
+          role: string
+          user_id: string
+          username: string
+          xp: number
+        }[]
+      }
       get_gift_code: { Args: { p_code: string }; Returns: Json }
       get_leaderboard: {
         Args: { p_limit?: number; p_period?: string }
@@ -1655,6 +1666,29 @@ export type Database = {
           claimed_tiers: number[]
           days_claimed: number
           purchased: boolean
+        }[]
+      }
+      get_public_profile: {
+        Args: { p_username: string }
+        Returns: {
+          avatar_url: string
+          badges: number
+          created_at: string
+          id: string
+          is_vip: boolean
+          level: number
+          total_clicks: number
+          total_wins: number
+          username: string
+          xp: number
+        }[]
+      }
+      get_public_profiles: {
+        Args: { p_ids: string[] }
+        Returns: {
+          avatar_url: string
+          id: string
+          username: string
         }[]
       }
       get_recent_comments: {
