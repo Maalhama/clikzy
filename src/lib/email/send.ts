@@ -34,6 +34,31 @@ export async function sendWelcomeEmail(email: string, username: string): Promise
   }
 }
 
+/** Alerte admin sur événement critique (paiement non honoré, etc.). */
+export async function sendAdminAlertEmail(subject: string, detail: string): Promise<boolean> {
+  if (!resend) {
+    console.log('[EMAIL] Resend non configuré, alerte admin ignorée')
+    return false
+  }
+  const to = process.env.ADMIN_ALERT_EMAIL || 'support@cleekzy.com'
+  try {
+    const { error } = await resend.emails.send({
+      from: EMAIL_FROM,
+      to,
+      subject: `[CLEEKZY ALERTE] ${subject}`,
+      html: `<div style="font-family:sans-serif;padding:16px;max-width:560px"><h2 style="margin:0 0 8px">Alerte Cleekzy</h2><p style="font-weight:600;margin:0 0 12px">${subject}</p><pre style="background:#f4f4f4;padding:12px;border-radius:8px;white-space:pre-wrap;font-size:13px">${detail}</pre><p style="color:#888;font-size:12px">${new Date().toISOString()}</p></div>`,
+    })
+    if (error) {
+      console.error('[EMAIL] Erreur alerte admin:', error)
+      return false
+    }
+    return true
+  } catch (err) {
+    console.error('[EMAIL] Exception alerte admin:', err)
+    return false
+  }
+}
+
 export async function sendWinnerEmail(
   email: string,
   username: string,

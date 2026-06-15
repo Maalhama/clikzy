@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import { createServiceClient } from '@/lib/supabase/service'
 import { checkAdminStatus } from '@/lib/auth/adminCheck'
 import { sendShippingEmail } from '@/lib/email'
+import { CREDIT_PACKS } from '@/lib/stripe/config'
 import { revalidatePath } from 'next/cache'
 import type { Profile, Game, Item, Winner } from '@/types/database'
 
@@ -59,6 +60,64 @@ export async function getAdminStats(): Promise<AdminStats | null> {
     totalWins: winsResult.count || 0,
     totalClicks,
     totalRevenue: 0, // TODO: Calculate from Stripe
+  }
+}
+
+export interface AdminHealth {
+  totalUsers: number
+  realPlayers: number
+  recentSignups7d: number
+  payingUsers: number
+  conversionPct: number
+  realClicks: number
+  botClicks: number
+  activeVips: number
+  revenueEstimate: number
+}
+
+// Santé business : vrais joueurs vs bots, conversion, revenus estimés (clé pour le lancement).
+export async function getAdminHealth(): Promise<AdminHealth | null> {
+  const { isAdmin } = await checkAdminStatus()
+  if (!isAdmin) return null
+  const supabase = createServiceClient()
+  /* eslint-disable @typescript-eslint/no-explicit-any */
+  const sb = supabase as any
+  const since7d = new Date(Date.now() - 7 * 86_400_000).toISOString()
+  const [usersRes, vipRes, signupRes, realClicksRes, botClicksRes, realClickers, packBuys, binBuys, giftBuys] =
+    await Promise.all([
+      sb.from('profiles').select('*', { count: 'exact', head: true }),
+      sb.from('profiles').select('*', { count: 'exact', head: true }).eq('is_vip', true),
+      sb.from('profiles').select('*', { count: 'exact', head: true }).gte('created_at', since7d),
+      sb.from('clicks').select('*', { count: 'exact', head: true }).eq('is_bot', false),
+      sb.from('clicks').select('*', { count: 'exact', head: true }).eq('is_bot', true),
+      sb.from('clicks').select('user_id').eq('is_bot', false).not('user_id', 'is', null),
+      sb.from('pack_purchases').select('user_id, pack_id'),
+      sb.from('buy_it_now_purchases').select('price_paid'),
+      sb.from('gift_codes').select('amount_paid'),
+    ])
+  /* eslint-enable @typescript-eslint/no-explicit-any */
+  const totalUsers = usersRes.count ?? 0
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const realPlayers = new Set((realClickers.data ?? []).map((r: any) => r.user_id)).size
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const payers = new Set((packBuys.data ?? []).map((r: any) => r.user_id))
+  const packPrice: Record<string, number> = Object.fromEntries(CREDIT_PACKS.map((p) => [p.id, p.price]))
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const packRevenue = (packBuys.data ?? []).reduce((s: number, r: any) => s + (packPrice[r.pack_id] ?? 0), 0)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const binRevenue = (binBuys.data ?? []).reduce((s: number, r: any) => s + Number(r.price_paid || 0), 0)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const giftRevenue = (giftBuys.data ?? []).reduce((s: number, r: any) => s + Number(r.amount_paid || 0), 0) / 100
+  return {
+    totalUsers,
+    realPlayers,
+    recentSignups7d: signupRes.count ?? 0,
+    payingUsers: payers.size,
+    conversionPct: totalUsers > 0 ? Math.round((payers.size / totalUsers) * 1000) / 10 : 0,
+    realClicks: realClicksRes.count ?? 0,
+    botClicks: botClicksRes.count ?? 0,
+    activeVips: vipRes.count ?? 0,
+    revenueEstimate: Math.round((packRevenue + binRevenue + giftRevenue) * 100) / 100,
   }
 }
 

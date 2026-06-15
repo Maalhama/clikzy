@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import type { AdminStats, AdminUser, AdminGame, BuyItNowOrder } from '@/actions/admin'
+import type { AdminStats, AdminUser, AdminGame, BuyItNowOrder, AdminHealth } from '@/actions/admin'
 import type { Item, Winner } from '@/types/database'
 import { updateUserCredits, toggleUserAdmin, updateShippingStatus, updateBuyItNowShipping } from '@/actions/admin'
 
@@ -13,15 +13,17 @@ interface AdminDashboardProps {
   items: Item[]
   winners: Winner[]
   buyItNowOrders: BuyItNowOrder[]
+  health: AdminHealth | null
 }
 
-type Tab = 'overview' | 'users' | 'games' | 'items' | 'winners' | 'buyitnow'
+type Tab = 'overview' | 'health' | 'users' | 'games' | 'items' | 'winners' | 'buyitnow'
 
-export function AdminDashboard({ stats, users, games, items, winners, buyItNowOrders }: AdminDashboardProps) {
+export function AdminDashboard({ stats, users, games, items, winners, buyItNowOrders, health }: AdminDashboardProps) {
   const [activeTab, setActiveTab] = useState<Tab>('overview')
 
   const tabs: { id: Tab; label: string; icon: React.ReactNode }[] = [
     { id: 'overview', label: 'Vue d\'ensemble', icon: <ChartIcon /> },
+    { id: 'health', label: 'Santé', icon: <ChartIcon /> },
     { id: 'users', label: 'Utilisateurs', icon: <UsersIcon /> },
     { id: 'games', label: 'Parties', icon: <GameIcon /> },
     { id: 'items', label: 'Lots', icon: <GiftIcon /> },
@@ -72,6 +74,7 @@ export function AdminDashboard({ stats, users, games, items, winners, buyItNowOr
           transition={{ duration: 0.2 }}
         >
           {activeTab === 'overview' && <OverviewTab stats={stats} />}
+          {activeTab === 'health' && <HealthTab health={health} />}
           {activeTab === 'users' && <UsersTab users={users} />}
           {activeTab === 'games' && <GamesTab games={games} />}
           {activeTab === 'items' && <ItemsTab items={items} />}
@@ -111,6 +114,48 @@ function OverviewTab({ stats }: { stats: AdminStats }) {
           <div className="text-white/40 text-xs">{stat.label}</div>
         </motion.div>
       ))}
+    </div>
+  )
+}
+
+// Health Tab — santé business
+function HealthTab({ health }: { health: AdminHealth | null }) {
+  if (!health) return <div className="text-white/50">Indisponible.</div>
+  const cards = [
+    { label: 'Vrais joueurs', value: health.realPlayers.toLocaleString('fr-FR'), sub: `${health.recentSignups7d} inscrits (7j)`, color: 'text-success' },
+    { label: 'Joueurs payants', value: health.payingUsers.toLocaleString('fr-FR'), sub: `${health.conversionPct}% de conversion`, color: 'text-neon-pink' },
+    { label: 'Revenus estimés', value: `${health.revenueEstimate.toLocaleString('fr-FR')}€`, sub: 'packs + rachats + cadeaux', color: 'text-warning' },
+    { label: 'VIP actifs', value: health.activeVips.toLocaleString('fr-FR'), sub: 'abonnements', color: 'text-yellow-400' },
+    { label: 'Clics réels', value: health.realClicks.toLocaleString('fr-FR'), sub: 'hors bots', color: 'text-neon-blue' },
+    { label: 'Clics bots', value: health.botClicks.toLocaleString('fr-FR'), sub: 'activité simulée', color: 'text-white/40' },
+  ]
+  const tot = health.realClicks + health.botClicks
+  const realShare = tot > 0 ? Math.round((health.realClicks / tot) * 100) : 0
+  return (
+    <div className="space-y-4">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+        {cards.map((c) => (
+          <div key={c.label} className="p-4 rounded-xl bg-bg-secondary/50 border border-white/10">
+            <div className={`text-2xl font-bold ${c.color}`}>{c.value}</div>
+            <div className="text-white/60 text-xs font-medium">{c.label}</div>
+            <div className="text-white/35 text-[0.65rem] mt-0.5">{c.sub}</div>
+          </div>
+        ))}
+      </div>
+      <div className="p-4 rounded-xl bg-bg-secondary/50 border border-white/10">
+        <div className="flex items-center justify-between text-sm mb-2">
+          <span className="text-white/70 font-medium">Part d&apos;activité réelle (vs bots)</span>
+          <span className="text-white font-bold">{realShare}%</span>
+        </div>
+        <div className="h-2 rounded-full bg-white/10 overflow-hidden">
+          <div className="h-full rounded-full bg-success transition-all" style={{ width: `${realShare}%` }} />
+        </div>
+        <p className="text-white/40 text-xs mt-2">
+          {realShare < 10
+            ? 'Trafic dominé par les bots — priorité n°1 : acquisition de vrais joueurs.'
+            : 'Bon équilibre joueurs réels / activité simulée.'}
+        </p>
+      </div>
     </div>
   )
 }

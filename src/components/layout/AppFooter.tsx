@@ -15,6 +15,7 @@ export function AppFooter() {
         </div>
 
         <nav aria-label="Liens légaux" className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs">
+          <Link href="/comment-ca-marche" className="text-white/55 transition-colors hover:text-white">Comment ça marche</Link>
           <Link href="/terms" className="text-white/55 transition-colors hover:text-white">Conditions</Link>
           <Link href="/cgv" className="text-white/55 transition-colors hover:text-white">CGV</Link>
           <Link href="/privacy" className="text-white/55 transition-colors hover:text-white">Confidentialité</Link>

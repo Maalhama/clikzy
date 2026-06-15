@@ -156,6 +156,11 @@ export async function handleStripeEvent(event: Stripe.Event): Promise<HandlerRes
       const bin = binResult as { ok?: boolean; error?: string } | null
       if (bin && bin.ok === false) {
         console.error(`[STRIPE] Buy-It-Now NON enregistré — user ${userId}, game ${gameId}, session ${session.id}, raison:`, bin.error)
+        import('@/lib/email')
+          .then(({ sendAdminAlertEmail }) =>
+            sendAdminAlertEmail('Buy-It-Now payé non enregistré', `user ${userId}\ngame ${gameId}\nsession ${session.id}\nraison: ${bin.error ?? 'inconnue'}`)
+          )
+          .catch((e) => console.error('[WEBHOOK] alerte admin échouée:', e))
         try {
           if (session.payment_intent) {
             await getStripeInstance().refunds.create({ payment_intent: session.payment_intent as string })
@@ -227,6 +232,11 @@ export async function handleStripeEvent(event: Stripe.Event): Promise<HandlerRes
       }
       if (!grant || (grant.granted ?? 0) <= 0) {
         console.error(`[STRIPE] PAYÉ MAIS 0 CRÉDIT — user ${userId}, pack ${packId}, session ${session.id}, raison:`, grant?.error)
+        import('@/lib/email')
+          .then(({ sendAdminAlertEmail }) =>
+            sendAdminAlertEmail('Paiement sans crédit', `user ${userId}\npack ${packId}\nsession ${session.id}\nraison: ${grant?.error ?? 'inconnue'}`)
+          )
+          .catch((e) => console.error('[WEBHOOK] alerte admin échouée:', e))
         try {
           if (session.payment_intent) {
             await getStripeInstance().refunds.create({ payment_intent: session.payment_intent as string })
