@@ -77,10 +77,8 @@ export function ProfileClient({ profile, wins, gamesPlayed, totalValueWon, gameH
   const [showCreditModal, setShowCreditModal] = useState(false)
 
   // Courbe XP serveur (xp_to_level) : niveau L atteint à 50·L·(L-1), 100·L XP par palier
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const xpTotal = Number((profile as any).xp ?? 0)
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const level = Number((profile as any).level ?? 1) || 1
+  const xpTotal = Number(profile.xp ?? 0)
+  const level = Number(profile.level ?? 1) || 1
   const xpIntoLevel = Math.max(0, xpTotal - 50 * level * (level - 1))
   const xpForLevel = 100 * level
   const levelProgress = Math.min(100, Math.round((xpIntoLevel / xpForLevel) * 100))

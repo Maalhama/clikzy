@@ -32,8 +32,7 @@ export async function removePushSubscription(endpoint: string): Promise<Res> {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { success: false, error: 'Non authentifié' }
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { error } = await (supabase as any)
+  const { error } = await supabase
     .from('push_subscriptions')
     .delete()
     .eq('endpoint', endpoint)

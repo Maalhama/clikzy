@@ -54,8 +54,7 @@ export async function getMiniGameEligibility(): Promise<ActionResult<MiniGameEli
   const tomorrowMidnight = getTomorrowMidnightFrench()
 
   // Get today's FREE plays for all game types (ignore paid plays)
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data: plays, error } = await (supabase as any)
+  const { data: plays, error } = await supabase
     .from('mini_game_plays')
     .select('game_type, played_at')
     .eq('user_id', user.id)
@@ -122,8 +121,7 @@ export async function playMiniGame(gameType: MiniGameType): Promise<ActionResult
   // Résultat provably-fair (commit-reveal) : seeds consommés côté serveur,
   // résultat déterministe vérifiable = HMAC(server_seed, client_seed:nonce:cursor).
   const fairAdmin = createServiceClient()
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data: fairRows } = await (fairAdmin.rpc as any)('consume_fairness', { p_user: user.id })
+  const { data: fairRows } = await fairAdmin.rpc('consume_fairness', { p_user: user.id })
   const fair = Array.isArray(fairRows) ? fairRows[0] : fairRows
   const fairNonce: number = fair?.nonce ?? 0
   const { creditsWon, segmentIndex, slotIndex, slotsSymbols, coinResult, diceResults } =
@@ -134,8 +132,7 @@ export async function playMiniGame(gameType: MiniGameType): Promise<ActionResult
   // parallèles (TOCTOU) -> un conflit 23505 = déjà joué aujourd'hui. C'est ce
   // gate, pas le check JS d'éligibilité ci-dessus, qui fait autorité.
   // Écriture via service_role : plus aucune policy INSERT côté client (durcissement).
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { error: insertError } = await (fairAdmin as any)
+  const { error: insertError } = await fairAdmin
     .from('mini_game_plays')
     .insert({
       user_id: user.id,
@@ -253,8 +250,7 @@ export async function playMiniGamePaid(gameType: MiniGameType): Promise<ActionRe
   // Résultat provably-fair (commit-reveal) : seeds consommés côté serveur,
   // résultat déterministe vérifiable = HMAC(server_seed, client_seed:nonce:cursor).
   const fairAdmin = createServiceClient()
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data: fairRows } = await (fairAdmin.rpc as any)('consume_fairness', { p_user: user.id })
+  const { data: fairRows } = await fairAdmin.rpc('consume_fairness', { p_user: user.id })
   const fair = Array.isArray(fairRows) ? fairRows[0] : fairRows
   const fairNonce: number = fair?.nonce ?? 0
   const { creditsWon, segmentIndex, slotIndex, slotsSymbols, coinResult, diceResults } =
@@ -262,8 +258,7 @@ export async function playMiniGamePaid(gameType: MiniGameType): Promise<ActionRe
 
   // Insert play record (paid play - for history tracking).
   // Écriture via service_role : plus aucune policy INSERT côté client (durcissement).
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { error: paidInsertError } = await (fairAdmin as any)
+  const { error: paidInsertError } = await fairAdmin
     .from('mini_game_plays')
     .insert({
       user_id: user.id,

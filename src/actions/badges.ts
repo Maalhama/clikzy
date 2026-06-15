@@ -38,8 +38,7 @@ export async function getAllBadges(): Promise<{ badge: Badge; earned: boolean; e
   const { data: { user } } = await supabase.auth.getUser()
 
   // Get all badges
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data: badges } = await (supabase as any)
+  const { data: badges } = await supabase
     .from('badges')
     .select('*')
     .order('requirement_value', { ascending: true })
@@ -51,8 +50,7 @@ export async function getAllBadges(): Promise<{ badge: Badge; earned: boolean; e
   let earnedDates: Map<string, string> = new Map()
 
   if (user) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data: userBadges } = await (supabase as any)
+    const { data: userBadges } = await supabase
       .from('user_badges')
       .select('badge_id, earned_at')
       .eq('user_id', user.id)
@@ -80,8 +78,7 @@ export async function getUserBadges(): Promise<UserBadge[]> {
 
   if (!user) return []
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data } = await (supabase as any)
+  const { data } = await supabase
     .from('user_badges')
     .select('*, badge:badges(*)')
     .eq('user_id', user.id)
@@ -119,8 +116,7 @@ export async function checkAndAwardBadges(): Promise<BadgeCheckResult> {
   const totalCreditsEarned = awardedRows.reduce((sum, a) => sum + (a.credits_reward || 0), 0)
 
   // Récupère les badges complets pour l'affichage (nom, icône, rareté...)
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data: badgeRows } = await (supabase as any)
+  const { data: badgeRows } = await supabase
     .from('badges')
     .select('*')
     .in('id', awardedIds)
@@ -158,8 +154,7 @@ export async function getBadgeStats(): Promise<{
   let earnedBadgeIds: Set<string> = new Set()
 
   if (user) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data: userBadges } = await (supabase as any)
+    const { data: userBadges } = await supabase
       .from('user_badges')
       .select('badge_id')
       .eq('user_id', user.id)

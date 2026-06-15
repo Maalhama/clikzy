@@ -58,8 +58,7 @@ export async function getGameHistory(limit: number = 20): Promise<GameHistoryIte
   }
 
   // Fetch game details
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data: games, error: gamesError } = await (supabase as any)
+  const { data: games, error: gamesError } = await supabase
     .from('games')
     .select(`
       id,
@@ -136,8 +135,7 @@ export async function getGameHistoryStats(): Promise<{
     .single()
 
   // Count distinct games played
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data: clicks } = await (supabase as any)
+  const { data: clicks } = await supabase
     .from('clicks')
     .select('game_id')
     .eq('user_id', user.id)

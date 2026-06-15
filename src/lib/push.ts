@@ -42,8 +42,7 @@ async function sendToSubscriptions(subs: SubRow[], payload: PushPayload): Promis
         // 404/410 = abonnement mort -> on le purge
         const status = (err as { statusCode?: number })?.statusCode
         if (status === 404 || status === 410) {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          await (service as any).from('push_subscriptions').delete().eq('endpoint', s.endpoint)
+          await service.from('push_subscriptions').delete().eq('endpoint', s.endpoint)
         }
       }
     })
@@ -54,8 +53,7 @@ async function sendToSubscriptions(subs: SubRow[], payload: PushPayload): Promis
 export async function sendPushToUser(userId: string, payload: PushPayload): Promise<void> {
   if (!ensureConfigured()) return
   const service = createServiceClient()
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data } = await (service as any)
+  const { data } = await service
     .from('push_subscriptions')
     .select('endpoint, p256dh, auth')
     .eq('user_id', userId)
@@ -66,8 +64,7 @@ export async function sendPushToUser(userId: string, payload: PushPayload): Prom
 export async function broadcastPush(payload: PushPayload): Promise<void> {
   if (!ensureConfigured()) return
   const service = createServiceClient()
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data } = await (service as any)
+  const { data } = await service
     .from('push_subscriptions')
     .select('endpoint, p256dh, auth')
     .limit(5000)

@@ -196,8 +196,7 @@ export async function getGameClicks(
 ): Promise<ActionResult<(Click & { username: string })[]>> {
   const supabase = await createClient()
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data, error } = await (supabase as any)
+  const { data, error } = await supabase
     .from('clicks')
     .select(`
       *,

@@ -49,8 +49,7 @@ export async function ensureGiftCodeForSession(sessionId: string): Promise<GiftI
   const code = giftCodeFromSession(sessionId)
 
   const svc = createServiceClient()
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  await (svc as any)
+  await svc
     .from('gift_codes')
     .upsert(
       {

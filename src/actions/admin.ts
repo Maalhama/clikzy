@@ -35,23 +35,20 @@ export async function getAdminStats(): Promise<AdminStats | null> {
   // service client : compte/agrège TOUS les profils (profiles est en RLS own-row).
   const supabase = createServiceClient()
 
-  /* eslint-disable @typescript-eslint/no-explicit-any */
   const [usersResult, gamesResult, itemsResult, activeGamesResult, winsResult] = await Promise.all([
-    (supabase as any).from('profiles').select('*', { count: 'exact', head: true }),
-    (supabase as any).from('games').select('*', { count: 'exact', head: true }),
-    (supabase as any).from('items').select('*', { count: 'exact', head: true }),
-    (supabase as any).from('games').select('*', { count: 'exact', head: true }).in('status', ['waiting', 'active', 'final_phase']),
-    (supabase as any).from('winners').select('*', { count: 'exact', head: true }),
+    supabase.from('profiles').select('*', { count: 'exact', head: true }),
+    supabase.from('games').select('*', { count: 'exact', head: true }),
+    supabase.from('items').select('*', { count: 'exact', head: true }),
+    supabase.from('games').select('*', { count: 'exact', head: true }).in('status', ['waiting', 'active', 'final_phase']),
+    supabase.from('winners').select('*', { count: 'exact', head: true }),
   ])
-  /* eslint-enable @typescript-eslint/no-explicit-any */
 
   // Get total clicks from all profiles
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data: clicksData } = await (supabase as any)
+  const { data: clicksData } = await supabase
     .from('profiles')
     .select('total_clicks')
 
-  const totalClicks = clicksData?.reduce((acc: number, p: { total_clicks: number }) => acc + (p.total_clicks || 0), 0) || 0
+  const totalClicks = clicksData?.reduce((acc: number, p: { total_clicks: number | null }) => acc + (p.total_clicks || 0), 0) || 0
 
   return {
     totalUsers: usersResult.count || 0,
@@ -81,8 +78,7 @@ export async function getAdminHealth(): Promise<AdminHealth | null> {
   const { isAdmin } = await checkAdminStatus()
   if (!isAdmin) return null
   const supabase = createServiceClient()
-  /* eslint-disable @typescript-eslint/no-explicit-any */
-  const sb = supabase as any
+  const sb = supabase
   const since7d = new Date(Date.now() - 7 * 86_400_000).toISOString()
   const [usersRes, vipRes, signupRes, realClicksRes, botClicksRes, realClickers, packBuys, binBuys, giftBuys] =
     await Promise.all([
@@ -96,7 +92,6 @@ export async function getAdminHealth(): Promise<AdminHealth | null> {
       sb.from('buy_it_now_purchases').select('price_paid'),
       sb.from('gift_codes').select('amount_paid'),
     ])
-  /* eslint-enable @typescript-eslint/no-explicit-any */
   const totalUsers = usersRes.count ?? 0
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const realPlayers = new Set((realClickers.data ?? []).map((r: any) => r.user_id)).size
@@ -130,8 +125,7 @@ export async function getAdminUsers(limit: number = 50, offset: number = 0): Pro
   // service client : liste admin de TOUS les profils (profiles est en RLS own-row).
   const supabase = createServiceClient()
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data } = await (supabase as any)
+  const { data } = await supabase
     .from('profiles')
     .select('*')
     .order('created_at', { ascending: false })
@@ -147,8 +141,7 @@ export async function getAdminGames(limit: number = 50, offset: number = 0): Pro
 
   const supabase = await createClient()
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data } = await (supabase as any)
+  const { data } = await supabase
     .from('games')
     .select('*, item:items(*)')
     .order('created_at', { ascending: false })
@@ -164,8 +157,7 @@ export async function getAdminItems(limit: number = 50, offset: number = 0): Pro
 
   const supabase = await createClient()
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data } = await (supabase as any)
+  const { data } = await supabase
     .from('items')
     .select('*')
     .order('created_at', { ascending: false })
@@ -181,8 +173,7 @@ export async function getAdminWinners(limit: number = 50, offset: number = 0): P
 
   const supabase = await createClient()
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data } = await (supabase as any)
+  const { data } = await supabase
     .from('winners')
     .select('*')
     .order('won_at', { ascending: false })
@@ -208,8 +199,7 @@ export async function getBuyItNowOrders(limit = 50, offset = 0): Promise<BuyItNo
   const { isAdmin } = await checkAdminStatus()
   if (!isAdmin) return []
   const supabase = createServiceClient()
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data } = await (supabase as any)
+  const { data } = await supabase
     .from('buy_it_now_purchases')
     .select('id, user_id, game_id, item_name, price_paid, shipping_status, tracking_number, created_at, profiles:user_id(username)')
     .order('created_at', { ascending: false })
@@ -245,15 +235,13 @@ export async function updateBuyItNowShipping(
   }
   if (status === 'delivered') updateData.delivered_at = new Date().toISOString()
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { error } = await (supabase as any).from('buy_it_now_purchases').update(updateData).eq('id', purchaseId)
+  const { error } = await supabase.from('buy_it_now_purchases').update(updateData).eq('id', purchaseId)
   if (error) return { success: false, error: error.message }
 
   // Email de suivi à l'expédition (best-effort, non bloquant)
   if (status === 'shipped' && trackingNumber) {
     try {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { data: p } = await (supabase as any)
+      const { data: p } = await supabase
         .from('buy_it_now_purchases')
         .select('user_id, item_name')
         .eq('id', purchaseId)
@@ -262,8 +250,7 @@ export async function updateBuyItNowShipping(
         const { data: userRes } = await supabase.auth.admin.getUserById(p.user_id)
         const to = userRes?.user?.email
         if (to) {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const { data: prof } = await (supabase as any).from('profiles').select('username').eq('id', p.user_id).single()
+          const { data: prof } = await supabase.from('profiles').select('username').eq('id', p.user_id).single()
           await sendShippingEmail(to, prof?.username || 'Joueur', p.item_name || 'Ton lot', trackingNumber)
         }
       }
@@ -342,8 +329,7 @@ export async function createItem(data: {
   // APRÈS la vérification admin ci-dessus.
   const supabase = createServiceClient()
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data: item, error } = await (supabase as any)
+  const { data: item, error } = await supabase
     .from('items')
     .insert({
       name: data.name.trim(),
@@ -387,8 +373,7 @@ export async function updateShippingStatus(
     updateData.delivered_at = new Date().toISOString()
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { error } = await (supabase as any)
+  const { error } = await supabase
     .from('winners')
     .update(updateData)
     .eq('id', winnerId)
@@ -400,8 +385,7 @@ export async function updateShippingStatus(
   // Email de suivi au gagnant à l'expédition (best-effort, non bloquant)
   if (status === 'shipped' && trackingNumber) {
     try {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { data: w } = await (supabase as any)
+      const { data: w } = await supabase
         .from('winners')
         .select('user_id, username, item_name')
         .eq('id', winnerId)

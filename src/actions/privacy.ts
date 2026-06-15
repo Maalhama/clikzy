@@ -15,8 +15,7 @@ export async function exportMyData(): Promise<Res<string>> {
   if (!user) return { success: false, error: 'Non authentifié' }
 
   const svc = createServiceClient()
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = svc as any
+  const sb = svc
   const [
     { data: profile }, { data: winners }, { data: purchases }, { data: gifts }, clicksRes,
     { data: comments }, { data: packBuys }, { data: giftsReceived },
@@ -70,8 +69,7 @@ export async function deleteMyAccount(confirmation: string): Promise<Res> {
   }
 
   const svc = createServiceClient()
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = svc as any
+  const sb = svc
   try {
     // 1) Anonymiser les PII dénormalisées qui survivent à la suppression du profil.
     await sb.from('winners').update({ username: 'Compte supprimé' }).eq('user_id', user.id)
