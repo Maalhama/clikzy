@@ -1,3 +1,5 @@
+import { unstable_cache } from 'next/cache'
+import { createClient as createSupabaseClient } from '@supabase/supabase-js'
 import { createClient } from '@/lib/supabase/server'
 import { LandingClient } from '@/components/landing'
 import type { Winner as DbWinner, Profile, Game, Item } from '@/types/database'
@@ -37,8 +39,23 @@ interface Prize {
   status: 'available' | 'ending_soon' | 'ended'
 }
 
-async function getLandingData() {
-  const supabase = await createClient()
+// Client anon SANS cookies -> requête mise en cache possible (le client à cookies
+// rendrait la requête dynamique, donc non-cachable). Lectures PUBLIQUES uniquement.
+function publicLandingClient() {
+  return createSupabaseClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    { auth: { persistSession: false, autoRefreshToken: false } }
+  )
+}
+
+// Données publiques de la landing, mises en CACHE 30 s : les requêtes DB sortent du
+// chemin critique de chaque visite -> le HTML (hero) part quasi-instantané même si la
+// base est lente. Le client rafraîchit ensuite les gagnants en temps réel
+// (useLandingRealtime), donc la fraîcheur reste bonne.
+const getLandingData = unstable_cache(
+  async () => {
+  const supabase = publicLandingClient()
   const now = Date.now()
 
   // Run all independent queries in parallel for faster data fetching
@@ -228,7 +245,10 @@ async function getLandingData() {
       totalGames: totalItemsCount || 50,
     },
   }
-}
+  },
+  ['landing-data'],
+  { revalidate: 30 }
+)
 
 export default async function LandingPage() {
   const supabase = await createClient()
