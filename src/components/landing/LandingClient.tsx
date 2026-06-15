@@ -438,8 +438,8 @@ export function LandingClient({
             </span>
           </div>
 
-          {/* Titre massif */}
-          <h1 className="hero-title reveal reveal-1 title-giant mb-4 text-[2.4rem]">
+          {/* Titre massif — pas de reveal sur mobile : affichage IMMÉDIAT du hero */}
+          <h1 className="hero-title title-giant mb-4 text-[2.4rem]">
             <span className="block text-white">Le dernier</span>
             <span className="block">
               <span className="text-click text-neon-purple neon-text">clic</span>{' '}
@@ -449,14 +449,14 @@ export function LandingClient({
           </h1>
 
           {/* Subtitle - Short */}
-          <p className="hero-subtitle reveal reveal-2 text-sm text-white/60 mb-4 max-w-[300px]">
+          <p className="hero-subtitle text-sm text-white/60 mb-4 max-w-[300px]">
             Des lots réels, un timer, des milliers de joueurs. Le dernier clic repart avec le lot.
             <span className="block text-neon-blue font-semibold mt-1">10 clics gratuits chaque jour.</span>
             <span className="block text-neon-purple text-xs mt-1">Nouveaux produits toutes les 3 heures.</span>
           </p>
 
           {/* Partie en direct (si disponible) */}
-          <div className="reveal reveal-3 mb-5">
+          <div className="mb-5">
             <HeroLiveCard games={heroGames} compact />
           </div>
 

@@ -41,8 +41,8 @@ export function LiveTickerBar({ winners }: LiveTickerBarProps) {
   )
 
   return (
-    <div className="relative border-y border-white/[0.07] bg-bg-secondary/40 py-2.5 overflow-hidden" aria-label="Dernières victoires">
-      {/* Étiquette LIVE fixe à gauche */}
+    <div className="relative flex h-11 items-center overflow-hidden border-y border-white/[0.07] bg-bg-secondary/40 pt-px" aria-label="Dernières victoires">
+      {/* Étiquette LIVE fixe à gauche (centrée verticalement comme le ticker) */}
       <div
         className="absolute left-0 top-0 bottom-0 z-10 flex items-center gap-2 pl-4 pr-16 md:pl-6"
         style={{ background: 'linear-gradient(90deg, #0F1422 0%, #0F1422 55%, rgba(15,20,34,0) 100%)' }}
@@ -52,7 +52,7 @@ export function LiveTickerBar({ winners }: LiveTickerBarProps) {
       </div>
 
       <div className="marquee-container pl-24">
-        <div className="flex w-max animate-[marquee_75s_linear_infinite]">
+        <div className="flex w-max items-center animate-[marquee_75s_linear_infinite]">
           <Track />
           <Track />
         </div>
