@@ -83,6 +83,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'yearly',
       priority: 0.3,
     },
+    {
+      url: `${BASE_URL}/comment-ca-marche`,
+      lastModified: now,
+      changeFrequency: 'monthly',
+      priority: 0.6,
+    },
+    {
+      url: `${BASE_URL}/jeu-responsable`,
+      lastModified: now,
+      changeFrequency: 'yearly',
+      priority: 0.4,
+    },
   ]
 
   // Profils publics des gagnants récents (pages /joueur/[username] indexables).

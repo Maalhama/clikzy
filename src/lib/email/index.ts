@@ -6,6 +6,7 @@ export {
   sendVipPaymentFailedEmail,
   sendStreakReminderEmail,
   sendAdminAlertEmail,
+  sendPurchaseConfirmationEmail,
 } from './send'
 export {
   welcomeEmailHtml,

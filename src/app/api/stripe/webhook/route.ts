@@ -249,6 +249,17 @@ export async function handleStripeEvent(event: Stripe.Event): Promise<HandlerRes
       }
 
       console.log(`Pack ${packId} granted to user ${userId}:`, grantResult)
+      // Email de confirmation d'achat (non-bloquant).
+      Promise.resolve()
+        .then(() => supabase.auth.admin.getUserById(userId))
+        .then(({ data: u }) => {
+          const to = u?.user?.email
+          if (!to) return
+          return import('@/lib/email').then(({ sendPurchaseConfirmationEmail }) =>
+            sendPurchaseConfirmationEmail(to, grant?.granted ?? credits, !!(grant as { doubled?: boolean })?.doubled)
+          )
+        })
+        .catch((e) => console.error('[WEBHOOK] email confirmation achat échoué:', e))
     } catch (error) {
       console.error('Error processing payment:', error)
       return { status: 500, body: { error: 'Payment processing failed' } }

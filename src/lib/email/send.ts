@@ -59,6 +59,35 @@ export async function sendAdminAlertEmail(subject: string, detail: string): Prom
   }
 }
 
+/** Confirmation d'achat de crédits (après grant réussi côté webhook). */
+export async function sendPurchaseConfirmationEmail(email: string, credits: number, doubled: boolean): Promise<boolean> {
+  if (!resend) {
+    console.log('[EMAIL] Resend non configuré, confirmation achat ignorée')
+    return false
+  }
+  try {
+    const { error } = await resend.emails.send({
+      from: EMAIL_FROM,
+      to: email,
+      subject: `Tes ${credits} crédits Cleekzy sont là`,
+      html: `<div style="font-family:sans-serif;background:#0B0F1A;color:#fff;padding:32px;border-radius:16px;max-width:480px">
+        <h1 style="color:#9B5CFF;margin:0 0 8px;font-size:22px">Paiement confirmé</h1>
+        <p style="color:#cbd5e1;line-height:1.5">Merci pour ton achat ! <strong style="color:#fff">${credits} crédits</strong> ont été ajoutés à ton compte${doubled ? ' <span style="color:#FF4FD8">(bonus x2 du 1er achat du mois inclus !)</span>' : ''}.</p>
+        <a href="https://www.cleekzy.com/lobby" style="display:inline-block;margin-top:16px;background:linear-gradient(135deg,#9B5CFF,#FF4FD8);color:#fff;text-decoration:none;padding:12px 24px;border-radius:12px;font-weight:600">Retour à l'arène</a>
+        <p style="color:#64748b;font-size:12px;margin-top:24px">Joue de façon responsable. Réservé aux 18 ans et plus. cleekzy.com</p>
+      </div>`,
+    })
+    if (error) {
+      console.error('[EMAIL] Erreur confirmation achat:', error)
+      return false
+    }
+    return true
+  } catch (err) {
+    console.error('[EMAIL] Exception confirmation achat:', err)
+    return false
+  }
+}
+
 export async function sendWinnerEmail(
   email: string,
   username: string,
