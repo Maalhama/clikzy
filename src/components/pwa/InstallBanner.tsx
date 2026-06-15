@@ -10,11 +10,11 @@ export function InstallBanner() {
   const [isDismissed, setIsDismissed] = useState(false)
   const [showIOSGuide, setShowIOSGuide] = useState(false)
 
-
-  // Check if already dismissed in localStorage
+  // Dismiss persistant via clé VERSIONNÉE : bumper la version (-v2, -v3…) ré-affiche
+  // le bandeau pour tous ceux qui l'avaient fermé (reset du « ne plus afficher »).
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const dismissed = localStorage.getItem('pwa-install-dismissed')
+      const dismissed = localStorage.getItem('pwa-install-dismissed-v2')
       if (dismissed) {
         const dismissedAt = parseInt(dismissed, 10)
         // Show again after 7 days
@@ -64,9 +64,9 @@ export function InstallBanner() {
               </svg>
             </div>
             <div className="min-w-0 flex-1">
-              <span className="text-sm font-bold text-white">Installe CLEEKZY</span>
+              <span className="text-sm font-bold text-white">L&apos;app Cleekzy</span>
               <span className="ml-2 hidden text-xs text-white/50 sm:inline">
-                Accès rapide depuis ton écran d&apos;accueil
+                Sur ton écran d&apos;accueil, accès direct en 1 tap
               </span>
             </div>
             <button

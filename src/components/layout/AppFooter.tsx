@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { InstallAppLink } from '@/components/pwa/InstallAppLink'
 
 /**
  * Footer minimal des pages app : ancre les pages courtes (clans, classement)
@@ -15,6 +16,7 @@ export function AppFooter() {
         </div>
 
         <nav aria-label="Liens légaux" className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs">
+          <InstallAppLink className="font-semibold text-neon-blue transition-colors hover:text-white" />
           <Link href="/comment-ca-marche" className="text-white/55 transition-colors hover:text-white">Comment ça marche</Link>
           <Link href="/terms" className="text-white/55 transition-colors hover:text-white">Conditions</Link>
           <Link href="/cgv" className="text-white/55 transition-colors hover:text-white">CGV</Link>

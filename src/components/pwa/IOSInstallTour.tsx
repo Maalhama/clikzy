@@ -18,9 +18,11 @@ const IcoAddHome = (
     <path d="M12 8.5v7M8.5 12h7" />
   </svg>
 )
-const IcoSparkle = (
+const IcoDots = (
   <svg viewBox="0 0 24 24" fill="currentColor" className="h-3.5 w-3.5">
-    <path d="M12 2l1.6 5.4L19 9l-5.4 1.6L12 16l-1.6-5.4L5 9l5.4-1.6L12 2z" />
+    <circle cx="5" cy="12" r="2" />
+    <circle cx="12" cy="12" r="2" />
+    <circle cx="19" cy="12" r="2" />
   </svg>
 )
 
@@ -54,30 +56,39 @@ const STEPS: Step[] = [
   {
     accent: '#3CCBFF',
     eyebrow: 'Étape 1 sur 3',
-    title: 'Appuie sur « Partager »',
+    title: 'Ouvre le menu (•••)',
     body: (
       <>
-        Tout en bas de Safari, repère le petit carré avec une flèche qui monte (
-        <span className="mx-0.5 inline-flex translate-y-0.5 text-neon-blue">{IcoShare}</span>
-        ). C&apos;est le bouton de partage d&apos;Apple — touche-le.
+        Tout en bas à <span className="font-semibold text-white">droite</span> de ton navigateur, touche le bouton
+        menu (<span className="mx-0.5 inline-flex font-bold tracking-[0.1em] text-neon-blue">•••</span>).
+      </>
+    ),
+    icon: IcoDots,
+  },
+  {
+    accent: '#9B5CFF',
+    eyebrow: 'Étape 2 sur 3',
+    title: 'Choisis « Partager »',
+    body: (
+      <>
+        Dans le menu qui s&apos;ouvre, touche <span className="font-semibold text-white">« Partager »</span> (
+        <span className="mx-0.5 inline-flex translate-y-0.5 text-neon-purple">{IcoShare}</span>).
       </>
     ),
     icon: IcoShare,
   },
   {
-    accent: '#9B5CFF',
-    eyebrow: 'Étape 2 sur 3',
-    title: '« Sur l’écran d’accueil »',
-    body: <>Dans le menu qui s&apos;ouvre, fais défiler un peu vers le bas, puis touche cette ligne :</>,
-    icon: IcoAddHome,
-    visual: ShareSheetRow,
-  },
-  {
     accent: '#FFB800',
     eyebrow: 'Dernière étape',
-    title: 'Et voilà, on y est !',
-    body: <>Touche « Ajouter » en haut à droite. Cleekzy débarque sur ton écran d&apos;accueil — je t&apos;y attends pour cliquer.</>,
-    icon: IcoSparkle,
+    title: '« Sur l’écran d’accueil »',
+    body: (
+      <>
+        Fais défiler (ou <span className="font-semibold text-white">« Voir plus »</span>), puis touche cette ligne.
+        Cleekzy débarque sur ton écran d&apos;accueil — je t&apos;y attends !
+      </>
+    ),
+    icon: IcoAddHome,
+    visual: ShareSheetRow,
   },
 ]
 
@@ -206,20 +217,21 @@ export function IOSInstallTour({ open, onClose }: { open: boolean; onClose: () =
             </AnimatePresence>
           </div>
 
-          {/* Flèche néon qui rebondit vers la barre Safari (étape 1 : où taper Partager) */}
+          {/* Flèche néon qui pointe vers le bouton menu (•••), en bas à DROITE de la
+              barre du navigateur (étape 1) */}
           <AnimatePresence>
             {step === 0 && (
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="pointer-events-none absolute inset-x-0 bottom-3 flex flex-col items-center gap-2"
+                className="pointer-events-none absolute bottom-2 right-3 flex flex-col items-center gap-2"
               >
                 <span
-                  className="rounded-full border border-neon-blue/40 bg-neon-blue/10 px-3 py-1 text-[0.7rem] font-bold uppercase tracking-[0.16em] text-neon-blue"
+                  className="rounded-full border border-neon-blue/40 bg-neon-blue/10 px-3 py-1 text-[0.7rem] font-bold uppercase tracking-[0.14em] text-neon-blue"
                   style={{ boxShadow: '0 0 20px -6px #3CCBFF' }}
                 >
-                  Le bouton Partager est là
+                  Le menu ••• est ici
                 </span>
                 <motion.svg
                   viewBox="0 0 24 24"
