@@ -3,11 +3,13 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { usePWAInstall } from '@/hooks/usePWAInstall'
+import { IOSInstallTour } from './IOSInstallTour'
 
 export function InstallBanner() {
   const { isInstallable, isInstalled, isIOS, install } = usePWAInstall()
   const [isDismissed, setIsDismissed] = useState(false)
   const [showIOSGuide, setShowIOSGuide] = useState(false)
+
 
   // Check if already dismissed in localStorage
   useEffect(() => {
@@ -86,74 +88,8 @@ export function InstallBanner() {
         </motion.div>
       </AnimatePresence>
 
-      {/* iOS Installation Guide Modal */}
-      <AnimatePresence>
-        {showIOSGuide && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 backdrop-blur-sm p-4"
-            onClick={() => setShowIOSGuide(false)}
-          >
-            <motion.div
-              initial={{ opacity: 0, y: 50 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 50 }}
-              onClick={(e) => e.stopPropagation()}
-              className="w-full max-w-md p-6 rounded-2xl bg-bg-secondary border border-white/10"
-            >
-              <h3 className="text-xl font-bold text-white mb-4 text-center">
-                Installer sur iPhone/iPad
-              </h3>
-
-              <div className="space-y-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-neon-purple/20 flex items-center justify-center text-neon-purple font-bold">
-                    1
-                  </div>
-                  <p className="text-white/80 text-sm">
-                    Appuie sur <span className="inline-flex items-center"><ShareIcon className="w-5 h-5 mx-1 text-neon-blue" /></span> en bas de Safari
-                  </p>
-                </div>
-
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-neon-purple/20 flex items-center justify-center text-neon-purple font-bold">
-                    2
-                  </div>
-                  <p className="text-white/80 text-sm">
-                    Fais défiler et choisis &quot;Sur l&apos;écran d&apos;accueil&quot;
-                  </p>
-                </div>
-
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-neon-purple/20 flex items-center justify-center text-neon-purple font-bold">
-                    3
-                  </div>
-                  <p className="text-white/80 text-sm">
-                    Appuie sur &quot;Ajouter&quot; en haut à droite
-                  </p>
-                </div>
-              </div>
-
-              <button
-                onClick={() => setShowIOSGuide(false)}
-                className="btn-arena-ghost w-full mt-6 py-3 text-sm"
-              >
-                Compris !
-              </button>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* Tuto d'installation iOS guidé par la mascotte Cleek (DA Cleekzy) */}
+      <IOSInstallTour open={showIOSGuide} onClose={() => setShowIOSGuide(false)} />
     </>
-  )
-}
-
-function ShareIcon({ className }: { className?: string }) {
-  return (
-    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-      <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-    </svg>
   )
 }

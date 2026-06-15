@@ -4,6 +4,7 @@ import { SkipLink } from '@/components/ui/SkipLink'
 import { CookieConsent } from '@/components/common/CookieConsent'
 import { Analytics } from '@/components/common/Analytics'
 import { WebVitalsReporter } from '@/components/analytics/WebVitalsReporter'
+import { SWRegister } from '@/components/pwa/SWRegister'
 import './globals.css'
 
 // Body : grotesque moderne et lisible (remplace Inter)
@@ -79,6 +80,21 @@ export const metadata: Metadata = {
   },
   manifest: '/manifest.json',
   category: 'gaming',
+  icons: {
+    icon: [
+      { url: '/icon.svg', type: 'image/svg+xml' },
+      { url: '/icon-192.png', sizes: '192x192', type: 'image/png' },
+      { url: '/icon-512.png', sizes: '512x512', type: 'image/png' },
+    ],
+    // apple-touch-icon : icône de l'app une fois ajoutée à l'écran d'accueil iOS
+    // (sinon iOS prend une capture floue de la page).
+    apple: [{ url: '/icon-192.png', sizes: '180x180' }],
+  },
+  appleWebApp: {
+    capable: true,
+    title: 'CLEEKZY',
+    statusBarStyle: 'black-translucent',
+  },
 }
 
 // JSON-LD Structured Data
@@ -125,6 +141,7 @@ export default function RootLayout({
         <CookieConsent />
         <Analytics />
         <WebVitalsReporter />
+        <SWRegister />
       </body>
     </html>
   )
