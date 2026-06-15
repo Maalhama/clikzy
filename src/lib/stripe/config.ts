@@ -67,3 +67,9 @@ export type CreditPackId = (typeof CREDIT_PACKS)[number]['id']
 export function getCreditPack(packId: CreditPackId) {
   return CREDIT_PACKS.find((pack) => pack.id === packId)
 }
+
+// Cadeau VIP : pass non-récurrent de 30 jours, au tarif du VIP mensuel.
+export const GIFT_VIP_DAYS = 30
+export const GIFT_VIP_PRICE = 12.99
+
+export type GiftCheckoutInput = { kind: 'credits'; packId: CreditPackId } | { kind: 'vip' }

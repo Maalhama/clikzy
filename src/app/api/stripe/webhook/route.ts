@@ -153,6 +153,24 @@ export async function handleStripeEvent(event: Stripe.Event): Promise<HandlerRes
       return { status: 200, body: { received: true } }
     }
 
+    // Cadeau (offrir crédits/VIP) : génère le code à réclamer (idempotent par session).
+    // import dynamique : gift.ts est server-only (non résolvable dans les tests unitaires).
+    if (session.metadata?.type === 'gift') {
+      try {
+        const { ensureGiftCodeForSession } = await import('@/lib/gift')
+        const gift = await ensureGiftCodeForSession(session.id)
+        if (!gift) {
+          console.error('[WEBHOOK] gift session non payée ou invalide:', session.id)
+          return { status: 200, body: { received: true, skipped: true } }
+        }
+        console.log(`Gift code created for session ${session.id}: ${gift.kind}`)
+      } catch (e) {
+        console.error('Error creating gift code:', e)
+        return { status: 500, body: { error: 'Failed to create gift' } }
+      }
+      return { status: 200, body: { received: true } }
+    }
+
     const packId = session.metadata?.packId
     const credits = parseInt(session.metadata?.credits || '0', 10)
     const monthlyLimit = session.metadata?.monthlyLimit === '1'

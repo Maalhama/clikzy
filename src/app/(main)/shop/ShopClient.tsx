@@ -175,6 +175,23 @@ export function ShopClient({ currentCredits }: ShopClientProps) {
             </div>
           </div>
 
+          {/* Offrir un cadeau */}
+          <div className="mt-8">
+            <Link
+              href="/cadeau/offrir"
+              className="group flex items-center justify-center gap-3 rounded-2xl border border-neon-pink/30 bg-gradient-to-r from-neon-pink/[0.08] to-transparent px-5 py-4 transition-colors hover:border-neon-pink/50"
+            >
+              <svg className="h-6 w-6 shrink-0 text-neon-pink" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M5 8h14M5 8a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2v-9a2 2 0 00-2-2M5 8l2-4h10l2 4M12 8v13" />
+              </svg>
+              <span className="text-sm">
+                <span className="font-display font-bold text-white">Offrir un cadeau</span>
+                <span className="ml-2 text-white/55">crédits ou V.I.P, pour faire plaisir à un ami</span>
+              </span>
+              <span className="text-neon-pink transition-transform group-hover:translate-x-0.5">→</span>
+            </Link>
+          </div>
+
           {/* Trust badges */}
           <div className="mt-12 flex flex-wrap items-center justify-center gap-6 text-white/50 text-sm">
             <div className="flex items-center gap-2">
