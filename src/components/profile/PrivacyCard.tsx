@@ -13,6 +13,7 @@ export function PrivacyCard() {
 
   const handleExport = async () => {
     setExporting(true)
+    setError(null)
     try {
       const r = await exportMyData()
       if (r.success && r.data) {
@@ -23,7 +24,11 @@ export function PrivacyCard() {
         a.download = 'mes-donnees-cleekzy.json'
         a.click()
         URL.revokeObjectURL(url)
+      } else {
+        setError(r.error || 'Export impossible pour le moment.')
       }
+    } catch {
+      setError('Export impossible pour le moment.')
     } finally {
       setExporting(false)
     }
@@ -63,6 +68,8 @@ export function PrivacyCard() {
           </button>
         )}
       </div>
+
+      {error && !confirmOpen && <p role="alert" className="mt-3 text-sm text-danger">{error}</p>}
 
       {confirmOpen && (
         <div className="mt-4 rounded-xl border border-danger/30 bg-danger/[0.06] p-4">

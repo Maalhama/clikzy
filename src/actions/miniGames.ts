@@ -3,6 +3,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { createServiceClient } from '@/lib/supabase/service'
 import { computeMiniGameOutcome, makeFairGenerator } from '@/lib/provablyFair'
+import { selfExcludedUntil, selfExclusionError } from '@/lib/selfExclusion'
 import {
   MiniGameType,
   MiniGameEligibility,
@@ -104,6 +105,10 @@ export async function playMiniGame(gameType: MiniGameType): Promise<ActionResult
   if (!user) {
     return { success: false, error: 'Non authentifié' }
   }
+
+  // Jeu responsable : compte en pause -> pas de mini-jeu.
+  const excl = await selfExcludedUntil(supabase, user.id)
+  if (excl) return { success: false, error: selfExclusionError(excl) }
 
   // Check eligibility
   const eligibilityResult = await getMiniGameEligibility()
@@ -211,6 +216,10 @@ export async function playMiniGamePaid(gameType: MiniGameType): Promise<ActionRe
   if (!user) {
     return { success: false, error: 'Non authentifié' }
   }
+
+  // Jeu responsable : compte en pause -> pas de mini-jeu payant.
+  const excl = await selfExcludedUntil(supabase, user.id)
+  if (excl) return { success: false, error: selfExclusionError(excl) }
 
   // Check if user has enough total credits (daily + earned)
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

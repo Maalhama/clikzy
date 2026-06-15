@@ -17,7 +17,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 
 export default function JeuResponsablePage() {
   return (
-    <main className="relative z-10 mx-auto max-w-2xl px-4 py-10">
+    <div className="mx-auto max-w-2xl">
       <div className="mb-2 text-center">
         <span className="kicker">Engagement</span>
       </div>
@@ -74,19 +74,18 @@ export default function JeuResponsablePage() {
         </p>
       </Section>
 
-      <Section title="Limiter ou fermer ton compte">
+      <Section title="Faire une pause ou fermer ton compte">
         <p>
-          Tu peux <span className="font-semibold text-white">supprimer définitivement ton compte</span> à tout moment depuis
-          ton <Link href="/profile" className="text-neon-purple hover:underline">profil</Link> (section « Confidentialité &amp;
-          données »). Pour une auto-exclusion temporaire ou une limite de dépense, écris-nous à{' '}
-          <a href="mailto:support@cleekzy.com" className="text-neon-purple hover:underline">support@cleekzy.com</a> : nous
-          appliquons ta demande sous 48h.
+          Tu peux <span className="font-semibold text-white">mettre ton compte en pause</span> (de 24 h à 90 jours) à tout
+          moment depuis ton <Link href="/profile" className="text-neon-purple hover:underline">profil</Link>, section
+          « Faire une pause » : pendant la pause, tu ne peux ni jouer ni acheter, et elle ne peut pas être raccourcie.
+        </p>
+        <p>
+          Tu peux aussi y <span className="font-semibold text-white">supprimer définitivement ton compte</span> (section
+          « Confidentialité &amp; données »). Pour toute autre demande, écris-nous à{' '}
+          <a href="mailto:support@cleekzy.com" className="text-neon-purple hover:underline">support@cleekzy.com</a>.
         </p>
       </Section>
-
-      <div className="mt-10 text-center">
-        <Link href="/lobby" className="btn-arena-outline px-6 py-3 text-sm">Retour à l&apos;arène</Link>
-      </div>
-    </main>
+    </div>
   )
 }

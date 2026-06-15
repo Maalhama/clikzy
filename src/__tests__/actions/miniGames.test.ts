@@ -11,6 +11,7 @@ function makeSelectChain(plays: unknown[]) {
   chain.gte = vi.fn(() => chain)
   chain.order = vi.fn(() => Promise.resolve({ data: plays, error: null }))
   chain.single = vi.fn(() => Promise.resolve({ data: { credits: 7 }, error: null }))
+  chain.maybeSingle = vi.fn(() => Promise.resolve({ data: null, error: null }))
   chain.insert = mockInsert
   return chain
 }

@@ -37,6 +37,7 @@ export default function RegisterPage() {
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
   const [refCode, setRefCode] = useState<string | null>(null)
+  const [ageConfirmed, setAgeConfirmed] = useState(false)
 
   // Capte le code parrain ?ref=CODE et le garde aussi en localStorage :
   // le flow OAuth (Google) passe par un redirect qui perd les query params.
@@ -58,6 +59,10 @@ export default function RegisterPage() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
+    if (!ageConfirmed) {
+      setError('Confirme avoir 18 ans et accepter les conditions.')
+      return
+    }
     setIsLoading(true)
     setError(null)
 
@@ -99,6 +104,10 @@ export default function RegisterPage() {
   }
 
   async function handleOAuth(provider: 'google' | 'github') {
+    if (!ageConfirmed) {
+      setError('Confirme d\'abord avoir 18 ans et accepter les conditions.')
+      return
+    }
     setIsOAuthLoading(provider)
     setError(null)
 
@@ -236,10 +245,26 @@ export default function RegisterPage() {
             </p>
           </div>
 
+          {/* Consentement 18+ / CGU — gate les DEUX méthodes (OAuth ET email) */}
+          <label className="flex items-start gap-2.5 mb-5 text-xs text-white/60">
+            <input
+              type="checkbox"
+              checked={ageConfirmed}
+              onChange={(e) => setAgeConfirmed(e.target.checked)}
+              className="mt-0.5 h-4 w-4 shrink-0 accent-neon-purple"
+            />
+            <span>
+              Je certifie avoir <span className="font-semibold text-white/80">18 ans ou plus</span> et j&apos;accepte les{' '}
+              <a href="/terms" className="text-neon-purple hover:underline">CGU</a>,{' '}
+              <a href="/cgv" className="text-neon-purple hover:underline">CGV</a> et la{' '}
+              <a href="/privacy" className="text-neon-purple hover:underline">politique de confidentialité</a>.
+            </span>
+          </label>
+
           {/* Google OAuth */}
           <button
             onClick={() => handleOAuth('google')}
-            disabled={isOAuthLoading !== null || isLoading}
+            disabled={isOAuthLoading !== null || isLoading || !ageConfirmed}
             className="w-full flex items-center justify-center gap-3 px-5 py-4 rounded-2xl bg-white/5 border border-white/10 text-white font-medium transition-all active:scale-95 active:bg-white/15 hover:bg-white/10 hover:border-white/20 disabled:opacity-50 disabled:cursor-not-allowed mb-5"
           >
             {isOAuthLoading === 'google' ? (
@@ -357,21 +382,6 @@ export default function RegisterPage() {
                 {error}
               </div>
             )}
-
-            <label className="flex items-start gap-2.5 text-xs text-white/60">
-              <input
-                type="checkbox"
-                required
-                disabled={isLoading}
-                className="mt-0.5 h-4 w-4 shrink-0 accent-neon-purple"
-              />
-              <span>
-                Je certifie avoir <span className="font-semibold text-white/80">18 ans ou plus</span> et j&apos;accepte les{' '}
-                <a href="/terms" className="text-neon-purple hover:underline">CGU</a>,{' '}
-                <a href="/cgv" className="text-neon-purple hover:underline">CGV</a> et la{' '}
-                <a href="/privacy" className="text-neon-purple hover:underline">politique de confidentialité</a>.
-              </span>
-            </label>
 
             <div className="pt-1">
               <Button

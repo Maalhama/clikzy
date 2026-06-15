@@ -1276,6 +1276,32 @@ export type Database = {
           },
         ]
       }
+      user_self_exclusion: {
+        Row: {
+          created_at: string
+          excluded_until: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          excluded_until: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          excluded_until?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_self_exclusion_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       winners: {
         Row: {
           delivered_at: string | null
@@ -1753,6 +1779,7 @@ export type Database = {
           old_server_seed: string
         }[]
       }
+      set_self_exclusion: { Args: { p_days: number }; Returns: string }
       unequip_slot: {
         Args: { p_slot: string }
         Returns: {

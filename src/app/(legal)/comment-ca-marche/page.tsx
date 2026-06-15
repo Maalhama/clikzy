@@ -17,7 +17,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 
 export default function CommentCaMarchePage() {
   return (
-    <main className="relative z-10 mx-auto max-w-2xl px-4 py-10">
+    <div className="mx-auto max-w-2xl">
       <div className="mb-2 text-center">
         <span className="kicker">Transparence</span>
       </div>
@@ -77,6 +77,6 @@ export default function CommentCaMarchePage() {
         <Link href="/lobby" className="btn-arena px-6 py-3 text-sm">Entrer dans l&apos;arène</Link>
         <Link href="/cgv" className="btn-arena-outline px-6 py-3 text-sm">Lire les CGV</Link>
       </div>
-    </main>
+    </div>
   )
 }

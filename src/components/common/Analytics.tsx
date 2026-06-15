@@ -1,23 +1,23 @@
 'use client'
 
 import Script from 'next/script'
+import { useCookieConsent } from '@/hooks/useCookieConsent'
 
 /**
- * Umami Analytics - Privacy-friendly, GDPR compliant
- * Only loads in production when configured
- *
- * Setup:
- * 1. Deploy Umami on Vercel/Railway or use Umami Cloud
- * 2. Create a website in Umami dashboard
- * 3. Add NEXT_PUBLIC_UMAMI_URL and NEXT_PUBLIC_UMAMI_WEBSITE_ID to .env
+ * Umami Analytics — privacy-friendly. Ne charge le script QUE :
+ *  - en production,
+ *  - si configuré (URL + website id),
+ *  - ET après consentement explicite (CNIL : pas de traçage avant le « Accepter »).
+ * `trackEvent` (lib/analytics) ne fait rien tant que `window.umami` n'existe pas,
+ * donc gater le script ici suffit à respecter le refus.
  */
 export function Analytics() {
+  const { status } = useCookieConsent()
   const umamiUrl = process.env.NEXT_PUBLIC_UMAMI_URL
   const websiteId = process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID
   const isProduction = process.env.NODE_ENV === 'production'
 
-  // Only load in production with valid config
-  if (!isProduction || !umamiUrl || !websiteId) {
+  if (!isProduction || !umamiUrl || !websiteId || status !== 'accepted') {
     return null
   }
 

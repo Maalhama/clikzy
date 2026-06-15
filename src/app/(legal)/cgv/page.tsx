@@ -29,12 +29,11 @@ export default function CGVPage() {
           CLEEKZY propose à la vente des packs de crédits permettant de participer aux jeux sur la plateforme :
         </p>
         <ul className="text-white/70 list-disc pl-6">
-          <li><strong className="text-white">Pack Starter :</strong> 50 crédits</li>
-          <li><strong className="text-white">Pack Populaire :</strong> 150 crédits</li>
-          <li><strong className="text-white">Pack Premium :</strong> 500 crédits</li>
+          <li><strong className="text-white">Packs de crédits :</strong> plusieurs paliers, avec un bonus x2 sur le premier achat de chaque pack par mois civil.</li>
+          <li><strong className="text-white">Abonnement V.I.P :</strong> avantages premium (crédits quotidiens majorés, remises sur les packs), sans engagement.</li>
         </ul>
         <p className="text-white/70 mt-4">
-          Les crédits sont des biens numériques utilisables uniquement sur la plateforme CLEEKZY.
+          La grille complète des packs, quantités et prix en vigueur est affichée sur la page <a href="/shop" className="text-neon-purple hover:underline">Boutique</a>. Les crédits sont des biens numériques utilisables uniquement sur la plateforme CLEEKZY.
         </p>
       </section>
 
