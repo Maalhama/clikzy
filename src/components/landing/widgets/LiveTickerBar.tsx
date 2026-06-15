@@ -41,7 +41,7 @@ export function LiveTickerBar({ winners }: LiveTickerBarProps) {
   )
 
   return (
-    <div className="relative flex h-11 items-center overflow-hidden border-y border-white/[0.07] bg-bg-secondary/40 pt-px" aria-label="Dernières victoires">
+    <div className="relative flex h-10 items-center overflow-hidden border-y border-white/[0.07] bg-bg-secondary/40" aria-label="Dernières victoires">
       {/* Étiquette LIVE fixe à gauche (centrée verticalement comme le ticker) */}
       <div
         className="absolute left-0 top-0 bottom-0 z-10 flex items-center gap-2 pl-4 pr-16 md:pl-6"

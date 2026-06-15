@@ -57,7 +57,7 @@ export function InstallBanner() {
           exit={{ opacity: 0, height: 0 }}
           className="relative z-30 overflow-hidden border-b border-neon-purple/25 bg-gradient-to-r from-neon-purple/15 via-bg-secondary/90 to-neon-pink/15 backdrop-blur-sm"
         >
-          <div className="mx-auto flex min-h-[2.875rem] max-w-7xl items-center gap-3 px-4 md:px-6">
+          <div className="mx-auto flex min-h-[2.875rem] max-w-7xl items-center gap-3 px-4 pt-1.5 md:px-6">
             <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-neon-purple to-neon-pink">
               <svg className="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />

@@ -108,8 +108,23 @@ export function HeroLiveCard({ games, compact = false }: HeroLiveCardProps) {
     () => getProductImageWithFallback(game?.item_name ?? '', game?.item_image_url ?? ''),
     [game?.item_name, game?.item_image_url]
   )
+  // Révélation « laser » de l'item pendant le chargement de l'image (évite le rendu
+  // partiel/moche). Reset à chaque partie ; révèle direct si l'image est déjà en cache
+  // (complete) ; filet de sécurité si onLoad ne se déclenche pas.
+  const imgRef = useRef<HTMLImageElement>(null)
   const [imgError, setImgError] = useState(false)
-  useEffect(() => setImgError(false), [game?.id])
+  const [imgLoaded, setImgLoaded] = useState(false)
+  useEffect(() => {
+    setImgError(false)
+    setImgLoaded(false)
+    const el = imgRef.current
+    if (el?.complete && el.naturalWidth > 0) {
+      setImgLoaded(true)
+      return
+    }
+    const t = setTimeout(() => setImgLoaded(true), 3000)
+    return () => clearTimeout(t)
+  }, [game?.id])
 
   const leaderName = useMemo(() => {
     if (!game) return null
@@ -203,14 +218,23 @@ export function HeroLiveCard({ games, compact = false }: HeroLiveCardProps) {
           aria-hidden
         />
         <Image
+          ref={imgRef}
           src={imgError ? fallbackImage : productImage}
           alt={game.item_name}
           fill
           sizes={compact ? '144px' : '208px'}
-          className="object-contain [filter:drop-shadow(0_0_30px_rgba(155,92,255,0.45))_drop-shadow(0_10px_20px_rgba(4,2,12,0.85))] transition-transform duration-500 group-hover:scale-105"
+          className="object-contain [filter:drop-shadow(0_0_30px_rgba(155,92,255,0.45))_drop-shadow(0_10px_20px_rgba(4,2,12,0.85))] group-hover:scale-105"
+          style={{
+            opacity: imgLoaded ? 1 : 0,
+            clipPath: imgLoaded ? 'inset(0 0 0 0)' : 'inset(0 0 100% 0)',
+            transition: 'opacity 0.5s ease, clip-path 0.7s cubic-bezier(0.45,0,0.2,1), transform 0.5s ease',
+          }}
           priority
+          onLoad={() => setImgLoaded(true)}
           onError={() => !imgError && setImgError(true)}
         />
+        {/* Révélation « laser » DA pendant le chargement de l'image (disparaît dès qu'elle est prête) */}
+        {!imgLoaded && <span className="hero-scan pointer-events-none absolute inset-0 z-10" aria-hidden />}
       </div>
 
       {/* Nom + valeur */}
