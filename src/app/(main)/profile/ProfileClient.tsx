@@ -12,6 +12,7 @@ import { ReferralSection } from '@/components/profile/ReferralSection'
 import { BadgesSection } from '@/components/profile/BadgesSection'
 import { BuyItNowSection } from '@/components/profile/BuyItNowSection'
 import { BuyItNowResultToast } from '@/components/profile/BuyItNowResultToast'
+import { PrivacyCard } from '@/components/profile/PrivacyCard'
 import { ProgressionCard } from '@/components/progression/ProgressionCard'
 import { getNeonImagePath } from '@/lib/utils/productImages'
 import type { Badge } from '@/actions/badges'
@@ -434,6 +435,9 @@ export function ProfileClient({ profile, wins, gamesPlayed, totalValueWon, gameH
             Jouer maintenant
           </Link>
         </motion.div>
+
+        {/* Confidentialité / RGPD */}
+        <div className="mt-8"><PrivacyCard /></div>
 
         {/* Member since */}
         <p className="text-center text-white/50 text-xs mt-6">

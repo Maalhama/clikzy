@@ -358,6 +358,21 @@ export default function RegisterPage() {
               </div>
             )}
 
+            <label className="flex items-start gap-2.5 text-xs text-white/60">
+              <input
+                type="checkbox"
+                required
+                disabled={isLoading}
+                className="mt-0.5 h-4 w-4 shrink-0 accent-neon-purple"
+              />
+              <span>
+                Je certifie avoir <span className="font-semibold text-white/80">18 ans ou plus</span> et j&apos;accepte les{' '}
+                <a href="/terms" className="text-neon-purple hover:underline">CGU</a>,{' '}
+                <a href="/cgv" className="text-neon-purple hover:underline">CGV</a> et la{' '}
+                <a href="/privacy" className="text-neon-purple hover:underline">politique de confidentialité</a>.
+              </span>
+            </label>
+
             <div className="pt-1">
               <Button
                 type="submit"

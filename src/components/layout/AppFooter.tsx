@@ -20,12 +20,16 @@ export function AppFooter() {
           <Link href="/privacy" className="text-white/55 transition-colors hover:text-white">Confidentialité</Link>
           <Link href="/legal" className="text-white/55 transition-colors hover:text-white">Mentions légales</Link>
           <Link href="/support" className="text-white/55 transition-colors hover:text-white">Support</Link>
+          <Link href="/jeu-responsable" className="text-white/55 transition-colors hover:text-white">Jeu responsable</Link>
         </nav>
 
-        <div className="flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5">
+        <Link
+          href="/jeu-responsable"
+          className="flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5 transition-colors hover:border-white/25"
+        >
           <span className="font-display text-[0.6rem] font-bold text-white/70">18+</span>
           <span className="text-[0.65rem] text-white/45">Joue de façon responsable</span>
-        </div>
+        </Link>
       </div>
     </footer>
   )
