@@ -43,12 +43,3 @@ export function getProductImageWithFallback(
     fallback: DEFAULT_PRODUCT_IMAGE
   }
 }
-
-/**
- * @deprecated Use getNeonImagePath or the image_url from database
- * This function is kept for backwards compatibility
- */
-export function getProductSvg(itemName: string, _itemId?: string): string {
-  // Now returns the neon PNG path instead of SVG
-  return getNeonImagePath(itemName)
-}

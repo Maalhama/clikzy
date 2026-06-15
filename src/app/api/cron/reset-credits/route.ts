@@ -2,9 +2,11 @@ import { NextRequest, NextResponse } from 'next/server'
 import { broadcastPush } from '@/lib/push'
 import { createClient } from '@supabase/supabase-js'
 
-// Daily credits reset for all users EXCEPT those who purchased credits
-// VIP users GET the reset (they also get +10 bonus they can collect manually)
-// Users who purchased credits do NOT get reset - they keep their credits
+// Daily credits reset for ALL users (refonte 2026-06) :
+//   credits = 10 (gratuit) / 20 (VIP) + equip_daily_clicks (bonus d'équipement).
+// Le VIP reçoit son allocation doublée directement via ce reset (plus de bonus
+// manuel). Les crédits achetés vivent dans earned_credits (PERMANENTS, jamais
+// reset), donc tout le monde est reset sans distinction acheteur/non-acheteur.
 // Should be called at midnight via cron-job.org
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
@@ -87,7 +89,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({
         message: 'No users need daily credits reset',
         resetCount: 0,
-        note: 'Users who purchased credits are NOT reset',
+        note: 'All users reset to 10 (free) / 20 (VIP) + equip_daily_clicks; purchased credits live in earned_credits (never reset)',
       })
     }
 
@@ -146,7 +148,7 @@ export async function GET(request: NextRequest) {
       message: `Reset daily credits for ${usersToReset.length} users`,
       resetCount: usersToReset.length,
       creditsAmount: DAILY_FREE_CREDITS,
-      note: 'VIP users included (they can also collect +10 bonus). Users with purchased credits NOT reset.',
+      note: 'All users reset to 10 (free) / 20 (VIP) + equip_daily_clicks; purchased credits live in earned_credits (never reset)',
     })
   } catch (error) {
     console.error('Cron error:', error)

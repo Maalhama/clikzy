@@ -13,7 +13,7 @@ import { BadgesSection } from '@/components/profile/BadgesSection'
 import { BuyItNowSection } from '@/components/profile/BuyItNowSection'
 import { BuyItNowResultToast } from '@/components/profile/BuyItNowResultToast'
 import { ProgressionCard } from '@/components/progression/ProgressionCard'
-import { getProductSvg } from '@/lib/utils/productImages'
+import { getNeonImagePath } from '@/lib/utils/productImages'
 import type { Badge } from '@/actions/badges'
 import {
   TrophyIcon,
@@ -489,9 +489,10 @@ function WinCard({ win, index }: { win: WinnerWithItem; index: number }) {
       <div className="flex items-center gap-3">
         <div className="relative w-14 h-14 rounded-lg bg-bg-primary/50 flex-shrink-0 overflow-hidden">
           <Image
-            src={getProductSvg(win.item_name, win.item_id)}
+            src={getNeonImagePath(win.item_name)}
             alt={win.item_name}
             fill
+            sizes="56px"
             className="object-contain p-1.5"
           />
         </div>

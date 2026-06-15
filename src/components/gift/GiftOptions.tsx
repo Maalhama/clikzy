@@ -33,7 +33,7 @@ export function GiftOptions() {
   return (
     <div>
       {error && (
-        <div className="mb-4 rounded-lg border border-danger/30 bg-danger/10 px-3 py-2 text-center text-sm text-danger">{error}</div>
+        <div role="alert" aria-live="assertive" className="mb-4 rounded-lg border border-danger/30 bg-danger/10 px-3 py-2 text-center text-sm text-danger">{error}</div>
       )}
 
       {/* VIP — mise en avant or */}

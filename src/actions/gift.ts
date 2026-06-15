@@ -1,16 +1,10 @@
 'use server'
 
-import Stripe from 'stripe'
+import { getServerStripe } from '@/lib/stripe/server'
 import { createClient } from '@/lib/supabase/server'
 import { CREDIT_PACKS, GIFT_VIP_DAYS, GIFT_VIP_PRICE, type GiftCheckoutInput } from '@/lib/stripe/config'
 
 type ActionResult<T = void> = { success: boolean; data?: T; error?: string }
-
-function getStripeInstance(): Stripe | null {
-  const secretKey = process.env.STRIPE_SECRET_KEY
-  if (!secretKey) return null
-  return new Stripe(secretKey, { apiVersion: '2025-12-15.clover', timeout: 30000, maxNetworkRetries: 3 })
-}
 
 /**
  * Crée la session Stripe pour OFFRIR un cadeau. Aucun crédit n'est attribué à
@@ -22,7 +16,7 @@ export async function createGiftCheckout(input: GiftCheckoutInput): Promise<Acti
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { success: false, error: 'Non authentifié' }
 
-  const stripe = getStripeInstance()
+  const stripe = getServerStripe()
   if (!stripe) return { success: false, error: 'Service de paiement non configuré' }
 
   const { data: profileData } = await supabase.from('profiles').select('username').eq('id', user.id).single()

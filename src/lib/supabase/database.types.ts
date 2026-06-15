@@ -59,6 +59,199 @@ export type Database = {
         }
         Relationships: []
       }
+      battle_passes: {
+        Row: {
+          month: string
+          purchased_at: string
+          stripe_session: string | null
+          user_id: string
+        }
+        Insert: {
+          month: string
+          purchased_at?: string
+          stripe_session?: string | null
+          user_id: string
+        }
+        Update: {
+          month?: string
+          purchased_at?: string
+          stripe_session?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "battle_passes_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      buy_it_now_purchases: {
+        Row: {
+          created_at: string
+          delivered_at: string | null
+          game_id: string
+          id: string
+          item_id: string
+          item_name: string
+          price_paid: number
+          shipped_at: string | null
+          shipping_status: string
+          stripe_session: string | null
+          tracking_number: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          delivered_at?: string | null
+          game_id: string
+          id?: string
+          item_id: string
+          item_name: string
+          price_paid: number
+          shipped_at?: string | null
+          shipping_status?: string
+          stripe_session?: string | null
+          tracking_number?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          delivered_at?: string | null
+          game_id?: string
+          id?: string
+          item_id?: string
+          item_name?: string
+          price_paid?: number
+          shipped_at?: string | null
+          shipping_status?: string
+          stripe_session?: string | null
+          tracking_number?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "buy_it_now_purchases_game_id_fkey"
+            columns: ["game_id"]
+            isOneToOne: false
+            referencedRelation: "games"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "buy_it_now_purchases_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "buy_it_now_purchases_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      calendar_claims: {
+        Row: {
+          claimed_at: string
+          day: string
+          user_id: string
+        }
+        Insert: {
+          claimed_at?: string
+          day: string
+          user_id: string
+        }
+        Update: {
+          claimed_at?: string
+          day?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "calendar_claims_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      clan_members: {
+        Row: {
+          clan_id: string
+          joined_at: string
+          role: string
+          user_id: string
+        }
+        Insert: {
+          clan_id: string
+          joined_at?: string
+          role?: string
+          user_id: string
+        }
+        Update: {
+          clan_id?: string
+          joined_at?: string
+          role?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "clan_members_clan_id_fkey"
+            columns: ["clan_id"]
+            isOneToOne: false
+            referencedRelation: "clans"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "clan_members_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      clans: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          owner_id: string | null
+          tag: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          owner_id?: string | null
+          tag: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          owner_id?: string | null
+          tag?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "clans_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       clicks: {
         Row: {
           clicked_at: string | null
@@ -109,6 +302,102 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      comments: {
+        Row: {
+          content: string
+          created_at: string
+          game_id: string
+          id: string
+          user_id: string
+          username: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          game_id: string
+          id?: string
+          user_id: string
+          username: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          game_id?: string
+          id?: string
+          user_id?: string
+          username?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "comments_game_id_fkey"
+            columns: ["game_id"]
+            isOneToOne: false
+            referencedRelation: "games"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "comments_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      cosmetics_catalog: {
+        Row: {
+          id: string
+          is_premium: boolean
+          name: string
+          rarity: string
+          sort_order: number
+          type: string
+          unlock_level: number
+        }
+        Insert: {
+          id: string
+          is_premium?: boolean
+          name: string
+          rarity: string
+          sort_order?: number
+          type: string
+          unlock_level?: number
+        }
+        Update: {
+          id?: string
+          is_premium?: boolean
+          name?: string
+          rarity?: string
+          sort_order?: number
+          type?: string
+          unlock_level?: number
+        }
+        Relationships: []
+      }
+      credit_grant_sessions: {
+        Row: {
+          created_at: string
+          credits_granted: number
+          pack_id: string
+          stripe_session: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          credits_granted?: number
+          pack_id: string
+          stripe_session: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          credits_granted?: number
+          pack_id?: string
+          stripe_session?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       daily_quests: {
         Row: {
@@ -222,6 +511,69 @@ export type Database = {
           },
         ]
       }
+      gift_codes: {
+        Row: {
+          amount_paid: number
+          code: string
+          created_at: string
+          credits: number
+          expires_at: string
+          gifter_id: string | null
+          gifter_username: string | null
+          kind: string
+          pack_id: string | null
+          redeemed_at: string | null
+          redeemed_by: string | null
+          stripe_session: string | null
+          vip_days: number
+        }
+        Insert: {
+          amount_paid?: number
+          code: string
+          created_at?: string
+          credits?: number
+          expires_at?: string
+          gifter_id?: string | null
+          gifter_username?: string | null
+          kind: string
+          pack_id?: string | null
+          redeemed_at?: string | null
+          redeemed_by?: string | null
+          stripe_session?: string | null
+          vip_days?: number
+        }
+        Update: {
+          amount_paid?: number
+          code?: string
+          created_at?: string
+          credits?: number
+          expires_at?: string
+          gifter_id?: string | null
+          gifter_username?: string | null
+          kind?: string
+          pack_id?: string | null
+          redeemed_at?: string | null
+          redeemed_by?: string | null
+          stripe_session?: string | null
+          vip_days?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gift_codes_gifter_id_fkey"
+            columns: ["gifter_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gift_codes_redeemed_by_fkey"
+            columns: ["redeemed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       items: {
         Row: {
           created_at: string | null
@@ -294,9 +646,37 @@ export type Database = {
         }
         Relationships: []
       }
+      jackpot: {
+        Row: {
+          amount: number
+          id: number
+          last_distributed_month: string | null
+          last_winner_amount: number | null
+          last_winner_username: string | null
+          updated_at: string
+        }
+        Insert: {
+          amount?: number
+          id?: number
+          last_distributed_month?: string | null
+          last_winner_amount?: number | null
+          last_winner_username?: string | null
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          id?: number
+          last_distributed_month?: string | null
+          last_winner_amount?: number | null
+          last_winner_username?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       mini_game_plays: {
         Row: {
           credits_won: number
+          fair_nonce: number | null
           game_type: string
           id: string
           is_free_play: boolean
@@ -306,6 +686,7 @@ export type Database = {
         }
         Insert: {
           credits_won?: number
+          fair_nonce?: number | null
           game_type: string
           id?: string
           is_free_play?: boolean
@@ -315,6 +696,7 @@ export type Database = {
         }
         Update: {
           credits_won?: number
+          fair_nonce?: number | null
           game_type?: string
           id?: string
           is_free_play?: boolean
@@ -325,6 +707,73 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "mini_game_plays_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pack_purchases: {
+        Row: {
+          created_at: string
+          credits_granted: number
+          doubled: boolean
+          month: string
+          pack_id: string
+          stripe_session: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          credits_granted?: number
+          doubled?: boolean
+          month: string
+          pack_id: string
+          stripe_session?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          credits_granted?: number
+          doubled?: boolean
+          month?: string
+          pack_id?: string
+          stripe_session?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pack_purchases_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pass_tier_claims: {
+        Row: {
+          claimed_at: string
+          month: string
+          tier: number
+          user_id: string
+        }
+        Insert: {
+          claimed_at?: string
+          month: string
+          tier: number
+          user_id: string
+        }
+        Update: {
+          claimed_at?: string
+          month?: string
+          tier?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pass_tier_claims_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
@@ -367,6 +816,10 @@ export type Database = {
       profiles: {
         Row: {
           avatar_url: string | null
+          chest_last_claim_day: string | null
+          cosmetic_cursor: string
+          cosmetic_frame: string
+          cosmetic_trail: string
           created_at: string | null
           credits: number | null
           earned_credits: number
@@ -374,6 +827,10 @@ export type Database = {
           equip_chest_luck: number
           equip_credit_bonus_pct: number
           equip_daily_clicks: number
+          fair_client_seed: string | null
+          fair_nonce: number
+          fair_server_seed: string | null
+          fair_server_seed_hash: string | null
           has_purchased_credits: boolean | null
           id: string
           is_admin: boolean | null
@@ -405,6 +862,10 @@ export type Database = {
         }
         Insert: {
           avatar_url?: string | null
+          chest_last_claim_day?: string | null
+          cosmetic_cursor?: string
+          cosmetic_frame?: string
+          cosmetic_trail?: string
           created_at?: string | null
           credits?: number | null
           earned_credits?: number
@@ -412,6 +873,10 @@ export type Database = {
           equip_chest_luck?: number
           equip_credit_bonus_pct?: number
           equip_daily_clicks?: number
+          fair_client_seed?: string | null
+          fair_nonce?: number
+          fair_server_seed?: string | null
+          fair_server_seed_hash?: string | null
           has_purchased_credits?: boolean | null
           id: string
           is_admin?: boolean | null
@@ -443,6 +908,10 @@ export type Database = {
         }
         Update: {
           avatar_url?: string | null
+          chest_last_claim_day?: string | null
+          cosmetic_cursor?: string
+          cosmetic_frame?: string
+          cosmetic_trail?: string
           created_at?: string | null
           credits?: number | null
           earned_credits?: number
@@ -450,6 +919,10 @@ export type Database = {
           equip_chest_luck?: number
           equip_credit_bonus_pct?: number
           equip_daily_clicks?: number
+          fair_client_seed?: string | null
+          fair_nonce?: number
+          fair_server_seed?: string | null
+          fair_server_seed_hash?: string | null
           has_purchased_credits?: boolean | null
           id?: string
           is_admin?: boolean | null
@@ -486,6 +959,38 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["referral_code"]
+          },
+        ]
+      }
+      push_subscriptions: {
+        Row: {
+          auth: string
+          created_at: string
+          endpoint: string
+          p256dh: string
+          user_id: string
+        }
+        Insert: {
+          auth: string
+          created_at?: string
+          endpoint: string
+          p256dh: string
+          user_id: string
+        }
+        Update: {
+          auth?: string
+          created_at?: string
+          endpoint?: string
+          p256dh?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "push_subscriptions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -587,6 +1092,39 @@ export type Database = {
           },
           {
             foreignKeyName: "user_chests_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_cosmetics: {
+        Row: {
+          acquired_at: string
+          cosmetic_id: string
+          user_id: string
+        }
+        Insert: {
+          acquired_at?: string
+          cosmetic_id: string
+          user_id: string
+        }
+        Update: {
+          acquired_at?: string
+          cosmetic_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_cosmetics_cosmetic_id_fkey"
+            columns: ["cosmetic_id"]
+            isOneToOne: false
+            referencedRelation: "cosmetics_catalog"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_cosmetics_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
@@ -854,9 +1392,38 @@ export type Database = {
           new_xp: number
         }[]
       }
+      calendar_reward: {
+        Args: { p_day: string }
+        Returns: {
+          amount: number
+          kind: string
+          rarity: string
+        }[]
+      }
+      can_comment: { Args: { p_game_id: string }; Returns: boolean }
       can_play_mini_game: {
         Args: { p_game_type: string; p_user_id: string }
         Returns: boolean
+      }
+      claim_calendar_day: {
+        Args: { p_user_id: string }
+        Returns: {
+          already: boolean
+          amount: number
+          chest_id: string
+          kind: string
+          ok: boolean
+          rarity: string
+        }[]
+      }
+      claim_daily_chest: {
+        Args: { p_user_id: string }
+        Returns: {
+          already: boolean
+          granted: number
+          ok: boolean
+          rarities: string[]
+        }[]
       }
       claim_daily_login: {
         Args: { p_user_id: string }
@@ -874,6 +1441,16 @@ export type Database = {
           credits_reward: number
         }[]
       }
+      claim_pass_tier: {
+        Args: { p_tier: number; p_user_id: string }
+        Returns: {
+          reward_amount: number
+          reward_item_id: string
+          reward_item_name: string
+          reward_kind: string
+          reward_rarity: string
+        }[]
+      }
       claim_quest: {
         Args: { p_quest_key: string }
         Returns: {
@@ -887,6 +1464,22 @@ export type Database = {
         Args: { p_amount?: number; p_user_id: string }
         Returns: {
           earned: number
+          ok: boolean
+          reason: string
+        }[]
+      }
+      consume_fairness: {
+        Args: { p_user: string }
+        Returns: {
+          client_seed: string
+          nonce: number
+          server_seed: string
+        }[]
+      }
+      create_clan: {
+        Args: { p_desc?: string; p_name: string; p_tag: string }
+        Returns: {
+          clan_id: string
           ok: boolean
           reason: string
         }[]
@@ -909,6 +1502,22 @@ export type Database = {
         Args: { p_amount: number; p_user_id: string }
         Returns: number
       }
+      distribute_jackpot: {
+        Args: never
+        Returns: {
+          distributed: boolean
+          winner: string
+          won: number
+        }[]
+      }
+      ensure_fairness: { Args: { p_user: string }; Returns: undefined }
+      equip_cosmetic: {
+        Args: { p_id: string }
+        Returns: {
+          ok: boolean
+          reason: string
+        }[]
+      }
       equip_item: {
         Args: { p_inventory_id: string }
         Returns: {
@@ -917,6 +1526,42 @@ export type Database = {
           slot: string
         }[]
       }
+      get_buy_it_now_offers: {
+        Args: { p_user_id: string }
+        Returns: {
+          credits_spent: number
+          expires_at: string
+          game_id: string
+          item_id: string
+          item_image: string
+          item_name: string
+          price: number
+          retail_value: number
+        }[]
+      }
+      get_calendar_month: {
+        Args: { p_user_id: string }
+        Returns: {
+          amount: number
+          claimable: boolean
+          claimed: boolean
+          day: string
+          kind: string
+          rarity: string
+        }[]
+      }
+      get_clan_leaderboard: {
+        Args: { p_limit?: number }
+        Returns: {
+          clan_id: string
+          member_count: number
+          name: string
+          rank: number
+          tag: string
+          total_xp: number
+        }[]
+      }
+      get_gift_code: { Args: { p_code: string }; Returns: Json }
       get_leaderboard: {
         Args: { p_limit?: number; p_period?: string }
         Returns: {
@@ -936,7 +1581,63 @@ export type Database = {
           total_players: number
         }[]
       }
+      get_pack_month_state: {
+        Args: { p_user_id: string }
+        Returns: {
+          doubled: boolean
+          pack_id: string
+        }[]
+      }
+      get_pass_state: {
+        Args: { p_user_id: string }
+        Returns: {
+          claimed_tiers: number[]
+          days_claimed: number
+          purchased: boolean
+        }[]
+      }
+      get_recent_comments: {
+        Args: { p_limit?: number }
+        Returns: {
+          content: string
+          created_at: string
+          game_id: string
+          id: string
+          item_image: string
+          item_name: string
+          username: string
+        }[]
+      }
+      grant_battle_pass: {
+        Args: { p_session: string; p_user_id: string }
+        Returns: undefined
+      }
+      grant_pack_credits: {
+        Args: {
+          p_base_credits: number
+          p_monthly_limit?: boolean
+          p_pack_id: string
+          p_session: string
+          p_user_id: string
+        }
+        Returns: Json
+      }
+      grow_jackpot: { Args: { p_amount?: number }; Returns: undefined }
       increment_total_wins: { Args: { p_user_id: string }; Returns: number }
+      join_clan: {
+        Args: { p_clan_id: string }
+        Returns: {
+          ok: boolean
+          reason: string
+        }[]
+      }
+      leave_clan: {
+        Args: never
+        Returns: {
+          ok: boolean
+          reason: string
+        }[]
+      }
       log_player_event: {
         Args: { p_action: string; p_details?: Json; p_user_id: string }
         Returns: undefined
@@ -975,13 +1676,46 @@ export type Database = {
           reason: string
         }[]
       }
+      post_comment: {
+        Args: { p_content: string; p_game_id: string }
+        Returns: Json
+      }
+      quote_buy_it_now: {
+        Args: { p_game_id: string; p_user_id: string }
+        Returns: {
+          item_id: string
+          item_name: string
+          price: number
+        }[]
+      }
       recompute_equip_bonus: { Args: { p_user_id: string }; Returns: undefined }
+      record_buy_it_now: {
+        Args: {
+          p_game_id: string
+          p_price: number
+          p_session: string
+          p_user_id: string
+        }
+        Returns: Json
+      }
+      redeem_gift_code: {
+        Args: { p_code: string; p_user_id: string }
+        Returns: Json
+      }
       reset_daily_credits: {
         Args: { p_user_id: string }
         Returns: {
           daily_credits: number
           earned: number
           was_reset: boolean
+        }[]
+      }
+      rotate_fairness: {
+        Args: { p_client_seed: string }
+        Returns: {
+          new_hash: string
+          old_hash: string
+          old_server_seed: string
         }[]
       }
       unequip_slot: {

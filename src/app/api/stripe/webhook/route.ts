@@ -12,6 +12,8 @@ function getStripeInstance(): Stripe {
     }
     stripe = new Stripe(secretKey, {
       apiVersion: '2025-12-15.clover',
+      timeout: 30000,
+      maxNetworkRetries: 3,
     })
   }
   return stripe

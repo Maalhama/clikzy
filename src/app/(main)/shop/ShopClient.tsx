@@ -114,7 +114,7 @@ export function ShopClient({ currentCredits }: ShopClientProps) {
 
           {/* Error message */}
           {error && (
-            <div className="mt-6 p-4 rounded-xl bg-danger/10 border border-danger/30 text-danger text-center">
+            <div role="alert" aria-live="assertive" className="mt-6 p-4 rounded-xl bg-danger/10 border border-danger/30 text-danger text-center">
               {error}
             </div>
           )}

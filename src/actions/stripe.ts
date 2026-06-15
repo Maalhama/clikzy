@@ -1,6 +1,6 @@
 'use server'
 
-import Stripe from 'stripe'
+import { getServerStripe } from '@/lib/stripe/server'
 import { createClient } from '@/lib/supabase/server'
 import { CREDIT_PACKS, type CreditPackId } from '@/lib/stripe/config'
 
@@ -8,20 +8,6 @@ type ActionResult<T = void> = {
   success: boolean
   data?: T
   error?: string
-}
-
-// Create Stripe instance per request (no caching for serverless)
-function getStripeInstance(): Stripe | null {
-  const secretKey = process.env.STRIPE_SECRET_KEY
-  if (!secretKey) {
-    console.error('STRIPE_SECRET_KEY is not configured')
-    return null
-  }
-  return new Stripe(secretKey, {
-    apiVersion: '2025-12-15.clover',
-    timeout: 30000, // 30 seconds timeout
-    maxNetworkRetries: 3,
-  })
 }
 
 /**
@@ -48,7 +34,7 @@ export async function createCheckoutSession(
   }
 
   try {
-    const stripeInstance = getStripeInstance()
+    const stripeInstance = getServerStripe()
     if (!stripeInstance) {
       return { success: false, error: 'Service de paiement non configuré' }
     }
@@ -153,7 +139,7 @@ export async function createVIPCheckoutSession(): Promise<ActionResult<{ url: st
   }
 
   try {
-    const stripeInstance = getStripeInstance()
+    const stripeInstance = getServerStripe()
     if (!stripeInstance) {
       return { success: false, error: 'Service de paiement non configuré' }
     }
@@ -350,7 +336,7 @@ export async function createBillingPortalSession(): Promise<ActionResult<{ url: 
   }
 
   try {
-    const stripeInstance = getStripeInstance()
+    const stripeInstance = getServerStripe()
     if (!stripeInstance) {
       return { success: false, error: 'Service de paiement non configuré' }
     }
@@ -397,7 +383,7 @@ export async function createPassCheckoutSession(): Promise<ActionResult<{ url: s
   if (!user) return { success: false, error: 'Non authentifié' }
 
   try {
-    const stripeInstance = getStripeInstance()
+    const stripeInstance = getServerStripe()
     if (!stripeInstance) {
       return { success: false, error: 'Service de paiement non configuré' }
     }

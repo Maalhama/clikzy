@@ -1,6 +1,6 @@
 'use server'
 
-import Stripe from 'stripe'
+import { getServerStripe } from '@/lib/stripe/server'
 import { createClient } from '@/lib/supabase/server'
 
 type ActionResult<T = void> = { success: boolean; data?: T; error?: string }
@@ -14,12 +14,6 @@ export interface BuyItNowOffer {
   creditsSpent: number
   price: number
   expiresAt: string
-}
-
-function getStripeInstance(): Stripe | null {
-  const secretKey = process.env.STRIPE_SECRET_KEY
-  if (!secretKey) return null
-  return new Stripe(secretKey, { apiVersion: '2025-12-15.clover', timeout: 30000, maxNetworkRetries: 3 })
 }
 
 /** Offres de rachat malin pour le joueur connecté (enchères perdues < 48h). */
@@ -93,7 +87,7 @@ export async function createBuyItNowCheckout(gameId: string): Promise<ActionResu
   if (!(price > 0)) return { success: false, error: 'Prix invalide' }
 
   try {
-    const stripe = getStripeInstance()
+    const stripe = getServerStripe()
     if (!stripe) return { success: false, error: 'Service de paiement non configuré' }
     const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
 

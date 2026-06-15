@@ -22,7 +22,7 @@
 
 ### 3. Configurer sur Vercel
 
-1. Aller sur https://vercel.com/[ton-équipe]/clikzy/settings/environment-variables
+1. Aller sur https://vercel.com/[ton-équipe]/cleekzy/settings/environment-variables
 2. Ajouter la variable :
    - **Nom** : `NEXT_PUBLIC_SENTRY_DSN`
    - **Valeur** : Le DSN copié

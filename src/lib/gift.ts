@@ -1,5 +1,5 @@
 import 'server-only'
-import Stripe from 'stripe'
+import { getServerStripe } from '@/lib/stripe/server'
 import { createHash } from 'crypto'
 import { createServiceClient } from '@/lib/supabase/service'
 
@@ -30,19 +30,13 @@ function giftCodeFromSession(sessionId: string): string {
   return out
 }
 
-function getStripe(): Stripe | null {
-  const key = process.env.STRIPE_SECRET_KEY
-  if (!key) return null
-  return new Stripe(key, { apiVersion: '2025-12-15.clover', timeout: 30000, maxNetworkRetries: 3 })
-}
-
 /**
  * Garantit l'existence du code cadeau pour une session Stripe PAYÉE de type
  * « gift ». Idempotent. Retourne les infos du cadeau (ou null si session
  * invalide / non payée / pas un cadeau).
  */
 export async function ensureGiftCodeForSession(sessionId: string): Promise<GiftInfo | null> {
-  const stripe = getStripe()
+  const stripe = getServerStripe()
   if (!stripe) return null
 
   const session = await stripe.checkout.sessions.retrieve(sessionId)

@@ -12,7 +12,7 @@ export function ShareWinButtons({ itemName, itemValue, username }: { itemName: s
   const [copied, setCopied] = useState(false)
 
   const url = username ? `https://www.cleekzy.com/joueur/${encodeURIComponent(username)}` : 'https://www.cleekzy.com'
-  const text = `Je viens de gagner ${itemName} (${itemValue.toLocaleString()}€) sur Cleekzy — le dernier clic gagne !`
+  const text = `Je viens de gagner ${itemName} (${itemValue.toLocaleString('fr-FR')}€) sur Cleekzy — le dernier clic gagne !`
 
   const nativeShare = async () => {
     try {

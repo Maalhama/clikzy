@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Image from 'next/image'
 import { motion, AnimatePresence } from 'framer-motion'
-import { getProductSvg } from '@/lib/utils/productImages'
+import { getNeonImagePath } from '@/lib/utils/productImages'
 import type { GameHistoryItem } from '@/actions/gameHistory'
 
 interface GameHistorySectionProps {
@@ -100,9 +100,10 @@ function HistoryCard({ game, index }: { game: GameHistoryItem; index: number }) 
       {/* Product Image */}
       <div className="relative w-12 h-12 rounded-lg bg-bg-primary/50 flex-shrink-0 overflow-hidden">
         <Image
-          src={getProductSvg(game.itemName)}
+          src={getNeonImagePath(game.itemName)}
           alt={game.itemName}
           fill
+          sizes="48px"
           className="object-contain p-1"
         />
         {game.won && (

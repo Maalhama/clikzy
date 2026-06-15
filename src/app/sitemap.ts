@@ -83,19 +83,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'yearly',
       priority: 0.3,
     },
-    // Auth pages
-    {
-      url: `${BASE_URL}/login`,
-      lastModified: now,
-      changeFrequency: 'monthly',
-      priority: 0.6,
-    },
-    {
-      url: `${BASE_URL}/register`,
-      lastModified: now,
-      changeFrequency: 'monthly',
-      priority: 0.6,
-    },
   ]
 
   // Profils publics des gagnants récents (pages /joueur/[username] indexables).

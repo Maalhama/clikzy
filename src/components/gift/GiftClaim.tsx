@@ -22,7 +22,7 @@ export function GiftClaim({ initialCode, initialInfo }: { initialCode: string; i
   useEffect(() => {
     if (done) return
     const c = code.trim()
-    if (c.length < 6) {
+    if (c.length < 10) {
       setInfo(null)
       return
     }
@@ -106,7 +106,7 @@ export function GiftClaim({ initialCode, initialInfo }: { initialCode: string; i
           className="stat-numeral w-full rounded-xl border border-white/15 bg-white/[0.04] px-4 py-3.5 text-center text-lg tracking-[0.3em] text-white placeholder:tracking-normal placeholder:text-white/30 focus:border-neon-pink/50 focus:outline-none"
         />
         {preview}
-        {error && <p className="mt-3 text-center text-sm text-danger">{error}</p>}
+        {error && <p role="alert" aria-live="assertive" className="mt-3 text-center text-sm text-danger">{error}</p>}
         {needLogin && (
           <Link
             href={`/login?next=${encodeURIComponent(`/cadeau?code=${encodeURIComponent(code.trim())}`)}`}
