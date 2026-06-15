@@ -34,19 +34,10 @@ export async function updateUsername(newUsername: string): Promise<ProfileResult
     return { success: false, error: 'Non authentifié' }
   }
 
-  // Check if username is already taken
-  const { data: existingUser } = await supabase
-    .from('profiles')
-    .select('id')
-    .eq('username', newUsername)
-    .neq('id', user.id)
-    .single()
-
-  if (existingUser) {
-    return { success: false, error: 'Ce pseudo est déjà pris' }
-  }
-
-  // Update username
+  // Unicité garantie par la contrainte UNIQUE (profiles.username). Plus de
+  // pré-check côté client : profiles est en RLS own-row, on ne voit pas les pseudos
+  // des autres. On tente l'update et on traduit l'erreur d'unicité (23505) —
+  // atomique, sans fenêtre TOCTOU.
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { error } = await (supabase as any)
     .from('profiles')
@@ -54,6 +45,9 @@ export async function updateUsername(newUsername: string): Promise<ProfileResult
     .eq('id', user.id)
 
   if (error) {
+    if ((error as { code?: string }).code === '23505') {
+      return { success: false, error: 'Ce pseudo est déjà pris' }
+    }
     console.error('Update username error:', error.message)
     return { success: false, error: 'Erreur lors de la mise à jour du pseudo' }
   }

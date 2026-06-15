@@ -21,19 +21,14 @@ type PublicProfile = {
 
 async function getPublicProfile(username: string): Promise<{ profile: PublicProfile; badges: number } | null> {
   const supabase = await createClient()
+  // RPC DEFINER : n'expose que les colonnes publiques (la table profiles est en
+  // RLS own-row pour authenticated). La fonction renvoie aussi le compte de badges.
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any
-  const { data } = await sb
-    .from('profiles')
-    .select('id, username, avatar_url, total_wins, total_clicks, created_at, is_vip, level, xp')
-    .eq('username', username)
-    .single()
-  if (!data) return null
-  const { count } = await sb
-    .from('user_badges')
-    .select('badge_id', { count: 'exact', head: true })
-    .eq('user_id', data.id)
-  return { profile: data as PublicProfile, badges: count ?? 0 }
+  const { data } = await (supabase.rpc as any)('get_public_profile', { p_username: username })
+  const row = Array.isArray(data) ? data[0] : data
+  if (!row) return null
+  const { badges, ...profile } = row
+  return { profile: profile as PublicProfile, badges: Number(badges ?? 0) }
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ username: string }> }): Promise<Metadata> {

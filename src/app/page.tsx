@@ -96,12 +96,14 @@ async function getLandingData() {
   const realUserIds = typedWinners
     ? typedWinners.filter(w => w.user_id && !w.is_bot).map(w => w.user_id).filter(Boolean) as string[]
     : []
-  const { data: profilesData } = realUserIds.length > 0
-    ? await supabase
-        .from('profiles')
-        .select('id, username, avatar_url')
-        .in('id', realUserIds)
-    : { data: [] }
+  // RPC DEFINER (colonnes publiques only) : profiles est en RLS own-row pour
+  // authenticated, donc plus de lecture cross-user directe sur la table.
+  let profilesData: Pick<Profile, 'id' | 'username' | 'avatar_url'>[] | null = []
+  if (realUserIds.length > 0) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data } = await (supabase.rpc as any)('get_public_profiles', { p_ids: realUserIds })
+    profilesData = data
+  }
 
   const typedProfiles = profilesData as Pick<Profile, 'id' | 'username' | 'avatar_url'>[] | null
   const profilesMap = new Map(

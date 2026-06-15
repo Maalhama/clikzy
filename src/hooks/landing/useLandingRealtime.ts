@@ -119,18 +119,18 @@ export function useLandingRealtime(
           // Fetch username for the winner
           const fetchProfile = async () => {
             try {
-              const { data, error: profileError } = await supabase
-                .from('profiles')
-                .select('username, avatar_url')
-                .eq('id', newWinner.user_id)
-                .single()
+              // RPC DEFINER (colonnes publiques only) : profiles est en RLS own-row.
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              const { data, error: profileError } = await (supabase.rpc as any)(
+                'get_public_profiles', { p_ids: [newWinner.user_id] }
+              )
 
               if (profileError) {
                 console.error('Error fetching winner profile:', profileError)
                 return
               }
 
-              const profileData = data as { username: string; avatar_url: string | null } | null
+              const profileData = (Array.isArray(data) ? data[0] : null) as { username: string; avatar_url: string | null } | null
               if (profileData) {
                 const winner: Winner = {
                   id: newWinner.id,

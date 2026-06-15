@@ -32,7 +32,8 @@ export async function getAdminStats(): Promise<AdminStats | null> {
   const { isAdmin } = await checkAdminStatus()
   if (!isAdmin) return null
 
-  const supabase = await createClient()
+  // service client : compte/agrège TOUS les profils (profiles est en RLS own-row).
+  const supabase = createServiceClient()
 
   /* eslint-disable @typescript-eslint/no-explicit-any */
   const [usersResult, gamesResult, itemsResult, activeGamesResult, winsResult] = await Promise.all([
@@ -126,7 +127,8 @@ export async function getAdminUsers(limit: number = 50, offset: number = 0): Pro
   const { isAdmin } = await checkAdminStatus()
   if (!isAdmin) return []
 
-  const supabase = await createClient()
+  // service client : liste admin de TOUS les profils (profiles est en RLS own-row).
+  const supabase = createServiceClient()
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { data } = await (supabase as any)
