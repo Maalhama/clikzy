@@ -1,4 +1,14 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+// Génère les icônes Cleekzy (PWA + favicon) depuis un SVG vectoriel.
+// Logo header : wordmark CLEEK (violet) + ZY (rose) + curseur néon qui clique.
+// FULL-BLEED (carré plein) : l'OS arrondit/masque lui-même.
+// Lancer : node scripts/generate-icons.cjs
+const fs = require('fs')
+const path = require('path')
+const sharp = require('sharp')
+const PUB = path.join(__dirname, '..', 'public')
+
+function iconSVG() {
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0B0F1A"/><stop offset="1" stop-color="#141B2D"/></linearGradient>
     <linearGradient id="neon" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#9B5CFF"/><stop offset="1" stop-color="#FF4FD8"/></linearGradient>
@@ -17,4 +27,15 @@
     <path d="M5 3l14 9-7 2-3 7-4-18z" fill="url(#neon)" stroke="#ffffff" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/>
   </g>
   <circle cx="294" cy="302" r="8" fill="#FF4FD8" opacity="0.9"/>
-</svg>
+</svg>`
+}
+
+async function main() {
+  const svg = iconSVG()
+  fs.writeFileSync(path.join(PUB, 'icon.svg'), svg)
+  const buf = Buffer.from(svg)
+  for (const [name, size] of [['icon-512.png',512],['icon-192.png',192],['apple-touch-icon.png',180]]) {
+    await sharp(buf).resize(size,size).png().toFile(path.join(PUB, name)); console.log('écrit', name, size)
+  }
+}
+main().catch((e)=>{console.error(e);process.exit(1)})

@@ -88,7 +88,7 @@ export const metadata: Metadata = {
     ],
     // apple-touch-icon : icône de l'app une fois ajoutée à l'écran d'accueil iOS
     // (sinon iOS prend une capture floue de la page).
-    apple: [{ url: '/icon-192.png', sizes: '180x180' }],
+    apple: [{ url: '/apple-touch-icon.png', sizes: '180x180' }],
   },
   appleWebApp: {
     capable: true,
