@@ -19,6 +19,7 @@ import { seedBotComments } from '@/lib/bots/commentGenerator'
 import { PaymentSuccessModal } from '@/components/lobby/PaymentSuccessModal'
 import { LobbyGamificationBar } from '@/components/progression/LobbyGamificationBar'
 import { BuyItNowLobbyBanner } from '@/components/profile/BuyItNowLobbyBanner'
+import { trackPurchase } from '@/lib/analytics'
 import { RewardsCalendarModal } from '@/components/progression/RewardsCalendarModal'
 import { getCalendarMonth, type CalendarDay } from '@/actions/calendar'
 import { applyReferralCode } from '@/actions/referral'
@@ -84,14 +85,17 @@ export function LobbyClient({
       if (purchasedCredits > 0) {
         setPaymentSuccess({ show: true, credits: purchasedCredits, kind: 'credits' })
         creditsContext?.refreshCredits()
+        trackPurchase(0, purchasedCredits) // conversion pack (montant réel suivi côté admin)
         router.replace('/lobby', { scroll: false })
       }
     } else if (searchParams.get('vip') === 'success') {
       setPaymentSuccess({ show: true, credits: 0, kind: 'vip' })
       creditsContext?.refreshCredits()
+      trackPurchase(12.99, 0) // conversion VIP
       router.replace('/lobby', { scroll: false })
     } else if (searchParams.get('pass') === 'success') {
       setPaymentSuccess({ show: true, credits: 0, kind: 'pass' })
+      trackPurchase(4.99, 0) // conversion Passe d'Arène
       router.replace('/lobby', { scroll: false })
     }
   }, [searchParams, router, creditsContext])
