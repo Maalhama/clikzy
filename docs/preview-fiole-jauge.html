@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Preview — Fiole jauge pixel-art</title>
+<style>
+  :root {
+    --neon-purple:#9B5CFF; --neon-pink:#FF4FD8; --neon-blue:#3CCBFF;
+    --notch: polygon(0 4px,4px 4px,4px 0,calc(100% - 4px) 0,calc(100% - 4px) 4px,100% 4px,100% calc(100% - 4px),calc(100% - 4px) calc(100% - 4px),calc(100% - 4px) 100%,4px 100%,4px calc(100% - 4px),0 calc(100% - 4px));
+    --grid: repeating-linear-gradient(0deg, rgba(0,0,0,.22) 0 1px, transparent 1px 4px),
+            repeating-linear-gradient(90deg, rgba(0,0,0,.22) 0 1px, transparent 1px 4px);
+  }
+  * { box-sizing:border-box; }
+  body { margin:0; background:#07060d; color:#fff; font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+         display:flex; gap:28px; flex-wrap:wrap; padding:36px; align-items:flex-start; }
+  .col { width:340px; }
+  .lbl { font-size:12px; letter-spacing:.18em; text-transform:uppercase; color:#9aa; margin:0 0 10px; }
+
+  .card { border-radius:16px; overflow:hidden; border:1px solid rgba(255,255,255,.12);
+          box-shadow:0 0 0 1px rgba(155,92,255,.25), 0 14px 40px rgba(0,0,0,.5); }
+  .stage { position:relative; aspect-ratio:4/3; overflow:hidden; background:linear-gradient(135deg,#15131f,#0d0c14); }
+  .product { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; }
+  .ph { width:150px; height:150px; border-radius:18px; background:radial-gradient(circle at 35% 30%,#2a2740,#16141f);
+        box-shadow:0 0 30px rgba(155,92,255,.35); display:flex; align-items:center; justify-content:center; color:#6b6890; font-size:13px; }
+  .price { position:absolute; bottom:16px; left:16px; padding:8px 16px; border-radius:12px; font-weight:900; font-size:22px;
+           background:linear-gradient(135deg,rgba(155,92,255,.9),rgba(255,92,184,.9)); box-shadow:0 0 20px rgba(155,92,255,.5); }
+  .info { padding:14px; }
+  .info h1 { margin:0 0 4px; font-size:18px; }
+  .cap { margin:8px 0 0; font-size:12px; line-height:1.55; color:rgba(255,255,255,.55); }
+  .cap .k { color:var(--neon-purple); font-size:10px; letter-spacing:.2em; text-transform:uppercase; font-weight:700; }
+  .cap .it { color:rgba(255,255,255,.8); }
+  .cap .n { color:var(--neon-blue); font-weight:700; }
+  .cap2 { margin:4px 0 0; font-size:12px; color:rgba(255,255,255,.45); }
+  .cap2 .n { color:var(--neon-blue); font-weight:700; }
+
+  /* ----- FIOLE ----- */
+  .vwrap { position:absolute; right:12px; top:56px; bottom:14px; width:48px; z-index:20; }
+  .vial { display:flex; height:100%; flex-direction:column; align-items:center; justify-content:flex-end; gap:4px; }
+  .cork { width:50%; height:8px; background:linear-gradient(180deg,#e2a85c 0 3px,#b9772f 3px 5px,#8c531f 5px);
+          box-shadow:inset 1px 1px 0 rgba(255,255,255,.4), inset -1px -1px 0 rgba(0,0,0,.45); }
+  .neck { width:33%; height:9px; background:rgba(12,12,22,.9); box-shadow:inset 0 0 0 2px rgba(255,255,255,.1); }
+  .frame { display:flex; width:100%; flex:1; min-height:64px; clip-path:var(--notch); padding:2px;
+           background:linear-gradient(180deg,#ffb347,#9B5CFF); box-shadow:0 0 14px rgba(255,107,26,.7); }
+  .frame.hot { background:linear-gradient(180deg,#ffe7a0,#FF4FD8); box-shadow:0 0 18px rgba(255,196,84,.85); }
+  .tube { position:relative; width:100%; overflow:hidden; clip-path:var(--notch); background:rgba(9,9,18,.92); image-rendering:pixelated; }
+  .liquid { position:absolute; left:0; right:0; bottom:0;
+            background:linear-gradient(0deg,#6f1208 0%,#c81e0f 32%,#ff6b1a 68%,#ffd23f 100%);
+            background-size:100% 16px; box-shadow:0 0 16px rgba(255,107,26,.7);
+            animation:gauge-magma-flow 1.1s linear infinite, gauge-magma-flicker 1.5s ease-in-out infinite; }
+  .liquid.hot { background:linear-gradient(0deg,#b81e0f 0%,#ff6b1a 45%,#fff1a8 100%); box-shadow:0 0 18px rgba(255,196,84,.85); }
+  .surface { position:absolute; left:0; right:0; top:0; height:4px; background:#ffd23f; box-shadow:0 0 8px rgba(255,107,26,.7);
+             transform-origin:bottom; animation:gauge-surface-wave .9s ease-in-out infinite; }
+  .surface.hot { background:#fff6cf; }
+  .ember { position:absolute; width:2px; height:2px; }
+  .bub { position:absolute; bottom:4px; border-radius:1px; background:#ffd23f; }
+  .bub.hot { background:#fff6cf; }
+  .grid { position:absolute; inset:0; pointer-events:none; background-image:var(--grid); }
+  .tick { position:absolute; left:0; width:6px; height:2px; background:rgba(255,255,255,.28); pointer-events:none; }
+  .shineL { position:absolute; top:0; bottom:0; left:2px; width:3px; background:rgba(255,255,255,.12); pointer-events:none; }
+  .shineT { position:absolute; left:0; right:0; top:0; height:3px; background:rgba(255,255,255,.1); pointer-events:none; }
+
+  /* badge pixel % */
+  .badge { margin-top:2px; filter:drop-shadow(2px 2px 0 rgba(0,0,0,.55)); }
+  .badge .bf { clip-path:var(--notch); padding:2px; background:linear-gradient(135deg,#ff6b1a,#9B5CFF); }
+  .badge.hot .bf { background:linear-gradient(135deg,#ffd23f,#FF4FD8); }
+  .badge .bi { display:flex; align-items:center; gap:4px; padding:2px 6px; clip-path:var(--notch); background:#0b0a16; }
+  .badge .num { font-weight:800; font-size:10px; color:#fff; }
+
+  @keyframes gauge-magma-flow { 0%{background-position:0 0;} 100%{background-position:0 -16px;} }
+  @keyframes gauge-magma-flicker { 0%,100%{filter:brightness(1) saturate(1.05);} 35%{filter:brightness(1.28) saturate(1.2);} 70%{filter:brightness(.9) saturate(1);} }
+  @keyframes gauge-surface-wave { 0%,100%{transform:translateX(-2px) scaleY(1);} 50%{transform:translateX(2px) scaleY(1.4);} }
+  @keyframes gauge-bubble-rise { 0%{transform:translateY(0) scale(1);opacity:0;} 25%{opacity:.9;} 100%{transform:translateY(-180%) scale(.6);opacity:0;} }
+</style>
+</head>
+<body>
+  <!-- template via JS pour éviter la répétition -->
+  <div id="root" style="display:flex;gap:28px;flex-wrap:wrap;"></div>
+<script>
+  const ICON = '<svg viewBox="0 0 8 8" width="9" height="9" shape-rendering="crispEdges"><rect x="0" y="6" width="2" height="2" fill="C"/><rect x="3" y="4" width="2" height="4" fill="C"/><rect x="6" y="2" width="2" height="6" fill="C"/></svg>';
+  function fiole(pct, hot) {
+    const fill = pct>0 ? Math.max(pct,6) : 0;
+    const ec = hot ? '#fff1a8' : null;
+    const acc = hot ? '#ffd23f' : '#ff8a3c';
+    const bub = hot ? 'bub hot' : 'bub';
+    return `
+    <div class="vwrap"><div class="vial">
+      <div class="cork"></div><div class="neck"></div>
+      <div class="frame ${hot?'hot':''}"><div class="tube">
+        <div class="liquid ${hot?'hot':''}" style="height:${fill}%">
+          <div class="surface ${hot?'hot':''}"></div>
+          <span class="ember" style="left:38%;bottom:28%;background:#fff1a8;opacity:.85"></span>
+          <span class="ember" style="left:62%;bottom:48%;background:#ffd98a;opacity:.7"></span>
+          <span class="${bub}" style="left:22%;width:4px;height:4px;animation:gauge-bubble-rise 1.7s ease-in 0s infinite"></span>
+          <span class="${bub}" style="left:54%;width:3px;height:3px;animation:gauge-bubble-rise 2.1s ease-in .5s infinite"></span>
+          <span class="${bub}" style="left:74%;width:5px;height:5px;animation:gauge-bubble-rise 1.5s ease-in 1s infinite"></span>
+          <div class="grid"></div>
+        </div>
+        <span class="tick" style="bottom:25%"></span><span class="tick" style="bottom:50%"></span><span class="tick" style="bottom:75%"></span>
+        <div class="grid" style="opacity:.5"></div><div class="shineL"></div><div class="shineT"></div>
+      </div></div>
+      <div class="badge ${hot?'hot':''}"><div class="bf"><div class="bi">${ICON.replaceAll('C',acc)}<span class="num">${pct}%</span></div></div></div>
+    </div></div>`;
+  }
+  function card(o) {
+    const cap = o.hot
+      ? `<p class="cap"><span class="k">Jauge pleine</span> ${o.it} est à toi.</p>`
+      : `<p class="cap"><span class="k">Ta jauge</span> monte à chaque clic. Pleine, <span class="it">${o.it}</span> est à toi, garanti.</p>
+         <p class="cap2">Encore <span class="n">${o.rem}</span> clics.</p>`;
+    return `<div class="col"><p class="lbl">${o.lbl}</p>
+      <div class="card" style="${o.hot?'box-shadow:0 0 0 1px rgba(255,79,216,.5),0 14px 40px rgba(0,0,0,.5)':''}">
+        <div class="stage">
+          <div class="product"><div class="ph">${o.it}</div></div>
+          <div class="price">${o.price}</div>
+          ${fiole(o.pct, o.hot)}
+        </div>
+        <div class="info"><h1>${o.it}</h1>${cap}</div>
+      </div></div>`;
+  }
+  document.getElementById('root').innerHTML = [
+    card({lbl:'En cours · 32 %', it:'iPhone 17', price:'59€', pct:32, rem:280}),
+    card({lbl:'En cours · 68 %', it:'PS5 Pro', price:'799€', pct:68, rem:42}),
+    card({lbl:'Pleine · 100 %', it:'AirPods', price:'279€', pct:100, hot:true}),
+  ].join('');
+</script>
+</body>
+</html>

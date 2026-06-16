@@ -1,0 +1,358 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Cleekzy — Modèle d'éco unitaire (jauge)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;800&family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #0B0F1A; --panel: #141B2D; --panel2: #1B2438;
+    --violet: #9B5CFF; --cyan: #3CCBFF; --pink: #FF4FD8; --gold: #FFC24B;
+    --success: #34D399; --danger: #FF5A67; --amber: #FBBF24;
+    --text: #E8ECF5; --muted: #8A93A8; --line: rgba(255,255,255,.08);
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: radial-gradient(1200px 700px at 80% -10%, rgba(155,92,255,.14), transparent 60%),
+             radial-gradient(900px 600px at -10% 110%, rgba(60,203,255,.10), transparent 55%), var(--bg);
+    color: var(--text); font-family: 'Hanken Grotesk', system-ui, sans-serif;
+    line-height: 1.5; -webkit-font-smoothing: antialiased; padding: 28px 18px 60px;
+  }
+  .wrap { max-width: 1120px; margin: 0 auto; }
+  h1 { font-family: 'Unbounded', sans-serif; font-weight: 800; font-size: clamp(1.4rem, 3.4vw, 2.1rem);
+       margin: 0 0 6px; letter-spacing: -.02em; }
+  h1 .g { background: linear-gradient(90deg, var(--violet), var(--cyan)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .sub { color: var(--muted); margin: 0 0 18px; font-size: .98rem; }
+  .kicker { font-family:'Unbounded',sans-serif; font-size:.62rem; letter-spacing:.32em; text-transform:uppercase; color:var(--violet); font-weight:700; }
+
+  .vat {
+    display:flex; gap:14px; flex-wrap:wrap; align-items:center; background:linear-gradient(90deg, rgba(255,194,75,.10), rgba(255,79,216,.06));
+    border:1px solid rgba(255,194,75,.22); border-radius:14px; padding:12px 16px; margin-bottom:22px; font-size:.9rem;
+  }
+  .vat b { color: var(--gold); }
+  .vat .chip { font-family:'Unbounded',sans-serif; font-weight:700; font-size:.78rem; }
+
+  .grid { display:grid; grid-template-columns: 1fr 1.15fr; gap:20px; }
+  @media (max-width: 880px){ .grid{ grid-template-columns:1fr; } }
+
+  .panel { background:linear-gradient(180deg, var(--panel), #11182a); border:1px solid var(--line); border-radius:18px; padding:20px 20px 8px; }
+  .panel h2 { font-family:'Unbounded',sans-serif; font-size:.95rem; font-weight:700; margin:0 0 16px; letter-spacing:-.01em; }
+
+  .field { margin-bottom:16px; }
+  .field .row { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:7px; gap:10px; }
+  .field label { font-size:.86rem; color:#C4CCDD; font-weight:500; }
+  .field .val { font-family:'Unbounded',sans-serif; font-weight:700; font-size:.92rem; color:#fff; white-space:nowrap; }
+  .field .hint { color:var(--muted); font-size:.74rem; font-weight:400; display:block; margin-top:2px; }
+  input[type=range]{ -webkit-appearance:none; appearance:none; width:100%; height:6px; border-radius:6px; outline:none;
+    background:linear-gradient(90deg, var(--violet), var(--cyan)); background-repeat:no-repeat; }
+  input[type=range]::-webkit-slider-thumb{ -webkit-appearance:none; width:18px; height:18px; border-radius:50%;
+    background:#fff; border:3px solid var(--violet); cursor:pointer; box-shadow:0 0 0 4px rgba(155,92,255,.25); }
+  input[type=range]::-moz-range-thumb{ width:16px; height:16px; border-radius:50%; background:#fff; border:3px solid var(--violet); cursor:pointer; }
+  input[type=number]{ width:96px; background:var(--panel2); border:1px solid var(--line); color:#fff; border-radius:9px;
+    padding:6px 9px; font-family:'Unbounded',sans-serif; font-weight:700; font-size:.86rem; text-align:right; }
+  .inl { display:flex; align-items:center; gap:10px; }
+
+  .verdict { border-radius:16px; padding:16px 18px; margin-bottom:16px; border:1px solid; }
+  .verdict .vt { font-family:'Unbounded',sans-serif; font-weight:800; font-size:1.05rem; margin:0 0 3px; }
+  .verdict .vd { font-size:.88rem; }
+  .v-green { background:rgba(52,211,153,.10); border-color:rgba(52,211,153,.4); }
+  .v-green .vt{ color:var(--success); }
+  .v-amber { background:rgba(251,191,36,.10); border-color:rgba(251,191,36,.4); }
+  .v-amber .vt{ color:var(--amber); }
+  .v-red { background:rgba(255,90,103,.10); border-color:rgba(255,90,103,.42); }
+  .v-red .vt{ color:var(--danger); }
+
+  .cards { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .card { background:var(--panel2); border:1px solid var(--line); border-radius:14px; padding:14px; }
+  .card.big { grid-column:1 / -1; }
+  .card .lab { font-size:.72rem; text-transform:uppercase; letter-spacing:.12em; color:var(--muted); margin-bottom:6px; font-weight:600; }
+  .card .num { font-family:'Unbounded',sans-serif; font-weight:800; font-size:1.5rem; letter-spacing:-.02em; }
+  .card .num.sm { font-size:1.15rem; }
+  .card .note { font-size:.78rem; color:var(--muted); margin-top:4px; }
+  .pos{ color:var(--success); } .neg{ color:var(--danger); } .cy{ color:var(--cyan); } .vi{ color:var(--violet); } .pk{ color:var(--pink); } .gd{ color:var(--gold); }
+
+  table.pl { width:100%; border-collapse:collapse; margin-top:4px; font-size:.86rem; }
+  table.pl td { padding:7px 0; border-bottom:1px solid var(--line); }
+  table.pl td:last-child { text-align:right; font-family:'Unbounded',sans-serif; font-weight:700; }
+  table.pl tr.tot td { border-bottom:none; padding-top:11px; font-size:.96rem; }
+  table.pl tr.tot td:first-child { color:#fff; font-weight:600; font-family:'Hanken Grotesk'; }
+  table.pl .mut { color:var(--muted); }
+
+  .safebtn { width:100%; margin:6px 0 14px; background:linear-gradient(90deg, rgba(52,211,153,.16), rgba(60,203,255,.12));
+    border:1px solid rgba(52,211,153,.35); color:var(--success); font-family:'Unbounded',sans-serif; font-weight:700; font-size:.8rem;
+    padding:11px; border-radius:11px; cursor:pointer; transition:.15s; }
+  .safebtn:hover{ filter:brightness(1.15); }
+  .seg { display:flex; gap:6px; background:var(--panel2); border:1px solid var(--line); border-radius:10px; padding:4px; }
+  .seg button { flex:1; background:transparent; border:none; color:var(--muted); font-family:'Hanken Grotesk'; font-weight:600;
+    font-size:.8rem; padding:7px; border-radius:7px; cursor:pointer; }
+  .seg button.on { background:linear-gradient(90deg,var(--violet),var(--pink)); color:#fff; }
+
+  .foot { color:var(--muted); font-size:.78rem; margin-top:22px; border-top:1px solid var(--line); padding-top:14px; }
+  .foot b{ color:#C4CCDD; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="kicker">Cleekzy · simulateur</div>
+  <h1>Modèle d'éco unitaire — <span class="g">la jauge</span></h1>
+  <p class="sub">Un seul l'a pas cher (timer), les autres au prix marché (ta marge). Bouge les curseurs : le verdict se recalcule en direct.</p>
+
+  <div class="vat">
+    <span class="chip gd">TVA</span>
+    <span>Le prix marché est <b>TTC</b> : <span id="vatLine">1200 € = 1000 € HT + 200 € TVA</span>. Tu <b>extrais</b> la TVA, tu ne l'ajoutes jamais par-dessus. Ta marge vit dans le <b>HT</b>.</span>
+  </div>
+
+  <div class="grid">
+    <!-- INPUTS -->
+    <div class="panel">
+      <h2>Hypothèses</h2>
+
+      <div class="field">
+        <div class="row"><label>Prix marché de l'item (TTC)</label>
+          <span class="inl"><input type="number" id="market" value="1200" min="50" step="10"> €</span></div>
+        <span class="hint">La cible de la jauge = ce prix. Jamais au-dessus du marché réel.</span>
+      </div>
+
+      <div class="field">
+        <div class="row"><label>Ton coût d'achat fournisseur (HT)</label>
+          <span class="inl"><input type="number" id="cost" value="850" min="0" step="10"> €</span></div>
+        <span class="hint" id="costHint">Ta vraie marge = prix HT − coût HT.</span>
+      </div>
+
+      <div class="field">
+        <div class="row"><label>TVA</label><span class="val"><span id="vatV">20</span> %</span></div>
+        <input type="range" id="vat" min="0" max="25" value="20" step="0.5">
+      </div>
+
+      <hr style="border:none;border-top:1px solid var(--line);margin:18px 0;">
+
+      <div class="field">
+        <div class="row"><label>Joueurs par cycle (cohorte d'un item)</label><span class="val"><span id="playersV">100</span></span></div>
+        <input type="range" id="players" min="10" max="1000" value="100" step="10">
+      </div>
+
+      <div class="field">
+        <div class="row"><label>Gagnants au timer</label><span class="val"><span id="twrV">5</span> %</span></div>
+        <input type="range" id="twr" min="0" max="30" value="5" step="0.5">
+        <span class="hint">Part des joueurs qui remportent l'item <i>cheap</i> via le timer (les loss leaders).</span>
+      </div>
+
+      <div class="field">
+        <div class="row"><label>Ce que paie le gagnant timer</label><span class="val"><span id="twpV">15</span> % du prix</span></div>
+        <input type="range" id="twp" min="0" max="100" value="15" step="1">
+        <span class="hint" id="twpHint"></span>
+      </div>
+      <button class="safebtn" id="safeBtn">⟂ Mode safe : caler le gagnant timer au plancher = ton coût (0 perte/unité)</button>
+
+      <div class="field">
+        <div class="row"><label>Taux de complétion (parmi les non-gagnants)</label><span class="val"><span id="cmpV">40</span> %</span></div>
+        <input type="range" id="cmp" min="0" max="100" value="40" step="1">
+        <span class="hint">Ceux qui remplissent la jauge à fond, au prix marché → ta marge.</span>
+      </div>
+
+      <div class="field">
+        <div class="row"><label>Remplissage moyen des abandons</label><span class="val"><span id="abfV">25</span> %</span></div>
+        <input type="range" id="abf" min="0" max="100" value="25" step="1">
+        <span class="hint">Cash encaissé puis converti en avoir à 90 j (passif, pas du profit tant que non redépensé).</span>
+      </div>
+
+      <div class="field">
+        <div class="row"><label>Avoirs (90 j) : on les compte comment ?</label></div>
+        <div class="seg" id="avoirSeg">
+          <button data-v="0" class="on">Prudent (0 €, comme un remboursement)</button>
+          <button data-v="1">Réaliste (marge std à la redépense)</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- OUTPUTS -->
+    <div>
+      <div id="verdict" class="verdict v-green">
+        <p class="vt" id="vTitle">—</p>
+        <p class="vd" id="vDesc">—</p>
+      </div>
+
+      <div class="cards">
+        <div class="card">
+          <div class="lab">Marge / item complété</div>
+          <div class="num pos" id="oMargin">+150 €</div>
+          <div class="note" id="oMarginPct">15 % du HT</div>
+        </div>
+        <div class="card">
+          <div class="lab">Résultat / gagnant timer</div>
+          <div class="num neg" id="oTimer">−700 €</div>
+          <div class="note" id="oTimerNote">loss leader à amortir</div>
+        </div>
+
+        <div class="card">
+          <div class="lab">Compléteurs requis / gagnant timer</div>
+          <div class="num cy" id="oRatio">4,7</div>
+          <div class="note">pour absorber un seul item bradé</div>
+        </div>
+        <div class="card">
+          <div class="lab">Complétion pour l'équilibre</div>
+          <div class="num vi" id="oBE">25 %</div>
+          <div class="note" id="oBENote">tu es au-dessus → marge positive</div>
+        </div>
+
+        <div class="card big">
+          <div class="lab">P&amp;L de la cohorte (1 cycle d'un item)</div>
+          <table class="pl">
+            <tr><td>Items livrés <span class="mut" id="plUnits"></span></td><td id="plUnitsV"></td></tr>
+            <tr><td>Cash encaissé <span class="mut">(TTC, ventes réalisées)</span></td><td id="plCash"></td></tr>
+            <tr><td class="mut">— dont TVA reversée à l'État</td><td class="mut" id="plVat"></td></tr>
+            <tr><td>Chiffre d'affaires HT</td><td id="plHt"></td></tr>
+            <tr><td>Coût des marchandises (COGS)</td><td id="plCogs"></td></tr>
+            <tr><td>Avoirs encaissés <span class="mut">(passif différé)</span></td><td id="plAvoir"></td></tr>
+            <tr class="tot"><td>Marge réalisée nette</td><td id="plNet"></td></tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="foot">
+        <b>Lecture :</b> chaque gagnant timer est un <b>loss leader</b> (il paie sous ton coût) que tu amortis sur les compléteurs au prix marché. Le modèle tient si <b>complétion &gt; seuil d'équilibre</b>. Le « +20 % TVA » n'apparaît nulle part : la TVA est déjà dans le prix marché, l'ajouter te ferait sortir du cadre safe (prix &gt; valeur réelle).<br><br>
+        <b>⚠️ Modèle directionnel</b> pour cadrer ta décision, pas un bilan comptable. La TVA sur avoirs (bons à usages multiples), le régime exact (normal vs TVA sur marge si reconditionné) et la qualification juridique sont à confirmer par un <b>comptable</b> et un <b>avocat</b>.
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const $ = id => document.getElementById(id);
+  const eur = n => (n>=0?'+':'−') + Math.abs(Math.round(n)).toLocaleString('fr-FR') + ' €';
+  const eurp = n => Math.round(n).toLocaleString('fr-FR') + ' €';
+  const pct = n => n.toLocaleString('fr-FR',{maximumFractionDigits:1}) + ' %';
+  let avoirMode = 0;
+
+  function setRangeFill(el){
+    const min=+el.min, max=+el.max, v=+el.value;
+    const p = ((v-min)/(max-min))*100;
+    el.style.backgroundSize = p + '% 100%';
+  }
+
+  function compute(){
+    const marketTTC = +$('market').value || 0;
+    const costHT = +$('cost').value || 0;
+    const vat = (+$('vat').value)/100;
+    const N = +$('players').value;
+    const twr = (+$('twr').value)/100;
+    const twp = (+$('twp').value)/100;
+    const cmp = (+$('cmp').value)/100;
+    const abf = (+$('abf').value)/100;
+
+    const marketHT = marketTTC/(1+vat);
+    const vatUnit = marketTTC - marketHT;
+
+    const payTimerTTC = marketTTC*twp;
+    const payTimerHT = payTimerTTC/(1+vat);
+
+    const marginComplete = marketHT - costHT;          // €/unit HT
+    const resultTimer = payTimerHT - costHT;           // €/unit HT (neg=loss)
+    const marginRate = marketHT>0 ? marginComplete/marketHT : 0;
+
+    const nTimer = N*twr;
+    const nRest = N - nTimer;
+    const nComplete = nRest*cmp;
+    const nAbandon = nRest*(1-cmp);
+
+    const unitsDelivered = nTimer + nComplete;
+    const cashRealizedTTC = nComplete*marketTTC + nTimer*payTimerTTC;
+    const htRealized = cashRealizedTTC/(1+vat);
+    const vatRemitted = cashRealizedTTC - htRealized;
+    const cogs = unitsDelivered*costHT;
+    const realizedMargin = htRealized - cogs;          // = nComplete*marginComplete + nTimer*resultTimer
+
+    const avoirTTC = nAbandon*marketTTC*abf;
+    const avoirFutureMargin = avoirMode ? (avoirTTC/(1+vat))*marginRate : 0;
+    const netMargin = realizedMargin + avoirFutureMargin;
+
+    // break-even ratio + completion rate
+    const beRatio = (marginComplete>0 && resultTimer<0) ? (costHT-payTimerHT)/marginComplete : (resultTimer>=0? 0 : Infinity);
+    let beComplete = Infinity;
+    if (marginComplete>0 && nRest>0){
+      const nCompleteBE = nTimer*Math.max(0,(costHT-payTimerHT))/marginComplete;
+      beComplete = Math.min(100, (nCompleteBE/nRest)*100);
+    }
+
+    // ---- render ----
+    $('vatLine').textContent = `${eurp(marketTTC)} = ${eurp(marketHT)} HT + ${eurp(vatUnit)} TVA`;
+    $('vatV').textContent = (vat*100).toLocaleString('fr-FR',{maximumFractionDigits:1});
+    $('playersV').textContent = N;
+    $('twrV').textContent = (twr*100).toLocaleString('fr-FR',{maximumFractionDigits:1});
+    $('twpV').textContent = Math.round(twp*100);
+    $('cmpV').textContent = Math.round(cmp*100);
+    $('abfV').textContent = Math.round(abf*100);
+
+    const costPct = marketHT>0 ? (costHT/marketHT*100) : 0;
+    $('costHint').textContent = `Soit ${pct(costPct)} du prix HT — il te reste ${pct(100-costPct)} de marge brute.`;
+    $('twpHint').innerHTML = resultTimer>=0
+      ? `Le gagnant paie ${eurp(payTimerHT)} HT ≥ ton coût → <span class="pos">aucune perte par unité.</span>`
+      : `Le gagnant paie ${eurp(payTimerHT)} HT &lt; ton coût (${eurp(costHT)}) → <span class="neg">tu perds ${eurp(costHT-payTimerHT)} sur cette unité.</span>`;
+
+    $('oMargin').textContent = eur(marginComplete);
+    $('oMargin').className = 'num ' + (marginComplete>=0?'pos':'neg');
+    $('oMarginPct').textContent = pct(marginRate*100) + ' du HT';
+
+    $('oTimer').textContent = eur(resultTimer);
+    $('oTimer').className = 'num ' + (resultTimer>=0?'pos':'neg');
+    $('oTimerNote').textContent = resultTimer>=0 ? 'au plancher : pas de perte' : 'loss leader à amortir';
+
+    $('oRatio').textContent = (beRatio===Infinity)?'∞':(beRatio===0?'0':beRatio.toLocaleString('fr-FR',{maximumFractionDigits:1}));
+    $('oBE').textContent = (beComplete===Infinity)?'impossible':pct(beComplete);
+    const cmpNow = cmp*100;
+    $('oBENote').textContent = (beComplete===Infinity) ? 'marge/unité ≤ 0 : revois prix ou coût'
+      : (cmpNow>=beComplete ? 'tu es au-dessus → marge positive' : 'tu es EN DESSOUS → déficit');
+
+    $('plUnits').textContent = `(${nTimer.toLocaleString('fr-FR',{maximumFractionDigits:1})} timer + ${nComplete.toLocaleString('fr-FR',{maximumFractionDigits:1})} complétés)`;
+    $('plUnitsV').textContent = unitsDelivered.toLocaleString('fr-FR',{maximumFractionDigits:1});
+    $('plCash').textContent = eurp(cashRealizedTTC);
+    $('plVat').textContent = '− ' + eurp(vatRemitted);
+    $('plHt').textContent = eurp(htRealized);
+    $('plCogs').textContent = '− ' + eurp(cogs);
+    $('plAvoir').textContent = eurp(avoirTTC) + (avoirMode? ' → +'+eurp(avoirFutureMargin)+' marge future' : ' (non compté)');
+    $('plNet').textContent = eur(netMargin);
+    $('plNet').className = netMargin>=0?'pos':'neg';
+
+    // verdict
+    const v = $('verdict');
+    if (realizedMargin >= 0){
+      v.className = 'verdict v-green';
+      $('vTitle').textContent = '✅ Rentable';
+      $('vDesc').innerHTML = `Marge réalisée <b>${eur(realizedMargin)}</b> par cycle, même sans compter les avoirs. Il te faut <b>${beRatio===Infinity?'∞':beRatio.toLocaleString('fr-FR',{maximumFractionDigits:1})}</b> compléteurs par gagnant timer ; tu en as ${ (nComplete/Math.max(nTimer,0.0001)).toLocaleString('fr-FR',{maximumFractionDigits:1}) }.`;
+    } else if (netMargin >= 0){
+      v.className = 'verdict v-amber';
+      $('vTitle').textContent = '⚠️ Rentable seulement via les avoirs';
+      $('vDesc').innerHTML = `Sur les ventes seules tu es à <b>${eur(realizedMargin)}</b>. Tu ne passes positif (<b>${eur(netMargin)}</b>) que si les avoirs se reconvertissent en ventes. Fragile : monte la complétion à <b>${pct(beComplete)}</b> ou réduis les giveaways.`;
+    } else {
+      v.className = 'verdict v-red';
+      $('vTitle').textContent = '❌ Déficitaire';
+      $('vDesc').innerHTML = `<b>${eur(netMargin)}</b> par cycle. Les items bradés au timer ne sont pas amortis. Leviers : complétion ≥ <b>${beComplete===Infinity?'—':pct(beComplete)}</b>, gagnant timer plus cher (mode safe), moins de gagnants, ou meilleur coût d'achat.`;
+    }
+  }
+
+  // wire
+  ['market','cost','vat','players','twr','twp','cmp','abf'].forEach(id=>{
+    const el = $(id);
+    el.addEventListener('input', ()=>{ if(el.type==='range') setRangeFill(el); compute(); });
+    if(el.type==='range') setRangeFill(el);
+  });
+  $('safeBtn').addEventListener('click', ()=>{
+    const marketTTC=+$('market').value, costHT=+$('cost').value, vat=(+$('vat').value)/100;
+    const marketHT = marketTTC/(1+vat);
+    const safePct = marketHT>0 ? Math.min(100, Math.round(costHT/marketHT*100)) : 0;
+    $('twp').value = safePct; setRangeFill($('twp')); compute();
+  });
+  $('avoirSeg').addEventListener('click', e=>{
+    const b = e.target.closest('button'); if(!b) return;
+    avoirMode = +b.dataset.v;
+    [...$('avoirSeg').children].forEach(c=>c.classList.toggle('on', c===b));
+    compute();
+  });
+
+  compute();
+</script>
+</body>
+</html>

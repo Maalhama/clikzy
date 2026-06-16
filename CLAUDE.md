@@ -343,6 +343,7 @@ Les crons sont configurés sur **cron-job.org** (pas GitHub Actions) :
 | Create Rotation | `45 1,4,7,10,13,16,19,22 * * *` (toutes les 3 h à :45) | `/api/cron/create-rotation` |
 | Reset Credits | `0 0 * * *` (minuit Europe/Paris) | `/api/cron/reset-credits` |
 | Streak Reminder | `0 20 * * *` (20h Europe/Paris) | `/api/cron/streak-reminder` |
+| Convert Abandoned Gauges | `30 2 * * *` (1×/jour) | `/api/cron/convert-abandoned-gauges` |
 
 > **Bot Clicks** est le cron unifié : il fait l'activation (waiting → active) +
 > les bots + la bataille finale + la fin de partie. Il n'y a donc **pas** de cron

@@ -11,8 +11,9 @@ import { useSounds } from '@/hooks/useSounds'
 import { useBotSimulation } from '@/hooks/useBotSimulation'
 import { useCredits } from '@/contexts/CreditsContext'
 import { useBadgeNotification } from '@/contexts/BadgeNotificationContext'
-import { clickGame } from '@/actions/game'
-import { GAME_CONSTANTS } from '@/lib/constants'
+import { clickGame, getItemGauge, type GaugeState } from '@/actions/game'
+import { GAME_CONSTANTS, GAUGE_ENABLED } from '@/lib/constants'
+import { ItemGauge, GaugeCaption } from '@/components/game/ItemGauge'
 import { formatTime } from '@/lib/utils/timer'
 import { generateDeterministicUsername } from '@/lib/bots/usernameGenerator'
 import { getProductImageWithFallback } from '@/lib/utils/productImages'
@@ -83,6 +84,9 @@ export function GameClient({
   const [bursts, setBursts] = useState<number[]>([])
   const burstSeq = useRef(0)
   const [creditsAnimation, setCreditsAnimation] = useState(false)
+  // JAUGE (feature en exploration) : progression perso vers CE modèle d'item
+  const [gauge, setGauge] = useState<GaugeState | null>(null)
+  const [gaugeCelebrate, setGaugeCelebrate] = useState(false)
 
   const { timeLeft, isUrgent, isEnded } = useTimer({ endTime: game.end_time ?? 0 })
 
@@ -119,6 +123,12 @@ export function GameClient({
       }).catch(() => {})
     }
   }, [isPremiumProduct])
+
+  // Charge la progression de la jauge à l'ouverture (lecture own-row via RLS)
+  useEffect(() => {
+    if (!GAUGE_ENABLED || !userId || !game.item_id) return
+    getItemGauge(game.item_id).then(setGauge).catch(() => {})
+  }, [userId, game.item_id])
 
   // Get leader name (real or bot-generated for consistency)
   const leaderName = useMemo(() => {
@@ -203,6 +213,10 @@ export function GameClient({
     // Optimistic updates
     const now = new Date().toISOString()
     decrementCredits(GAME_CONSTANTS.CREDIT_COST_PER_CLICK)
+    // La jauge avance d'un cran (le serveur la réconcilie / gère la complétion)
+    if (GAUGE_ENABLED) {
+      setGauge((g) => (g ? { ...g, progress: g.progress + GAME_CONSTANTS.CREDIT_COST_PER_CLICK } : g))
+    }
 
     const newClick = { id: generateId(), username, clickedAt: now, isBot: false }
     addClick(newClick)
@@ -229,13 +243,28 @@ export function GameClient({
         // Refund credit by decrementing a negative amount
         decrementCredits(-GAME_CONSTANTS.CREDIT_COST_PER_CLICK)
         removeClick(newClick.id)
+        // Annule le cran optimiste de la jauge
+        if (GAUGE_ENABLED) {
+          setGauge((g) => (g ? { ...g, progress: Math.max(0, g.progress - GAME_CONSTANTS.CREDIT_COST_PER_CLICK) } : g))
+        }
         setError(result.error || 'Une erreur est survenue')
-      } else if (result.data?.newBadges && result.data.newBadges.length > 0) {
-        // Show badge notifications for newly earned badges
-        showBadgeNotifications(result.data.newBadges)
+      } else {
+        // Réconcilie la jauge avec l'état serveur (autoritaire) + célèbre la complétion
+        if (result.data?.gauge) {
+          setGauge(result.data.gauge)
+          if (result.data.gauge.completed) {
+            playWin()
+            setGaugeCelebrate(true)
+            setTimeout(() => setGaugeCelebrate(false), 4500)
+          }
+        }
+        if (result.data?.newBadges && result.data.newBadges.length > 0) {
+          // Show badge notifications for newly earned badges
+          showBadgeNotifications(result.data.newBadges)
+        }
       }
     })
-  }, [userId, isPending, hasCredits, canClick, isPremiumProduct, isVip, playClick, triggerHaptic, username, game, optimisticUpdate, decrementCredits, addClick, removeClick, showBadgeNotifications])
+  }, [userId, isPending, hasCredits, canClick, isPremiumProduct, isVip, playClick, playWin, triggerHaptic, username, game, optimisticUpdate, decrementCredits, addClick, removeClick, showBadgeNotifications])
 
   // Border gradient style (same as lobby cards)
   const borderStyle = useMemo(() => {
@@ -282,6 +311,12 @@ export function GameClient({
             {/* Product image section */}
             <div className={`relative aspect-[4/3] bg-gradient-to-br from-bg-tertiary to-bg-secondary overflow-hidden ${game.status === 'ended' ? 'grayscale-[30%]' : ''}`}>
               <div className="hero-stage-floor opacity-70" aria-hidden="true" />
+              {/* Jauge FIOLE pixel-art : overlay magma à droite de la card */}
+              {GAUGE_ENABLED && gauge && (
+                <div className="absolute right-2 top-14 bottom-3 z-20 w-11">
+                  <ItemGauge gauge={gauge} celebrate={gaugeCelebrate} itemName={game.item.name} />
+                </div>
+              )}
               {/* Back to lobby button - top left */}
               <Link
                 href="/lobby"
@@ -441,6 +476,14 @@ export function GameClient({
                       Chaque clic remet le timer à 1min30 !
                     </p>
                   )}
+                </div>
+              )}
+
+              {/* Jauge perso (feature en exploration) : la FIOLE est en overlay sur la
+                  card produit (à droite) ; ici uniquement la légende explicative. */}
+              {GAUGE_ENABLED && gauge && (
+                <div className="mb-5">
+                  <GaugeCaption gauge={gauge} itemName={game.item.name} />
                 </div>
               )}
 
@@ -694,6 +737,12 @@ export function GameClient({
               >
               <div className={`relative aspect-[4/3] bg-gradient-to-br from-bg-tertiary to-bg-secondary overflow-hidden ${game.status === 'ended' ? 'grayscale-[30%]' : ''}`}>
               <div className="hero-stage-floor opacity-70" aria-hidden="true" />
+                {/* Jauge FIOLE pixel-art : overlay magma à droite de l'image, dans la card */}
+                {GAUGE_ENABLED && gauge && (
+                  <div className="absolute right-3 top-16 bottom-4 z-20 w-12">
+                    <ItemGauge gauge={gauge} celebrate={gaugeCelebrate} itemName={game.item.name} />
+                  </div>
+                )}
                 {/* Back to lobby button - top left */}
                 <Link
                   href="/lobby"
@@ -857,6 +906,14 @@ export function GameClient({
                       Chaque clic remet le timer à 1min30 !
                     </p>
                   )}
+                </div>
+              )}
+
+              {/* Jauge perso (feature en exploration) : fiole en overlay sur la card ;
+                  ici la légende explicative. */}
+              {GAUGE_ENABLED && gauge && (
+                <div className="mb-4">
+                  <GaugeCaption gauge={gauge} itemName={game.item.name} />
                 </div>
               )}
 

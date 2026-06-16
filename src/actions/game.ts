@@ -1,7 +1,8 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
-import { GAME_CONSTANTS } from '@/lib/constants'
+import { createServiceClient } from '@/lib/supabase/service'
+import { GAME_CONSTANTS, GAUGE_ENABLED, GAUGE_MULTIPLIER } from '@/lib/constants'
 import { checkAndAwardBadges, type Badge } from '@/actions/badges'
 import { checkClickFraud, auditLog } from '@/lib/security'
 import { selfExcludedUntil, selfExclusionError } from '@/lib/selfExclusion'
@@ -26,7 +27,9 @@ type ActionResult<T = void> = {
  * - Records click
  * - Resets timer if in final phase (<1 minute)
  */
-export async function clickGame(gameId: string): Promise<ActionResult<{ newEndTime?: number; newBadges?: Badge[] }>> {
+export type GaugeState = { progress: number; target: number; completed: boolean; completedCount: number }
+
+export async function clickGame(gameId: string): Promise<ActionResult<{ newEndTime?: number; newBadges?: Badge[]; gauge?: GaugeState }>> {
   const supabase = await createClient()
 
   // Get current user
@@ -132,6 +135,35 @@ export async function clickGame(gameId: string): Promise<ActionResult<{ newEndTi
     console.error('Error checking badges:', error)
   }
 
+  // JAUGE (feature en exploration) : on remplit la jauge perso de ce MODÈLE d'item.
+  // Appel via service_role APRÈS un clic réussi (= 1 crédit réellement dépensé) -> un
+  // user ne peut pas appeler la RPC en direct pour tricher (révoquée d'`authenticated`).
+  // Best-effort : un souci de jauge ne doit JAMAIS faire échouer le clic.
+  // Inerte en prod : ce code vit sur feat/shop-redesign, pas mergé sur main.
+  let gauge: GaugeState | undefined
+  if (GAUGE_ENABLED && game.item_id) {
+    try {
+      const svc = createServiceClient()
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data: gaugeData } = await (svc.rpc as any)('increment_item_gauge', {
+        p_user_id: user.id,
+        p_item_id: game.item_id,
+        p_credits: GAME_CONSTANTS.CREDIT_COST_PER_CLICK,
+      })
+      const g = Array.isArray(gaugeData) ? gaugeData[0] : gaugeData
+      if (g) {
+        gauge = {
+          progress: g.out_progress ?? 0,
+          target: g.out_target ?? 0,
+          completed: !!g.out_completed,
+          completedCount: g.out_completed_count ?? 0,
+        }
+      }
+    } catch (gaugeError) {
+      console.error('Gauge increment failed (non-bloquant):', gaugeError)
+    }
+  }
+
   // Audit log successful click
   auditLog('game.click', {
     gameId,
@@ -140,7 +172,42 @@ export async function clickGame(gameId: string): Promise<ActionResult<{ newEndTi
     inFinalPhase: !!newEndTime,
   }, { userId: user.id, username: profile.username })
 
-  return { success: true, data: { newEndTime, newBadges } }
+  return { success: true, data: { newEndTime, newBadges, gauge } }
+}
+
+/**
+ * État initial de la jauge perso pour un MODÈLE d'item (affichage à l'ouverture de la
+ * partie). Lecture seule via le client authentifié (RLS own-row sur user_item_gauges).
+ * La cible = valeur de l'item × GAUGE_MULTIPLIER (aligné avec la RPC).
+ */
+export async function getItemGauge(itemId: string): Promise<GaugeState> {
+  const supabase = await createClient()
+  const { data: itemData } = await supabase
+    .from('items')
+    .select('retail_value')
+    .eq('id', itemId)
+    .single()
+  const retail = Number((itemData as { retail_value: number | null } | null)?.retail_value ?? 0)
+  const target = Math.max(1, Math.round(retail * GAUGE_MULTIPLIER))
+
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { progress: 0, target, completed: false, completedCount: 0 }
+
+  // user_item_gauges absent des types générés -> accès casté (idem pattern RPC du projet)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: gaugeData } = await (supabase as any)
+    .from('user_item_gauges')
+    .select('progress, completed_count')
+    .eq('user_id', user.id)
+    .eq('item_id', itemId)
+    .maybeSingle()
+  const g = gaugeData as { progress: number; completed_count: number } | null
+  return {
+    progress: g?.progress ?? 0,
+    target,
+    completed: false,
+    completedCount: g?.completed_count ?? 0,
+  }
 }
 
 /**

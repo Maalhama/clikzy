@@ -8,6 +8,19 @@ export const CLICK_COOLDOWN = 1000 // 1 second between clicks
 export const INITIAL_CREDITS = 10
 export const CREDITS_PER_CLICK = 1
 
+// Jauge (feature EN EXPLORATION — voir cleekzy-gauge-pivot en mémoire).
+// GAUGE_ENABLED : déclenche le remplissage côté app. Vit sur feat/shop-redesign,
+// NE PAS mettre à true sur main avant validation juridique (sinon prod déclenche).
+// GAUGE_MULTIPLIER : cible = valeur de l'item × ce facteur. ⚠️ LEVIER JURIDIQUE —
+// 2 = l'user paie le double (PAS safe) ; 1 = plafond au prix réel (défendable).
+// DOIT rester aligné avec v_multiplier de la RPC increment_item_gauge.
+export const GAUGE_ENABLED = true
+export const GAUGE_MULTIPLIER = 2
+// GAUGE_ABANDON_DAYS : au-delà de N jours sans clic sur une jauge, la progression
+// (jamais perdue) est convertie en avoir crédit permanent (earned_credits) via le
+// cron convert-abandoned-gauges. DOIT rester aligné avec le défaut p_days de la RPC.
+export const GAUGE_ABANDON_DAYS = 90
+
 // Game statuses
 export const GAME_STATUS = {
   WAITING: 'waiting',
