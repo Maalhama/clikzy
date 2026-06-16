@@ -1888,11 +1888,18 @@ body::after {
   position: absolute;
   left: 8%;
   right: 8%;
-  height: 2px;
+  top: 0;
+  /* Hauteur en % (et non px fixes) : translateY(%) est relatif à la hauteur de
+     l'élément, donc le balayage reste proportionnel quelle que soit la taille de
+     la carte (mobile 144px / desktop 208px). */
+  height: 1.5%;
   border-radius: 2px;
   background: linear-gradient(90deg, transparent, #3ccbff 25%, #ff4fd8 75%, transparent);
   box-shadow: 0 0 12px 2px rgba(60, 203, 255, 0.9), 0 0 28px 6px rgba(155, 92, 255, 0.55);
+  /* On anime transform (GPU, fiable iOS Safari) plutôt que top (layout, souvent
+     figé/saccadé sur iOS). */
   animation: hero-scan-line 1.3s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+  will-change: transform, opacity;
 }
 .hero-scan::after {
   content: '';
@@ -1903,12 +1910,15 @@ body::after {
   mask: radial-gradient(circle at 50% 45%, #000 32%, transparent 72%);
 }
 @keyframes hero-scan-line {
-  0% { top: 10%; opacity: 0.15; }
-  50% { top: 84%; opacity: 1; }
-  100% { top: 10%; opacity: 0.15; }
+  /* translateY en % d'une hauteur de 1.5% du conteneur : 530% ≈ 8%, 5500% ≈ 83% */
+  0% { transform: translateY(530%); opacity: 0.2; }
+  50% { transform: translateY(5500%); opacity: 1; }
+  100% { transform: translateY(530%); opacity: 0.2; }
 }
+/* Reduced-motion : on RALENTIT le balayage au lieu de le figer — c'est un
+   indicateur de chargement, il doit rester vivant. */
 @media (prefers-reduced-motion: reduce) {
-  .hero-scan::before { animation: none; top: 50%; opacity: 0.6; }
+  .hero-scan::before { animation-duration: 2.4s; }
 }
 
 /* ---- Skeleton de chargement (carte hero) : shimmer néon violet ----
