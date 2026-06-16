@@ -543,7 +543,7 @@ export function GameClient({
                   <svg className="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M13 10V3L4 14h7v7l9-11h-7z" />
                   </svg>
-                  Crée ton compte pour jouer
+                  FONCE !
                 </button>
               )}
               {/* Connecté sans crédits : achat */}
@@ -973,7 +973,7 @@ export function GameClient({
                   <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M13 10V3L4 14h7v7l9-11h-7z" />
                   </svg>
-                  Crée ton compte pour jouer
+                  FONCE !
                 </button>
               )}
               {/* Connecté sans crédits : achat */}
