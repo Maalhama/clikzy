@@ -53,14 +53,17 @@ export async function createCheckoutSession(
     const profile = profileData as { username: string; is_vip: boolean; vip_expires_at: string | null } | null
 
     // Mini (monthlyLimit) : achetable 1×/mois. Pré-vérif UX — l'autorité reste grant_pack_credits.
-    if (pack.monthlyLimit) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { data: monthState } = await (supabase.rpc as any)('get_pack_month_state', { p_user_id: user.id })
-      const already = (monthState as { pack_id: string }[] | null)?.some((r) => r.pack_id === pack.id)
-      if (already) {
-        return { success: false, error: 'Ce pack est limité à un achat par mois — reviens le mois prochain.' }
-      }
+    // État des achats de CE mois (pour la limite mensuelle ET l'affichage du x2).
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: monthState } = await (supabase.rpc as any)('get_pack_month_state', { p_user_id: user.id })
+    const alreadyThisMonth = (monthState as { pack_id: string }[] | null)?.some((r) => r.pack_id === pack.id) ?? false
+    if (pack.monthlyLimit && alreadyThisMonth) {
+      return { success: false, error: 'Ce pack est limité à un achat par mois — reviens le mois prochain.' }
     }
+    // x2 sur le 1er achat de CE pack ce mois-ci. Affiché sur Stripe pour zéro doute au
+    // paiement ; l'autorité reste grant_pack_credits (recalcul atomique au paiement).
+    const x2Eligible = !alreadyThisMonth
+    const displayCredits = x2Eligible ? pack.credits * 2 : pack.credits
 
     // Remise V.I.P -10% sur tous les packs (le VIP rentabilise l'achat au lieu de le remplacer)
     const isVip = !!profile?.is_vip && (!profile.vip_expires_at || new Date(profile.vip_expires_at) > new Date())
@@ -77,8 +80,10 @@ export async function createCheckoutSession(
           price_data: {
             currency: 'eur',
             product_data: {
-              name: `${pack.credits} Crédits Cleekzy`,
-              description: `Pack ${pack.name} — ${pack.credits} crédits${vipNote}`,
+              name: `${displayCredits} Crédits Cleekzy${x2Eligible ? ' ×2' : ''}`,
+              description: x2Eligible
+                ? `Pack ${pack.name} — ${pack.credits} crédits ×2 = ${displayCredits} (1er achat du mois doublé)${vipNote}`
+                : `Pack ${pack.name} — ${pack.credits} crédits${vipNote}`,
             },
             unit_amount: Math.round(unitPrice * 100), // centimes
           },
@@ -88,7 +93,7 @@ export async function createCheckoutSession(
       mode: 'payment',
       // Compte Stripe « Frizaway. Inc. » (partagé) : libellé relevé forcé à « CLEEKZY ».
       payment_intent_data: { statement_descriptor: 'CLEEKZY' },
-      success_url: `${baseUrl}/lobby?payment=success&credits=${pack.credits}`,
+      success_url: `${baseUrl}/lobby?payment=success&credits=${displayCredits}`,
       cancel_url: `${baseUrl}/lobby?payment=cancelled`,
       customer_email: user.email,
       metadata: {
