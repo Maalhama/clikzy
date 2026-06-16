@@ -135,20 +135,21 @@ export async function clickGame(gameId: string): Promise<ActionResult<{ newEndTi
     console.error('Error checking badges:', error)
   }
 
-  // JAUGE (feature en exploration) : on remplit la jauge perso de ce MODÈLE d'item.
-  // Appel via service_role APRÈS un clic réussi (= 1 crédit réellement dépensé) -> un
-  // user ne peut pas appeler la RPC en direct pour tricher (révoquée d'`authenticated`).
-  // Best-effort : un souci de jauge ne doit JAMAIS faire échouer le clic.
-  // Inerte en prod : ce code vit sur feat/shop-redesign, pas mergé sur main.
+  // JAUGE « cash réel » (feature en exploration) : la jauge mesure le CASH réellement
+  // payé (centimes), pas un nombre de clics. Elle n'avance donc QUE si ce clic a dépensé
+  // un crédit PAYANT (earned). perform_click consomme le daily gratuit d'abord → le clic
+  // est payant ssi le solde daily AVANT le clic était insuffisant (= 0). increment_item_gauge
+  // (service_role) calcule le coût cash réel du crédit (coût moyen pondéré, x2/VIP inclus).
+  // Best-effort : un souci de jauge ne doit JAMAIS faire échouer le clic. Inerte en prod.
+  const usedEarnedCredit = (profile.credits ?? 0) < GAME_CONSTANTS.CREDIT_COST_PER_CLICK
   let gauge: GaugeState | undefined
-  if (GAUGE_ENABLED && game.item_id) {
+  if (GAUGE_ENABLED && game.item_id && usedEarnedCredit) {
     try {
       const svc = createServiceClient()
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { data: gaugeData } = await (svc.rpc as any)('increment_item_gauge', {
         p_user_id: user.id,
         p_item_id: game.item_id,
-        p_credits: GAME_CONSTANTS.CREDIT_COST_PER_CLICK,
       })
       const g = Array.isArray(gaugeData) ? gaugeData[0] : gaugeData
       if (g) {
@@ -178,7 +179,8 @@ export async function clickGame(gameId: string): Promise<ActionResult<{ newEndTi
 /**
  * État initial de la jauge perso pour un MODÈLE d'item (affichage à l'ouverture de la
  * partie). Lecture seule via le client authentifié (RLS own-row sur user_item_gauges).
- * La cible = valeur de l'item × GAUGE_MULTIPLIER (aligné avec la RPC).
+ * Jauge « cash réel » : progress/target sont en CENTIMES. Cible = valeur × GAUGE_MULTIPLIER
+ * × 100 (aligné avec la RPC increment_item_gauge).
  */
 export async function getItemGauge(itemId: string): Promise<GaugeState> {
   const supabase = await createClient()
@@ -188,7 +190,7 @@ export async function getItemGauge(itemId: string): Promise<GaugeState> {
     .eq('id', itemId)
     .single()
   const retail = Number((itemData as { retail_value: number | null } | null)?.retail_value ?? 0)
-  const target = Math.max(1, Math.round(retail * GAUGE_MULTIPLIER))
+  const target = Math.max(1, Math.round(retail * GAUGE_MULTIPLIER * 100))
 
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { progress: 0, target, completed: false, completedCount: 0 }

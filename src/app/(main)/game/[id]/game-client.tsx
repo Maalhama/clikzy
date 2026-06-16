@@ -213,10 +213,8 @@ export function GameClient({
     // Optimistic updates
     const now = new Date().toISOString()
     decrementCredits(GAME_CONSTANTS.CREDIT_COST_PER_CLICK)
-    // La jauge avance d'un cran (le serveur la réconcilie / gère la complétion)
-    if (GAUGE_ENABLED) {
-      setGauge((g) => (g ? { ...g, progress: g.progress + GAME_CONSTANTS.CREDIT_COST_PER_CLICK } : g))
-    }
+    // Jauge « cash réel » : on NE fait PAS d'avance optimiste (l'avance dépend du coût
+    // cash du crédit, connu seulement du serveur). On réconcilie depuis result.data.gauge.
 
     const newClick = { id: generateId(), username, clickedAt: now, isBot: false }
     addClick(newClick)
@@ -243,10 +241,7 @@ export function GameClient({
         // Refund credit by decrementing a negative amount
         decrementCredits(-GAME_CONSTANTS.CREDIT_COST_PER_CLICK)
         removeClick(newClick.id)
-        // Annule le cran optimiste de la jauge
-        if (GAUGE_ENABLED) {
-          setGauge((g) => (g ? { ...g, progress: Math.max(0, g.progress - GAME_CONSTANTS.CREDIT_COST_PER_CLICK) } : g))
-        }
+        // (pas d'avance optimiste de jauge à annuler)
         setError(result.error || 'Une erreur est survenue')
       } else {
         // Réconcilie la jauge avec l'état serveur (autoritaire) + célèbre la complétion

@@ -249,6 +249,23 @@ export async function handleStripeEvent(event: Stripe.Event): Promise<HandlerRes
       }
 
       console.log(`Pack ${packId} granted to user ${userId}:`, grantResult)
+
+      // JAUGE « cash réel » (feature en exploration) : enregistre le cash NET réellement
+      // payé (amount_total, x2 et remise VIP déjà déduits) comme cost-basis des crédits
+      // earned. C'est ce qui fait avancer la jauge « a payé 2× la valeur ». Best-effort :
+      // un échec ici ne casse jamais le paiement. Inerte si la RPC n'existe pas (prod main).
+      try {
+        if (typeof session.amount_total === 'number' && session.amount_total > 0) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          await (supabase.rpc as any)('add_purchased_value', {
+            p_user_id: userId,
+            p_amount_cents: session.amount_total,
+          })
+        }
+      } catch (valueErr) {
+        console.error('[WEBHOOK] add_purchased_value échoué (non-bloquant):', valueErr)
+      }
+
       // Email de confirmation d'achat (non-bloquant).
       Promise.resolve()
         .then(() => supabase.auth.admin.getUserById(userId))

@@ -6,6 +6,8 @@ import Image from 'next/image'
 import { formatTime, calculateTimeLeft } from '@/lib/utils/timer'
 import { generateDeterministicUsername } from '@/lib/bots/usernameGenerator'
 import { getProductImageWithFallback } from '@/lib/utils/productImages'
+import { ItemGauge } from '@/components/game/ItemGauge'
+import { GAUGE_MULTIPLIER } from '@/lib/constants'
 
 export interface HeroLiveGame {
   id: string
@@ -221,6 +223,16 @@ export function HeroLiveCard({ games, compact = false }: HeroLiveCardProps) {
 
   const isUrgent = timeLeft > 0 && timeLeft <= 90000
 
+  // Mockup : fiole à MOITIÉ remplie. Cible en CENTIMES = valeur × multiplicateur × 100
+  // (jauge « cash réel » x2), progression = la moitié -> exactement 50 %.
+  const heroGaugeTarget = Math.max(2, Math.round(game.item_value * GAUGE_MULTIPLIER * 100))
+  const heroGauge = {
+    progress: Math.round(heroGaugeTarget / 2),
+    target: heroGaugeTarget,
+    completed: false,
+    completedCount: 0,
+  }
+
   return (
     <div
       ref={tiltRef}
@@ -251,7 +263,8 @@ export function HeroLiveCard({ games, compact = false }: HeroLiveCardProps) {
 
       {/* Produit — mis en scène : god rays + halo + socle lumineux.
           Le produit est la SOURCE de lumière de la carte (lumière diégétique). */}
-      <div className={`relative mx-auto ${compact ? 'h-36 w-36' : 'h-52 w-52'} mb-4`}>
+      <div className="mb-4 flex items-center justify-center gap-3">
+        <div className={`relative ${compact ? 'h-36 w-36' : 'h-52 w-52'}`}>
         {!compact && <div className="god-rays" aria-hidden />}
         <div
           className="absolute inset-0 rounded-full opacity-70 blur-2xl"
@@ -286,6 +299,12 @@ export function HeroLiveCard({ games, compact = false }: HeroLiveCardProps) {
         />
         {/* Révélation « laser » DA pendant le chargement de l'image (disparaît dès qu'elle est prête) */}
         {!imgLoaded && <span className="hero-scan pointer-events-none absolute inset-0 z-10" aria-hidden />}
+
+        </div>
+        {/* Jauge fiole (mockup), à droite de l'item — moitié remplie (jauge x2) */}
+        <div className={`relative shrink-0 w-11 ${compact ? 'h-32' : 'h-48'}`}>
+          <ItemGauge gauge={heroGauge} itemName={game.item_name} />
+        </div>
       </div>
 
       {/* Nom + valeur */}

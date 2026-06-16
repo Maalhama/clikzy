@@ -178,20 +178,24 @@ export function ItemGauge({ gauge, celebrate = false, itemName }: ItemGaugeProps
  */
 export function GaugeCaption({ gauge, itemName }: { gauge: GaugeState | null; itemName: string }) {
   if (!gauge) return null
-  const remaining = Math.max(0, gauge.target - gauge.progress)
+  // progress/target en CENTIMES (jauge « cash réel »).
+  const remainingEur = Math.max(0, gauge.target - gauge.progress) / 100
   return (
     <div className="mt-2 text-xs leading-relaxed text-white/55">
       <p>
         <span className="font-display text-[0.6rem] font-semibold uppercase tracking-[0.2em] text-neon-purple">
           Ta jauge
         </span>{' '}
-        monte à chaque clic. Pleine, <span className="text-white/80">{itemName}</span> est à toi,
-        garanti.
+        se remplit avec tes crédits. Pleine, <span className="text-white/80">{itemName}</span> est à
+        toi, garanti.
       </p>
-      {remaining > 0 && (
+      {remainingEur > 0 && (
         <p className="mt-1 text-white/45">
           Encore{' '}
-          <span className="stat-numeral text-neon-blue">{remaining.toLocaleString('fr-FR')}</span> clics.
+          <span className="stat-numeral text-neon-blue">
+            {remainingEur.toLocaleString('fr-FR', { maximumFractionDigits: 0 })}€
+          </span>{' '}
+          à jouer.
         </p>
       )}
     </div>
