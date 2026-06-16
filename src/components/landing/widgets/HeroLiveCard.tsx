@@ -263,8 +263,8 @@ export function HeroLiveCard({ games, compact = false }: HeroLiveCardProps) {
 
       {/* Produit — mis en scène : god rays + halo + socle lumineux.
           Le produit est la SOURCE de lumière de la carte (lumière diégétique). */}
-      <div className="mb-4 flex items-center justify-center gap-3">
-        <div className={`relative ${compact ? 'h-36 w-36' : 'h-52 w-52'}`}>
+      <div className="relative mb-4">
+        <div className={`relative mx-auto ${compact ? 'h-36 w-36' : 'h-52 w-52'}`}>
         {!compact && <div className="god-rays" aria-hidden />}
         <div
           className="absolute inset-0 rounded-full opacity-70 blur-2xl"
@@ -301,8 +301,8 @@ export function HeroLiveCard({ games, compact = false }: HeroLiveCardProps) {
         {!imgLoaded && <span className="hero-scan pointer-events-none absolute inset-0 z-10" aria-hidden />}
 
         </div>
-        {/* Jauge fiole (mockup), à droite de l'item — moitié remplie (jauge x2) */}
-        <div className={`relative shrink-0 w-11 ${compact ? 'h-32' : 'h-48'}`}>
+        {/* Jauge fiole (mockup), collée au bord DROIT de la card — moitié remplie (jauge x2) */}
+        <div className={`absolute right-0 top-1/2 -translate-y-1/2 z-20 w-11 ${compact ? 'h-32' : 'h-48'}`}>
           <ItemGauge gauge={heroGauge} itemName={game.item_name} />
         </div>
       </div>
