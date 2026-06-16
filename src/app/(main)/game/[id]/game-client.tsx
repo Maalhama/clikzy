@@ -12,7 +12,7 @@ import { useBotSimulation } from '@/hooks/useBotSimulation'
 import { useCredits } from '@/contexts/CreditsContext'
 import { useBadgeNotification } from '@/contexts/BadgeNotificationContext'
 import { clickGame, getItemGauge, type GaugeState } from '@/actions/game'
-import { GAME_CONSTANTS, GAUGE_ENABLED } from '@/lib/constants'
+import { GAME_CONSTANTS, GAUGE_ENABLED, GAUGE_MULTIPLIER } from '@/lib/constants'
 import { ItemGauge, GaugeCaption } from '@/components/game/ItemGauge'
 import { formatTime } from '@/lib/utils/timer'
 import { generateDeterministicUsername } from '@/lib/bots/usernameGenerator'
@@ -84,8 +84,21 @@ export function GameClient({
   const [bursts, setBursts] = useState<number[]>([])
   const burstSeq = useRef(0)
   const [creditsAnimation, setCreditsAnimation] = useState(false)
-  // JAUGE (feature en exploration) : progression perso vers CE modèle d'item
-  const [gauge, setGauge] = useState<GaugeState | null>(null)
+  // JAUGE (feature en exploration) : progression perso vers CE modèle d'item.
+  // Init SYNCHRONE pour afficher la fiole dès le 1er rendu (pas de pop-in / décalage) :
+  // la cible est calculable depuis retail_value (déjà dispo) ; getItemGauge réconcilie
+  // ensuite la progression réelle. Logged-in uniquement (anon = pas de fiole).
+  const [gauge, setGauge] = useState<GaugeState | null>(() => {
+    if (!GAUGE_ENABLED || !userId || !game.item_id) return null
+    const retail = Number(game.item?.retail_value ?? 0)
+    if (retail <= 0) return null
+    return {
+      progress: 0,
+      target: Math.max(1, Math.round(retail * GAUGE_MULTIPLIER * 100)),
+      completed: false,
+      completedCount: 0,
+    }
+  })
   const [gaugeCelebrate, setGaugeCelebrate] = useState(false)
 
   const { timeLeft, isUrgent, isEnded } = useTimer({ endTime: game.end_time ?? 0 })

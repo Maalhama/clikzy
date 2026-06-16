@@ -363,15 +363,14 @@ export const GameCard = memo(function GameCard({ game, index = 0, isFavorite = f
 
         {/* Neon glow effect behind product */}
         {!isEnded && (
-          <div
-            className="absolute inset-0 pointer-events-none animate-pulse"
-            style={{
-              // Glow plein cadre qui s'éteint AVANT le bord (transparent à 80%) :
-              // plus de coupe nette en haut/bas due à l'overflow-hidden du conteneur.
-              background:
-                'radial-gradient(ellipse 62% 58% at 50% 50%, rgba(255,79,216,0.55) 0%, rgba(155,92,255,0.38) 38%, rgba(60,203,255,0.22) 62%, transparent 80%)',
-            }}
-          />
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <div
+              className="w-3/4 h-3/4 rounded-full blur-3xl opacity-60 animate-pulse"
+              style={{
+                background: 'radial-gradient(ellipse at center, rgba(255,79,216,0.8) 0%, rgba(155,92,255,0.6) 40%, rgba(60,203,255,0.4) 70%, transparent 100%)',
+              }}
+            />
+          </div>
         )}
 
         {/* Product image */}
