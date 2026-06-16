@@ -1911,6 +1911,27 @@ body::after {
   .hero-scan::before { animation: none; top: 50%; opacity: 0.6; }
 }
 
+/* ---- Skeleton de chargement (carte hero) : shimmer néon violet ----
+   Affiché en SSR + 1er rendu client (avant montage) pour éviter tout flicker
+   d'hydratation, et pendant la recherche d'une partie. */
+.sk-line {
+  background: linear-gradient(
+    90deg,
+    rgba(155, 92, 255, 0.07) 25%,
+    rgba(155, 92, 255, 0.18) 37%,
+    rgba(155, 92, 255, 0.07) 63%
+  );
+  background-size: 400% 100%;
+  animation: sk-shimmer 1.4s ease-in-out infinite;
+}
+@keyframes sk-shimmer {
+  0% { background-position: 100% 0; }
+  100% { background-position: 0 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sk-line { animation: none; }
+}
+
 /* ---- Anneau holo (avatars, timers, raretés) ---- */
 @keyframes holo-spin {
   to { transform: rotate(360deg); }

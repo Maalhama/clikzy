@@ -455,9 +455,9 @@ export function LandingClient({
             <span className="block text-neon-purple text-xs mt-1">Nouveaux produits toutes les 3 heures.</span>
           </p>
 
-          {/* Partie en direct (si disponible) — petite entrée fade-up (le hero TEXTE
-              reste instantané ; seule la carte s'anime légèrement à l'arrivée). */}
-          <div className="reveal reveal-2 mb-5">
+          {/* Partie en direct : skeleton instantané (patience) puis la vraie carte
+              se matérialise via warp-in. Pas de reveal ici sinon le skeleton fonderait. */}
+          <div className="mb-5">
             <HeroLiveCard games={heroGames} compact />
           </div>
 

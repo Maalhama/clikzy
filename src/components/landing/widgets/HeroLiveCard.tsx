@@ -48,6 +48,65 @@ function makeDemoGame(seed: number): HeroLiveGame {
 }
 
 /**
+ * Skeleton de la carte (mêmes dimensions → aucun saut de layout au swap).
+ * Rendu en SSR + 1er rendu client (avant montage) et pendant la recherche d'une
+ * partie : fait patienter l'user et supprime le flicker d'hydratation.
+ */
+function HeroCardSkeleton({ compact = false }: { compact?: boolean }) {
+  return (
+    <div className={`hero-live-card block overflow-hidden ${compact ? 'p-4' : 'p-6'}`} aria-hidden>
+      {/* Bandeau live */}
+      <div className="mb-4 flex items-center justify-between">
+        <div className="flex items-center gap-2.5">
+          <span className="live-dot" aria-hidden="true" />
+          <span className="sk-line h-2.5 w-16 rounded-full" />
+        </div>
+        <span className="sk-line h-5 w-24 rounded-full" />
+      </div>
+
+      {/* Produit : halo DA + bloc shimmer + balayage laser (« l'item arrive ») */}
+      <div className={`relative mx-auto mb-4 ${compact ? 'h-36 w-36' : 'h-52 w-52'}`}>
+        <div
+          className="absolute inset-0 rounded-full opacity-50 blur-2xl"
+          style={{
+            background:
+              'radial-gradient(ellipse at center, rgba(255,79,216,0.4) 0%, rgba(155,92,255,0.3) 50%, transparent 75%)',
+          }}
+          aria-hidden
+        />
+        <span className="sk-line absolute inset-[16%] rounded-2xl opacity-60" />
+        <span className="hero-scan pointer-events-none absolute inset-0 z-10" aria-hidden />
+      </div>
+
+      {/* Nom + valeur */}
+      <div className="mb-4 flex items-end justify-between gap-3">
+        <div className="min-w-0 space-y-2">
+          <span className="sk-line block h-4 w-32 rounded" />
+          <span className="sk-line block h-3 w-20 rounded" />
+        </div>
+        <span className="sk-line h-6 w-16 shrink-0 rounded" />
+      </div>
+
+      {/* Compte à rebours */}
+      <div className="rounded-xl border border-white/10 bg-white/[0.04] p-3.5">
+        <div className="flex items-center justify-between">
+          <span className="sk-line h-2.5 w-20 rounded-full" />
+          <span className="sk-line h-7 w-20 rounded" />
+        </div>
+        <div className="meter-track mt-2.5 !h-1.5">
+          <span className="sk-line block h-full w-2/5 rounded-full" />
+        </div>
+      </div>
+
+      {/* CTA */}
+      <div className="mt-4 flex justify-center">
+        <span className="sk-line h-4 w-40 rounded-full" />
+      </div>
+    </div>
+  )
+}
+
+/**
  * Carte « arène en direct » du hero : montre une vraie partie en cours
  * (produit, compte à rebours, leader). Quand la partie affichée se termine,
  * la suivante de la file prend sa place ; s'il n'y a plus de partie réelle,
@@ -154,18 +213,10 @@ export function HeroLiveCard({ games, compact = false }: HeroLiveCardProps) {
     inner.style.transform = 'rotateY(0deg) rotateX(0deg)'
   }, [])
 
-  // Coquille stable côté serveur tant qu'aucune partie n'est affichable
-  if (!game || timeLeft < 0) {
-    return (
-      <div className={`hero-live-card ${compact ? 'p-4 min-h-[280px]' : 'p-6 min-h-[420px]'} flex items-center justify-center`}>
-        <div className="flex items-center gap-2.5 text-white/40">
-          <span className="live-dot" aria-hidden="true" />
-          <span className="font-display text-[0.625rem] font-semibold uppercase tracking-[0.3em]">
-            Recherche d&apos;une partie…
-          </span>
-        </div>
-      </div>
-    )
+  // Skeleton en SSR + 1er rendu client (avant montage → identique des 2 côtés, donc
+  // zéro flicker d'hydratation) et tant qu'aucune partie n'est affichable.
+  if (!mounted || !game || timeLeft < 0) {
+    return <HeroCardSkeleton compact={compact} />
   }
 
   const isUrgent = timeLeft > 0 && timeLeft <= 90000
