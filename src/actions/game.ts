@@ -103,8 +103,12 @@ export async function clickGame(gameId: string): Promise<ActionResult<{ newEndTi
   // + maj de la partie (last_click, total_clicks, timer en phase finale, battle_start_time)
   // + maj total_clicks du profil, le tout dans UNE transaction verrouillée (FOR UPDATE → règle
   // les races de séquence/dernier-clic). SECURITY DEFINER → fonctionne avec la RLS games fermée (C1).
+  // Appelé en SERVICE_ROLE : combiné au REVOKE de `authenticated` sur perform_click
+  // (migration 20260616120006), le clic n'est plus appelable en direct via supabase.rpc
+  // -> il passe OBLIGATOIREMENT par cette action, donc par checkClickFraud + la garde
+  // d'auto-exclusion ci-dessus (fin du bypass de la détection de fraude au clic).
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data: clickResult, error: clickError } = await (supabase.rpc as any)('perform_click', {
+  const { data: clickResult, error: clickError } = await (createServiceClient().rpc as any)('perform_click', {
     p_game_id: gameId,
     p_user_id: user.id,
     p_username: profile.username,
