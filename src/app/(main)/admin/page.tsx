@@ -1,14 +1,15 @@
-import { getAdminStats, getAdminUsers, getAdminGames, getAdminItems, getAdminWinners, getBuyItNowOrders, getAdminHealth } from '@/actions/admin'
+import { getAdminStats, getAdminUsers, getAdminGames, getAdminItems, getAdminWinners, getBuyItNowOrders, getGaugeWins, getAdminHealth } from '@/actions/admin'
 import { AdminDashboard } from './AdminDashboard'
 
 export default async function AdminPage() {
-  const [stats, users, games, items, winners, buyItNowOrders, health] = await Promise.all([
+  const [stats, users, games, items, winners, buyItNowOrders, gaugeWins, health] = await Promise.all([
     getAdminStats(),
     getAdminUsers(20),
     getAdminGames(20),
     getAdminItems(20),
     getAdminWinners(20),
     getBuyItNowOrders(50),
+    getGaugeWins(50),
     getAdminHealth(),
   ])
 
@@ -24,6 +25,7 @@ export default async function AdminPage() {
       items={items}
       winners={winners}
       buyItNowOrders={buyItNowOrders}
+      gaugeWins={gaugeWins}
       health={health}
     />
   )

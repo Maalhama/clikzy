@@ -263,6 +263,111 @@ export async function updateBuyItNowShipping(
   return { success: true }
 }
 
+// ----- JAUGE : items gagnés (l'user a payé 2× la valeur) à honorer/expédier -----
+export interface GaugeWinOrder {
+  id: string
+  user_id: string
+  item_id: string
+  item_name: string
+  paid_credits: number
+  won_at: string
+  shipping_status: string
+  tracking_number: string | null
+  username: string | null
+  shipping: {
+    firstname: string | null
+    lastname: string | null
+    address: string | null
+    city: string | null
+    postal_code: string | null
+    country: string | null
+    phone: string | null
+  }
+}
+
+// Liste des items gagnés à la jauge à expédier (admin, avec adresse de livraison).
+export async function getGaugeWins(limit = 50, offset = 0): Promise<GaugeWinOrder[]> {
+  const { isAdmin } = await checkAdminStatus()
+  if (!isAdmin) return []
+  const supabase = createServiceClient()
+  // gauge_wins absent des types générés -> accès casté (idem pattern du projet)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data } = await (supabase as any)
+    .from('gauge_wins')
+    .select(
+      'id, user_id, item_id, paid_credits, won_at, shipping_status, tracking_number, items:item_id(name), profiles:user_id(username, shipping_firstname, shipping_lastname, shipping_address, shipping_city, shipping_postal_code, shipping_country, shipping_phone)'
+    )
+    .order('won_at', { ascending: false })
+    .range(offset, offset + limit - 1)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return ((data as any[]) || []).map((r) => ({
+    id: r.id,
+    user_id: r.user_id,
+    item_id: r.item_id,
+    item_name: r.items?.name ?? 'Item',
+    paid_credits: Number(r.paid_credits),
+    won_at: r.won_at,
+    shipping_status: r.shipping_status,
+    tracking_number: r.tracking_number,
+    username: r.profiles?.username ?? null,
+    shipping: {
+      firstname: r.profiles?.shipping_firstname ?? null,
+      lastname: r.profiles?.shipping_lastname ?? null,
+      address: r.profiles?.shipping_address ?? null,
+      city: r.profiles?.shipping_city ?? null,
+      postal_code: r.profiles?.shipping_postal_code ?? null,
+      country: r.profiles?.shipping_country ?? null,
+      phone: r.profiles?.shipping_phone ?? null,
+    },
+  }))
+}
+
+// Met à jour l'expédition d'un item gagné à la jauge (+ email de suivi).
+export async function updateGaugeWinShipping(
+  winId: string,
+  status: 'pending' | 'processing' | 'shipped' | 'delivered',
+  trackingNumber?: string
+): Promise<{ success: boolean; error?: string }> {
+  const { isAdmin } = await checkAdminStatus()
+  if (!isAdmin) return { success: false, error: 'Non autorisé' }
+  const supabase = createServiceClient()
+  const updateData: Record<string, unknown> = { shipping_status: status }
+  if (status === 'shipped' && trackingNumber) {
+    updateData.tracking_number = trackingNumber
+    updateData.shipped_at = new Date().toISOString()
+  }
+  if (status === 'delivered') updateData.delivered_at = new Date().toISOString()
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { error } = await (supabase as any).from('gauge_wins').update(updateData).eq('id', winId)
+  if (error) return { success: false, error: error.message }
+
+  if (status === 'shipped' && trackingNumber) {
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data: w } = await (supabase as any)
+        .from('gauge_wins')
+        .select('user_id, items:item_id(name)')
+        .eq('id', winId)
+        .single()
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const ww = w as any
+      if (ww?.user_id) {
+        const { data: userRes } = await supabase.auth.admin.getUserById(ww.user_id)
+        const to = userRes?.user?.email
+        if (to) {
+          const { data: prof } = await supabase.from('profiles').select('username').eq('id', ww.user_id).single()
+          await sendShippingEmail(to, prof?.username || 'Joueur', ww.items?.name || 'Ton lot', trackingNumber)
+        }
+      }
+    } catch (e) {
+      console.error('[ADMIN] Envoi email suivi jauge échoué:', e)
+    }
+  }
+
+  revalidatePath('/admin')
+  return { success: true }
+}
+
 // Update user credits
 export async function updateUserCredits(userId: string, credits: number): Promise<{ success: boolean; error?: string }> {
   const { isAdmin } = await checkAdminStatus()

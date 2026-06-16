@@ -159,6 +159,18 @@ export async function clickGame(gameId: string): Promise<ActionResult<{ newEndTi
           completed: !!g.out_completed,
           completedCount: g.out_completed_count ?? 0,
         }
+        if (gauge.completed) {
+          // Item dû (l'user a payé 2× la valeur) -> alerte admin pour l'expédition
+          // (la ligne gauge_wins est écrite par la RPC ; voir /admin onglet Jauge).
+          import('@/lib/email')
+            .then(({ sendAdminAlertEmail }) =>
+              sendAdminAlertEmail(
+                'Jauge complétée — item à expédier',
+                `user ${user.id} (${profile.username})\nitem ${game.item?.name ?? game.item_id}\ngame ${gameId}\n→ /admin (onglet Jauge gagnée)`
+              )
+            )
+            .catch((e) => console.error('[GAUGE] alerte admin échouée:', e))
+        }
       }
     } catch (gaugeError) {
       console.error('Gauge increment failed (non-bloquant):', gaugeError)
