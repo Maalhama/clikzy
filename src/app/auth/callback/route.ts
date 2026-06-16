@@ -1,6 +1,7 @@
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { NextResponse, type NextRequest } from 'next/server'
+import { selfExcludedUntil } from '@/lib/selfExclusion'
 
 type CookieOptions = {
   name: string
@@ -46,6 +47,17 @@ export async function GET(request: NextRequest) {
     const { error } = await supabase.auth.exchangeCodeForSession(code)
 
     if (!error) {
+      // Jeu responsable : un compte en pause (auto-exclusion) ne doit PAS pouvoir se
+      // reconnecter via OAuth/magic-link (signInWithPassword le bloque déjà côté action,
+      // ce callback était le trou par lequel Google OAuth contournait la pause).
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user) {
+        const until = await selfExcludedUntil(supabase, user.id)
+        if (until) {
+          await supabase.auth.signOut()
+          return NextResponse.redirect(`${siteUrl}/login?error=self_excluded`)
+        }
+      }
       // Redirect to the intended destination
       return NextResponse.redirect(`${siteUrl}${next}`)
     }

@@ -5,6 +5,12 @@ import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { sendWelcomeEmail } from '@/lib/email'
 import { selfExcludedUntil, selfExclusionError } from '@/lib/selfExclusion'
+import { rateLimiters } from '@/lib/rateLimit'
+
+// IP du client (les server actions ne passent pas par le proxy /api -> rate-limit ici).
+async function clientIp(): Promise<string> {
+  return (await headers()).get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown'
+}
 
 export type AuthResult = {
   success: boolean
@@ -24,6 +30,11 @@ export async function signInWithPassword(formData: FormData): Promise<AuthResult
 
   if (!password) {
     return { success: false, error: 'Mot de passe requis' }
+  }
+
+  // Anti credential-stuffing / password-spraying (par IP).
+  if (!(await rateLimiters.auth(`signin:${await clientIp()}`)).success) {
+    return { success: false, error: 'Trop de tentatives. Réessaie dans une minute.' }
   }
 
   const supabase = await createClient()
@@ -126,6 +137,11 @@ export async function signUp(formData: FormData): Promise<AuthResult> {
     return { success: false, error: 'Le pseudo ne peut contenir que des lettres, chiffres et underscores' }
   }
 
+  // Anti-flood d'inscriptions (par IP).
+  if (!(await rateLimiters.auth(`signup:${await clientIp()}`)).success) {
+    return { success: false, error: 'Trop de tentatives. Réessaie dans une minute.' }
+  }
+
   const supabase = await createClient()
   const origin = (await headers()).get('origin') || process.env.NEXT_PUBLIC_SITE_URL
 
@@ -202,12 +218,19 @@ export async function resetPassword(email: string): Promise<AuthResult> {
     return { success: false, error: 'Email invalide' }
   }
 
+  // Anti-flood d'emails de reset (par IP).
+  if (!(await rateLimiters.auth(`reset:${await clientIp()}`)).success) {
+    return { success: false, error: 'Trop de demandes. Réessaie dans une minute.' }
+  }
+
   const supabase = await createClient()
   // Toujours utiliser NEXT_PUBLIC_SITE_URL pour éviter les redirections vers localhost
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://cleekzy.com'
 
+  // Le lien DOIT passer par /auth/callback pour échanger le code PKCE en session, sinon
+  // updateUser échoue côté /reset-password (pas de session). next=/reset-password.
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: `${siteUrl}/reset-password`,
+    redirectTo: `${siteUrl}/auth/callback?next=/reset-password`,
   })
 
   if (error) {
