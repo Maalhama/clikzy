@@ -40,6 +40,7 @@ export default function PrivacyPage() {
           <li><strong className="text-white">Données d'identification :</strong> nom d'utilisateur, adresse email</li>
           <li><strong className="text-white">Données de livraison :</strong> nom, prénom, adresse postale, téléphone (uniquement en cas de gain)</li>
           <li><strong className="text-white">Données de jeu :</strong> historique des parties, clics, victoires</li>
+          <li><strong className="text-white">Données de progression « jauge » :</strong> montant de crédits payants accumulés par article et items obtenus via la jauge, afin de suivre votre progression vers l'obtention garantie d'un article</li>
           <li><strong className="text-white">Données de paiement :</strong> traitées par Stripe, nous ne stockons pas vos informations bancaires</li>
           <li><strong className="text-white">Données techniques :</strong> adresse IP, type de navigateur, données de connexion</li>
         </ul>

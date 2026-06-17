@@ -20,6 +20,7 @@ export async function exportMyData(): Promise<Res<string>> {
     { data: profile }, { data: winners }, { data: purchases }, { data: gifts }, clicksRes,
     { data: comments }, { data: packBuys }, { data: giftsReceived },
     { data: selfExclusion }, { data: miniGamePlays }, { data: badges }, { data: clanMembership },
+    { data: gauges }, { data: gaugeWins },
   ] = await Promise.all([
     sb.from('profiles').select('*').eq('id', user.id).single(),
     sb.from('winners').select('item_name, item_value, won_at, shipping_status').eq('user_id', user.id),
@@ -33,6 +34,11 @@ export async function exportMyData(): Promise<Res<string>> {
     sb.from('mini_game_plays').select('*').eq('user_id', user.id),
     sb.from('user_badges').select('*').eq('user_id', user.id),
     sb.from('clan_members').select('clan_id, role, joined_at').eq('user_id', user.id),
+    // Feature jauge (paiement cash) : progression en cours + items obtenus (#305 RGPD).
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (sb as any).from('user_item_gauges').select('item_id, progress, target, completed_count, last_click_at, updated_at').eq('user_id', user.id),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (sb as any).from('gauge_wins').select('item_id, paid_credits, shipping_status, created_at').eq('user_id', user.id),
   ])
 
   const payload = {
@@ -50,6 +56,8 @@ export async function exportMyData(): Promise<Res<string>> {
     badges: badges ?? [],
     clanMembership: clanMembership ?? [],
     selfExclusion: selfExclusion ?? [],
+    gauges: gauges ?? [],
+    gaugeWins: gaugeWins ?? [],
     note: "Tes paiements détaillés sont conservés chez notre prestataire Stripe conformément aux obligations comptables.",
   }
   return { success: true, data: JSON.stringify(payload, null, 2) }
@@ -73,6 +81,9 @@ export async function deleteMyAccount(confirmation: string): Promise<Res> {
   try {
     // 1) Anonymiser les PII dénormalisées qui survivent à la suppression du profil.
     await sb.from('winners').update({ username: 'Compte supprimé' }).eq('user_id', user.id)
+    // games.last_click_username est dénormalisé (pseudo en clair) : on l'anonymise et on
+    // coupe la référence pour ne pas bloquer la suppression du profil (#304 PII résiduelle).
+    await sb.from('games').update({ last_click_username: 'Compte supprimé', last_click_user_id: null }).eq('last_click_user_id', user.id)
     // 2) Effacer les PII du profil (au cas où la FK ne cascade pas).
     await sb.from('profiles').update({
       username: `deleted_${user.id.slice(0, 8)}`,
