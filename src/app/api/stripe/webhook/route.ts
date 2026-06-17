@@ -260,6 +260,8 @@ export async function handleStripeEvent(event: Stripe.Event): Promise<HandlerRes
           await (supabase.rpc as any)('add_purchased_value', {
             p_user_id: userId,
             p_amount_cents: session.amount_total,
+            // Stampe le cash sur la session -> permet la reprise du cost-basis au clawback (#100).
+            p_session: session.id,
           })
         }
       } catch (valueErr) {
