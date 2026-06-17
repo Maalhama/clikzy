@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
+import { getCurrentUser } from '@/lib/auth/getCurrentUser'
 import { redirect } from 'next/navigation'
 import { ProfileClient } from './ProfileClient'
 import { getGameHistory, getGameHistoryStats } from '@/actions/gameHistory'
@@ -14,7 +15,7 @@ type WinnerWithItem = Winner & {
 export default async function ProfilePage() {
   const supabase = await createClient()
 
-  const { data: { user } } = await supabase.auth.getUser()
+  const user = await getCurrentUser()
 
   if (!user) {
     redirect('/login')

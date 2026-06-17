@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation'
-import { createClient } from '@/lib/supabase/server'
+import { getCurrentUser } from '@/lib/auth/getCurrentUser'
 import { getMiniGameEligibility } from '@/actions/miniGames'
 import MiniGamesClient from './MiniGamesClient'
 
@@ -10,8 +10,7 @@ export const metadata = {
 }
 
 export default async function MiniGamesPage() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const user = await getCurrentUser()
   if (!user) redirect('/login')
 
   const eligibilityResult = await getMiniGameEligibility()

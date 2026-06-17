@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation'
-import { createClient } from '@/lib/supabase/server'
+import { getCurrentUser } from '@/lib/auth/getCurrentUser'
 import { CollectionClient } from '@/components/collection/CollectionClient'
 
 export const metadata = {
@@ -8,8 +8,7 @@ export const metadata = {
 }
 
 export default async function CollectionPage() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const user = await getCurrentUser()
   if (!user) redirect('/login')
   return (
     <main className="relative z-10 mx-auto max-w-3xl px-4 py-6">

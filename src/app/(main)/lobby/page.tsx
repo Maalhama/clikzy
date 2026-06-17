@@ -1,5 +1,6 @@
 import { Suspense } from 'react'
 import { createClient } from '@/lib/supabase/server'
+import { getCurrentUser } from '@/lib/auth/getCurrentUser'
 import { checkAndResetDailyCredits } from '@/actions/credits'
 import { getProgression } from '@/actions/progression'
 import { getRecentWinners } from '@/actions/winners'
@@ -130,7 +131,7 @@ async function getLobbyData() {
 
   // Coffres du joueur pour le widget du header (connecté uniquement)
   let chestInfo: { count: number; bestRarity: string; dailyAvailable: boolean } | null = null
-  const { data: { user } } = await supabase.auth.getUser()
+  const user = await getCurrentUser()
   if (user) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const sb = supabase as any

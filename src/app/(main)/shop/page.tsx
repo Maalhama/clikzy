@@ -1,6 +1,7 @@
 import { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import { getCurrentUser } from '@/lib/auth/getCurrentUser'
 import { ShopClient } from './ShopClient'
 
 export const metadata: Metadata = {
@@ -10,11 +11,11 @@ export const metadata: Metadata = {
 }
 
 async function getCredits(): Promise<number> {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const user = await getCurrentUser()
 
   if (!user) return 0
 
+  const supabase = await createClient()
   const { data } = await supabase
     .from('profiles')
     .select('credits, earned_credits')
@@ -26,8 +27,7 @@ async function getCredits(): Promise<number> {
 }
 
 export default async function ShopPage() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const user = await getCurrentUser()
   if (!user) redirect('/login')
 
   const credits = await getCredits()
