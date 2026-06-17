@@ -3,6 +3,7 @@
 import { useEffect, useRef, useCallback } from 'react'
 import { generateDeterministicUsername } from '@/lib/bots/usernameGenerator'
 import { buildBotComment, type BotComment } from '@/lib/bots/commentGenerator'
+import { getDeterministicSeed, getGamePersonality, seededRandom, getBattleProgress } from '@/lib/bots/simulation'
 import type { GameWithItem } from '@/types/database'
 
 // Logs de simulation visibles uniquement en dev : en prod ils révéleraient
@@ -40,52 +41,7 @@ interface UseLobbyBotSimulationProps {
 }
 
 // Seed déterministe basé sur gameId + timestamp arrondi
-function getDeterministicSeed(gameId: string, roundedTime: number): number {
-  const str = `${gameId}-${roundedTime}`
-  let hash = 0
-  for (let i = 0; i < str.length; i++) {
-    const char = str.charCodeAt(i)
-    hash = ((hash << 5) - hash) + char
-    hash = hash & hash
-  }
-  return Math.abs(hash)
-}
-
-// Générateur pseudo-aléatoire déterministe
-function seededRandom(seed: number): () => number {
-  let state = seed
-  return () => {
-    state = (state * 1103515245 + 12345) & 0x7fffffff
-    return state / 0x7fffffff
-  }
-}
-
-function getGamePersonality(gameId: string): number {
-  const seed = getDeterministicSeed(gameId, 0)
-  return 0.7 + (seed % 60) / 100
-}
-
-// ============================================
-// SYSTÈME DE BATAILLE (durée limitée de la phase finale)
-// ============================================
-
-const BATTLE_MIN_DURATION = 30 * 60 * 1000  // 30 minutes min
-const BATTLE_MAX_DURATION = 119 * 60 * 1000 // 1h59 max
-
-function getBattleDuration(gameId: string): number {
-  const hash = getDeterministicSeed(gameId + '-battle', 0)
-  return BATTLE_MIN_DURATION + (hash % (BATTLE_MAX_DURATION - BATTLE_MIN_DURATION))
-}
-
-function getBattleProgress(gameId: string, battleStartTime: string | null): number {
-  if (!battleStartTime) return 0
-
-  const battleStart = new Date(battleStartTime).getTime()
-  const elapsed = Date.now() - battleStart
-  const totalDuration = getBattleDuration(gameId)
-
-  return Math.min(1.5, elapsed / totalDuration)
-}
+// Helpers déterministes + bataille -> module partagé @/lib/bots/simulation.
 
 function shouldBotClickInBattle(gameId: string, battleProgress: number): boolean {
   if (battleProgress >= 1) return false
