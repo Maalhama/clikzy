@@ -194,7 +194,8 @@ export function GaugeCaption({ gauge, itemName }: { gauge: GaugeState | null; it
         <span className="font-display text-[0.6rem] font-semibold uppercase tracking-[0.2em] text-neon-purple">
           Ta jauge
         </span>{' '}
-        se remplit avec tes crédits. Pleine, tu auras misé{' '}
+        monte avec tes crédits achetés (les crédits offerts ne la remplissent pas). Pleine, tu
+        auras misé{' '}
         <span className="text-white/80">{fmt(gauge.target)}€ (2× la valeur)</span> et{' '}
         <span className="text-white/80">{itemName}</span> est à toi, garanti.
       </p>

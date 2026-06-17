@@ -460,6 +460,8 @@ export function GameClient({
                     </span>
                     <span
                       suppressHydrationWarning
+                      role="timer"
+                      aria-label={game.status === 'waiting' ? 'Le jeu commence bientôt' : `Temps restant : ${formatTime(displayTimeLeft)}`}
                       className={`stat-numeral text-3xl ${
                         isCritical ? 'text-danger animate-pulse' : isUrgent ? 'text-danger' : 'text-neon-blue'
                       }`}
@@ -887,6 +889,8 @@ export function GameClient({
                     </span>
                     <div
                       suppressHydrationWarning
+                      role="timer"
+                      aria-label={game.status === 'waiting' ? 'Le jeu commence bientôt' : `Temps restant : ${formatTime(displayTimeLeft)}`}
                       className={`stat-numeral text-4xl ${
                         isCritical ? 'text-danger animate-pulse' : isUrgent ? 'text-danger' : 'text-neon-blue'
                       }`}
