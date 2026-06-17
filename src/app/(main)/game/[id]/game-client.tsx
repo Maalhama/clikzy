@@ -8,6 +8,8 @@ import Image from 'next/image'
 import { useGame } from '@/hooks/useGame'
 import { useTimer } from '@/hooks/useTimer'
 import { useSounds } from '@/hooks/useSounds'
+import { useSoundPreference } from '@/hooks/useSoundPreference'
+import { Volume2, VolumeX } from 'lucide-react'
 import { useBotSimulation } from '@/hooks/useBotSimulation'
 import { useCredits } from '@/contexts/CreditsContext'
 import { useBadgeNotification } from '@/contexts/BadgeNotificationContext'
@@ -106,7 +108,9 @@ export function GameClient({
 
   // Display actual time (everything resets to 60s)
   const displayTimeLeft = timeLeft
-  const { playClick, playWin, playHeartbeat, stopAll: stopSounds } = useSounds(true)
+  // Libre choix du joueur : préférence sonore persistée (au lieu d'un son figé).
+  const { soundEnabled, toggleSound } = useSoundPreference()
+  const { playClick, playWin, playHeartbeat, stopAll: stopSounds } = useSounds(soundEnabled)
 
   // Simulation pour expérience visuelle fluide
   useBotSimulation({
@@ -306,6 +310,16 @@ export function GameClient({
 
   return (
     <div className="min-h-screen pb-20 lg:pb-8">
+
+      {/* Contrôle du son — libre choix du joueur, persistant (#292/#327) */}
+      <button
+        onClick={toggleSound}
+        aria-label={soundEnabled ? 'Couper les effets sonores' : 'Activer les effets sonores'}
+        aria-pressed={!soundEnabled}
+        className="fixed right-4 bottom-24 z-30 flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-bg-secondary/80 text-white/70 backdrop-blur-sm transition-colors hover:text-white lg:bottom-8"
+      >
+        {soundEnabled ? <Volume2 className="h-5 w-5" /> : <VolumeX className="h-5 w-5" />}
+      </button>
 
       {/* Main content - Different layouts for mobile and desktop */}
       <div className="px-4 pt-4 md:px-6 lg:px-8 lg:pt-8">
