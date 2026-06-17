@@ -64,8 +64,9 @@ export function GameComments({ gameId, userId, itemName }: { gameId: string; use
               onChange={(e) => setContent(e.target.value)}
               maxLength={280}
               rows={2}
+              aria-label="Écrire un message dans le chat de la partie"
               placeholder="Lâche un message… (il faut avoir cliqué au moins une fois)"
-              className="w-full resize-none bg-transparent px-4 py-3 text-sm text-white placeholder:text-white/35 focus:outline-none"
+              className="w-full resize-none bg-transparent px-4 py-3 text-sm text-white placeholder:text-white/55 focus:outline-none"
             />
             <div className="flex items-center justify-between px-4 pb-3">
               <span className="text-[0.7rem] text-white/30">{content.length}/280</span>
@@ -78,7 +79,7 @@ export function GameComments({ gameId, userId, itemName }: { gameId: string; use
               </button>
             </div>
           </div>
-          {error && <p className="mt-2 text-xs text-danger">{error}</p>}
+          {error && <p role="alert" className="mt-2 text-xs text-danger">{error}</p>}
         </form>
       ) : (
         <a

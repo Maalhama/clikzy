@@ -153,7 +153,7 @@ export default function VIPSubscriptionModal({
               </button>
 
               {/* Cancellation note */}
-              <p className="text-center text-white/25 text-[10px] mt-2">
+              <p className="text-center text-white/55 text-[10px] mt-2">
                 Annulable à tout moment
               </p>
             </div>
