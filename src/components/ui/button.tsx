@@ -52,7 +52,8 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         ref={ref}
         className={`
           inline-flex items-center justify-center gap-2
-          font-semibold rounded-lg
+          font-semibold
+          [clip-path:polygon(0_0,100%_0,100%_calc(100%-10px),calc(100%-10px)_100%,0_100%)]
           transition-all duration-300 ease-out
           focus:outline-none focus-visible:ring-2 focus-visible:ring-neon-purple/50 focus-visible:ring-offset-1 focus-visible:ring-offset-bg-primary
           disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100
