@@ -184,27 +184,18 @@ export function ItemGauge({ gauge, celebrate = false, itemName }: ItemGaugeProps
  */
 export function GaugeCaption({ gauge, itemName }: { gauge: GaugeState | null; itemName: string }) {
   if (!gauge) return null
-  // progress/target en CENTIMES (jauge « cash réel », cible = valeur de l'item × 2).
-  const fmt = (cents: number) =>
-    (cents / 100).toLocaleString('fr-FR', { minimumFractionDigits: cents % 100 === 0 ? 0 : 2, maximumFractionDigits: 2 })
-  const remainingCents = Math.max(0, gauge.target - gauge.progress)
   return (
     <div className="mt-2 text-xs leading-relaxed text-white/55">
       <p>
         <span className="font-display text-[0.6rem] font-semibold uppercase tracking-[0.2em] text-neon-purple">
           Ta jauge
         </span>{' '}
-        monte avec tes crédits achetés (les crédits offerts ne la remplissent pas). Pleine, tu
-        auras misé{' '}
-        <span className="text-white/80">{fmt(gauge.target)}€ (2× la valeur)</span> et{' '}
-        <span className="text-white/80">{itemName}</span> est à toi, garanti.
+        monte avec tes crédits achetés. Pleine, <span className="text-white/80">{itemName}</span> est
+        à toi, garanti.
       </p>
-      {remainingCents > 0 && (
-        <p className="mt-1 text-white/45">
-          Encore <span className="stat-numeral text-neon-blue">{fmt(remainingCents)}€</span> à jouer.
-          Rien n&apos;est perdu : ta progression redevient des crédits si tu t&apos;arrêtes.
-        </p>
-      )}
+      <p className="mt-1 text-white/45">
+        Rien n&apos;est perdu : ta progression redevient des crédits si tu t&apos;arrêtes.
+      </p>
     </div>
   )
 }
