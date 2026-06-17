@@ -34,7 +34,9 @@ export function CookieConsent() {
     <div
       role="dialog"
       aria-label="Consentement aux cookies"
-      className={`fixed bottom-4 left-4 right-4 z-[60] transition-all duration-300 ease-out md:left-auto md:right-4 md:max-w-md ${
+      // #325 — décollé de l'indicateur d'accueil iOS (safe-area) plutôt qu'un bottom-4 fixe.
+      style={{ bottom: 'max(1rem, env(safe-area-inset-bottom))' }}
+      className={`fixed left-4 right-4 z-[60] transition-all duration-300 ease-out md:left-auto md:right-4 md:max-w-md ${
         visible ? 'translate-y-0 opacity-100' : 'translate-y-24 opacity-0'
       }`}
     >
