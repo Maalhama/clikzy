@@ -1,11 +1,12 @@
 'use client'
 
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Dices, Target, Users } from 'lucide-react'
 import { CREDIT_PACKS, type CreditPackId } from '@/lib/stripe/config'
 import { createCheckoutSession } from '@/actions/stripe'
 import { PackCard } from '@/components/shop/PackCard'
+import { useModalA11y } from '@/hooks/useModalA11y'
 
 interface CreditPacksModalProps {
   isOpen: boolean
@@ -14,6 +15,8 @@ interface CreditPacksModalProps {
 
 export function CreditPacksModal({ isOpen, onClose }: CreditPacksModalProps) {
   const [loadingPack, setLoadingPack] = useState<CreditPackId | null>(null)
+  const panelRef = useRef<HTMLDivElement>(null)
+  useModalA11y(isOpen, onClose, panelRef)
   const [error, setError] = useState<string | null>(null)
 
   const handlePurchase = async (packId: CreditPackId) => {
@@ -45,6 +48,7 @@ export function CreditPacksModal({ isOpen, onClose }: CreditPacksModalProps) {
 
           {/* Modal */}
           <motion.div
+            ref={panelRef}
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}

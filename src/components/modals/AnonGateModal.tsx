@@ -1,7 +1,9 @@
 'use client'
 
+import { useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
+import { useModalA11y } from '@/hooks/useModalA11y'
 
 interface AnonGateModalProps {
   isOpen: boolean
@@ -14,6 +16,8 @@ interface AnonGateModalProps {
  * proposé : sans compte ça n'a pas de sens).
  */
 export function AnonGateModal({ isOpen, onClose }: AnonGateModalProps) {
+  const panelRef = useRef<HTMLDivElement>(null)
+  useModalA11y(isOpen, onClose, panelRef)
   return (
     <AnimatePresence>
       {isOpen && (
@@ -31,6 +35,7 @@ export function AnonGateModal({ isOpen, onClose }: AnonGateModalProps) {
             onClick={onClose}
           />
           <motion.div
+            ref={panelRef}
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}

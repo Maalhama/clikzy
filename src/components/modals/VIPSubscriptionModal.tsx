@@ -1,7 +1,9 @@
 'use client'
 
+import { useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, Crown, Check, Sparkles } from 'lucide-react'
+import { useModalA11y } from '@/hooks/useModalA11y'
 
 interface VIPSubscriptionModalProps {
   isOpen: boolean
@@ -23,6 +25,8 @@ export default function VIPSubscriptionModal({
   onSubscribe,
   isLoading = false,
 }: VIPSubscriptionModalProps) {
+  const panelRef = useRef<HTMLDivElement>(null)
+  useModalA11y(isOpen, onClose, panelRef)
   if (!isOpen) return null
 
   return (
@@ -45,6 +49,7 @@ export default function VIPSubscriptionModal({
 
           {/* Modal - Compact */}
           <motion.div
+            ref={panelRef}
             initial={{ opacity: 0, scale: 0.9, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
