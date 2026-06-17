@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import { getCurrentUser } from '@/lib/auth/getCurrentUser'
 import { checkAndResetDailyCredits } from '@/actions/credits'
 import { GameClient } from './game-client'
 import type { Game, Item } from '@/types/database'
@@ -40,7 +41,8 @@ export default async function GamePage({ params }: PageProps) {
 
   // Auth OPTIONNELLE : la page de jeu est consultable sans compte (rétention).
   // Le clic « Jouer » redirige vers l'inscription côté client si non connecté.
-  const { data: { user } } = await supabase.auth.getUser()
+  // Mémoïsé : réutilise la validation de JWT déjà faite par le layout (main).
+  const user = await getCurrentUser()
 
   // Jeu + clics récents (publics) — pas besoin d'être connecté pour voir
   const [gameResult, clicksResult] = await Promise.all([

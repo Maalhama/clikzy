@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
+import { getCurrentUser } from '@/lib/auth/getCurrentUser'
 import { Header } from '@/components/layout/Header'
 import { ArenaAtmosphereLazy } from '@/components/ui/ArenaAtmosphereLazy'
 import { ClientProviders } from '@/components/providers/ClientProviders'
@@ -17,7 +18,9 @@ export default async function MainLayout({
   // Auth OPTIONNELLE : le lobby et les pages de jeu sont consultables sans compte
   // (rétention). Les pages personnelles (profil, collection, vip, mini-jeux, shop)
   // se protègent elles-mêmes via leur propre redirect.
-  const { data: { user } } = await supabase.auth.getUser()
+  // getCurrentUser est mémoïsé par requête : la page rendue en dessous réutilise
+  // la même validation de JWT au lieu d'en refaire une.
+  const user = await getCurrentUser()
 
   let profile: Profile | null = null
   let totalCredits = 0
