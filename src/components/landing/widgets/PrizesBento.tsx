@@ -71,9 +71,13 @@ export function PrizesBento({ games }: PrizesBentoProps) {
   const [demos, setDemos] = useState<HeroLiveGame[]>([])
   useEffect(() => setMounted(true), [])
 
+  // `!mounted || …` : au 1er rendu (serveur + hydratation client), on N'utilise PAS `now`
+  // (≠ serveur/client) pour décider quelles cartes s'affichent — sinon une partie qui
+  // expire dans l'écart de temps serveur→client change la liste et casse l'hydratation (#418).
+  // L'heure courante ne filtre qu'APRÈS le montage.
   const live = useMemo(
-    () => games.filter((g) => g.status !== 'ended' && g.status !== 'waiting' && g.end_time > now),
-    [games, now]
+    () => games.filter((g) => g.status !== 'ended' && g.status !== 'waiting' && (!mounted || g.end_time > now)),
+    [games, now, mounted]
   )
 
   // Complète avec des lots démo (client uniquement) ; remplace ceux expirés
