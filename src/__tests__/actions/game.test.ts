@@ -9,8 +9,18 @@ const mockSupabase = {
   rpc: vi.fn(),
 }
 
+// Depuis le fix d'audit, le clic appelle perform_click (+ increment_item_gauge) via
+// service_role -> on mocke aussi le client service.
+const mockServiceSupabase = {
+  rpc: vi.fn(),
+}
+
 vi.mock('@/lib/supabase/server', () => ({
   createClient: vi.fn(() => mockSupabase),
+}))
+
+vi.mock('@/lib/supabase/service', () => ({
+  createServiceClient: vi.fn(() => mockServiceSupabase),
 }))
 
 vi.mock('@/lib/security', () => ({
@@ -152,7 +162,7 @@ describe('Game Actions', () => {
       mockSelect.mockReturnValue({ eq: mockEq })
       mockEq.mockReturnValue({ single: mockSingle, maybeSingle: vi.fn().mockResolvedValue({ data: null }) })
 
-      mockSupabase.rpc.mockResolvedValue({
+      mockServiceSupabase.rpc.mockResolvedValue({
         data: [{ ok: true, new_total: 14, new_end_time: Date.now() + 90000, reason: 'ok' }],
         error: null,
       })
@@ -160,7 +170,7 @@ describe('Game Actions', () => {
       const result = await clickGame('game-1')
 
       expect(result.success).toBe(true)
-      expect(mockSupabase.rpc).toHaveBeenCalledWith(
+      expect(mockServiceSupabase.rpc).toHaveBeenCalledWith(
         'perform_click',
         expect.objectContaining({
           p_game_id: 'game-1',
@@ -204,7 +214,7 @@ describe('Game Actions', () => {
       mockSelect.mockReturnValue({ eq: mockEq })
       mockEq.mockReturnValue({ single: mockSingle, maybeSingle: vi.fn().mockResolvedValue({ data: null }) })
 
-      mockSupabase.rpc.mockResolvedValue({
+      mockServiceSupabase.rpc.mockResolvedValue({
         data: [{ ok: true, new_total: 14, new_end_time: now + 90000, reason: 'ok' }],
         error: null,
       })

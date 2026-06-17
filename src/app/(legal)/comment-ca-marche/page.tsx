@@ -47,6 +47,23 @@ export default function CommentCaMarchePage() {
         </p>
       </Section>
 
+      <Section title="La jauge : l'item garanti">
+        <p>
+          Sur une enchère, tu peux aussi remplir une <span className="font-semibold text-white">jauge</span> en
+          cliquant. Quand elle est pleine, l&apos;item est <span className="font-semibold text-white">à toi,
+          garanti</span> — même si tu n&apos;as pas gagné au minuteur, et il t&apos;est livré.
+        </p>
+        <p>
+          La jauge se remplit avec tes crédits payants. Une fois pleine, tu auras misé{' '}
+          <span className="font-semibold text-white">2× la valeur réelle de l&apos;item</span> en argent réel :
+          c&apos;est le prix, affiché en toute transparence, de la garantie d&apos;obtention.
+        </p>
+        <p>
+          <span className="font-semibold text-white">Rien n&apos;est perdu</span> : si tu t&apos;arrêtes avant la
+          fin, ta progression te revient sous forme de crédits réutilisables.
+        </p>
+      </Section>
+
       <Section title="Mini-jeux : équité vérifiable (provably-fair)">
         <p>
           Nos mini-jeux utilisent un système <span className="font-semibold text-white">provably-fair</span> de type casino

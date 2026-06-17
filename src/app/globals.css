@@ -2602,3 +2602,10 @@ body::after {
     animation: none !important;
   }
 }
+/* PWA iOS installée (standalone) : décale le contenu sous la barre d'état translucide
+   (viewport-fit: cover active env(safe-area-*)) -> le header ne passe plus dessous. */
+@media all and (display-mode: standalone) {
+  body {
+    padding-top: env(safe-area-inset-top);
+  }
+}
