@@ -5,6 +5,7 @@ import { createServiceClient } from '@/lib/supabase/service'
 import { GAME_CONSTANTS, GAUGE_ENABLED, GAUGE_MULTIPLIER } from '@/lib/constants'
 import { checkAndAwardBadges, type Badge } from '@/actions/badges'
 import { checkClickFraud, auditLog } from '@/lib/security'
+import { rateLimiters } from '@/lib/rateLimit'
 import { selfExcludedUntil, selfExclusionError } from '@/lib/selfExclusion'
 import type { Game, Click, Item, Profile } from '@/types/database'
 
@@ -41,6 +42,14 @@ export async function clickGame(gameId: string): Promise<ActionResult<{ newEndTi
   // Jeu responsable : compte en pause -> pas de clic.
   const excl = await selfExcludedUntil(supabase, user.id)
   if (excl) return { success: false, error: selfExclusionError(excl) }
+
+  // Garde-fou de débit DISTRIBUÉ (#8) : 90 clics/min/user, partagé via Redis en prod
+  // (résiste au serverless multi-instance, contrairement à checkClickFraud qui est en
+  // mémoire par instance). Seuil haut -> n'impacte pas le jeu légitime.
+  if (!(await rateLimiters.clicks(`click:${user.id}`)).success) {
+    auditLog('security.rate_limited', { gameId, scope: 'game.click' }, { userId: user.id, severity: 'warning' })
+    return { success: false, error: 'Tu cliques trop vite, ralentis un peu.' }
+  }
 
   // Fraud detection check
   const fraudCheck = checkClickFraud(user.id, gameId, 'server-action')

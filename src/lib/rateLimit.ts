@@ -156,4 +156,11 @@ export const rateLimiters = {
 
   // Cron routes - 10 requests per minute
   cron: (identifier: string) => checkRateLimit(identifier, 10, 60 * 1000),
+
+  // Clics de jeu — garde-fou de débit DISTRIBUÉ (partagé via Redis si Upstash est
+  // configuré, sinon in-memory comme avant). Seuil volontairement HAUT (90/min, soit
+  // 1,5 clic/s soutenu) : très au-dessus du jeu légitime — les crédits bornent déjà
+  // le volume de clics — il ne vise que l'automatisation soutenue qui contourne le
+  // détecteur en mémoire (par instance) en serverless multi-instance.
+  clicks: (identifier: string) => checkRateLimit(identifier, 90, 60 * 1000),
 }
