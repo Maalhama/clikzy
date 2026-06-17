@@ -71,7 +71,7 @@ export function RewardsCalendarModal({
         transition={{ type: 'spring', stiffness: 260, damping: 22 }}
         className="relative max-h-[94vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-white/10 surface-3 p-4 sm:p-6"
       >
-        <button onClick={onClose} aria-label="Fermer" className="absolute top-3 right-3 z-10 text-white/40 hover:text-white">
+        <button onClick={onClose} aria-label="Fermer" className="absolute top-3 right-3 z-10 text-white/55 hover:text-white">
           <X size={20} />
         </button>
 
@@ -140,7 +140,7 @@ export function RewardsCalendarModal({
               {claiming ? 'Récupération…' : 'Réclamer la récompense du jour'}
             </button>
           ) : (
-            <p className="text-xs text-white/40">Récompense du jour déjà réclamée — reviens demain !</p>
+            <p className="text-xs text-white/55">Récompense du jour déjà réclamée — reviens demain !</p>
           )}
         </div>
 

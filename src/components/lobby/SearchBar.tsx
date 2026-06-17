@@ -135,7 +135,7 @@ export function SearchBar({ onSearch, placeholder = 'Rechercher un produit...' }
             )}
             <button
               onClick={handleClose}
-              className="flex-shrink-0 text-white/40 hover:text-white/60 transition-colors"
+              className="flex-shrink-0 text-white/55 hover:text-white/60 transition-colors"
             >
               <svg
                 className="w-4 h-4"

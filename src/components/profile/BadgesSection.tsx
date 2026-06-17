@@ -213,7 +213,7 @@ export function BadgesSection({ badges, stats }: BadgesSectionProps) {
               <div className={`text-xs font-bold ${rarityColors[rarity].text}`}>
                 {earned}/{total}
               </div>
-              <div className="text-[10px] text-white/40">{rarityLabels[rarity]}</div>
+              <div className="text-[10px] text-white/55">{rarityLabels[rarity]}</div>
             </div>
           ))}
         </div>
@@ -266,8 +266,8 @@ export function BadgesSection({ badges, stats }: BadgesSectionProps) {
                 }`}
               >
                 {badge.is_hidden && !earned
-                  ? <span className="flex h-full w-full items-center justify-center text-2xl font-black text-white/40">?</span>
-                  : getBadgeIcon(badge.id, `w-full h-full ${earned ? colors.text : 'text-white/40'}`)}
+                  ? <span className="flex h-full w-full items-center justify-center text-2xl font-black text-white/55">?</span>
+                  : getBadgeIcon(badge.id, `w-full h-full ${earned ? colors.text : 'text-white/55'}`)}
               </motion.button>
             )
           })}
@@ -301,8 +301,8 @@ export function BadgesSection({ badges, stats }: BadgesSectionProps) {
                       earned ? `shadow-lg ${colors.glow}` : 'opacity-40 grayscale'
                     }`}>
                       {hidden
-                        ? <span className="text-3xl font-black text-white/40">?</span>
-                        : getBadgeIcon(badge.id, `w-full h-full ${earned ? colors.text : 'text-white/40'}`)}
+                        ? <span className="text-3xl font-black text-white/55">?</span>
+                        : getBadgeIcon(badge.id, `w-full h-full ${earned ? colors.text : 'text-white/55'}`)}
                     </div>
 
                     <h3 className="text-xl font-bold text-white text-center mb-1">
@@ -333,7 +333,7 @@ export function BadgesSection({ badges, stats }: BadgesSectionProps) {
                         ✓ Obtenu le {earnedAt ? new Date(earnedAt).toLocaleDateString('fr-FR') : '-'}
                       </div>
                     ) : (
-                      <div className="text-center text-white/40 text-sm">
+                      <div className="text-center text-white/55 text-sm">
                         <Lock className="mr-1.5 inline h-3.5 w-3.5 align-[-2px]" />Non débloqué
                       </div>
                     )}

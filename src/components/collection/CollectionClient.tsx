@@ -81,7 +81,7 @@ export function CollectionClient() {
         <div className="mb-4 flex items-center gap-2">
           <Gift className="h-5 w-5 text-neon-purple" />
           <h2 className="text-lg font-display font-semibold text-white">Coffres</h2>
-          <span className="ml-auto text-sm text-white/40">{data.chests.length} à ouvrir</span>
+          <span className="ml-auto text-sm text-white/55">{data.chests.length} à ouvrir</span>
         </div>
 
         {/* Coffre quotidien gratuit (reset minuit Paris) */}
@@ -106,7 +106,7 @@ export function CollectionClient() {
         {data.chests.length === 0 ? (
           <div className="flex flex-col items-center gap-3 py-8">
             <span className="opacity-35"><NeonChest rarity="common" size={84} /></span>
-            <p className="text-center text-sm text-white/40">
+            <p className="text-center text-sm text-white/55">
               Aucun coffre à ouvrir pour l'instant.<br />
               <span className="text-white/60">Reviens après minuit</span> pour tes 3 coffres gratuits — et gagne des parties pour en obtenir plus.
             </p>
@@ -157,13 +157,13 @@ export function CollectionClient() {
             const eq = data.equipment[slot]
             return (
               <div key={slot} className="rounded-xl border border-white/10 bg-white/[0.03] p-3 text-center">
-                <p className="mb-2 text-[10px] uppercase tracking-wider text-white/40">{SLOT_LABEL[slot]}</p>
+                <p className="mb-2 text-[10px] uppercase tracking-wider text-white/55">{SLOT_LABEL[slot]}</p>
                 {eq ? (
                   <div className={`rounded-lg border bg-gradient-to-b p-2 ${RARITY[eq.item.rarity].border} ${RARITY[eq.item.rarity].bg}`}>
                     <span className="flex justify-center"><ItemIcon itemId={eq.item.id} slot={eq.item.slot} rarity={eq.item.rarity} size={34} /></span>
                     <p className={`mt-1 truncate text-xs font-bold ${RARITY[eq.item.rarity].text}`}>{eq.item.name}</p>
                     <p className="truncate text-[10px] text-white/50">{bonusLabel(eq.item.bonusKind, eq.item.bonusValue)}</p>
-                    <button onClick={() => onUnequip(slot)} disabled={busy === 'slot-' + slot} className="mt-2 text-[10px] font-semibold text-white/40 hover:text-white/70">
+                    <button onClick={() => onUnequip(slot)} disabled={busy === 'slot-' + slot} className="mt-2 text-[10px] font-semibold text-white/55 hover:text-white/70">
                       {busy === 'slot-' + slot ? '...' : 'Retirer'}
                     </button>
                   </div>
@@ -185,9 +185,9 @@ export function CollectionClient() {
 
       {/* Inventaire */}
       <section className="panel reveal reveal-4 p-5">
-        <h2 className="mb-4 text-lg font-display font-semibold text-white">Inventaire <span className="text-sm font-normal text-white/40">({data.inventory.length})</span></h2>
+        <h2 className="mb-4 text-lg font-display font-semibold text-white">Inventaire <span className="text-sm font-normal text-white/55">({data.inventory.length})</span></h2>
         {data.inventory.length === 0 ? (
-          <p className="py-6 text-center text-sm text-white/40">Ouvre des coffres pour récupérer des pièces d&apos;équipement.</p>
+          <p className="py-6 text-center text-sm text-white/55">Ouvre des coffres pour récupérer des pièces d&apos;équipement.</p>
         ) : (
           <div className="grid grid-cols-3 gap-2 sm:grid-cols-6">
             {data.inventory.map((inv) => {

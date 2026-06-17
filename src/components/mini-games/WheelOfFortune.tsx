@@ -460,7 +460,7 @@ export default function WheelOfFortune({
                     : 'bg-[#141B2D] border-white/10'
               }`}
             >
-              <Trophy className={`w-5 h-5 ${isJackpot ? 'text-[#FFB800]' : isWin ? 'text-[#9B5CFF]' : 'text-white/40'}`} />
+              <Trophy className={`w-5 h-5 ${isJackpot ? 'text-[#FFB800]' : isWin ? 'text-[#9B5CFF]' : 'text-white/55'}`} />
               <div className="flex flex-col">
                 <span className="text-white/60 text-[9px] uppercase font-bold tracking-widest">
                   {isJackpot ? 'JACKPOT' : isWin ? 'Gagné' : 'Perdu'}

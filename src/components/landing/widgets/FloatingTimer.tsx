@@ -259,7 +259,7 @@ export function FloatingTimer({
           >
             <button
               onClick={handleClose}
-              className="absolute top-1 right-1 w-4 h-4 flex items-center justify-center rounded-full bg-white/10 text-white/40 z-10"
+              className="absolute top-1 right-1 w-4 h-4 flex items-center justify-center rounded-full bg-white/10 text-white/55 z-10"
               aria-label="Fermer"
             >
               <svg className="w-2.5 h-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>

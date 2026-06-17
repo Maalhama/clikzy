@@ -62,7 +62,7 @@ export function BuyItNowGameOffer({ gameId }: { gameId: string }) {
           </div>
           <div className="mt-1.5 flex flex-wrap items-baseline gap-2">
             <span className="stat-numeral text-2xl font-black text-neon-pink">{offer.price}€</span>
-            <span className="text-sm text-white/40 line-through">{offer.retailValue}€</span>
+            <span className="text-sm text-white/55 line-through">{offer.retailValue}€</span>
             {pct > 0 && <span className="rounded bg-neon-pink/20 px-1.5 py-0.5 text-xs font-bold text-neon-pink">-{pct}%</span>}
             {save > 0 && <span className="text-xs text-white/55">tu économises {save}€</span>}
           </div>

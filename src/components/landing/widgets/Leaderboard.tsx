@@ -337,7 +337,7 @@ export function Leaderboard({
                 >
                   {entry.totalValue.toLocaleString()}€
                 </div>
-                <div className="text-xs text-white/40">total</div>
+                <div className="text-xs text-white/55">total</div>
               </div>
 
               {/* Animated bottom border on hover */}

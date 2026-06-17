@@ -94,7 +94,7 @@ export default async function WrappedPage({ params }: { params: Promise<{ userna
           {stats.map((st) => (
             <div key={st.label} className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-4">
               <div className={`stat-numeral text-2xl ${st.color}`}>{st.value}</div>
-              <div className="mt-1 text-[0.65rem] uppercase tracking-[0.18em] text-white/40">{st.label}</div>
+              <div className="mt-1 text-[0.65rem] uppercase tracking-[0.18em] text-white/55">{st.label}</div>
             </div>
           ))}
         </div>
@@ -113,7 +113,7 @@ export default async function WrappedPage({ params }: { params: Promise<{ userna
         )}
 
         {s.memberSince && (
-          <p className="mt-4 text-xs text-white/40">
+          <p className="mt-4 text-xs text-white/55">
             Dans l&apos;arène depuis {s.memberSince} · {s.daysInArena} jour{s.daysInArena > 1 ? 's' : ''}
           </p>
         )}
@@ -129,7 +129,7 @@ export default async function WrappedPage({ params }: { params: Promise<{ userna
         <Link href="/lobby" className="btn-arena px-8 py-3.5 text-sm">
           Fais ton propre bilan
         </Link>
-        <p className="mt-3 text-xs text-white/40">10 clics gratuits par jour · le dernier clic remporte le lot</p>
+        <p className="mt-3 text-xs text-white/55">10 clics gratuits par jour · le dernier clic remporte le lot</p>
       </div>
     </main>
   )

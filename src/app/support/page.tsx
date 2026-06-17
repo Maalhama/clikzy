@@ -397,10 +397,10 @@ export default function SupportPage() {
       {/* Footer */}
       <footer className="relative z-10 border-t border-white/10 mt-12">
         <div className="max-w-6xl mx-auto px-6 py-8 flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="text-sm text-white/40">
+          <div className="text-sm text-white/55">
             © 2026 CLEEKZY. Tous droits réservés.
           </div>
-          <div className="flex items-center gap-6 text-sm text-white/40">
+          <div className="flex items-center gap-6 text-sm text-white/55">
             <Link href="/" className="hover:text-white transition-colors">Accueil</Link>
             <Link href="/lobby" className="hover:text-white transition-colors">Jouer</Link>
             <Link href="/#faq" className="hover:text-white transition-colors">FAQ</Link>

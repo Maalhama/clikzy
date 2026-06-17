@@ -433,7 +433,7 @@ export function GameClient({
                       <div className="text-success font-bold text-lg">
                         {isWinner ? 'Tu as gagné !' : leaderName || 'Champion'}
                       </div>
-                      <div className="text-white/40 text-sm">
+                      <div className="text-white/55 text-sm">
                         {isWinner ? 'Félicitations !' : 'a remporté ce lot'}
                       </div>
                     </div>
@@ -504,7 +504,7 @@ export function GameClient({
                     </svg>
                   </div>
                   <div>
-                    <div className="text-white/40 text-xs uppercase">Leader</div>
+                    <div className="text-white/55 text-xs uppercase">Leader</div>
                     <div className={`font-semibold ${game.status === 'ended' ? 'text-success' : 'text-white'}`}>
                       {leaderName || '-'}
                     </div>
@@ -512,7 +512,7 @@ export function GameClient({
                   </div>
                 </div>
                 <div className="text-right">
-                  <div className="text-white/40 text-xs uppercase">Activité</div>
+                  <div className="text-white/55 text-xs uppercase">Activité</div>
                   <div className="flex items-center gap-1.5 justify-end">
                     {game.status === 'ended' ? (
                       <span className="text-white/50 font-medium">Terminé</span>
@@ -860,7 +860,7 @@ export function GameClient({
                       <div className="text-success font-bold text-xl">
                         {isWinner ? 'Tu as gagné !' : leaderName || 'Champion'}
                       </div>
-                      <div className="text-white/40 text-sm">
+                      <div className="text-white/55 text-sm">
                         {isWinner ? 'Félicitations !' : 'a remporté ce lot'}
                       </div>
                     </div>
@@ -934,7 +934,7 @@ export function GameClient({
                     </svg>
                   </div>
                   <div>
-                    <div className="text-white/40 text-xs uppercase">Leader</div>
+                    <div className="text-white/55 text-xs uppercase">Leader</div>
                     <div className={`font-semibold truncate ${game.status === 'ended' ? 'text-success' : 'text-white'}`}>
                       {leaderName || '-'}
                     </div>
@@ -942,7 +942,7 @@ export function GameClient({
                   </div>
                 </div>
                 <div className="text-right">
-                  <div className="text-white/40 text-xs uppercase">Activité</div>
+                  <div className="text-white/55 text-xs uppercase">Activité</div>
                   <div className="flex items-center gap-1.5 justify-end">
                     {game.status === 'ended' ? (
                       <span className="text-white/50 font-medium text-lg">Terminé</span>

@@ -62,7 +62,7 @@ const ClickItem = memo(function ClickItem({
           </span>
           <span className="text-neon-purple text-xs">a cliqué</span>
         </div>
-        <div className="text-white/40 text-xs truncate">
+        <div className="text-white/55 text-xs truncate">
           {click.item_name}
         </div>
       </div>
@@ -148,7 +148,7 @@ export const LiveClicksFeed = memo(function LiveClicksFeed({
           </span>
           <span className="text-white font-bold text-sm">ACTIVITÉ LIVE</span>
         </div>
-        <span className="text-white/40 text-xs">
+        <span className="text-white/55 text-xs">
           {isConnected ? 'Connecté' : 'Connexion...'}
         </span>
       </div>

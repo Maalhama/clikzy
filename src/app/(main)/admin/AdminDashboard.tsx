@@ -114,7 +114,7 @@ function OverviewTab({ stats }: { stats: AdminStats }) {
             {stat.icon}
           </div>
           <div className={`text-2xl font-bold ${stat.color}`}>{stat.value}</div>
-          <div className="text-white/40 text-xs">{stat.label}</div>
+          <div className="text-white/55 text-xs">{stat.label}</div>
         </motion.div>
       ))}
     </div>
@@ -130,7 +130,7 @@ function HealthTab({ health }: { health: AdminHealth | null }) {
     { label: 'Revenus estimés', value: `${health.revenueEstimate.toLocaleString('fr-FR')}€`, sub: 'packs + rachats + cadeaux', color: 'text-warning' },
     { label: 'VIP actifs', value: health.activeVips.toLocaleString('fr-FR'), sub: 'abonnements', color: 'text-yellow-400' },
     { label: 'Clics réels', value: health.realClicks.toLocaleString('fr-FR'), sub: 'hors bots', color: 'text-neon-blue' },
-    { label: 'Clics bots', value: health.botClicks.toLocaleString('fr-FR'), sub: 'activité simulée', color: 'text-white/40' },
+    { label: 'Clics bots', value: health.botClicks.toLocaleString('fr-FR'), sub: 'activité simulée', color: 'text-white/55' },
   ]
   const tot = health.realClicks + health.botClicks
   const realShare = tot > 0 ? Math.round((health.realClicks / tot) * 100) : 0
@@ -153,7 +153,7 @@ function HealthTab({ health }: { health: AdminHealth | null }) {
         <div className="h-2 rounded-full bg-white/10 overflow-hidden">
           <div className="h-full rounded-full bg-success transition-all" style={{ width: `${realShare}%` }} />
         </div>
-        <p className="text-white/40 text-xs mt-2">
+        <p className="text-white/55 text-xs mt-2">
           {realShare < 10
             ? 'Trafic dominé par les bots — priorité n°1 : acquisition de vrais joueurs.'
             : 'Bon équilibre joueurs réels / activité simulée.'}
@@ -207,7 +207,7 @@ function UsersTab({ users }: { users: AdminUser[] }) {
                     </div>
                     <div>
                       <div className="text-white font-medium text-sm">{user.username}</div>
-                      <div className="text-white/40 text-xs truncate max-w-[150px]">{user.id.slice(0, 8)}...</div>
+                      <div className="text-white/55 text-xs truncate max-w-[150px]">{user.id.slice(0, 8)}...</div>
                     </div>
                   </div>
                 </td>
@@ -247,13 +247,13 @@ function UsersTab({ users }: { users: AdminUser[] }) {
                     className={`px-2 py-1 rounded text-xs font-medium transition-colors ${
                       user.is_admin
                         ? 'bg-neon-purple/20 text-neon-purple'
-                        : 'bg-white/10 text-white/40'
+                        : 'bg-white/10 text-white/55'
                     }`}
                   >
                     {user.is_admin ? 'Admin' : 'User'}
                   </button>
                 </td>
-                <td className="px-4 py-3 text-white/40 text-sm">
+                <td className="px-4 py-3 text-white/55 text-sm">
                   {new Date(user.created_at ?? 0).toLocaleDateString('fr-FR')}
                 </td>
                 <td className="px-4 py-3 text-right">
@@ -309,7 +309,7 @@ function GamesTab({ games }: { games: AdminGame[] }) {
           <tbody className="divide-y divide-white/5">
             {games.map((game) => (
               <tr key={game.id} className="hover:bg-white/5 transition-colors">
-                <td className="px-4 py-3 text-white/40 text-sm font-mono">{game.id.slice(0, 8)}...</td>
+                <td className="px-4 py-3 text-white/55 text-sm font-mono">{game.id.slice(0, 8)}...</td>
                 <td className="px-4 py-3">
                   <span className="text-white font-medium">{game.item?.name || '-'}</span>
                 </td>
@@ -320,7 +320,7 @@ function GamesTab({ games }: { games: AdminGame[] }) {
                 </td>
                 <td className="px-4 py-3 text-neon-pink font-bold">{game.total_clicks}</td>
                 <td className="px-4 py-3 text-white/60 text-sm">{game.last_click_username || '-'}</td>
-                <td className="px-4 py-3 text-white/40 text-sm">
+                <td className="px-4 py-3 text-white/55 text-sm">
                   {new Date(game.created_at ?? 0).toLocaleDateString('fr-FR')}
                 </td>
               </tr>
@@ -358,7 +358,7 @@ function ItemsTab({ items }: { items: Item[] }) {
                     <div>
                       <div className="text-white font-medium">{item.name}</div>
                       {item.description && (
-                        <div className="text-white/40 text-xs truncate max-w-[200px]">{item.description}</div>
+                        <div className="text-white/55 text-xs truncate max-w-[200px]">{item.description}</div>
                       )}
                     </div>
                   </div>
@@ -368,12 +368,12 @@ function ItemsTab({ items }: { items: Item[] }) {
                 </td>
                 <td className="px-4 py-3">
                   <span className={`px-2 py-1 rounded text-xs font-medium ${
-                    item.is_active ? 'bg-success/20 text-success' : 'bg-white/10 text-white/40'
+                    item.is_active ? 'bg-success/20 text-success' : 'bg-white/10 text-white/55'
                   }`}>
                     {item.is_active ? 'Actif' : 'Inactif'}
                   </span>
                 </td>
-                <td className="px-4 py-3 text-white/40 text-sm">
+                <td className="px-4 py-3 text-white/55 text-sm">
                   {new Date(item.created_at ?? 0).toLocaleDateString('fr-FR')}
                 </td>
               </tr>
@@ -435,7 +435,7 @@ function WinnersTab({ winners }: { winners: Winner[] }) {
                   <div className="flex items-center gap-2">
                     <span className="text-white font-medium">{winner.username || 'Anonyme'}</span>
                     {winner.is_bot && (
-                      <span className="px-1.5 py-0.5 rounded text-[10px] bg-white/10 text-white/40">BOT</span>
+                      <span className="px-1.5 py-0.5 rounded text-[10px] bg-white/10 text-white/55">BOT</span>
                     )}
                   </div>
                 </td>
@@ -443,7 +443,7 @@ function WinnersTab({ winners }: { winners: Winner[] }) {
                 <td className="px-4 py-3 text-success font-bold">
                   {winner.item_value ? `${winner.item_value}€` : '-'}
                 </td>
-                <td className="px-4 py-3 text-white/40 text-sm">
+                <td className="px-4 py-3 text-white/55 text-sm">
                   {new Date(winner.won_at ?? 0).toLocaleDateString('fr-FR')}
                 </td>
                 <td className="px-4 py-3">
@@ -519,7 +519,7 @@ function BuyItNowOrdersTab({ orders }: { orders: BuyItNowOrder[] }) {
                 <td className="px-4 py-3 font-medium text-white">{o.username || 'Anonyme'}</td>
                 <td className="px-4 py-3 text-white">{o.item_name}</td>
                 <td className="px-4 py-3 font-bold text-neon-pink">{o.price_paid}€</td>
-                <td className="px-4 py-3 text-sm text-white/40">{new Date(o.created_at).toLocaleDateString('fr-FR')}</td>
+                <td className="px-4 py-3 text-sm text-white/55">{new Date(o.created_at).toLocaleDateString('fr-FR')}</td>
                 <td className="px-4 py-3">
                   <input
                     defaultValue={o.tracking_number ?? ''}
@@ -545,7 +545,7 @@ function BuyItNowOrdersTab({ orders }: { orders: BuyItNowOrder[] }) {
           </tbody>
         </table>
       </div>
-      <p className="border-t border-white/5 px-4 py-3 text-xs text-white/40">
+      <p className="border-t border-white/5 px-4 py-3 text-xs text-white/55">
         Astuce : saisis le n° de suivi PUIS passe le statut sur « Expédié » — un email avec le suivi part automatiquement à l&apos;acheteur.
       </p>
     </div>
@@ -630,7 +630,7 @@ function GaugeWinsTab({ wins }: { wins: GaugeWinOrder[] }) {
           </tbody>
         </table>
       </div>
-      <p className="border-t border-white/5 px-4 py-3 text-xs text-white/40">
+      <p className="border-t border-white/5 px-4 py-3 text-xs text-white/55">
         Item « garanti » : le joueur a payé 2× la valeur. Saisis le suivi puis passe « Expédié » — email automatique.
       </p>
     </div>

@@ -110,7 +110,7 @@ export function CreditPacksModal({ isOpen, onClose }: CreditPacksModalProps) {
 
             {/* Alternatives gratuites : réengager plutôt que frustrer à 0 crédit */}
             <div className="mx-4 mb-3 rounded-xl border border-white/10 bg-white/[0.03] p-3">
-              <div className="mb-2 text-center text-[10px] font-semibold uppercase tracking-wider text-white/40">
+              <div className="mb-2 text-center text-[10px] font-semibold uppercase tracking-wider text-white/55">
                 Ou gagne des crédits gratuitement
               </div>
               <div className="grid grid-cols-3 gap-2 text-center">

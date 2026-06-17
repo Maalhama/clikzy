@@ -125,7 +125,7 @@ export function GiftClaim({ initialCode, initialInfo }: { initialCode: string; i
         </button>
       </div>
 
-      <p className="mt-6 text-center text-xs text-white/40">
+      <p className="mt-6 text-center text-xs text-white/55">
         Tu veux faire plaisir à quelqu&apos;un ?{' '}
         <Link href="/cadeau/offrir" className="text-neon-pink hover:underline">Offrir un cadeau</Link>
       </p>

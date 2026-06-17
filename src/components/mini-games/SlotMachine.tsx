@@ -402,7 +402,7 @@ export default function SlotMachine({
                     : 'bg-[#141B2D] border-white/10'
               }`}
             >
-              <Trophy className={`w-5 h-5 ${(isJackpot || allMatch) ? 'text-[#FFB800]' : isWin ? 'text-[#9B5CFF]' : 'text-white/40'}`} />
+              <Trophy className={`w-5 h-5 ${(isJackpot || allMatch) ? 'text-[#FFB800]' : isWin ? 'text-[#9B5CFF]' : 'text-white/55'}`} />
               <div className="flex flex-col">
                 <span className="text-white/60 text-[9px] uppercase font-bold tracking-widest">
                   {allMatch ? 'TRIPLE' : isJackpot ? 'JACKPOT' : isWin ? 'Gagné' : 'Perdu'}

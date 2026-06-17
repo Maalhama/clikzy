@@ -57,7 +57,7 @@ export function LobbyChestsModal({ onClose }: { onClose: () => void }) {
           transition={{ type: 'spring', stiffness: 260, damping: 22 }}
           className="relative w-full max-w-lg overflow-hidden rounded-2xl border border-white/10 bg-bg-secondary p-6"
         >
-          <button onClick={onClose} aria-label="Fermer" className="absolute top-3 right-3 z-10 text-white/40 hover:text-white">
+          <button onClick={onClose} aria-label="Fermer" className="absolute top-3 right-3 z-10 text-white/55 hover:text-white">
             <X size={20} />
           </button>
 
@@ -94,7 +94,7 @@ export function LobbyChestsModal({ onClose }: { onClose: () => void }) {
               {data.chests.length === 0 ? (
                 <div className="flex flex-col items-center gap-3 py-8">
                   <span className="opacity-35"><NeonChest rarity="common" size={84} /></span>
-                  <p className="text-center text-sm text-white/40">
+                  <p className="text-center text-sm text-white/55">
                     Aucun coffre à ouvrir pour l'instant.<br />
                     <span className="text-white/60">Reviens après minuit</span> pour tes 3 coffres gratuits.
                   </p>

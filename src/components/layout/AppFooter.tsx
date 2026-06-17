@@ -12,7 +12,7 @@ export function AppFooter() {
       <div className="mx-auto flex max-w-7xl flex-col items-center gap-4 px-4 py-8 text-center md:flex-row md:justify-between md:px-6 md:text-left">
         <div className="flex flex-col gap-1">
           <span className="font-display text-sm font-bold tracking-wide text-white/70">CLEEKZY</span>
-          <span className="text-xs text-white/40">Le dernier clic gagne. Lots réels, livrés chez toi.</span>
+          <span className="text-xs text-white/55">Le dernier clic gagne. Lots réels, livrés chez toi.</span>
         </div>
 
         <nav aria-label="Liens légaux" className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs">

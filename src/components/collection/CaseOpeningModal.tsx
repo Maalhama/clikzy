@@ -91,7 +91,7 @@ export function CaseOpeningModal({
       </AnimatePresence>
 
       <div className="relative w-full max-w-xl overflow-hidden rounded-2xl border border-white/10 bg-bg-secondary p-6">
-        <button onClick={onClose} aria-label="Fermer" className="absolute top-3 right-3 z-20 text-white/40 hover:text-white">
+        <button onClick={onClose} aria-label="Fermer" className="absolute top-3 right-3 z-20 text-white/55 hover:text-white">
           <X size={20} />
         </button>
 

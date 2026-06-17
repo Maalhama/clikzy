@@ -16,7 +16,7 @@ export function LobbyCommentsFeed({ comments }: { comments: CommentFeedItem[] })
       </div>
 
       {comments.length === 0 ? (
-        <p className="py-3 text-center text-xs leading-relaxed text-white/40">
+        <p className="py-3 text-center text-xs leading-relaxed text-white/55">
           Pas encore de message. Lance la discussion depuis une partie&nbsp;!
         </p>
       ) : (

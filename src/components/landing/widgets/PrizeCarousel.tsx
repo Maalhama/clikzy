@@ -200,7 +200,7 @@ export function PrizeCarousel({
                 >
                   {currentPrize.value}€
                 </span>
-                <span className="text-white/40 text-sm">à gagner</span>
+                <span className="text-white/55 text-sm">à gagner</span>
               </div>
               <Link
                 href={`/game/${currentPrize.id}`}

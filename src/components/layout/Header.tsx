@@ -289,7 +289,7 @@ export function Header({ profile }: HeaderProps) {
                 <div className="flex items-center gap-2 px-3.5 py-2 rounded-full bg-neon-purple/10 border border-neon-purple/30 hover:border-neon-purple/50 transition-colors">
                   <span className="text-neon-purple">{creditsIcon}</span>
                   <AnimatedNumber value={credits} className="stat-numeral text-neon-purple" />
-                  <span className="text-white/40 text-xs uppercase tracking-wider">crédits</span>
+                  <span className="text-white/55 text-xs uppercase tracking-wider">crédits</span>
                 </div>
 
                 <Link
@@ -417,7 +417,7 @@ export function Header({ profile }: HeaderProps) {
                       <span className="stat-numeral">{credits} crédits</span>
                     </div>
                   </div>
-                  <svg className="w-5 h-5 text-white/40" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <svg className="w-5 h-5 text-white/55" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
                   </svg>
                 </div>

@@ -462,7 +462,7 @@ export const GameCard = memo(function GameCard({ game, index = 0, isFavorite = f
                 <div className="text-success font-bold text-sm">
                   {leaderName || 'Champion'}
                 </div>
-                <div className="text-white/40 text-[10px] uppercase tracking-wider">
+                <div className="text-white/55 text-[10px] uppercase tracking-wider">
                   a remporté ce lot
                 </div>
               </div>
@@ -545,7 +545,7 @@ export const GameCard = memo(function GameCard({ game, index = 0, isFavorite = f
               </svg>
             </div>
             <div>
-              <div className="text-white/40 text-[10px] uppercase">
+              <div className="text-white/55 text-[10px] uppercase">
                 {isEnded ? 'Gagnant' : 'Leader'}
               </div>
               <div className={`font-medium text-xs truncate max-w-[100px] ${isEnded ? 'text-success' : 'text-white'}`}>
@@ -556,7 +556,7 @@ export const GameCard = memo(function GameCard({ game, index = 0, isFavorite = f
 
           {/* Activity indicator */}
           <div className="text-right">
-            <div className="text-white/40 text-[9px] uppercase">Activité</div>
+            <div className="text-white/55 text-[9px] uppercase">Activité</div>
             <div className="flex items-center gap-0.5 justify-end">
               {isEnded ? (
                 <span className="text-white/50 text-[10px] font-medium">Terminé</span>

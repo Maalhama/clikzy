@@ -172,7 +172,7 @@ export function PackCard({ pack, loading, disabled, onBuy, compact }: PackCardPr
         </div>
 
         <div className="text-center">
-          <div className="text-[0.55rem] uppercase tracking-[0.25em] text-white/40">crédits</div>
+          <div className="text-[0.55rem] uppercase tracking-[0.25em] text-white/55">crédits</div>
           <h3 className="font-display text-xl font-bold text-white">{pack.name}</h3>
           <p className="mx-auto mt-1 max-w-[14rem] text-[0.72rem] leading-snug text-white/45">{pack.tagline}</p>
           <div className="mt-1.5 text-xs"><Tag pack={pack} /></div>

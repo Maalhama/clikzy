@@ -43,7 +43,7 @@ export default function LegalLayout({
       {/* Footer */}
       <footer className="relative z-10 border-t border-white/10 py-8">
         <div className="max-w-4xl mx-auto px-4">
-          <div className="flex flex-wrap justify-center gap-6 text-sm text-white/40">
+          <div className="flex flex-wrap justify-center gap-6 text-sm text-white/55">
             <Link href="/terms" className="hover:text-neon-purple transition-colors">CGU</Link>
             <Link href="/privacy" className="hover:text-neon-purple transition-colors">Confidentialité</Link>
             <Link href="/legal" className="hover:text-neon-purple transition-colors">Mentions légales</Link>

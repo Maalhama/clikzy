@@ -55,7 +55,7 @@ export function ClansClient() {
     setBusy(false)
   }
 
-  if (loading) return <div className="flex justify-center py-12 text-white/40"><Loader2 className="h-6 w-6 animate-spin" /></div>
+  if (loading) return <div className="flex justify-center py-12 text-white/55"><Loader2 className="h-6 w-6 animate-spin" /></div>
 
   const myRank = myClan ? board.find((c) => c.clanId === myClan.id)?.rank : undefined
 
@@ -120,13 +120,13 @@ export function ClansClient() {
 
           {/* Membres */}
           <div className="space-y-1.5 px-5 pb-5 pt-4">
-            <div className="mb-2 text-[0.65rem] font-semibold uppercase tracking-wider text-white/40">Membres</div>
+            <div className="mb-2 text-[0.65rem] font-semibold uppercase tracking-wider text-white/55">Membres</div>
             {myClan.members.map((m) => (
               <div key={m.userId} className="flex items-center gap-3 rounded-lg bg-white/[0.03] px-3 py-2">
                 <span className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-neon-purple to-neon-pink text-xs font-bold text-white">{m.username.charAt(0).toUpperCase()}</span>
                 <span className="flex-1 truncate text-sm text-white">{m.username}</span>
                 {m.role === 'owner' && <Crown className="h-3.5 w-3.5 text-yellow-400" />}
-                <span className="text-[0.65rem] text-white/40">Niv. {m.level}</span>
+                <span className="text-[0.65rem] text-white/55">Niv. {m.level}</span>
                 <span className="stat-numeral text-xs text-white/70">{m.xp.toLocaleString('fr-FR')} XP</span>
               </div>
             ))}
@@ -150,7 +150,7 @@ export function ClansClient() {
       <section className="panel reveal reveal-3 p-5">
         <h2 className="mb-4 flex items-center gap-2 font-display text-lg font-semibold text-white"><Users className="h-5 w-5 text-neon-pink" /> Classement des clans</h2>
         {board.length === 0 ? (
-          <p className="py-4 text-center text-sm text-white/40">Aucun clan pour l’instant : sois le premier à en fonder un !</p>
+          <p className="py-4 text-center text-sm text-white/55">Aucun clan pour l’instant : sois le premier à en fonder un !</p>
         ) : (
           <div className="space-y-1.5">
             {board.map((c) => {
@@ -161,7 +161,7 @@ export function ClansClient() {
                   <span className="stat-numeral w-7 text-center text-sm font-bold" style={{ color: c.rank <= 3 ? MEDAL[c.rank - 1] : 'rgba(255,255,255,0.5)' }}>{c.rank}</span>
                   <div className="min-w-0 flex-1">
                     <span className="truncate text-sm font-semibold text-white">{c.name} <span className="text-neon-pink">[{c.tag}]</span></span>
-                    <span className="block text-[0.65rem] text-white/40">{c.memberCount} membre{c.memberCount > 1 ? 's' : ''}</span>
+                    <span className="block text-[0.65rem] text-white/55">{c.memberCount} membre{c.memberCount > 1 ? 's' : ''}</span>
                   </div>
                   <span className="stat-numeral text-xs text-neon-blue">{c.totalXp.toLocaleString('fr-FR')} XP</span>
                   {canJoin && <button onClick={() => doJoin(c.clanId)} disabled={busy} className="btn-arena-ghost px-3 py-1.5 text-[0.7rem] disabled:opacity-50">Rejoindre</button>}

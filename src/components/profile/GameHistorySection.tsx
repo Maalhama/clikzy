@@ -125,7 +125,7 @@ function HistoryCard({ game, index }: { game: GameHistoryItem; index: number }) 
             </span>
           )}
         </div>
-        <div className="flex items-center gap-2 text-xs text-white/40">
+        <div className="flex items-center gap-2 text-xs text-white/55">
           <span>{new Date(game.playedAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })}</span>
           <span>•</span>
           <span>{game.clickCount} clic{game.clickCount > 1 ? 's' : ''}</span>

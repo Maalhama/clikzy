@@ -84,7 +84,7 @@ export function GiftOptions() {
         ))}
       </div>
 
-      <p className="mt-6 text-center text-xs text-white/40">
+      <p className="mt-6 text-center text-xs text-white/55">
         Après paiement, tu reçois un code à partager. Déjà un code ?{' '}
         <Link href="/cadeau" className="text-neon-pink hover:underline">Le réclamer</Link>
       </p>

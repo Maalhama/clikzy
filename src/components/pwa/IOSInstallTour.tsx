@@ -183,7 +183,7 @@ export function IOSInstallTour({ open, onClose }: { open: boolean; onClose: () =
                 <button
                   onClick={onClose}
                   aria-label="Fermer le guide d'installation"
-                  className="absolute right-3 top-3 z-10 text-[0.7rem] font-medium text-white/40 transition-colors hover:text-white"
+                  className="absolute right-3 top-3 z-10 text-[0.7rem] font-medium text-white/55 transition-colors hover:text-white"
                 >
                   Passer
                 </button>

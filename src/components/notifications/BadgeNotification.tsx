@@ -87,7 +87,7 @@ export function BadgeNotificationContainer() {
                 {/* Close button */}
                 <button
                   onClick={() => dismissNotification(id)}
-                  className="absolute top-2 right-2 text-white/40 hover:text-white transition-colors z-10"
+                  className="absolute top-2 right-2 text-white/55 hover:text-white transition-colors z-10"
                 >
                   <X size={18} />
                 </button>
@@ -135,7 +135,7 @@ export function BadgeNotificationContainer() {
                       <span className={`text-xs font-bold uppercase tracking-wider ${colors.text}`}>
                         {rarityLabels[badge.rarity]}
                       </span>
-                      <span className="text-white/40 text-xs">•</span>
+                      <span className="text-white/55 text-xs">•</span>
                       <span className="text-[#00FF88] text-xs font-bold">
                         +{badge.credits_reward} crédits
                       </span>

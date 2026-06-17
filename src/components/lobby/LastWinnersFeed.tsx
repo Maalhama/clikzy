@@ -54,7 +54,7 @@ const WinnerItem = memo(function WinnerItem({
           <span className="text-success text-xs">a gagné</span>
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-white/40 text-xs truncate">
+          <span className="text-white/55 text-xs truncate">
             {winner.itemName}
           </span>
           {winner.itemValue && (
@@ -115,7 +115,7 @@ export const LastWinnersFeed = memo(function LastWinnersFeed({
           </svg>
           <span className="text-white font-display font-semibold text-xs uppercase tracking-[0.18em]">Derniers gagnants</span>
         </div>
-        <span className="text-white/40 text-xs">
+        <span className="text-white/55 text-xs">
           {winners.length > 0 ? `${winners.length} récent${winners.length > 1 ? 's' : ''}` : ''}
         </span>
       </div>

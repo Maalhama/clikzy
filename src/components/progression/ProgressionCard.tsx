@@ -109,7 +109,7 @@ export function ProgressionCard({ compact = false }: Props) {
         className={`relative mt-4 flex w-full items-center justify-between rounded-xl border px-4 py-3 text-sm font-semibold transition-colors ${
           data.canClaimLogin
             ? 'border-neon-purple/40 bg-neon-purple/10 text-white hover:bg-neon-purple/20'
-            : 'border-white/10 bg-white/5 text-white/40'
+            : 'border-white/10 bg-white/5 text-white/55'
         }`}
       >
         <span className="flex items-center gap-2">
@@ -126,7 +126,7 @@ export function ProgressionCard({ compact = false }: Props) {
             <p className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-white/60">
               <Trophy className="h-3.5 w-3.5 text-yellow-400" /> Quêtes du jour
             </p>
-            <span className="text-xs text-white/40">{doneQuests}/{data.quests.length}{claimableQuests > 0 ? ` · ${claimableQuests} à récupérer` : ''}</span>
+            <span className="text-xs text-white/55">{doneQuests}/{data.quests.length}{claimableQuests > 0 ? ` · ${claimableQuests} à récupérer` : ''}</span>
           </div>
           <ul className="space-y-2">
             {data.quests.map((q) => {
@@ -152,7 +152,7 @@ export function ProgressionCard({ compact = false }: Props) {
                         {busy === q.key ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : `+${q.xpReward} XP`}
                       </button>
                     ) : (
-                      <span className="shrink-0 text-xs font-semibold text-white/40">{q.progress}/{q.target}</span>
+                      <span className="shrink-0 text-xs font-semibold text-white/55">{q.progress}/{q.target}</span>
                     )}
                   </div>
                   {!q.claimed && (

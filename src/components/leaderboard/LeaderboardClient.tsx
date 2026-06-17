@@ -83,12 +83,12 @@ function LeaderboardBody({ loading, rows, me, period }: { loading: boolean; rows
         <div className="flex items-center gap-2 border-b border-white/10 px-4 py-3">
           <Trophy className="h-5 w-5 text-yellow-400" />
           <h2 className="font-display font-semibold text-white">Top joueurs</h2>
-          <span className="ml-auto text-xs text-white/40">
+          <span className="ml-auto text-xs text-white/55">
             {period === 'all' ? 'all-time' : period === 'day' ? "aujourd'hui" : period === 'week' ? 'cette semaine' : 'ce mois'}
           </span>
         </div>
         {rows.length === 0 ? (
-          <p className="px-4 py-10 text-center text-sm text-white/40">
+          <p className="px-4 py-10 text-center text-sm text-white/55">
             Personne n&apos;a encore marqué d&apos;XP sur cette période. Joue, accomplis tes quêtes et reviens !
           </p>
         ) : (
@@ -145,7 +145,7 @@ function LeaderboardBody({ loading, rows, me, period }: { loading: boolean; rows
               </div>
               <div className="min-w-0 flex-1">
                 <p className="truncate text-sm font-semibold text-white">{r.username}</p>
-                <p className="text-xs text-white/40">Niveau {r.level} · {r.totalWins} victoire{r.totalWins > 1 ? 's' : ''}</p>
+                <p className="text-xs text-white/55">Niveau {r.level} · {r.totalWins} victoire{r.totalWins > 1 ? 's' : ''}</p>
               </div>
               <span className="shrink-0 text-sm font-bold text-neon-purple">{r.xp.toLocaleString('fr-FR')} XP</span>
             </li>

@@ -40,7 +40,7 @@ export function FairnessPanel() {
           <ShieldCheck className="h-4 w-4 text-success" />
           Équité vérifiable (provably-fair)
         </span>
-        <ChevronDown className={`h-4 w-4 text-white/40 transition-transform ${open ? 'rotate-180' : ''}`} />
+        <ChevronDown className={`h-4 w-4 text-white/55 transition-transform ${open ? 'rotate-180' : ''}`} />
       </button>
 
       {open && (
@@ -53,7 +53,7 @@ export function FairnessPanel() {
             <div className="space-y-2">
               <Field label="Hash du server seed (engagement)" value={state.serverSeedHash ?? '— joue une partie pour l’initialiser —'} />
               <div>
-                <label className="mb-1 block text-[0.65rem] uppercase tracking-wider text-white/40">Ton client seed (modifiable)</label>
+                <label className="mb-1 block text-[0.65rem] uppercase tracking-wider text-white/55">Ton client seed (modifiable)</label>
                 <input
                   value={clientSeedInput}
                   onChange={(e) => setClientSeedInput(e.target.value)}
@@ -75,7 +75,7 @@ export function FairnessPanel() {
               )}
             </div>
           ) : (
-            <p className="text-white/40">Chargement…</p>
+            <p className="text-white/55">Chargement…</p>
           )}
         </div>
       )}
@@ -86,7 +86,7 @@ export function FairnessPanel() {
 function Field({ label, value }: { label: string; value: string }) {
   return (
     <div>
-      <p className="text-[0.65rem] uppercase tracking-wider text-white/40">{label}</p>
+      <p className="text-[0.65rem] uppercase tracking-wider text-white/55">{label}</p>
       <p className="break-all rounded-lg bg-black/30 px-3 py-2 font-mono text-[0.7rem] text-white/80">{value}</p>
     </div>
   )

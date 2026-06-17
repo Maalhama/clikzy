@@ -104,7 +104,7 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
           )}
         </div>
         {memberSince && (
-          <p className="mt-2 text-xs text-white/40">Dans l&apos;arène depuis {memberSince}</p>
+          <p className="mt-2 text-xs text-white/55">Dans l&apos;arène depuis {memberSince}</p>
         )}
 
         {/* Stats */}
@@ -112,7 +112,7 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
           {stats.map((s) => (
             <div key={s.label} className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-4">
               <div className={`stat-numeral text-2xl ${s.color}`}>{s.value}</div>
-              <div className="mt-1 text-[0.65rem] uppercase tracking-[0.18em] text-white/40">{s.label}</div>
+              <div className="mt-1 text-[0.65rem] uppercase tracking-[0.18em] text-white/55">{s.label}</div>
             </div>
           ))}
         </div>
@@ -122,7 +122,7 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
           <Link href="/lobby" className="btn-arena px-8 py-3.5 text-sm">
             Le défier dans l&apos;arène
           </Link>
-          <p className="mt-3 text-xs text-white/40">
+          <p className="mt-3 text-xs text-white/55">
             10 clics gratuits par jour · le dernier clic remporte le lot
           </p>
         </div>

@@ -62,7 +62,7 @@ export function GiftCodeReveal({ code, reward }: { code: string; reward: string 
         </button>
       </div>
 
-      <p className="mt-6 text-xs text-white/40">
+      <p className="mt-6 text-xs text-white/55">
         Le code reste valable 90 jours.{' '}
         <Link href="/lobby" className="text-neon-pink hover:underline">Retour à l&apos;arène</Link>
       </p>

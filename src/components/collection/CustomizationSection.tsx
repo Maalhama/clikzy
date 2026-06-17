@@ -19,7 +19,7 @@ function Preview({ c }: { c: Cosmetic }) {
   }
   if (c.type === 'trail') {
     const cols = TRAIL_COLORS[c.id] ?? []
-    if (cols.length === 0) return <span className="text-[0.6rem] text-white/40">Aucune</span>
+    if (cols.length === 0) return <span className="text-[0.6rem] text-white/55">Aucune</span>
     return (
       <span className="flex gap-1">
         {cols.map((col, i) => <span key={i} className="h-3 w-3 rounded-sm" style={{ background: col, boxShadow: `0 0 6px ${col}` }} />)}
@@ -38,7 +38,7 @@ export function CustomizationSection() {
   if (!state) {
     return (
       <section className="panel reveal reveal-4 p-5">
-        <div className="flex items-center justify-center py-8 text-white/40"><Loader2 className="h-5 w-5 animate-spin" /></div>
+        <div className="flex items-center justify-center py-8 text-white/55"><Loader2 className="h-5 w-5 animate-spin" /></div>
       </section>
     )
   }
@@ -66,7 +66,7 @@ export function CustomizationSection() {
           const items = state.catalog.filter((c) => c.type === type)
           return (
             <div key={type}>
-              <p className="mb-2 text-[0.65rem] font-semibold uppercase tracking-wider text-white/40">{TYPE_LABEL[type]}</p>
+              <p className="mb-2 text-[0.65rem] font-semibold uppercase tracking-wider text-white/55">{TYPE_LABEL[type]}</p>
               <div className="grid grid-cols-3 gap-2 sm:grid-cols-5">
                 {items.map((c) => {
                   const equipped = state.equipped[type] === c.id

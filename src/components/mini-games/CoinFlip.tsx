@@ -307,7 +307,7 @@ export default function CoinFlip({
                   : 'bg-[#141B2D] border-white/10'
               }`}
             >
-              <Trophy className={`w-5 h-5 sm:w-6 sm:h-6 ${isWin ? 'text-[#FFB800]' : 'text-white/40'}`} />
+              <Trophy className={`w-5 h-5 sm:w-6 sm:h-6 ${isWin ? 'text-[#FFB800]' : 'text-white/55'}`} />
               <div className="flex flex-col">
                 <span className="text-white/60 text-[9px] sm:text-[10px] uppercase font-bold tracking-widest">
                   {isWin ? 'Gagné' : 'Perdu'}

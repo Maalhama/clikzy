@@ -66,7 +66,7 @@ export function JackpotWidget({ variant }: { variant: 'inline' | 'pill' | 'stat'
   const trigger = variant === 'stat' ? (
     <button onClick={() => setOpen(true)} className="pl-8 text-left transition-opacity hover:opacity-90" title="Jackpot communautaire">
       <div className="text-2xl lg:text-3xl stat-numeral text-yellow-300">{shown}</div>
-      <div className="mt-1 text-[0.65rem] uppercase tracking-[0.2em] text-white/40">Jackpot · le 8</div>
+      <div className="mt-1 text-[0.65rem] uppercase tracking-[0.2em] text-white/55">Jackpot · le 8</div>
     </button>
   ) : variant === 'pill' ? (
     <button
@@ -100,7 +100,7 @@ export function JackpotWidget({ variant }: { variant: 'inline' | 'pill' | 'stat'
           onClick={() => setOpen(false)}
         >
           <div className="relative w-full max-w-md overflow-hidden rounded-2xl border border-yellow-400/25 surface-3 p-6" onClick={(e) => e.stopPropagation()}>
-            <button onClick={() => setOpen(false)} aria-label="Fermer" className="absolute right-3 top-3 text-white/40 hover:text-white"><X size={20} /></button>
+            <button onClick={() => setOpen(false)} aria-label="Fermer" className="absolute right-3 top-3 text-white/55 hover:text-white"><X size={20} /></button>
             <div className="mb-4 flex flex-col items-center text-center">
               <span className="mb-3 flex h-14 w-14 items-center justify-center rounded-2xl border border-yellow-400/40 bg-yellow-400/10"><span className="h-7 w-7">{trophy}</span></span>
               <span className="kicker !text-[0.6rem]">Jackpot communautaire</span>

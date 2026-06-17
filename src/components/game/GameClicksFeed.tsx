@@ -71,7 +71,7 @@ const FeedRow = memo(function FeedRow({
       </div>
       <div className="min-w-0 flex-1">
         <span className="block truncate text-sm font-semibold text-white">{click.username}</span>
-        <span className="text-[0.65rem] text-white/40">a cliqué</span>
+        <span className="text-[0.65rem] text-white/55">a cliqué</span>
       </div>
       {isLeader && (
         <span className="flex items-center gap-1 rounded-full border border-neon-pink/40 bg-neon-pink/15 px-2 py-0.5 text-[0.6rem] font-bold uppercase tracking-wider text-neon-pink">

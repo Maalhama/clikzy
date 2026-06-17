@@ -660,15 +660,15 @@ export function LandingClient({
             <div className="hero-stats reveal reveal-4 flex items-stretch divide-x divide-white/10 border-y border-white/10 py-4">
               <div className="pr-8">
                 <div className="text-2xl lg:text-3xl stat-numeral text-neon-blue">+{stats.totalWinningsValue.toLocaleString()}€</div>
-                <div className="text-[0.65rem] text-white/40 uppercase tracking-[0.2em] mt-1">Récompenses</div>
+                <div className="text-[0.65rem] text-white/55 uppercase tracking-[0.2em] mt-1">Récompenses</div>
               </div>
               <div className="px-8">
                 <div className="text-2xl lg:text-3xl stat-numeral text-neon-purple">+100</div>
-                <div className="text-[0.65rem] text-white/40 uppercase tracking-[0.2em] mt-1">Lots</div>
+                <div className="text-[0.65rem] text-white/55 uppercase tracking-[0.2em] mt-1">Lots</div>
               </div>
               <div className="px-8">
-                <div className="text-2xl lg:text-3xl stat-numeral text-neon-pink">10<span className="text-base text-white/40">/jour</span></div>
-                <div className="text-[0.65rem] text-white/40 uppercase tracking-[0.2em] mt-1">Clics gratuits</div>
+                <div className="text-2xl lg:text-3xl stat-numeral text-neon-pink">10<span className="text-base text-white/55">/jour</span></div>
+                <div className="text-[0.65rem] text-white/55 uppercase tracking-[0.2em] mt-1">Clics gratuits</div>
               </div>
               <JackpotWidget variant="stat" />
             </div>
@@ -1010,11 +1010,11 @@ export function LandingClient({
             <div className="flex gap-4">
               <div className="panel panel-cut flex flex-col items-center justify-center px-6 py-4">
                 <span className="text-3xl stat-numeral text-neon-purple">{stats.totalWinningsValue.toLocaleString()}€</span>
-                <span className="text-xs text-white/40 uppercase tracking-wider mt-1">Distribué</span>
+                <span className="text-xs text-white/55 uppercase tracking-wider mt-1">Distribué</span>
               </div>
               <div className="panel panel-cut flex flex-col items-center justify-center px-6 py-4">
                 <span className="text-3xl stat-numeral text-success">{stats.totalGames}+</span>
-                <span className="text-xs text-white/40 uppercase tracking-wider mt-1">Gagnants</span>
+                <span className="text-xs text-white/55 uppercase tracking-wider mt-1">Gagnants</span>
               </div>
             </div>
           </div>
@@ -1135,7 +1135,7 @@ export function LandingClient({
           </button>
 
           {/* Reassurance */}
-          <p className="text-[10px] text-white/40 mb-5">Aucun paiement requis • Lots réels livrés</p>
+          <p className="text-[10px] text-white/55 mb-5">Aucun paiement requis • Lots réels livrés</p>
 
           {/* Trust badges - Compact horizontal */}
           <div className="flex justify-center gap-3">
@@ -1235,7 +1235,7 @@ export function LandingClient({
               </div>
               <div className="text-left">
                 <div className="text-white font-bold text-sm">0€ pour s'inscrire</div>
-                <div className="text-white/40 text-xs">100% gratuit</div>
+                <div className="text-white/55 text-xs">100% gratuit</div>
               </div>
             </div>
             <div className="panel flex items-center gap-3 px-5 py-3">
@@ -1246,7 +1246,7 @@ export function LandingClient({
               </div>
               <div className="text-left">
                 <div className="text-white font-bold text-sm">100% légal</div>
-                <div className="text-white/40 text-xs">Conforme CNIL</div>
+                <div className="text-white/55 text-xs">Conforme CNIL</div>
               </div>
             </div>
             <div className="panel flex items-center gap-3 px-5 py-3">
@@ -1257,7 +1257,7 @@ export function LandingClient({
               </div>
               <div className="text-left">
                 <div className="text-white font-bold text-sm">Livraison offerte</div>
-                <div className="text-white/40 text-xs">Partout en France</div>
+                <div className="text-white/55 text-xs">Partout en France</div>
               </div>
             </div>
           </div>
@@ -1285,10 +1285,10 @@ export function LandingClient({
 
         {/* Links - Horizontal compact */}
         <div className="flex flex-wrap gap-x-4 gap-y-2 mb-4 text-xs">
-          <Link href="/terms" className="text-white/40 hover:text-white">CGU</Link>
-          <Link href="/privacy" className="text-white/40 hover:text-white">Confidentialité</Link>
-          <Link href="/legal" className="text-white/40 hover:text-white">Mentions légales</Link>
-          <Link href="/support" className="text-white/40 hover:text-white">Contact</Link>
+          <Link href="/terms" className="text-white/55 hover:text-white">CGU</Link>
+          <Link href="/privacy" className="text-white/55 hover:text-white">Confidentialité</Link>
+          <Link href="/legal" className="text-white/55 hover:text-white">Mentions légales</Link>
+          <Link href="/support" className="text-white/55 hover:text-white">Contact</Link>
         </div>
 
         {/* Copyright */}
@@ -1365,11 +1365,11 @@ export function LandingClient({
                 <li><span className="text-white/50 text-sm">Support 24h/24 - 7j/7</span></li>
               </ul>
               <div className="flex gap-2">
-                <div className="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs text-white/40 flex items-center gap-1.5">
+                <div className="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs text-white/55 flex items-center gap-1.5">
                   <svg className="w-4 h-4 text-success" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
                   SSL
                 </div>
-                <div className="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs text-white/40 flex items-center gap-1.5">
+                <div className="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs text-white/55 flex items-center gap-1.5">
                   <svg className="w-4 h-4 text-neon-purple" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" /></svg>
                   Stripe
                 </div>
@@ -1442,7 +1442,7 @@ export function LandingClient({
         >
           {/* Menu Header */}
           <div className="flex items-center justify-between px-4 py-3 border-b border-white/10">
-            <span className="text-xs font-bold text-white/40 uppercase tracking-wider">Menu</span>
+            <span className="text-xs font-bold text-white/55 uppercase tracking-wider">Menu</span>
             <button
               onClick={closeMenu}
               className="flex items-center justify-center w-8 h-8 rounded-lg bg-neon-purple/10 hover:bg-neon-purple/20 border border-neon-purple/30 hover:border-neon-pink/50 transition-all"

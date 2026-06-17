@@ -189,13 +189,13 @@ export const GameFilters = memo(function GameFilters({
                   autoFocus
                 />
                 {searchQuery && (
-                  <button onClick={handleClearSearch} className="text-white/40 hover:text-white p-1">
+                  <button onClick={handleClearSearch} className="text-white/55 hover:text-white p-1">
                     <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                     </svg>
                   </button>
                 )}
-                <button onClick={() => setIsSearchExpanded(false)} className="text-white/40 hover:text-white p-1">
+                <button onClick={() => setIsSearchExpanded(false)} className="text-white/55 hover:text-white p-1">
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                   </svg>
@@ -345,13 +345,13 @@ export const GameFilters = memo(function GameFilters({
                     autoFocus
                   />
                   {searchQuery && (
-                    <button onClick={handleClearSearch} className="text-white/40 hover:text-white">
+                    <button onClick={handleClearSearch} className="text-white/55 hover:text-white">
                       <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                       </svg>
                     </button>
                   )}
-                  <button onClick={() => setIsSearchExpanded(false)} className="text-white/40 hover:text-white ml-1">
+                  <button onClick={() => setIsSearchExpanded(false)} className="text-white/55 hover:text-white ml-1">
                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                     </svg>

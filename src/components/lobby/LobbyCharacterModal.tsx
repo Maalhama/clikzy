@@ -46,7 +46,7 @@ export function LobbyCharacterModal({
         transition={{ type: 'spring', stiffness: 260, damping: 22 }}
         className="relative max-h-[94vh] w-full max-w-md overflow-y-auto rounded-2xl border border-white/10 surface-3 p-4 sm:p-6"
       >
-        <button onClick={onClose} aria-label="Fermer" className="absolute top-3 right-3 z-10 text-white/40 hover:text-white">
+        <button onClick={onClose} aria-label="Fermer" className="absolute top-3 right-3 z-10 text-white/55 hover:text-white">
           <X size={20} />
         </button>
 
@@ -83,7 +83,7 @@ export function LobbyCharacterModal({
                   )}
                 </div>
                 <div className="min-w-0">
-                  <div className="text-[0.6rem] uppercase tracking-wider text-white/40">{s.label}</div>
+                  <div className="text-[0.6rem] uppercase tracking-wider text-white/55">{s.label}</div>
                   {eq ? (
                     <>
                       <div className="truncate text-xs font-semibold text-white">{eq.item.name}</div>

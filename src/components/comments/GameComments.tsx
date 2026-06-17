@@ -91,9 +91,9 @@ export function GameComments({ gameId, userId, itemName }: { gameId: string; use
 
       {/* Liste */}
       {loading ? (
-        <p className="py-4 text-center text-sm text-white/40">Chargement…</p>
+        <p className="py-4 text-center text-sm text-white/55">Chargement…</p>
       ) : comments.length === 0 ? (
-        <p className="py-6 text-center text-sm text-white/40">
+        <p className="py-6 text-center text-sm text-white/55">
           Aucun message pour l’instant. Sois le premier à lancer la discussion !
         </p>
       ) : (

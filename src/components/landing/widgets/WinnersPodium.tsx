@@ -69,7 +69,7 @@ export function WinnersPodium({ winners }: WinnersPodiumProps) {
             {/* Identité + lot */}
             <div className="mb-3 text-center">
               <div className={`truncate font-bold text-white ${first ? 'text-base' : 'text-sm'}`}>{w.username}</div>
-              <div className="truncate text-xs text-white/40">{w.item_name}</div>
+              <div className="truncate text-xs text-white/55">{w.item_name}</div>
               <div className="stat-numeral mt-0.5 text-success" style={{ fontSize: first ? '1.4rem' : '1.1rem' }}>
                 {w.item_value.toLocaleString()}€
               </div>

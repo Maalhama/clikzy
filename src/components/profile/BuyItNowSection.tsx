@@ -97,7 +97,7 @@ export function BuyItNowSection() {
                 <div className="truncate font-semibold text-white">{o.itemName}</div>
                 <div className="mt-0.5 flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
                   <span className="stat-numeral text-lg font-black text-neon-pink">{o.price}€</span>
-                  <span className="text-xs text-white/40 line-through">{o.retailValue}€</span>
+                  <span className="text-xs text-white/55 line-through">{o.retailValue}€</span>
                   {pct > 0 && (
                     <span className="rounded bg-neon-pink/15 px-1.5 text-[0.65rem] font-bold text-neon-pink">-{pct}%</span>
                   )}

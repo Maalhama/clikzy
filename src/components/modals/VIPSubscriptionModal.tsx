@@ -63,7 +63,7 @@ export default function VIPSubscriptionModal({
             <button
               onClick={onClose}
               aria-label="Fermer"
-              className="absolute top-2 right-2 p-1.5 text-white/40 hover:text-white/80 transition-colors z-10"
+              className="absolute top-2 right-2 p-1.5 text-white/55 hover:text-white/80 transition-colors z-10"
             >
               <X size={16} />
             </button>
@@ -147,7 +147,7 @@ export default function VIPSubscriptionModal({
               {/* Later button - Compact */}
               <button
                 onClick={onClose}
-                className="w-full py-2 mt-2 text-white/40 hover:text-white/70 text-sm font-medium transition-colors"
+                className="w-full py-2 mt-2 text-white/55 hover:text-white/70 text-sm font-medium transition-colors"
               >
                 Plus tard
               </button>

@@ -269,7 +269,7 @@ export function ProfileClient({ profile, wins, gamesPlayed, totalValueWon, gameH
                   <span className="px-2 py-0.5 rounded bg-neon-purple/20 text-neon-purple text-xs font-medium">
                     {levelTitle}
                   </span>
-                  <span className="text-white/40 text-xs">
+                  <span className="text-white/55 text-xs">
                     {xpIntoLevel}/{xpForLevel} XP → Niv. {level + 1}
                   </span>
                 </div>
@@ -328,7 +328,7 @@ export function ProfileClient({ profile, wins, gamesPlayed, totalValueWon, gameH
               <div className="text-white font-bold">Mes crédits</div>
               <div className="flex items-center gap-2">
                 <span className="text-2xl stat-numeral text-neon-purple">{(profile.credits || 0) + (profile.earned_credits || 0)}</span>
-                <span className="text-white/40 text-sm">disponibles</span>
+                <span className="text-white/55 text-sm">disponibles</span>
               </div>
             </div>
           </div>
@@ -465,7 +465,7 @@ function StatItem({ value, label, color }: { value: number | string; label: stri
       <div className={`text-xl font-bold ${color}`}>
         {typeof value === 'number' ? value.toLocaleString() : value}
       </div>
-      <div className="text-white/40 text-[10px] uppercase tracking-wider">{label}</div>
+      <div className="text-white/55 text-[10px] uppercase tracking-wider">{label}</div>
     </div>
   )
 }
@@ -504,7 +504,7 @@ function WinCard({ win, index }: { win: WinnerWithItem; index: number }) {
         </div>
         <div className="flex-1 min-w-0">
           <h3 className="font-semibold text-white text-sm truncate">{win.item_name}</h3>
-          <p className="text-white/40 text-xs">
+          <p className="text-white/55 text-xs">
             {new Date(win.won_at ?? new Date(0).toISOString()).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' })}
           </p>
         </div>
