@@ -1,7 +1,7 @@
 'use client'
 
 import { useRef } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
 import { X, Crown, Check, Sparkles } from 'lucide-react'
 import { useModalA11y } from '@/hooks/useModalA11y'
 
@@ -26,6 +26,7 @@ export default function VIPSubscriptionModal({
   isLoading = false,
 }: VIPSubscriptionModalProps) {
   const panelRef = useRef<HTMLDivElement>(null)
+  const prefersReducedMotion = useReducedMotion()
   useModalA11y(isOpen, onClose, panelRef)
   if (!isOpen) return null
 
@@ -76,10 +77,10 @@ export default function VIPSubscriptionModal({
                   <div className="w-20 h-20 rounded-full bg-[#FFB800]/20 blur-[30px]" />
                 </div>
                 <motion.div
-                  animate={{
+                  animate={prefersReducedMotion ? undefined : {
                     scale: [1, 1.05, 1],
                   }}
-                  transition={{
+                  transition={prefersReducedMotion ? undefined : {
                     duration: 3,
                     repeat: Infinity,
                     ease: 'easeInOut'

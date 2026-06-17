@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback, type ReactNode, type CSSProperties } from 'react'
 import { createPortal } from 'react-dom'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
 import { PixelSprite } from '@/components/collection/PixelSprite'
 import { BASE_HERO } from '@/components/collection/pixelHero'
 
@@ -51,6 +51,7 @@ export function SpotlightTour({
   ariaLabel,
   mascotName = 'Cleek',
 }: SpotlightTourProps) {
+  const prefersReducedMotion = useReducedMotion()
   const [mounted, setMounted] = useState(false)
   const [step, setStep] = useState(0)
   const [rect, setRect] = useState<Rect | null>(null)
@@ -185,8 +186,8 @@ export function SpotlightTour({
               <motion.span
                 className="absolute inset-0 rounded-2xl"
                 style={{ boxShadow: `0 0 24px 2px ${s.accent}, inset 0 0 16px -4px ${s.accent}` }}
-                animate={{ opacity: [0.45, 1, 0.45] }}
-                transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+                animate={prefersReducedMotion ? undefined : { opacity: [0.45, 1, 0.45] }}
+                transition={prefersReducedMotion ? undefined : { duration: 2, repeat: Infinity, ease: 'easeInOut' }}
               />
             </div>
           ) : (
@@ -226,11 +227,11 @@ export function SpotlightTour({
                     <motion.div
                       className="absolute inset-0 -z-10 rounded-full blur-xl"
                       style={{ background: `${s.accent}45` }}
-                      animate={{ opacity: [0.4, 0.8, 0.4] }}
-                      transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+                      animate={prefersReducedMotion ? undefined : { opacity: [0.4, 0.8, 0.4] }}
+                      transition={prefersReducedMotion ? undefined : { duration: 3, repeat: Infinity, ease: 'easeInOut' }}
                       aria-hidden
                     />
-                    <motion.div animate={{ y: [0, -5, 0] }} transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}>
+                    <motion.div animate={prefersReducedMotion ? undefined : { y: [0, -5, 0] }} transition={prefersReducedMotion ? undefined : { duration: 3, repeat: Infinity, ease: 'easeInOut' }}>
                       <PixelSprite layers={[BASE_HERO]} size={58} className="drop-shadow-[0_6px_12px_rgba(0,0,0,0.5)]" />
                     </motion.div>
                     <div className="mt-0.5 text-center text-[0.55rem] font-bold uppercase tracking-[0.15em]" style={{ color: s.accent }}>
