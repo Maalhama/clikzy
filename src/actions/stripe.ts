@@ -112,8 +112,8 @@ export async function createCheckoutSession(
     return { success: true, data: { url: session.url } }
   } catch (error) {
     console.error('Checkout session error:', error)
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error'
-    return { success: false, error: `Erreur Stripe: ${errorMessage}` }
+    // Message générique côté user (le détail est loggé ci-dessus, pas exposé).
+    return { success: false, error: 'Le paiement a échoué. Réessaie dans un instant.' }
   }
 }
 
@@ -200,8 +200,8 @@ export async function createVIPCheckoutSession(): Promise<ActionResult<{ url: st
     return { success: true, data: { url: session.url } }
   } catch (error) {
     console.error('VIP Checkout session error:', error)
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error'
-    return { success: false, error: `Erreur Stripe: ${errorMessage}` }
+    // Message générique côté user (le détail est loggé ci-dessus, pas exposé).
+    return { success: false, error: 'Le paiement a échoué. Réessaie dans un instant.' }
   }
 }
 
@@ -381,8 +381,7 @@ export async function createBillingPortalSession(): Promise<ActionResult<{ url: 
     return { success: true, data: { url: session.url } }
   } catch (error) {
     console.error('Billing portal error:', error)
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error'
-    return { success: false, error: `Erreur: ${errorMessage}` }
+    return { success: false, error: "Impossible d'ouvrir la gestion de l'abonnement. Réessaie." }
   }
 }
 
