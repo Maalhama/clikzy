@@ -187,6 +187,7 @@ export function ShippingAddressForm({ initialData, onSuccess, compact = false }:
       {/* Error message */}
       {error && (
         <motion.div
+          role="alert"
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           className="p-3 rounded-lg bg-danger/10 border border-danger/30 text-danger text-sm"

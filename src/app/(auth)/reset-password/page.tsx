@@ -259,6 +259,7 @@ export default function ResetPasswordPage() {
 
           {error && (
             <motion.div
+              role="alert"
               initial={{ opacity: 0, y: -10, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               className="flex items-center gap-2 px-4 py-3 rounded-2xl bg-danger/10 border border-danger/20 text-danger text-sm"
