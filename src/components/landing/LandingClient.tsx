@@ -151,7 +151,7 @@ function WinnerCard({ winner }: { winner: Winner }) {
       {/* Item won */}
       <div>
         <div className="font-bold text-white text-sm sm:text-base mb-1 truncate">{winner.item_name}</div>
-        <div className="stat-numeral text-xl sm:text-2xl text-success">{winner.item_value.toLocaleString()}€</div>
+        <div className="stat-numeral text-xl sm:text-2xl text-success">{winner.item_value.toLocaleString('fr-FR')}€</div>
       </div>
     </div>
   )
@@ -561,7 +561,7 @@ export function LandingClient({
           {/* Stats - Horizontal compact */}
           <div className="hero-stats reveal reveal-4 flex justify-between gap-2">
             <div className="panel flex-1 py-3 px-2 text-center">
-              <div className="text-lg stat-numeral text-neon-blue">+{stats.totalWinningsValue.toLocaleString()}€</div>
+              <div className="text-lg stat-numeral text-neon-blue">+{stats.totalWinningsValue.toLocaleString('fr-FR')}€</div>
               <div className="text-[10px] text-white/55 uppercase">Récompenses</div>
             </div>
             <div className="panel flex-1 py-3 px-2 text-center">
@@ -659,7 +659,7 @@ export function LandingClient({
             {/* Stats — ruban horizontal */}
             <div className="hero-stats reveal reveal-4 flex items-stretch divide-x divide-white/10 border-y border-white/10 py-4">
               <div className="pr-8">
-                <div className="text-2xl lg:text-3xl stat-numeral text-neon-blue">+{stats.totalWinningsValue.toLocaleString()}€</div>
+                <div className="text-2xl lg:text-3xl stat-numeral text-neon-blue">+{stats.totalWinningsValue.toLocaleString('fr-FR')}€</div>
                 <div className="text-[0.65rem] text-white/55 uppercase tracking-[0.2em] mt-1">Récompenses</div>
               </div>
               <div className="px-8">
@@ -908,7 +908,7 @@ export function LandingClient({
             <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
               <div className="panel flex items-center gap-2.5 px-5 py-2.5">
                 <span className="live-dot" aria-hidden="true" />
-                <span className="stat-numeral text-base text-success">{playerCount.toLocaleString()}</span>
+                <span className="stat-numeral text-base text-success">{playerCount.toLocaleString('fr-FR')}</span>
                 <span className="text-xs text-white/50 uppercase tracking-wider">joueurs en ligne</span>
               </div>
               <div className="panel flex items-center gap-2.5 px-5 py-2.5">
@@ -943,7 +943,7 @@ export function LandingClient({
             </div>
             {/* Mini stats */}
             <div className="text-right">
-              <div className="text-lg font-black text-success">{stats.totalWinningsValue.toLocaleString()}€</div>
+              <div className="text-lg font-black text-success">{stats.totalWinningsValue.toLocaleString('fr-FR')}€</div>
               <div className="text-[10px] text-white/55 uppercase">Distribués</div>
             </div>
           </div>
@@ -1009,7 +1009,7 @@ export function LandingClient({
 
             <div className="flex gap-4">
               <div className="panel panel-cut flex flex-col items-center justify-center px-6 py-4">
-                <span className="text-3xl stat-numeral text-neon-purple">{stats.totalWinningsValue.toLocaleString()}€</span>
+                <span className="text-3xl stat-numeral text-neon-purple">{stats.totalWinningsValue.toLocaleString('fr-FR')}€</span>
                 <span className="text-xs text-white/55 uppercase tracking-wider mt-1">Distribué</span>
               </div>
               <div className="panel panel-cut flex flex-col items-center justify-center px-6 py-4">
@@ -1222,7 +1222,7 @@ export function LandingClient({
           <div className="mt-6 flex items-center justify-center gap-2.5">
             <span className="live-dot" aria-hidden="true" />
             <span className="text-sm text-white/60">
-              <span className="stat-numeral text-success">{playerCount.toLocaleString()}</span> joueurs sont dans l'arène en ce moment
+              <span className="stat-numeral text-success">{playerCount.toLocaleString('fr-FR')}</span> joueurs sont dans l'arène en ce moment
             </span>
           </div>
 
@@ -1317,7 +1317,7 @@ export function LandingClient({
               <p className="text-white/60 text-sm mb-4 leading-relaxed">La plateforme de jeu où le dernier clic gagne.</p>
               <div className="mb-6 flex items-center gap-2">
                 <span className="live-dot" aria-hidden="true" />
-                <span className="text-xs text-white/50"><span className="stat-numeral text-success">{playerCount.toLocaleString()}</span> joueurs en ligne</span>
+                <span className="text-xs text-white/50"><span className="stat-numeral text-success">{playerCount.toLocaleString('fr-FR')}</span> joueurs en ligne</span>
               </div>
               <nav className="flex gap-3" aria-label="Réseaux sociaux">
                 <a href="#" className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:border-neon-purple/50 hover:bg-neon-purple/10 transition-all group" aria-label="Twitter">

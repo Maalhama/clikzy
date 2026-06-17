@@ -1,3 +1,4 @@
+import { cache } from 'react'
 import { createClient } from '@supabase/supabase-js'
 
 // Stats publiques pour « Cleekzy Wrapped » (bilan partageable d'un joueur).
@@ -35,7 +36,9 @@ function computeTitle(s: { totalClicks: number; totalWins: number; totalValueWon
   return "Recrue de l'arène"
 }
 
-export async function fetchWrappedStats(username: string): Promise<WrappedStats | null> {
+// Mémoïsé par requête : la page Wrapped l'appelle dans generateMetadata ET dans
+// le rendu. Sans cache(), les mêmes requêtes Supabase partent deux fois.
+export const fetchWrappedStats = cache(async (username: string): Promise<WrappedStats | null> => {
   const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
   const { data: p } = await sb
@@ -84,4 +87,4 @@ export async function fetchWrappedStats(username: string): Promise<WrappedStats 
     bestLot,
     title: computeTitle({ totalClicks, totalWins, totalValueWon }),
   }
-}
+})
