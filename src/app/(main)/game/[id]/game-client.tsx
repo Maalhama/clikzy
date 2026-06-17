@@ -171,6 +171,10 @@ export function GameClient({
     if (game.status === 'ended' && game.winner_id === userId && !hasPlayedWinRef.current) {
       hasPlayedWinRef.current = true
       playWin()
+      // Haptique de victoire (motif festif, distinct du clic) — no-op si non supporté.
+      if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
+        navigator.vibrate([40, 60, 40, 60, 90])
+      }
       trackGameWin(game.id, game.item.name, game.item.retail_value ?? 0)
     }
   }, [game.status, game.winner_id, userId, playWin, game.id, game.item.name, game.item])
