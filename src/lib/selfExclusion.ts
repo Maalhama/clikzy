@@ -5,11 +5,18 @@
  *  Le joueur en pause ne peut ni jouer ni acheter jusqu'à cette date. */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function selfExcludedUntil(supabase: any, userId: string): Promise<Date | null> {
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from('user_self_exclusion')
     .select('excluded_until')
     .eq('user_id', userId)
     .maybeSingle()
+  if (error) {
+    // Fail-CLOSED (jeu responsable / conformité) : si on ne peut PAS vérifier l'exclusion
+    // (erreur DB, pooler down…), on bloque l'action quelques minutes plutôt que de laisser
+    // passer un joueur potentiellement exclu. Un retry lève le blocage une fois la DB OK.
+    console.error('[selfExclusion] vérification impossible, fail-closed:', error.message)
+    return new Date(Date.now() + 5 * 60 * 1000)
+  }
   if (!data?.excluded_until) return null
   const until = new Date(data.excluded_until)
   return until.getTime() > Date.now() ? until : null

@@ -98,7 +98,7 @@ export default function VIPSubscriptionModal({
               {/* Price - Compact */}
               <div className="text-center mb-3">
                 <div className="inline-flex items-baseline gap-0.5">
-                  <span className="text-2xl font-black text-white">9,99€</span>
+                  <span className="text-2xl font-black text-white">12,99€</span>
                   <span className="text-white/50 text-sm">/mois</span>
                 </div>
               </div>
