@@ -2,6 +2,8 @@ import type { NextConfig } from 'next'
 import { withSentryConfig } from '@sentry/nextjs'
 
 const nextConfig: NextConfig = {
+  // #302 — ne pas divulguer la stack (header X-Powered-By: Next.js retiré).
+  poweredByHeader: false,
   turbopack: {
     root: __dirname,
   },

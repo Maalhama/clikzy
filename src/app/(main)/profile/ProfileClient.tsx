@@ -166,6 +166,7 @@ export function ProfileClient({ profile, wins, gamesPlayed, totalValueWon, gameH
                       src={avatarPreview || profile.avatar_url || ''}
                       alt="Avatar"
                       fill
+                      sizes="80px"
                       className="object-cover"
                     />
                   ) : (
