@@ -136,9 +136,13 @@ export default async function RootLayout({
   return (
     <html lang="fr" suppressHydrationWarning className={`${sans.variable} ${display.variable} ${jetbrainsMono.variable}`}>
       <head>
+        {/* suppressHydrationWarning : React efface l'attribut `nonce` du DOM après
+            hydratation (sécurité) -> le diff voit serveur "" vs client réel. Bénin
+            (le HTML servi garde le bon nonce, CSP OK), on neutralise juste le warning. */}
         <script
           type="application/ld+json"
           nonce={nonce}
+          suppressHydrationWarning
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>

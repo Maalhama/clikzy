@@ -104,7 +104,9 @@ export function PrizesBento({ games }: PrizesBentoProps) {
   const isDemoGame = (g: HeroLiveGame) => g.id.startsWith('bento-demo-')
 
   const featuredLeft = calculateTimeLeft(featured.end_time)
-  const featuredUrgent = featuredLeft <= 90000
+  // `mounted &&` : l'urgence dépend de l'heure courante (≠ serveur/client au 1er rendu).
+  // On la neutralise jusqu'au montage pour éviter le mismatch d'hydratation (couleur + badge).
+  const featuredUrgent = mounted && featuredLeft <= 90000
   const featuredLeader = featured.last_click_username
     ?? ((featured.total_clicks ?? 0) > 0 ? generateDeterministicUsername(featured.id) : null)
 
@@ -171,7 +173,7 @@ export function PrizesBento({ games }: PrizesBentoProps) {
       {/* Tuiles compactes */}
       {rest.map((g) => {
         const left = calculateTimeLeft(g.end_time)
-        const urgent = left <= 90000
+        const urgent = mounted && left <= 90000
         const premium = g.item_value >= 1000
         return (
           <Link
