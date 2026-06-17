@@ -57,8 +57,8 @@ export default async function MainLayout({
         {/* PWA : bandeau d'installation fermable, juste sous le header */}
         <InstallBanner />
 
-        {/* Main content */}
-        <main className="flex-1 relative z-10">
+        {/* Main content (id ciblé par le lien d'évitement / skip link) */}
+        <main id="main-content" className="flex-1 relative z-10">
           {children}
         </main>
 

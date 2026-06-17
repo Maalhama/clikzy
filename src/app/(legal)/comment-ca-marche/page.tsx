@@ -29,8 +29,8 @@ export default function CommentCaMarchePage() {
       <Section title="Le principe : le dernier clic gagne">
         <p>
           Chaque enchère a un compte à rebours. <span className="font-semibold text-white">Chaque clic coûte 1 crédit</span> et
-          remet le minuteur à zéro. Quand le minuteur atteint zéro, <span className="font-semibold text-white">le dernier
-          joueur à avoir cliqué remporte le lot</span> et se le fait livrer.
+          relance le minuteur (dans la dernière ligne droite, il repart à 1min30). Quand le minuteur atteint
+          zéro, <span className="font-semibold text-white">le dernier joueur à avoir cliqué remporte le lot</span> et se le fait livrer.
         </p>
       </Section>
 

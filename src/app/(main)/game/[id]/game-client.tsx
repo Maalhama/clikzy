@@ -359,6 +359,7 @@ export function GameClient({
                     src={productImage}
                     alt={game.item.name}
                     fill
+                    sizes="(min-width: 1024px) 220px, 200px"
                     className={`object-contain ${
                       game.status === 'ended'
                         ? 'drop-shadow-[0_0_10px_rgba(255,255,255,0.1)] opacity-80'
@@ -725,6 +726,7 @@ export function GameClient({
                       src={productImage}
                       alt={game.item.name}
                       fill
+                      sizes="(min-width: 1024px) 220px, 200px"
                       className={`object-contain ${
                         game.status === 'ended'
                           ? 'drop-shadow-[0_0_15px_rgba(255,255,255,0.1)] opacity-80'
