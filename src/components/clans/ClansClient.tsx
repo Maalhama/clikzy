@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useCallback } from 'react'
+import { useState, useCallback } from 'react'
 import { Loader2, Shield, Crown, LogOut, Plus, Users } from 'lucide-react'
 import {
   getMyClan, getClanLeaderboard, createClan, joinClan, leaveClan,
@@ -17,23 +17,24 @@ function clanHue(tag: string): string {
   return CLAN_HUES[h % CLAN_HUES.length]
 }
 
-export function ClansClient() {
-  const [myClan, setMyClan] = useState<MyClan | null>(null)
-  const [board, setBoard] = useState<ClanRow[]>([])
-  const [loading, setLoading] = useState(true)
+export function ClansClient({ initialMyClan, initialBoard }: { initialMyClan: MyClan | null; initialBoard: ClanRow[] }) {
+  // Clan + classement résolus côté serveur (SSR) -> plus de spinner ni de fetch au montage.
+  const [myClan, setMyClan] = useState<MyClan | null>(initialMyClan)
+  const [board, setBoard] = useState<ClanRow[]>(initialBoard)
+  const [loading, setLoading] = useState(false)
   const [busy, setBusy] = useState(false)
   const [err, setErr] = useState<string | null>(null)
   const [name, setName] = useState('')
   const [tag, setTag] = useState('')
   const [desc, setDesc] = useState('')
 
+  // Rafraîchissement après une action (créer / rejoindre / quitter un clan).
   const refresh = useCallback(async () => {
     const [m, b] = await Promise.all([getMyClan(), getClanLeaderboard(50)])
     if (m.success) setMyClan(m.data ?? null)
     if (b.success && b.data) setBoard(b.data)
     setLoading(false)
   }, [])
-  useEffect(() => { refresh() }, [refresh])
 
   const doCreate = async () => {
     setBusy(true); setErr(null)

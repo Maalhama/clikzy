@@ -1,7 +1,7 @@
 'use client'
 
 import { PixelAvatar } from '@/components/ui/PixelAvatar'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
 import { Trophy } from 'lucide-react'
 import { getLeaderboard, getMyRank, type LeaderboardEntry, type LeaderboardPeriod } from '@/actions/leaderboard'
@@ -14,13 +14,20 @@ const PERIODS: Array<{ key: LeaderboardPeriod; label: string }> = [
   { key: 'all', label: 'All-time' },
 ]
 
-export function LeaderboardClient() {
-  const [period, setPeriod] = useState<LeaderboardPeriod>('week')
-  const [rows, setRows] = useState<LeaderboardEntry[]>([])
-  const [me, setMe] = useState<{ rank: number; total: number } | null>(null)
-  const [loading, setLoading] = useState(true)
+export function LeaderboardClient({ initialPeriod, initialRows, initialMe }: {
+  initialPeriod: LeaderboardPeriod
+  initialRows: LeaderboardEntry[]
+  initialMe: { rank: number; total: number } | null
+}) {
+  const [period, setPeriod] = useState<LeaderboardPeriod>(initialPeriod)
+  const [rows, setRows] = useState<LeaderboardEntry[]>(initialRows)
+  const [me, setMe] = useState<{ rank: number; total: number } | null>(initialMe)
+  const [loading, setLoading] = useState(false)
+  const firstRun = useRef(true)
 
   useEffect(() => {
+    // 1er rendu : on garde les données SSR (initialPeriod), pas de re-fetch.
+    if (firstRun.current) { firstRun.current = false; return }
     let active = true
     setLoading(true)
     ;(async () => {

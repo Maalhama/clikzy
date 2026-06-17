@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useCallback } from 'react'
+import { useState, useCallback } from 'react'
 import { Loader2, Gift, Sparkles, Zap, Coins, MousePointerClick, Clover, History } from 'lucide-react'
 import { getCollection, equipItem, unequipSlot, claimDailyChest, type Collection, type ChestDrop } from '@/actions/collection'
 import { RARITY, SLOT_LABEL, bonusLabel, type Rarity } from './rarity'
@@ -13,19 +13,20 @@ import { CustomizationSection } from './CustomizationSection'
 const SLOTS: Array<Collection['equipment'] extends Partial<Record<infer K, unknown>> ? K : never> = ['casque', 'armure', 'anneau', 'artefact']
 const CHEST_LABEL: Record<string, Rarity> = { common: 'common', rare: 'rare', epic: 'epic', legendary: 'legendary' }
 
-export function CollectionClient() {
-  const [data, setData] = useState<Collection | null>(null)
-  const [loading, setLoading] = useState(true)
+export function CollectionClient({ initialData }: { initialData: Collection | null }) {
+  // Données résolues côté serveur (SSR) -> plus de skeleton ni de fetch au montage.
+  const [data, setData] = useState<Collection | null>(initialData)
+  const [loading, setLoading] = useState(false)
   const [busy, setBusy] = useState<string | null>(null)
   const [opening, setOpening] = useState<{ id: string; rarity: string } | null>(null)
   const [flash, setFlash] = useState<string | null>(null)
 
+  // Rafraîchissement après une action (ouverture de coffre, équipement…).
   const load = useCallback(async () => {
     const res = await getCollection()
     if (res.success && res.data) setData(res.data)
     setLoading(false)
   }, [])
-  useEffect(() => { load() }, [load])
 
   const onReward = (d: ChestDrop) => {
     if (d.rewardKind === 'item' && d.item) setFlash(`${d.item.name} (${RARITY[d.item.rarity].label})`)

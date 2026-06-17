@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation'
 import { getCurrentUser } from '@/lib/auth/getCurrentUser'
+import { getCollection } from '@/actions/collection'
 import { CollectionClient } from '@/components/collection/CollectionClient'
 
 export const metadata = {
@@ -10,6 +11,9 @@ export const metadata = {
 export default async function CollectionPage() {
   const user = await getCurrentUser()
   if (!user) redirect('/login')
+  // Collection résolue côté serveur (SSR) -> le client reçoit l'état initial.
+  const res = await getCollection()
+  const initialData = res.success && res.data ? res.data : null
   return (
     <main className="relative z-10 mx-auto max-w-3xl px-4 py-6">
       <div className="mb-5 reveal reveal-1">
@@ -17,7 +21,7 @@ export default async function CollectionPage() {
         <h1 className="title-giant text-4xl text-white md:text-5xl">Collection</h1>
         <p className="text-sm text-white/50">Ouvre tes coffres, équipe ton personnage, deviens plus fort.</p>
       </div>
-      <CollectionClient />
+      <CollectionClient initialData={initialData} />
     </main>
   )
 }
