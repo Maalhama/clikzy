@@ -22,6 +22,31 @@ function getClientIP(request: NextRequest): string {
   return 'unknown'
 }
 
+// #0 — CSP par requête avec NONCE : remplace `script-src 'unsafe-inline'` (qui
+// laissait exécuter n'importe quel script injecté) par un nonce aléatoire. Next.js
+// applique automatiquement ce nonce à ses scripts (lu via le header CSP de la
+// requête) ; nos scripts inline (JSON-LD) le portent explicitement. On garde la
+// liste blanche d'hôtes (Stripe/Umami/Cloudflare) plutôt que `strict-dynamic`
+// pour ne pas casser les scripts externes. `style-src 'unsafe-inline'` conservé
+// (framer-motion/Tailwind injectent des styles ; risque XSS bien moindre).
+function buildCsp(nonce: string): string {
+  const isDev = process.env.NODE_ENV !== 'production'
+  return [
+    "default-src 'self'",
+    `script-src 'self' 'nonce-${nonce}'${isDev ? " 'unsafe-eval'" : ''} https://js.stripe.com https://challenges.cloudflare.com https://*.umami.is`,
+    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+    "img-src 'self' data: blob: https: http:",
+    "font-src 'self' https://fonts.gstatic.com",
+    "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.stripe.com https://*.sentry.io https://*.umami.is",
+    "frame-src 'self' https://js.stripe.com https://hooks.stripe.com https://challenges.cloudflare.com",
+    "object-src 'none'",
+    "base-uri 'self'",
+    "form-action 'self'",
+    "frame-ancestors 'self'",
+    "upgrade-insecure-requests",
+  ].join('; ')
+}
+
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
 
@@ -54,9 +79,18 @@ export async function proxy(request: NextRequest) {
     }
   }
 
+  // Nonce CSP : propagé aux Server Components via le header de requête `x-nonce`,
+  // et le header CSP de requête est lu par Next.js pour nonce-r ses propres scripts.
+  const nonce = btoa(crypto.randomUUID())
+  const csp = buildCsp(nonce)
+  const requestHeaders = new Headers(request.headers)
+  requestHeaders.set('x-nonce', nonce)
+  requestHeaders.set('content-security-policy', csp)
+
   let supabaseResponse = NextResponse.next({
-    request,
+    request: { headers: requestHeaders },
   })
+  supabaseResponse.headers.set('content-security-policy', csp)
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -71,11 +105,12 @@ export async function proxy(request: NextRequest) {
             request.cookies.set(name, value)
           )
           supabaseResponse = NextResponse.next({
-            request,
+            request: { headers: requestHeaders },
           })
           cookiesToSet.forEach(({ name, value, options }) =>
             supabaseResponse.cookies.set(name, value, options)
           )
+          supabaseResponse.headers.set('content-security-policy', csp)
         },
       },
     }

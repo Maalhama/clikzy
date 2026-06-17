@@ -60,26 +60,9 @@ const nextConfig: NextConfig = {
     ],
   },
   async headers() {
-    // CSP directives
-    // 'unsafe-eval' nécessaire au HMR/React refresh en dev uniquement ;
-    // retiré en production (durcissement : empêche eval/Function).
-    const isDev = process.env.NODE_ENV !== 'production'
-    const cspDirectives = [
-      "default-src 'self'",
-      // Umami (cloud.umami.is) ajouté pour que le script analytics charge en prod.
-      `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ''} https://js.stripe.com https://challenges.cloudflare.com https://*.umami.is`,
-      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-      "img-src 'self' data: blob: https: http:",
-      "font-src 'self' https://fonts.gstatic.com",
-      "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.stripe.com https://*.sentry.io https://*.umami.is",
-      "frame-src 'self' https://js.stripe.com https://hooks.stripe.com https://challenges.cloudflare.com",
-      "object-src 'none'",
-      "base-uri 'self'",
-      "form-action 'self'",
-      "frame-ancestors 'self'",
-      "upgrade-insecure-requests",
-    ].join('; ')
-
+    // NB : le Content-Security-Policy est désormais posé PAR REQUÊTE dans le
+    // middleware (src/proxy.ts) car il embarque un nonce aléatoire (#0). Ne pas
+    // le redéclarer ici : deux en-têtes CSP s'appliqueraient en intersection.
     return [
       {
         source: '/:path*',
@@ -90,7 +73,6 @@ const nextConfig: NextConfig = {
           { key: 'X-Content-Type-Options', value: 'nosniff' },
           { key: 'Referrer-Policy', value: 'origin-when-cross-origin' },
           { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
-          { key: 'Content-Security-Policy', value: cspDirectives },
         ],
       },
       // Cache static assets for 1 year

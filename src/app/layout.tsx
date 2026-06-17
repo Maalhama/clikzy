@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from 'next'
+import { headers } from 'next/headers'
 import { Hanken_Grotesk, Unbounded, JetBrains_Mono } from 'next/font/google'
 import { SkipLink } from '@/components/ui/SkipLink'
 import { CookieConsent } from '@/components/common/CookieConsent'
@@ -125,16 +126,19 @@ const jsonLd = {
   },
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
 }>) {
+  // Nonce CSP posé par le middleware (#0) — porté par le script inline JSON-LD.
+  const nonce = (await headers()).get('x-nonce') ?? undefined
   return (
     <html lang="fr" suppressHydrationWarning className={`${sans.variable} ${display.variable} ${jetbrainsMono.variable}`}>
       <head>
         <script
           type="application/ld+json"
+          nonce={nonce}
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
