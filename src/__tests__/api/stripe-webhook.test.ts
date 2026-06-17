@@ -17,13 +17,20 @@ vi.mock('@supabase/supabase-js', () => ({
   createClient: vi.fn(() => mockAdmin),
 }))
 
-const { mockSessionsList } = vi.hoisted(() => ({ mockSessionsList: vi.fn() }))
+const { mockSessionsList, mockChargesRetrieve, mockSubsCancel } = vi.hoisted(() => ({
+  mockSessionsList: vi.fn(),
+  mockChargesRetrieve: vi.fn(),
+  mockSubsCancel: vi.fn(),
+}))
 // Évite l'init Stripe réelle (clés absentes en test) ; classe constructible (getStripeInstance
-// fait `new Stripe(...)`) exposant checkout.sessions.list pour le handler de remboursement.
+// fait `new Stripe(...)`) exposant checkout.sessions.list + charges.retrieve (détection VIP
+// chargeback) + subscriptions.cancel pour le handler de remboursement.
 vi.mock('stripe', () => ({
   default: class MockStripe {
     checkout = { sessions: { list: mockSessionsList } }
     refunds = { create: vi.fn() }
+    charges = { retrieve: mockChargesRetrieve }
+    subscriptions = { cancel: mockSubsCancel }
   },
 }))
 
@@ -44,6 +51,8 @@ describe('handleStripeEvent — logique métier des paiements', () => {
     mockRpc.mockResolvedValue({ error: null })
     mockEq.mockResolvedValue({ error: null })
     mockUpdate.mockReturnValue({ eq: mockEq })
+    // Par défaut : charge sans invoice (= pack/cadeau one-shot, pas un abo VIP).
+    mockChargesRetrieve.mockResolvedValue({ invoice: null })
   })
 
   describe('checkout.session.completed — crédits', () => {
@@ -179,12 +188,18 @@ describe('handleStripeEvent — logique métier des paiements', () => {
   describe('remboursement / litige — reprise des crédits (anti-fraude)', () => {
     it('charge.refunded TOTAL : retrouve la session et reprend les crédits', async () => {
       mockSessionsList.mockResolvedValue({ data: [{ id: 'cs_pack' }] })
-      mockRpc.mockResolvedValue({ data: { ok: true, amount: 175 } })
+      // Pas un cadeau -> clawback_gift_code répond not_a_gift, puis le pack est repris.
+      mockRpc.mockImplementation((fn: string) =>
+        fn === 'clawback_gift_code'
+          ? Promise.resolve({ data: { ok: false, reason: 'not_a_gift' } })
+          : Promise.resolve({ data: { ok: true, amount: 175 } })
+      )
       const res = await handleStripeEvent(
         evt('charge.refunded', { id: 'ch_1', payment_intent: 'pi_1', amount: 1999, amount_refunded: 1999, refunded: true })
       )
       expect(res.status).toBe(200)
       expect(mockSessionsList).toHaveBeenCalledWith({ payment_intent: 'pi_1', limit: 1 })
+      expect(mockRpc).toHaveBeenCalledWith('clawback_gift_code', { p_session: 'cs_pack' })
       expect(mockRpc).toHaveBeenCalledWith('clawback_pack_credits', { p_session: 'cs_pack' })
       expect(res.body).toEqual({ received: true, clawed_back: 175 })
     })
@@ -200,13 +215,53 @@ describe('handleStripeEvent — logique métier des paiements', () => {
 
     it('charge.dispute.created : reprise des crédits (chargeback)', async () => {
       mockSessionsList.mockResolvedValue({ data: [{ id: 'cs_disp' }] })
-      mockRpc.mockResolvedValue({ data: { ok: true, amount: 50 } })
+      mockRpc.mockImplementation((fn: string) =>
+        fn === 'clawback_gift_code'
+          ? Promise.resolve({ data: { ok: false, reason: 'not_a_gift' } })
+          : Promise.resolve({ data: { ok: true, amount: 50 } })
+      )
       const res = await handleStripeEvent(
         evt('charge.dispute.created', { id: 'dp_1', payment_intent: 'pi_3' })
       )
       expect(res.status).toBe(200)
       expect(mockRpc).toHaveBeenCalledWith('clawback_pack_credits', { p_session: 'cs_disp' })
       expect(res.body).toEqual({ received: true, clawed_back: 50 })
+    })
+
+    it('#101 — chargeback d’un abonnement VIP : retire le statut + coupe l’abo', async () => {
+      // La charge porte un invoice d’abonnement VIP -> on remonte aux metadata.
+      mockChargesRetrieve.mockResolvedValue({
+        invoice: {
+          subscription: 'sub_vip',
+          subscription_details: { metadata: { type: 'vip_subscription', userId: 'u-9' } },
+        },
+      })
+      const res = await handleStripeEvent(
+        evt('charge.refunded', { id: 'ch_vip', payment_intent: 'pi_vip', amount: 1299, amount_refunded: 1299, refunded: true })
+      )
+      expect(res.status).toBe(200)
+      expect(res.body).toEqual({ received: true, vip_revoked: true })
+      expect(mockUpdate).toHaveBeenCalledWith(expect.objectContaining({ is_vip: false }))
+      expect(mockSubsCancel).toHaveBeenCalledWith('sub_vip')
+      // VIP traité en amont : pas de lookup de session pack/cadeau.
+      expect(mockSessionsList).not.toHaveBeenCalled()
+    })
+
+    it('#102 — remboursement d’un cadeau : géré par clawback_gift_code, pas le pack', async () => {
+      mockSessionsList.mockResolvedValue({ data: [{ id: 'cs_gift' }] })
+      mockRpc.mockImplementation((fn: string) =>
+        fn === 'clawback_gift_code'
+          ? Promise.resolve({ data: { ok: true, voided: true, code: 'ABCD' } })
+          : Promise.resolve({ data: { ok: true, amount: 999 } })
+      )
+      const res = await handleStripeEvent(
+        evt('charge.refunded', { id: 'ch_gift', payment_intent: 'pi_gift', amount: 500, amount_refunded: 500, refunded: true })
+      )
+      expect(res.status).toBe(200)
+      expect(mockRpc).toHaveBeenCalledWith('clawback_gift_code', { p_session: 'cs_gift' })
+      // C’était un cadeau -> on n’enchaîne PAS sur le clawback de pack.
+      expect(mockRpc).not.toHaveBeenCalledWith('clawback_pack_credits', { p_session: 'cs_gift' })
+      expect(res.body).toEqual({ received: true, gift: { ok: true, voided: true, code: 'ABCD' } })
     })
   })
 

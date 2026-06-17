@@ -448,6 +448,7 @@ export async function handleStripeEvent(event: Stripe.Event): Promise<HandlerRes
       amount_refunded?: number
       refunded?: boolean
       id?: string
+      charge?: string | null // présent sur charge.dispute.created (id de la charge)
     }
     const paymentIntent = typeof obj.payment_intent === 'string' ? obj.payment_intent : null
 
@@ -462,6 +463,48 @@ export async function handleStripeEvent(event: Stripe.Event): Promise<HandlerRes
       return { status: 200, body: { received: true, partial_refund: true } }
     }
 
+    // #101 — Chargeback / remboursement d'un ABONNEMENT VIP : une charge d'abonnement
+    // porte un `invoice` ; on remonte aux metadata de la sub pour retirer le statut VIP
+    // et couper l'abo (sinon l'utilisateur garde VIP + continue d'être prélevé après litige).
+    try {
+      const stripe = getStripeInstance()
+      const chargeId = event.type === 'charge.dispute.created'
+        ? (typeof obj.charge === 'string' ? obj.charge : null)
+        : (typeof obj.id === 'string' ? obj.id : null)
+      if (chargeId) {
+        const charge = await stripe.charges.retrieve(chargeId, { expand: ['invoice'] })
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const invoice = (charge as any).invoice as Record<string, any> | null
+        if (invoice) {
+          const meta = invoice.subscription_details?.metadata
+            ?? invoice.parent?.subscription_details?.metadata
+            ?? {}
+          if (meta.type === 'vip_subscription' && meta.userId) {
+            const admin = getSupabaseAdmin()
+            await admin
+              .from('profiles')
+              .update({ is_vip: false, vip_subscription_id: null, vip_expires_at: null })
+              .eq('id', meta.userId)
+            const subId = (typeof invoice.subscription === 'string' ? invoice.subscription : null)
+              ?? invoice.parent?.subscription_details?.subscription ?? null
+            if (typeof subId === 'string') {
+              try { await stripe.subscriptions.cancel(subId) }
+              catch (cErr) { console.error('[STRIPE] annulation sub VIP (chargeback) échouée:', cErr) }
+            }
+            import('@/lib/email')
+              .then(({ sendAdminAlertEmail }) =>
+                sendAdminAlertEmail(`VIP retiré (${event.type})`, `user ${meta.userId}\nsub ${subId}\ncharge ${chargeId}`)
+              )
+              .catch((e) => console.error('[WEBHOOK] alerte admin VIP chargeback échouée:', e))
+            console.log(`[STRIPE] VIP retiré pour ${meta.userId} (${event.type})`)
+            return { status: 200, body: { received: true, vip_revoked: true } }
+          }
+        }
+      }
+    } catch (vErr) {
+      console.error('[STRIPE] détection VIP chargeback échouée (on continue):', vErr)
+    }
+
     if (!paymentIntent) return { status: 200, body: { received: true } }
 
     try {
@@ -471,6 +514,29 @@ export async function handleStripeEvent(event: Stripe.Event): Promise<HandlerRes
       if (!sessionId) return { status: 200, body: { received: true, no_session: true } }
 
       const supabase = getSupabaseAdmin()
+
+      // #102 — Cadeau d'abord : si cette session est un code cadeau, on l'invalide
+      // (non réclamé) ou on reprend les crédits (réclamé). Sinon 'not_a_gift' -> pack.
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data: giftData, error: giftErr } = await (supabase.rpc as any)('clawback_gift_code', { p_session: sessionId })
+      if (!giftErr) {
+        const gr = giftData as { ok?: boolean; reason?: string; vip_manual?: boolean } | null
+        if (gr?.ok) {
+          console.log(`[STRIPE] Reprise cadeau (${event.type}) — session ${sessionId}:`, gr)
+          if (gr.vip_manual) {
+            import('@/lib/email')
+              .then(({ sendAdminAlertEmail }) =>
+                sendAdminAlertEmail('Cadeau VIP remboursé — reprise manuelle', `session ${sessionId}\n${JSON.stringify(gr)}`)
+              )
+              .catch((e) => console.error('[WEBHOOK] alerte admin cadeau VIP échouée:', e))
+          }
+          return { status: 200, body: { received: true, gift: gr } }
+        }
+        // gr.reason === 'not_a_gift' -> on enchaîne sur le clawback de pack.
+      } else {
+        console.error('[STRIPE] clawback_gift_code a échoué (on tente le pack):', giftErr)
+      }
+
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { data: clawData, error: clawErr } = await (supabase.rpc as any)('clawback_pack_credits', { p_session: sessionId })
       if (clawErr) {
