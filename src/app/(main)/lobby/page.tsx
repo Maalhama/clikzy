@@ -1,4 +1,3 @@
-import { Suspense } from 'react'
 import { createClient } from '@/lib/supabase/server'
 import { getCurrentUser } from '@/lib/auth/getCurrentUser'
 import { checkAndResetDailyCredits } from '@/actions/credits'
@@ -6,7 +5,6 @@ import { getProgression } from '@/actions/progression'
 import { getRecentWinners } from '@/actions/winners'
 import { getRecentComments } from '@/actions/comments'
 import { LobbyClient } from './LobbyClient'
-import { GameCardSkeleton } from '@/components/lobby'
 import { SOON_THRESHOLD, ROTATION_HOURS } from '@/lib/constants/rotation'
 import type { GameWithItem } from '@/types/database'
 import type { Metadata } from 'next'
@@ -157,66 +155,22 @@ async function getLobbyData() {
   return { games, credits, wasReset, winners, comments: commentsResult, chestInfo, progression, isLoggedIn: !!user }
 }
 
-function LobbyLoading() {
-  return (
-    <div className="min-h-screen pb-20">
-      {/* Header skeleton */}
-      <div className="py-6 md:py-8 px-4 md:px-6">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div>
-              <div className="h-8 bg-white/10 rounded-lg w-48 mb-2 animate-pulse" />
-              <div className="h-4 bg-white/5 rounded-lg w-64 animate-pulse" />
-            </div>
-            <div className="flex gap-2">
-              <div className="h-10 bg-white/10 rounded-xl w-24 animate-pulse" />
-              <div className="h-10 bg-white/10 rounded-xl w-24 animate-pulse" />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Filters skeleton */}
-      <div className="px-4 md:px-6 mb-6">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex gap-2">
-            {[1, 2, 3, 4].map((i) => (
-              <div
-                key={i}
-                className="h-10 bg-white/10 rounded-full w-24 animate-pulse"
-              />
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Games grid skeleton */}
-      <div className="px-4 md:px-6">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-            <GameCardSkeleton count={10} />
-          </div>
-        </div>
-      </div>
-    </div>
-  )
-}
-
 export default async function LobbyPage() {
+  // L'UI de chargement est fournie par `loading.tsx` (convention App Router) pendant
+  // le `await` ci-dessous. Pas de <Suspense> en page : les données sont déjà résolues
+  // au rendu, donc son fallback ne s'afficherait jamais (#276).
   const { games, credits, wasReset, winners, comments, chestInfo, progression, isLoggedIn } = await getLobbyData()
 
   return (
-    <Suspense fallback={<LobbyLoading />}>
-      <LobbyClient
-        initialGames={games}
-        credits={credits}
-        wasReset={wasReset}
-        winners={winners}
-        comments={comments}
-        chestInfo={chestInfo}
-        progression={progression}
-        isLoggedIn={isLoggedIn}
-      />
-    </Suspense>
+    <LobbyClient
+      initialGames={games}
+      credits={credits}
+      wasReset={wasReset}
+      winners={winners}
+      comments={comments}
+      chestInfo={chestInfo}
+      progression={progression}
+      isLoggedIn={isLoggedIn}
+    />
   )
 }
