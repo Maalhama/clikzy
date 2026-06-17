@@ -2576,10 +2576,11 @@ body::after {
   100% { background-position: 0 -16px; }
 }
 /* Flicker de feu : la luminosité pulse façon braises. */
+/* opacity (composité GPU) au lieu de filter:brightness (repaint thread) -> moins coûteux, surtout mobile */
 @keyframes gauge-magma-flicker {
-  0%, 100% { filter: brightness(1) saturate(1.05); }
-  35%      { filter: brightness(1.28) saturate(1.2); }
-  70%      { filter: brightness(0.9) saturate(1); }
+  0%, 100% { opacity: 1; }
+  35%      { opacity: 0.86; }
+  70%      { opacity: 0.96; }
 }
 /* Surface bouillonnante : la crête du liquide ondule horizontalement. */
 @keyframes gauge-surface-wave {
@@ -2591,4 +2592,13 @@ body::after {
   0%   { transform: translateY(0) scale(1); opacity: 0; }
   25%  { opacity: 0.9; }
   100% { transform: translateY(-180%) scale(0.6); opacity: 0; }
+}
+/* Accessibilité : on coupe les animations décoratives en boucle de la fiole pour les
+   utilisateurs qui demandent moins de mouvement (prefers-reduced-motion). */
+@media (prefers-reduced-motion: reduce) {
+  [style*="gauge-magma"],
+  [style*="gauge-bubble"],
+  [style*="gauge-surface"] {
+    animation: none !important;
+  }
 }

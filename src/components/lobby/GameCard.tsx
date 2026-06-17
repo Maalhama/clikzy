@@ -62,24 +62,21 @@ export const GameCard = memo(function GameCard({ game, index = 0, isFavorite = f
   const isTimerEnded = !isStatusEnded && timeLeft <= 0 && game.end_time && game.end_time <= Date.now()
   const isEnded = isStatusEnded || isTimerEnded
 
-  // Live timer update using RAF for performance
+  // Timer adaptatif : 1s pour une card normale (affiche mm:ss), 250ms seulement en phase
+  // finale (fluidité des secondes), et on ARRÊTE de planifier quand le timer atteint 0.
+  // (Avant : une boucle requestAnimationFrame en continu PAR card -> ~10 setState/s × N cards.)
   useEffect(() => {
     if (!game.end_time || isStatusEnded) return
-
-    let animationId: number
-    let lastUpdate = 0
-
-    const updateTimer = (timestamp: number) => {
-      // Update every 100ms for smooth countdown
-      if (timestamp - lastUpdate >= 100) {
-        setTimeLeft(calculateTimeLeft(game.end_time ?? 0))
-        lastUpdate = timestamp
-      }
-      animationId = requestAnimationFrame(updateTimer)
+    let timeoutId: ReturnType<typeof setTimeout>
+    const tick = () => {
+      const left = calculateTimeLeft(game.end_time ?? 0)
+      setTimeLeft(left)
+      if (left <= 0) return // partie terminée -> plus de planification
+      const delay = left <= FINAL_PHASE_THRESHOLD ? 250 : 1000
+      timeoutId = setTimeout(tick, delay)
     }
-
-    animationId = requestAnimationFrame(updateTimer)
-    return () => cancelAnimationFrame(animationId)
+    tick()
+    return () => clearTimeout(timeoutId)
   }, [game.end_time, isStatusEnded])
 
   // Click count sync

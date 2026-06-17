@@ -59,6 +59,12 @@ export function ItemGauge({ gauge, celebrate = false, itemName }: ItemGaugeProps
     <div
       className="flex h-full select-none flex-col items-center justify-end gap-1"
       title={explanationText(itemName)}
+      role="progressbar"
+      aria-label={`Jauge de progression pour ${itemName}`}
+      aria-valuemin={0}
+      aria-valuemax={100}
+      aria-valuenow={Math.round(pct)}
+      aria-valuetext={`${Math.round(pct)} % — ${explanationText(itemName)}`}
     >
       {gauge.completedCount > 0 && (
         <span

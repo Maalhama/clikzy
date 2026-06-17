@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { Header } from '@/components/layout/Header'
-import { ArenaAtmosphere } from '@/components/ui/ArenaAtmosphere'
+import { ArenaAtmosphereLazy } from '@/components/ui/ArenaAtmosphereLazy'
 import { ClientProviders } from '@/components/providers/ClientProviders'
 import { InstallBanner } from '@/components/pwa/InstallBanner'
 import { AppFooter } from '@/components/layout/AppFooter'
@@ -48,7 +48,7 @@ export default async function MainLayout({
 
         {/* Desktop animated background */}
         <div className="hidden md:block fixed inset-0 -z-10">
-          <ArenaAtmosphere simplified />
+          <ArenaAtmosphereLazy simplified />
         </div>
 
         {/* Header */}
