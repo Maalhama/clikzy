@@ -27,7 +27,8 @@ export function InstallBanner() {
 
   function handleDismiss() {
     setIsDismissed(true)
-    localStorage.setItem('pwa-install-dismissed', Date.now().toString())
+    // Même clé que la lecture (-v2) — sinon le dismiss n'était jamais persisté.
+    localStorage.setItem('pwa-install-dismissed-v2', Date.now().toString())
   }
 
   async function handleInstall() {

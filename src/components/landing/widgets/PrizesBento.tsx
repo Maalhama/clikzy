@@ -85,7 +85,9 @@ export function PrizesBento({ games }: PrizesBentoProps) {
       if (missing === 0 && alive.length === prev.length) return prev
       const next = [...alive]
       for (let i = 0; i < missing; i++) {
-        next.push(makeBentoDemo(now % 1000 + prev.length + i))
+        // seed = timestamp complet (PAS `% 1000` qui se répétait chaque seconde -> ids
+        // dupliqués -> clés React en double). now + offset = monotone et unique.
+        next.push(makeBentoDemo(now + prev.length + i))
       }
       return next
     })
