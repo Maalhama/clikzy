@@ -1,7 +1,17 @@
-'use client'
-
+import type { Metadata } from 'next'
 import { ReactNode } from 'react'
 import { ArenaAtmosphereLazy } from '@/components/ui/ArenaAtmosphereLazy'
+
+// Server component : les pages d'auth (login/register/forgot/reset) sont des
+// client components et ne peuvent pas exporter de metadata. On centralise donc
+// le noindex ici, pour tout le groupe (auth). Ces pages ne doivent jamais ranker
+// à la place de la landing.
+export const metadata: Metadata = {
+  robots: {
+    index: false,
+    follow: false,
+  },
+}
 
 interface AuthLayoutProps {
   children: ReactNode

@@ -34,24 +34,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'daily',
       priority: 0.7,
     },
-    {
-      url: `${BASE_URL}/vip`,
-      lastModified: now,
-      changeFrequency: 'monthly',
-      priority: 0.8,
-    },
-    {
-      url: `${BASE_URL}/shop`,
-      lastModified: now,
-      changeFrequency: 'monthly',
-      priority: 0.8,
-    },
-    {
-      url: `${BASE_URL}/mini-games`,
-      lastModified: now,
-      changeFrequency: 'weekly',
-      priority: 0.7,
-    },
+    // NOTE : /shop, /vip et /mini-games sont volontairement EXCLUS du sitemap.
+    // Ces routes font redirect('/login') pour un visiteur non connecté (donc pour
+    // Googlebot) : les soumettre à l'indexation produit des pages « mortes »
+    // (soft-404 / contenu vide). Elles sont aussi en Disallow dans robots.txt.
     {
       url: `${BASE_URL}/support`,
       lastModified: now,

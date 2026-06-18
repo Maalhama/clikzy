@@ -13,8 +13,16 @@ Disallow: /admin/
 
 # Disallow auth pages from indexing
 Disallow: /auth/callback
+Disallow: /login
+Disallow: /register
 Disallow: /reset-password
 Disallow: /forgot-password
 
-# Disallow profile pages (private)
+# Disallow private / authenticated-only zones (redirigent vers /login pour Googlebot)
 Disallow: /profile
+Disallow: /shop
+Disallow: /vip
+Disallow: /mini-games
+Disallow: /collection
+Disallow: /clans
+Disallow: /cadeau

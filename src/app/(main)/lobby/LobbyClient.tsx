@@ -10,17 +10,20 @@ import {
   Pagination,
   PullToRefreshIndicator,
 } from '@/components/lobby'
+import dynamic from 'next/dynamic'
 import { LobbyFeatured } from '@/components/lobby/LobbyFeatured'
-import { LobbyChestsModal } from '@/components/lobby/LobbyChestsModal'
-import { LobbyTour } from '@/components/tutorial/LobbyTour'
+// Modales montées à la demande (coffres, tuto, succès paiement, calendrier) : sorties
+// du bundle initial du lobby via next/dynamic (chargées à la 1re ouverture).
+const LobbyChestsModal = dynamic(() => import('@/components/lobby/LobbyChestsModal').then((m) => m.LobbyChestsModal), { ssr: false })
+const LobbyTour = dynamic(() => import('@/components/tutorial/LobbyTour').then((m) => m.LobbyTour), { ssr: false })
+const PaymentSuccessModal = dynamic(() => import('@/components/lobby/PaymentSuccessModal').then((m) => m.PaymentSuccessModal), { ssr: false })
+const RewardsCalendarModal = dynamic(() => import('@/components/progression/RewardsCalendarModal').then((m) => m.RewardsCalendarModal), { ssr: false })
 import { LobbyCommentsFeed } from '@/components/comments/LobbyCommentsFeed'
 import { type CommentFeedItem } from '@/actions/comments'
 import { seedBotComments } from '@/lib/bots/commentGenerator'
-import { PaymentSuccessModal } from '@/components/lobby/PaymentSuccessModal'
 import { LobbyGamificationBar } from '@/components/progression/LobbyGamificationBar'
 import { BuyItNowLobbyBanner } from '@/components/profile/BuyItNowLobbyBanner'
 import { trackPurchase } from '@/lib/analytics'
-import { RewardsCalendarModal } from '@/components/progression/RewardsCalendarModal'
 import { getCalendarMonth, type CalendarDay } from '@/actions/calendar'
 import { applyReferralCode } from '@/actions/referral'
 import { readPendingReferral, clearPendingReferral } from '@/lib/referralPending'

@@ -82,7 +82,8 @@ function checkRateLimitMemory(
 async function checkRateLimitRedis(
   identifier: string,
   limit: number,
-  windowMs: number
+  windowMs: number,
+  failClosed = false
 ): Promise<RateLimitResult> {
   const redis = getRedis()
 
@@ -122,6 +123,13 @@ async function checkRateLimitRedis(
       resetIn: ttl > 0 ? ttl * 1000 : windowMs,
     }
   } catch (error) {
+    // Limiteurs sensibles (auth/paiement/clics) : en cas d'erreur Redis on REFUSE
+    // (fail-closed) plutôt que de retomber sur un compteur par-instance, contournable
+    // en serverless multi-instance — mieux vaut un refus passager qu'un anti-abus muet.
+    if (failClosed) {
+      console.error('Redis rate limit error (fail-closed, refus):', error)
+      return { success: false, remaining: 0, resetIn: windowMs }
+    }
     console.error('Redis rate limit error, falling back to memory:', error)
     // Fallback to in-memory on Redis error
     return checkRateLimitMemory(identifier, limit, windowMs)
@@ -135,10 +143,11 @@ async function checkRateLimitRedis(
 export async function checkRateLimit(
   identifier: string,
   limit: number,
-  windowMs: number
+  windowMs: number,
+  failClosed = false
 ): Promise<RateLimitResult> {
   if (isRedisAvailable()) {
-    return checkRateLimitRedis(identifier, limit, windowMs)
+    return checkRateLimitRedis(identifier, limit, windowMs, failClosed)
   }
   return checkRateLimitMemory(identifier, limit, windowMs)
 }
@@ -148,11 +157,11 @@ export const rateLimiters = {
   // API routes - 60 requests per minute
   api: (identifier: string) => checkRateLimit(identifier, 60, 60 * 1000),
 
-  // Stripe/Payment routes - 10 requests per minute
-  payment: (identifier: string) => checkRateLimit(identifier, 10, 60 * 1000),
+  // Stripe/Payment routes - 10/min, fail-closed (anti-abus prioritaire sur la dispo).
+  payment: (identifier: string) => checkRateLimit(identifier, 10, 60 * 1000, true),
 
-  // Auth routes - 10 requests per minute
-  auth: (identifier: string) => checkRateLimit(identifier, 10, 60 * 1000),
+  // Auth routes - 10/min, fail-closed (anti credential-stuffing même si Redis tousse).
+  auth: (identifier: string) => checkRateLimit(identifier, 10, 60 * 1000, true),
 
   // Cron routes - 10 requests per minute
   cron: (identifier: string) => checkRateLimit(identifier, 10, 60 * 1000),
@@ -162,5 +171,5 @@ export const rateLimiters = {
   // 1,5 clic/s soutenu) : très au-dessus du jeu légitime — les crédits bornent déjà
   // le volume de clics — il ne vise que l'automatisation soutenue qui contourne le
   // détecteur en mémoire (par instance) en serverless multi-instance.
-  clicks: (identifier: string) => checkRateLimit(identifier, 90, 60 * 1000),
+  clicks: (identifier: string) => checkRateLimit(identifier, 90, 60 * 1000, true),
 }

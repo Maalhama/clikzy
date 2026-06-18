@@ -7,6 +7,12 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: __dirname,
   },
+  // Audit 2026-06-18 #P2 perf — quick win bundle : optimise les imports des
+  // "barrels" lourds (lucide-react, framer-motion, simple-icons) pour que Next
+  // ne tire que les modules réellement utilisés plutôt que tout le package.
+  experimental: {
+    optimizePackageImports: ['lucide-react', 'framer-motion', 'simple-icons'],
+  },
   // M7 — retire les console.log/info/debug du build de PRODUCTION (garde
   // error/warn pour le diagnostic). Évite le bruit et toute fuite d'info en prod.
   compiler: {

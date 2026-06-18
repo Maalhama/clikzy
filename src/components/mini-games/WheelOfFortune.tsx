@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useRef, useEffect } from 'react'
-import { motion, AnimatePresence, useAnimation } from 'framer-motion'
+import { motion, AnimatePresence, useAnimation, useReducedMotion } from 'framer-motion'
 import { Trophy, Zap, Sparkles } from 'lucide-react'
 import { useMiniGameSounds } from '@/hooks/mini-games/useMiniGameSounds'
 import { WHEEL_SEGMENTS } from '@/types/miniGames'
@@ -29,6 +29,7 @@ export default function WheelOfFortune({
   targetSegment,
   disabled = false,
 }: WheelOfFortuneProps) {
+  const prefersReducedMotion = useReducedMotion()
   const [isSpinning, setIsSpinning] = useState(false)
   const [rotation, setRotation] = useState(0)
   const [hasFinished, setHasFinished] = useState(false)
@@ -299,7 +300,7 @@ export default function WheelOfFortune({
                   transform: `rotate(${i * 30}deg) translateY(-110px) translateX(-50%)`,
                   backgroundColor: color,
                 }}
-                animate={isSpinning ? {
+                animate={isSpinning && !prefersReducedMotion ? {
                   opacity: [0.3, 1, 0.3],
                   scale: [1, 1.5, 1],
                   boxShadow: [
@@ -312,7 +313,7 @@ export default function WheelOfFortune({
                   scale: 1,
                   boxShadow: `0 0 8px ${color}, 0 0 16px ${color}40`
                 }}
-                transition={isSpinning ? {
+                transition={isSpinning && !prefersReducedMotion ? {
                   duration: 0.15,
                   repeat: Infinity,
                   delay: i * 0.05, // Chase effect: chaque lumière avec délai

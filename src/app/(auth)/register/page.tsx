@@ -70,6 +70,8 @@ export default function RegisterPage() {
     data.append('email', formData.email)
     data.append('password', formData.password)
     data.append('username', formData.username)
+    // Attestation 18+ — vérifiée aussi côté serveur (la case seule était contournable).
+    data.append('ageConfirmed', ageConfirmed ? 'true' : 'false')
 
     const result = await signUp(data)
 

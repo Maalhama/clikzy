@@ -32,7 +32,10 @@ export function CookieConsent() {
 
   return (
     <div
-      role="dialog"
+      // Bandeau NON bloquant (pas de voile, la page reste utilisable) : ce n'est pas
+      // une vraie modale -> role="region" plutôt que dialog, pour ne pas piéger le
+      // focus ni mentir au lecteur d'écran (aucun aria-modal).
+      role="region"
       aria-label="Consentement aux cookies"
       // #325 — décollé de l'indicateur d'accueil iOS (safe-area) plutôt qu'un bottom-4 fixe.
       style={{ bottom: 'max(1rem, env(safe-area-inset-bottom))' }}

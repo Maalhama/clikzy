@@ -46,8 +46,16 @@ export const viewport: Viewport = {
   ],
 }
 
+// Base canonique du site. Fallback PROD (jamais localhost) : sert de base à TOUS
+// les canonicals, OG:url et URLs du sitemap. La var d'env ne sert qu'au dev local.
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.cleekzy.com'
+
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://www.cleekzy.com'),
+  metadataBase: new URL(SITE_URL),
+  // NB : on ne pose PAS de `alternates.canonical` au niveau du root layout.
+  // Next l'héritrait sur toute page sans canonical propre (légales, comment-ca-marche,
+  // joueur/wrapped…), les canonicalisant à tort vers '/'. Le canonical de la landing
+  // doit être posé sur src/app/page.tsx (hors périmètre de ce correctif).
   title: {
     default: 'CLEEKZY - Le dernier clic gagne',
     template: '%s | CLEEKZY',
@@ -71,7 +79,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     locale: 'fr_FR',
-    url: 'https://www.cleekzy.com',
+    url: SITE_URL,
     siteName: 'CLEEKZY',
     title: 'CLEEKZY - Le dernier clic gagne',
     description: 'Jeu gratuit en temps réel : le dernier à cliquer remporte le lot. 10 clics gratuits chaque jour. iPhone, PS5, MacBook et plus à gagner.',
@@ -101,30 +109,28 @@ export const metadata: Metadata = {
   },
 }
 
-// JSON-LD Structured Data
-const jsonLd = {
-  '@context': 'https://schema.org',
-  '@type': 'WebApplication',
-  name: 'CLEEKZY',
-  description: 'Jeu gratuit en temps réel : le dernier à cliquer remporte le lot. 10 clics gratuits chaque jour.',
-  url: 'https://www.cleekzy.com',
-  applicationCategory: 'Game',
-  operatingSystem: 'Web',
-  offers: {
-    '@type': 'Offer',
-    price: '0',
-    priceCurrency: 'EUR',
-  },
-  author: {
+// JSON-LD Structured Data.
+// On évite WebApplication + offers (price 0) : déclarer « gratuit » est trompeur
+// (les clics consomment des crédits achetés en argent réel) et expose à un risque
+// rich-results / juridique. On ne garde que des affirmations exactes : l'identité
+// de marque (Organization) et le site (WebSite). Aucune offre/prix affirmé.
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
     '@type': 'Organization',
     name: 'CLEEKZY',
-    url: 'https://www.cleekzy.com',
+    url: SITE_URL,
+    logo: `${SITE_URL}/icon-512.png`,
+    sameAs: ['https://twitter.com/cleekzy_fr'],
   },
-  potentialAction: {
-    '@type': 'PlayAction',
-    target: 'https://www.cleekzy.com/lobby',
+  {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: 'CLEEKZY',
+    url: SITE_URL,
+    inLanguage: 'fr-FR',
   },
-}
+]
 
 export default async function RootLayout({
   children,

@@ -532,9 +532,48 @@ export async function handleStripeEvent(event: Stripe.Event): Promise<HandlerRes
           }
           return { status: 200, body: { received: true, gift: gr } }
         }
-        // gr.reason === 'not_a_gift' -> on enchaîne sur le clawback de pack.
+        // gr.reason === 'not_a_gift' -> on enchaîne sur le clawback de buy-it-now / pass / pack.
       } else {
         console.error('[STRIPE] clawback_gift_code a échoué (on tente le pack):', giftErr)
+      }
+
+      // #P0-6 — Achat « Rachat malin » (buy-it-now) : annule la commande physique non
+      // expédiée (sinon : payer un lot physique -> chargeback = objet gratuit + argent rendu).
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data: binClaw, error: binClawErr } = await (supabase.rpc as any)('clawback_buy_it_now', { p_session: sessionId })
+      if (!binClawErr) {
+        const b = binClaw as { ok?: boolean; reason?: string; manual?: boolean } | null
+        if (b?.ok) {
+          console.log(`[STRIPE] Reprise Rachat malin (${event.type}) — session ${sessionId}:`, b)
+          import('@/lib/email')
+            .then(({ sendAdminAlertEmail }) =>
+              sendAdminAlertEmail(`Rachat malin repris (${event.type})`, `session ${sessionId}\n${JSON.stringify(b)}`)
+            )
+            .catch((e) => console.error('[WEBHOOK] alerte admin rachat malin échouée:', e))
+          return { status: 200, body: { received: true, buy_it_now: b } }
+        }
+        // b.reason === 'not_a_bin' -> on enchaîne.
+      } else {
+        console.error('[STRIPE] clawback_buy_it_now a échoué (on continue):', binClawErr)
+      }
+
+      // #P1 — Passe d'Arène : annule la passe remboursée (stoppe les futurs claims).
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data: passClaw, error: passClawErr } = await (supabase.rpc as any)('clawback_battle_pass', { p_session: sessionId })
+      if (!passClawErr) {
+        const p = passClaw as { ok?: boolean; reason?: string; manual?: boolean } | null
+        if (p?.ok) {
+          console.log(`[STRIPE] Reprise Passe d'Arène (${event.type}) — session ${sessionId}:`, p)
+          import('@/lib/email')
+            .then(({ sendAdminAlertEmail }) =>
+              sendAdminAlertEmail(`Passe d'Arène reprise (${event.type})`, `session ${sessionId}\n${JSON.stringify(p)}`)
+            )
+            .catch((e) => console.error('[WEBHOOK] alerte admin passe échouée:', e))
+          return { status: 200, body: { received: true, battle_pass: p } }
+        }
+        // p.reason === 'not_a_pass' -> on enchaîne sur le clawback de pack.
+      } else {
+        console.error('[STRIPE] clawback_battle_pass a échoué (on continue):', passClawErr)
       }
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any

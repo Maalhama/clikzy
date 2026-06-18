@@ -119,6 +119,13 @@ export async function signUp(formData: FormData): Promise<AuthResult> {
   const email = formData.get('email') as string
   const password = formData.get('password') as string
   const username = formData.get('username') as string
+  const ageConfirmed = formData.get('ageConfirmed') === 'true'
+
+  // Protection des mineurs : l'attestation 18+ est OBLIGATOIRE et vérifiée CÔTÉ SERVEUR
+  // (la case client seule était contournable en appelant l'action directement).
+  if (!ageConfirmed) {
+    return { success: false, error: 'Tu dois confirmer avoir 18 ans ou plus pour créer un compte.' }
+  }
 
   if (!email || !email.includes('@')) {
     return { success: false, error: 'Email invalide' }
@@ -152,6 +159,8 @@ export async function signUp(formData: FormData): Promise<AuthResult> {
       emailRedirectTo: `${origin}/auth/callback`,
       data: {
         username,
+        // Trace de l'attestation 18+ (preuve d'acceptation côté serveur).
+        age_confirmed_at: new Date().toISOString(),
       },
     },
   })

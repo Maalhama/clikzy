@@ -1,10 +1,11 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { RARITY_LABEL } from '@/lib/cosmetics'
 import { createPortal } from 'react-dom'
 import { X, Zap, Coins, Check } from 'lucide-react'
 import { motion } from 'framer-motion'
+import { useModalA11y } from '@/hooks/useModalA11y'
 import { claimCalendarDay, type CalendarDay } from '@/actions/calendar'
 import { NeonChest, CHEST_THEME, type ChestRarityKey } from '@/components/collection/NeonChest'
 import { BattlePassRail } from '@/components/progression/BattlePassRail'
@@ -27,6 +28,8 @@ export function RewardsCalendarModal({
   const [claiming, setClaiming] = useState(false)
   const [localDays, setLocalDays] = useState(days)
   const [result, setResult] = useState<{ kind: string; amount: number; rarity: string | null } | null>(null)
+  const panelRef = useRef<HTMLDivElement>(null)
+  useModalA11y(true, onClose, panelRef)
 
   const today = localDays.find((d) => d.claimable)
   const monthTitle = useMemo(() => {
@@ -66,6 +69,7 @@ export function RewardsCalendarModal({
   return createPortal(
     <div role="dialog" aria-modal="true" aria-label="Récompenses du mois" className="fixed inset-0 max-sm:min-h-[100lvh] z-[100] flex items-center justify-center bg-black/85 p-4 backdrop-blur-sm">
       <motion.div
+        ref={panelRef}
         initial={{ opacity: 0, y: 24, scale: 0.96 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ type: 'spring', stiffness: 260, damping: 22 }}

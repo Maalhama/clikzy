@@ -5,11 +5,17 @@ import type Stripe from 'stripe'
 const mockRpc = vi.fn()
 const mockUpdate = vi.fn()
 const mockEq = vi.fn()
+// Claim d'idempotence (POST) : insert dans `stripe_events` + delete de relâchement.
+const mockInsert = vi.fn()
+const mockDelete = vi.fn()
+const mockDeleteEq = vi.fn()
 
 const mockAdmin = {
   rpc: mockRpc,
   from: vi.fn(() => ({
     update: mockUpdate.mockReturnValue({ eq: mockEq }),
+    insert: mockInsert,
+    delete: mockDelete.mockReturnValue({ eq: mockDeleteEq }),
   })),
 }
 
@@ -17,20 +23,23 @@ vi.mock('@supabase/supabase-js', () => ({
   createClient: vi.fn(() => mockAdmin),
 }))
 
-const { mockSessionsList, mockChargesRetrieve, mockSubsCancel } = vi.hoisted(() => ({
+const { mockSessionsList, mockChargesRetrieve, mockSubsCancel, mockConstructEvent } = vi.hoisted(() => ({
   mockSessionsList: vi.fn(),
   mockChargesRetrieve: vi.fn(),
   mockSubsCancel: vi.fn(),
+  mockConstructEvent: vi.fn(),
 }))
 // Évite l'init Stripe réelle (clés absentes en test) ; classe constructible (getStripeInstance
 // fait `new Stripe(...)`) exposant checkout.sessions.list + charges.retrieve (détection VIP
-// chargeback) + subscriptions.cancel pour le handler de remboursement.
+// chargeback) + subscriptions.cancel pour le handler de remboursement + webhooks.constructEvent
+// (vérif signature au niveau POST).
 vi.mock('stripe', () => ({
   default: class MockStripe {
     checkout = { sessions: { list: mockSessionsList } }
     refunds = { create: vi.fn() }
     charges = { retrieve: mockChargesRetrieve }
     subscriptions = { cancel: mockSubsCancel }
+    webhooks = { constructEvent: mockConstructEvent }
   },
 }))
 
@@ -38,8 +47,9 @@ vi.mock('stripe', () => ({
 process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://test.supabase.co'
 process.env.SUPABASE_SERVICE_ROLE_KEY = 'test-service-role-key'
 process.env.STRIPE_SECRET_KEY = 'sk_test_dummy'
+process.env.STRIPE_WEBHOOK_SECRET = 'whsec_test_dummy'
 
-import { handleStripeEvent } from '@/app/api/stripe/webhook/route'
+import { handleStripeEvent, POST } from '@/app/api/stripe/webhook/route'
 
 function evt(type: string, object: Record<string, unknown>): Stripe.Event {
   return { type, data: { object } } as unknown as Stripe.Event
@@ -188,12 +198,13 @@ describe('handleStripeEvent — logique métier des paiements', () => {
   describe('remboursement / litige — reprise des crédits (anti-fraude)', () => {
     it('charge.refunded TOTAL : retrouve la session et reprend les crédits', async () => {
       mockSessionsList.mockResolvedValue({ data: [{ id: 'cs_pack' }] })
-      // Pas un cadeau -> clawback_gift_code répond not_a_gift, puis le pack est repris.
-      mockRpc.mockImplementation((fn: string) =>
-        fn === 'clawback_gift_code'
-          ? Promise.resolve({ data: { ok: false, reason: 'not_a_gift' } })
-          : Promise.resolve({ data: { ok: true, amount: 175 } })
-      )
+      // Ni cadeau, ni rachat malin, ni passe -> on enchaîne jusqu'au clawback de pack.
+      mockRpc.mockImplementation((fn: string) => {
+        if (fn === 'clawback_gift_code') return Promise.resolve({ data: { ok: false, reason: 'not_a_gift' } })
+        if (fn === 'clawback_buy_it_now') return Promise.resolve({ data: { ok: false, reason: 'not_a_bin' } })
+        if (fn === 'clawback_battle_pass') return Promise.resolve({ data: { ok: false, reason: 'not_a_pass' } })
+        return Promise.resolve({ data: { ok: true, amount: 175 } })
+      })
       const res = await handleStripeEvent(
         evt('charge.refunded', { id: 'ch_1', payment_intent: 'pi_1', amount: 1999, amount_refunded: 1999, refunded: true })
       )
@@ -215,11 +226,12 @@ describe('handleStripeEvent — logique métier des paiements', () => {
 
     it('charge.dispute.created : reprise des crédits (chargeback)', async () => {
       mockSessionsList.mockResolvedValue({ data: [{ id: 'cs_disp' }] })
-      mockRpc.mockImplementation((fn: string) =>
-        fn === 'clawback_gift_code'
-          ? Promise.resolve({ data: { ok: false, reason: 'not_a_gift' } })
-          : Promise.resolve({ data: { ok: true, amount: 50 } })
-      )
+      mockRpc.mockImplementation((fn: string) => {
+        if (fn === 'clawback_gift_code') return Promise.resolve({ data: { ok: false, reason: 'not_a_gift' } })
+        if (fn === 'clawback_buy_it_now') return Promise.resolve({ data: { ok: false, reason: 'not_a_bin' } })
+        if (fn === 'clawback_battle_pass') return Promise.resolve({ data: { ok: false, reason: 'not_a_pass' } })
+        return Promise.resolve({ data: { ok: true, amount: 50 } })
+      })
       const res = await handleStripeEvent(
         evt('charge.dispute.created', { id: 'dp_1', payment_intent: 'pi_3' })
       )
@@ -262,6 +274,71 @@ describe('handleStripeEvent — logique métier des paiements', () => {
       // C’était un cadeau -> on n’enchaîne PAS sur le clawback de pack.
       expect(mockRpc).not.toHaveBeenCalledWith('clawback_pack_credits', { p_session: 'cs_gift' })
       expect(res.body).toEqual({ received: true, gift: { ok: true, voided: true, code: 'ABCD' } })
+    })
+
+    it('#P0-6 — remboursement d’un Rachat malin (buy-it-now) : géré par clawback_buy_it_now, PAS le pack', async () => {
+      mockSessionsList.mockResolvedValue({ data: [{ id: 'cs_bin' }] })
+      // gift -> not_a_gift, puis buy_it_now -> ok:true (cancelled) => court-circuit.
+      mockRpc.mockImplementation((fn: string) => {
+        if (fn === 'clawback_gift_code') return Promise.resolve({ data: { ok: false, reason: 'not_a_gift' } })
+        if (fn === 'clawback_buy_it_now') return Promise.resolve({ data: { ok: true, cancelled: true } })
+        return Promise.resolve({ data: { ok: true, amount: 999 } })
+      })
+      const res = await handleStripeEvent(
+        evt('charge.refunded', { id: 'ch_bin', payment_intent: 'pi_bin', amount: 2500, amount_refunded: 2500, refunded: true })
+      )
+      expect(res.status).toBe(200)
+      expect(res.body).toEqual({ received: true, buy_it_now: { ok: true, cancelled: true } })
+      // Ordre des RPC respecté : gift -> buy_it_now, puis on s’arrête.
+      expect(mockRpc).toHaveBeenCalledWith('clawback_gift_code', { p_session: 'cs_bin' })
+      expect(mockRpc).toHaveBeenCalledWith('clawback_buy_it_now', { p_session: 'cs_bin' })
+      // Court-circuit : ni passe ni pack ne sont touchés.
+      expect(mockRpc).not.toHaveBeenCalledWith('clawback_battle_pass', { p_session: 'cs_bin' })
+      expect(mockRpc).not.toHaveBeenCalledWith('clawback_pack_credits', { p_session: 'cs_bin' })
+    })
+
+    it('#P1 — chargeback d’une Passe d’Arène : géré par clawback_battle_pass, PAS le pack', async () => {
+      mockSessionsList.mockResolvedValue({ data: [{ id: 'cs_pass' }] })
+      // gift -> not_a_gift, bin -> not_a_bin, pass -> ok:true => court-circuit avant le pack.
+      mockRpc.mockImplementation((fn: string) => {
+        if (fn === 'clawback_gift_code') return Promise.resolve({ data: { ok: false, reason: 'not_a_gift' } })
+        if (fn === 'clawback_buy_it_now') return Promise.resolve({ data: { ok: false, reason: 'not_a_bin' } })
+        if (fn === 'clawback_battle_pass') return Promise.resolve({ data: { ok: true, cancelled: true } })
+        return Promise.resolve({ data: { ok: true, amount: 500 } })
+      })
+      const res = await handleStripeEvent(
+        evt('charge.dispute.created', { id: 'dp_pass', payment_intent: 'pi_pass' })
+      )
+      expect(res.status).toBe(200)
+      expect(res.body).toEqual({ received: true, battle_pass: { ok: true, cancelled: true } })
+      // Ordre attendu : gift -> bin -> pass.
+      expect(mockRpc).toHaveBeenCalledWith('clawback_gift_code', { p_session: 'cs_pass' })
+      expect(mockRpc).toHaveBeenCalledWith('clawback_buy_it_now', { p_session: 'cs_pass' })
+      expect(mockRpc).toHaveBeenCalledWith('clawback_battle_pass', { p_session: 'cs_pass' })
+      // La passe a court-circuité : le pack n’est jamais réclamé.
+      expect(mockRpc).not.toHaveBeenCalledWith('clawback_pack_credits', { p_session: 'cs_pass' })
+    })
+
+    it('aucune session liée au paiement : acquittement sans clawback', async () => {
+      mockSessionsList.mockResolvedValue({ data: [] })
+      const res = await handleStripeEvent(
+        evt('charge.refunded', { id: 'ch_none', payment_intent: 'pi_none', amount: 999, amount_refunded: 999, refunded: true })
+      )
+      expect(res.status).toBe(200)
+      expect(res.body).toEqual({ received: true, no_session: true })
+      expect(mockRpc).not.toHaveBeenCalledWith('clawback_gift_code', expect.anything())
+    })
+
+    it('clawback_pack_credits en erreur SQL : 500 (Stripe rejouera)', async () => {
+      mockSessionsList.mockResolvedValue({ data: [{ id: 'cs_err' }] })
+      mockRpc.mockImplementation((fn: string) => {
+        if (fn === 'clawback_pack_credits') return Promise.resolve({ data: null, error: { message: 'boom' } })
+        return Promise.resolve({ data: { ok: false, reason: `not_a_${fn.replace('clawback_', '')}` } })
+      })
+      const res = await handleStripeEvent(
+        evt('charge.refunded', { id: 'ch_err', payment_intent: 'pi_err', amount: 999, amount_refunded: 999, refunded: true })
+      )
+      expect(res.status).toBe(500)
     })
   })
 
@@ -332,5 +409,101 @@ describe('handleStripeEvent — logique métier des paiements', () => {
         })
       )
     })
+  })
+})
+
+// Niveau ROUTE (POST) : signature Stripe + claim d'idempotence `stripe_events`.
+// On construit une requête minimale (text() + headers) ; constructEvent et l'insert
+// du claim sont mockés, donc pas de réseau ni de vraie crypto/DB.
+describe('POST /api/stripe/webhook — signature & idempotence', () => {
+  function req(opts: { body?: string; signature?: string | null } = {}) {
+    const headers = new Headers()
+    if (opts.signature !== null) headers.set('stripe-signature', opts.signature ?? 'sig_ok')
+    return {
+      text: () => Promise.resolve(opts.body ?? '{}'),
+      headers,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } as any
+  }
+
+  beforeEach(() => {
+    vi.clearAllMocks()
+    mockRpc.mockResolvedValue({ data: { granted: 50 } })
+    mockEq.mockResolvedValue({ error: null })
+    mockUpdate.mockReturnValue({ eq: mockEq })
+    mockChargesRetrieve.mockResolvedValue({ invoice: null })
+    // Claim libre par défaut + delete de relâchement OK.
+    mockInsert.mockResolvedValue({ error: null })
+    mockDeleteEq.mockResolvedValue({ error: null })
+    mockDelete.mockReturnValue({ eq: mockDeleteEq })
+    // Event valide par défaut.
+    mockConstructEvent.mockReturnValue({
+      id: 'evt_1',
+      type: 'checkout.session.completed',
+      data: { object: { id: 'cs_post', metadata: { userId: 'u-1', packId: 'starter', credits: '50', monthlyLimit: '0' } } },
+    })
+  })
+
+  it('400 si la signature est absente (pas d’appel constructEvent)', async () => {
+    const res = await POST(req({ signature: null }))
+    expect(res.status).toBe(400)
+    expect(mockConstructEvent).not.toHaveBeenCalled()
+  })
+
+  it('400 si la signature est invalide (constructEvent jette)', async () => {
+    mockConstructEvent.mockImplementation(() => {
+      throw new Error('bad signature')
+    })
+    const res = await POST(req({ signature: 'sig_bad' }))
+    expect(res.status).toBe(400)
+    // Échec de vérif -> on n’a pas touché à l’idempotence ni au métier.
+    expect(mockInsert).not.toHaveBeenCalled()
+    expect(mockRpc).not.toHaveBeenCalled()
+  })
+
+  it('claim d’idempotence : insert dans stripe_events avec {id, type}', async () => {
+    const res = await POST(req())
+    expect(res.status).toBe(200)
+    expect(mockAdmin.from).toHaveBeenCalledWith('stripe_events')
+    expect(mockInsert).toHaveBeenCalledWith({ id: 'evt_1', type: 'checkout.session.completed' })
+  })
+
+  it('replay au niveau route : conflit 23505 -> { received:true, duplicate:true } sans traiter le métier', async () => {
+    mockInsert.mockResolvedValue({ error: { code: '23505', message: 'duplicate key' } })
+    const res = await POST(req())
+    expect(res.status).toBe(200)
+    const body = await res.json()
+    expect(body).toEqual({ received: true, duplicate: true })
+    // Event déjà traité -> on ne recrédite PAS.
+    expect(mockRpc).not.toHaveBeenCalled()
+  })
+
+  it('erreur de claim non-conflit -> 500 (Idempotency error)', async () => {
+    mockInsert.mockResolvedValue({ error: { code: '08006', message: 'connection error' } })
+    const res = await POST(req())
+    expect(res.status).toBe(500)
+    expect(mockRpc).not.toHaveBeenCalled()
+  })
+
+  it('échec du traitement (>=400) -> relâche le claim (delete) pour permettre un retry Stripe', async () => {
+    // metadata invalide -> handler renvoie 400.
+    mockConstructEvent.mockReturnValue({
+      id: 'evt_bad',
+      type: 'checkout.session.completed',
+      data: { object: { metadata: { credits: '50' } } }, // pas de userId/packId
+    })
+    const res = await POST(req())
+    expect(res.status).toBe(400)
+    // Le claim est relâché : delete().eq('id', 'evt_bad').
+    expect(mockDelete).toHaveBeenCalled()
+    expect(mockDeleteEq).toHaveBeenCalledWith('id', 'evt_bad')
+  })
+
+  it('succès complet : insert claim conservé (pas de delete de relâchement)', async () => {
+    const res = await POST(req())
+    expect(res.status).toBe(200)
+    const body = await res.json()
+    expect(body).toEqual({ received: true })
+    expect(mockDelete).not.toHaveBeenCalled()
   })
 })

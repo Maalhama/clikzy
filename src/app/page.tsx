@@ -1,8 +1,15 @@
+import type { Metadata } from 'next'
 import { unstable_cache } from 'next/cache'
 import { createClient as createSupabaseClient } from '@supabase/supabase-js'
 import { createClient } from '@/lib/supabase/server'
 import { LandingClient } from '@/components/landing'
 import type { Winner as DbWinner, Profile, Game, Item } from '@/types/database'
+
+// Canonical explicite de la landing : neutralise le duplicate créé par le param de
+// parrainage `?ref=CODE` (résolu via metadataBase = NEXT_PUBLIC_SITE_URL du layout).
+export const metadata: Metadata = {
+  alternates: { canonical: '/' },
+}
 
 interface Winner {
   id: string

@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useEffect, useRef, useState, useCallback } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
 import { Sparkles, Trophy } from 'lucide-react'
 import { useMiniGameSounds } from '@/hooks/mini-games/useMiniGameSounds'
 
@@ -30,6 +30,7 @@ export default function ScratchCard({
   disabled = false,
 }: ScratchCardProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
+  const prefersReducedMotion = useReducedMotion()
   const [isScratching, setIsScratching] = useState(false)
   const [isRevealed, setIsRevealed] = useState(false)
   const dprRef = useRef<number>(1)
@@ -326,12 +327,12 @@ export default function ScratchCard({
             {/* Trophy with glow */}
             <motion.div
               className={`p-3 rounded-full mb-2 ${prizeAmount >= 5 ? 'bg-gradient-to-br from-[#FFB800] to-[#FF8C00]' : 'bg-gradient-to-br from-[#9B5CFF] to-[#FF4FD8]'}`}
-              animate={isRevealed ? {
+              animate={isRevealed && !prefersReducedMotion ? {
                 boxShadow: prizeAmount >= 5
                   ? ['0 0 15px rgba(255, 184, 0, 0.5)', '0 0 30px rgba(255, 184, 0, 0.8)', '0 0 15px rgba(255, 184, 0, 0.5)']
                   : ['0 0 15px rgba(155, 92, 255, 0.5)', '0 0 30px rgba(155, 92, 255, 0.8)', '0 0 15px rgba(155, 92, 255, 0.5)']
               } : {}}
-              transition={{ duration: 1.5, repeat: Infinity }}
+              transition={prefersReducedMotion ? undefined : { duration: 1.5, repeat: Infinity }}
             >
               <Trophy className={`w-6 h-6 ${prizeAmount >= 5 ? 'text-[#0B0F1A]' : 'text-white'}`} />
             </motion.div>
@@ -450,7 +451,7 @@ export default function ScratchCard({
         }`} />
 
         {/* Sparkles */}
-        {isScratching && !isRevealed && (
+        {isScratching && !isRevealed && !prefersReducedMotion && (
           <div className="absolute inset-0 pointer-events-none z-40 overflow-hidden">
             {[...Array(6)].map((_, i) => (
               <motion.div
@@ -488,8 +489,8 @@ export default function ScratchCard({
           className="mt-2 text-center"
         >
           <motion.p
-            animate={{ opacity: [0.3, 0.7, 0.3] }}
-            transition={{ duration: 2, repeat: Infinity }}
+            animate={prefersReducedMotion ? undefined : { opacity: [0.3, 0.7, 0.3] }}
+            transition={prefersReducedMotion ? undefined : { duration: 2, repeat: Infinity }}
             className="text-[10px] tracking-widest text-white/50 uppercase font-medium"
           >
             Gratte ici
