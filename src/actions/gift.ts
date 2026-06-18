@@ -141,6 +141,15 @@ export async function redeemGift(
   if (!user) return { success: false, error: 'Connecte-toi pour réclamer ton cadeau.' }
   if (!code || !code.trim()) return { success: false, error: 'Entre un code cadeau.' }
 
+  // Jeu responsable : un compte en pause (auto-exclusion) ne peut pas se créditer,
+  // même via un code cadeau (réclamer = recevoir crédits/VIP).
+  const excl = await selfExcludedUntil(supabase, user.id)
+  if (excl) return { success: false, error: selfExclusionError(excl) }
+
+  // Anti-brute-force de la RÉCLAMATION (le lookup est déjà limité ; le redeem ne l'était pas).
+  const rl = await checkRateLimit(`gift-redeem:${getClientIP(await headers())}`, 20, 60_000)
+  if (!rl.success) return { success: false, error: 'Trop de tentatives. Réessaie dans une minute.' }
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { data, error } = await (supabase.rpc as any)('redeem_gift_code', { p_code: code.trim(), p_user_id: user.id })
   if (error) {

@@ -30,6 +30,11 @@ const ENV_VARS: EnvVar[] = [
   // Cron
   { name: 'CRON_SECRET', required: false, description: 'Cron job authorization secret' },
 
+  // Upstash Redis (rate-limit distribué — sans lui, le rate-limit retombe sur un
+  // compteur PAR INSTANCE, contournable en serverless multi-instance).
+  { name: 'UPSTASH_REDIS_REST_URL', required: false, description: 'Upstash Redis REST URL (rate-limit distribué)' },
+  { name: 'UPSTASH_REDIS_REST_TOKEN', required: false, description: 'Upstash Redis REST token (rate-limit distribué)' },
+
   // Sentry (optional)
   { name: 'NEXT_PUBLIC_SENTRY_DSN', required: false, description: 'Sentry DSN for error tracking' },
 ]
@@ -93,13 +98,25 @@ export function validateEnvOnStartup(): void {
     console.warn('[ENV] Optional variables not set:')
     result.warnings.forEach(w => console.warn(`  - ${w}`))
   }
+
+  // En PRODUCTION, l'absence d'Upstash dégrade SILENCIEUSEMENT le rate-limit vers un
+  // compteur par-instance (anti credential-stuffing / anti-clic contournable). On le
+  // signale fort (sans bloquer le boot — un déploiement sans Redis reste possible).
+  if (
+    process.env.NODE_ENV === 'production' &&
+    !(process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN)
+  ) {
+    console.error('[ENV] ⚠ Upstash Redis absent en production : rate-limit NON distribué (par-instance, contournable en serverless). Configure UPSTASH_REDIS_REST_URL/TOKEN.')
+  }
 }
 
 /**
  * Check if a specific feature is configured
  */
-export function isFeatureConfigured(feature: 'stripe' | 'resend' | 'sentry' | 'cron'): boolean {
+export function isFeatureConfigured(feature: 'stripe' | 'resend' | 'sentry' | 'cron' | 'redis'): boolean {
   switch (feature) {
+    case 'redis':
+      return !!(process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN)
     case 'stripe':
       return !!(
         process.env.STRIPE_SECRET_KEY &&
