@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useCallback, useTransition, useEffect, useMemo, useRef } from 'react'
-import { AnonGateModal } from '@/components/modals/AnonGateModal'
+import dynamic from 'next/dynamic'
 import { GameComments } from '@/components/comments/GameComments'
 import Link from 'next/link'
 import Image from 'next/image'
@@ -20,16 +20,31 @@ import { GameRules } from '@/components/game/GameRules'
 import { formatTime } from '@/lib/utils/timer'
 import { generateDeterministicUsername } from '@/lib/bots/usernameGenerator'
 import { getProductImageWithFallback } from '@/lib/utils/productImages'
-import { CreditPacksModal } from '@/components/modals/CreditPacksModal'
 import { ShareWinButtons } from '@/components/game/ShareWinButtons'
 import { ShareNearMissButtons } from '@/components/game/ShareNearMissButtons'
 import { BuyItNowGameOffer } from '@/components/game/BuyItNowGameOffer'
 import { GameContenders } from '@/components/game/GameContenders'
 import { GameClicksFeed } from '@/components/game/GameClicksFeed'
-import VIPSubscriptionModal from '@/components/modals/VIPSubscriptionModal'
 import { trackGameClick, trackGameWin } from '@/lib/analytics'
 import { createVIPCheckoutSession, checkVIPStatus } from '@/actions/stripe'
 import type { Game, Item } from '@/types/database'
+
+// Modales lourdes (chacune tire framer-motion) chargées en lazy : elles ne s'affichent
+// que sur action (gate anon, achat de crédits, abonnement V.I.P) -> hors bundle initial
+// de la route /game. Le rendu reste gardé par un booléen isOpen ; le piège de focus
+// (useModalA11y, keyé sur isOpen) reste fonctionnel après chargement.
+const AnonGateModal = dynamic(
+  () => import('@/components/modals/AnonGateModal').then((m) => ({ default: m.AnonGateModal })),
+  { ssr: false }
+)
+const CreditPacksModal = dynamic(
+  () => import('@/components/modals/CreditPacksModal').then((m) => ({ default: m.CreditPacksModal })),
+  { ssr: false }
+)
+const VIPSubscriptionModal = dynamic(
+  () => import('@/components/modals/VIPSubscriptionModal'),
+  { ssr: false }
+)
 
 // Generate UUID with fallback for browsers that don't support crypto.randomUUID
 function generateId(): string {
@@ -103,6 +118,13 @@ export function GameClient({
     }
   })
   const [gaugeCelebrate, setGaugeCelebrate] = useState(false)
+  // Annonces lecteur d'écran (régions live .sr-only) : le timer et les clics sont
+  // purement visuels/sonores. On annonce par PALIERS (jamais à chaque tick) pour ne
+  // pas spammer le lecteur d'écran.
+  const [timerAnnounce, setTimerAnnounce] = useState('')
+  const [clickAnnounce, setClickAnnounce] = useState('')
+  const lastTimerBucketRef = useRef<string>('')
+  const lastLeaderRef = useRef<string | null>(null)
 
   const { timeLeft, isUrgent, isEnded } = useTimer({ endTime: game.end_time ?? 0 })
 
@@ -130,6 +152,55 @@ export function GameClient({
   const canClick = !isEnded && game.status !== 'ended' && game.status !== 'waiting'
   const hasCredits = credits >= GAME_CONSTANTS.CREDIT_COST_PER_CLICK
   const isPremiumProduct = (game.item?.retail_value ?? 0) >= 1000
+
+  // Annonce le compte à rebours UNIQUEMENT aux seuils utiles (entrée phase finale,
+  // 30 s, 10 s, 5 s, 3-2-1, fin) — jamais à chaque seconde. On dérive un « palier »
+  // de displayTimeLeft et on n'annonce qu'au changement de palier.
+  useEffect(() => {
+    if (game.status === 'waiting' || game.status === 'ended') return
+    const secs = Math.ceil(displayTimeLeft / 1000)
+    let bucket = ''
+    let message = ''
+    if (displayTimeLeft <= 0) {
+      bucket = 'ended'
+      message = 'Temps écoulé.'
+    } else if (secs <= 3) {
+      bucket = `s${secs}`
+      message = `${secs}…`
+    } else if (secs <= 5) {
+      bucket = 's5'
+      message = 'Plus que 5 secondes.'
+    } else if (secs <= 10) {
+      bucket = 's10'
+      message = 'Plus que 10 secondes.'
+    } else if (secs <= 30) {
+      bucket = 's30'
+      message = 'Plus que 30 secondes.'
+    } else if (game.status === 'final_phase') {
+      bucket = 'final'
+      message = 'Phase finale, le dernier clic gagne.'
+    }
+    if (bucket && bucket !== lastTimerBucketRef.current) {
+      lastTimerBucketRef.current = bucket
+      if (message) setTimerAnnounce(message)
+    }
+  }, [displayTimeLeft, game.status])
+
+  // Annonce le changement de leader (qui est en tête) sans spammer : seulement
+  // quand le meneur change réellement.
+  useEffect(() => {
+    if (game.status === 'ended' || game.status === 'waiting') return
+    const leader = game.last_click_username ?? null
+    if (leader && leader !== lastLeaderRef.current) {
+      const wasInit = lastLeaderRef.current !== null
+      lastLeaderRef.current = leader
+      if (wasInit) {
+        setClickAnnounce(leader === username ? 'Tu es en tête.' : `${leader} a pris la tête.`)
+      } else {
+        lastLeaderRef.current = leader
+      }
+    }
+  }, [game.last_click_username, game.status, username])
 
   // Check VIP status on mount for premium products
   useEffect(() => {
@@ -171,6 +242,8 @@ export function GameClient({
     if (game.status === 'ended' && game.winner_id === userId && !hasPlayedWinRef.current) {
       hasPlayedWinRef.current = true
       playWin()
+      // Annonce la victoire au lecteur d'écran (aujourd'hui : seulement son + vibration).
+      setClickAnnounce(`Victoire ! Tu remportes ${game.item.name}.`)
       // Haptique de victoire (motif festif, distinct du clic) — no-op si non supporté.
       if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
         navigator.vibrate([40, 60, 40, 60, 90])
@@ -266,12 +339,17 @@ export function GameClient({
         // (pas d'avance optimiste de jauge à annuler)
         setError(result.error || 'Une erreur est survenue')
       } else {
+        // Retour lecteur d'écran : confirmation du clic + crédits restants (action
+        // centrale du produit, sinon le joueur aveugle clique « dans le vide »).
+        const remaining = Math.max(0, credits - GAME_CONSTANTS.CREDIT_COST_PER_CLICK)
+        setClickAnnounce(`Clic enregistré, tu es en tête. Crédits restants : ${remaining}.`)
         // Réconcilie la jauge avec l'état serveur (autoritaire) + célèbre la complétion
         if (result.data?.gauge) {
           setGauge(result.data.gauge)
           if (result.data.gauge.completed) {
             playWin()
             setGaugeCelebrate(true)
+            setClickAnnounce('Jauge complétée, récompense débloquée !')
             setTimeout(() => setGaugeCelebrate(false), 4500)
           }
         }
@@ -281,7 +359,7 @@ export function GameClient({
         }
       }
     })
-  }, [userId, isPending, hasCredits, canClick, isPremiumProduct, isVip, playClick, playWin, triggerHaptic, username, game, optimisticUpdate, decrementCredits, addClick, removeClick, showBadgeNotifications])
+  }, [userId, isPending, hasCredits, canClick, isPremiumProduct, isVip, playClick, playWin, triggerHaptic, username, game, credits, optimisticUpdate, decrementCredits, addClick, removeClick, showBadgeNotifications])
 
   // Border gradient style (same as lobby cards)
   const borderStyle = useMemo(() => {
@@ -314,6 +392,16 @@ export function GameClient({
 
   return (
     <div className="min-h-screen pb-20 lg:pb-8">
+
+      {/* Régions live accessibles (masquées visuellement) : annoncent le compte à
+          rebours par paliers et le retour de clic / changement de leader, sans
+          dupliquer le timer visuel ni spammer le lecteur d'écran. */}
+      <div aria-live="assertive" aria-atomic="true" className="sr-only" role="status">
+        {timerAnnounce}
+      </div>
+      <div aria-live="polite" aria-atomic="true" className="sr-only" role="status">
+        {clickAnnounce}
+      </div>
 
       {/* Contrôle du son — libre choix du joueur, persistant (#292/#327) */}
       <button
@@ -1043,22 +1131,28 @@ export function GameClient({
         </div>
       </div>
 
-      {/* Credit Packs Modal */}
-      <CreditPacksModal
-        isOpen={showCreditModal}
-        onClose={() => setShowCreditModal(false)}
-      />
+      {/* Credit Packs Modal (lazy : ne télécharge son JS qu'à la 1re ouverture) */}
+      {showCreditModal && (
+        <CreditPacksModal
+          isOpen={showCreditModal}
+          onClose={() => setShowCreditModal(false)}
+        />
+      )}
 
-      {/* VIP Subscription Modal */}
-      <VIPSubscriptionModal
-        isOpen={showVIPModal}
-        onClose={() => setShowVIPModal(false)}
-        onSubscribe={handleVIPSubscribe}
-        isLoading={vipLoading}
-      />
+      {/* VIP Subscription Modal (lazy) */}
+      {showVIPModal && (
+        <VIPSubscriptionModal
+          isOpen={showVIPModal}
+          onClose={() => setShowVIPModal(false)}
+          onSubscribe={handleVIPSubscribe}
+          isLoading={vipLoading}
+        />
+      )}
 
-      {/* Anon : modal d'invitation à l'inscription (au lieu de l'achat de crédits) */}
-      <AnonGateModal isOpen={showAuthGate} onClose={() => setShowAuthGate(false)} />
+      {/* Anon : modal d'invitation à l'inscription (au lieu de l'achat de crédits) — lazy */}
+      {showAuthGate && (
+        <AnonGateModal isOpen={showAuthGate} onClose={() => setShowAuthGate(false)} />
+      )}
     </div>
   )
 }

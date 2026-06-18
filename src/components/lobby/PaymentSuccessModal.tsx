@@ -1,6 +1,8 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { useReducedMotion } from 'framer-motion'
+import { useModalA11y } from '@/hooks/useModalA11y'
 
 interface PaymentSuccessModalProps {
   credits: number
@@ -27,14 +29,21 @@ const KIND_COPY = {
   },
 } as const
 
+const AUTO_DISMISS_MS = 5000
+
 export function PaymentSuccessModal({ credits, kind = 'credits', onClose }: PaymentSuccessModalProps) {
   const [progress, setProgress] = useState(100)
+  // Pause de l'auto-fermeture au survol / focus clavier (WCAG 2.2.1 — Timing Adjustable).
+  const [paused, setPaused] = useState(false)
+  const panelRef = useRef<HTMLDivElement>(null)
+  const prefersReducedMotion = useReducedMotion()
+  useModalA11y(true, onClose, panelRef)
 
-  // Auto-dismiss after 5 seconds with progress bar
+  // Auto-fermeture après 5 s, mise en pause tant que le panneau est survolé/focus.
   useEffect(() => {
-    const duration = 5000
+    if (paused) return
     const interval = 50
-    const step = (interval / duration) * 100
+    const step = (interval / AUTO_DISMISS_MS) * 100
 
     const timer = setInterval(() => {
       setProgress((prev) => {
@@ -48,7 +57,7 @@ export function PaymentSuccessModal({ credits, kind = 'credits', onClose }: Paym
     }, interval)
 
     return () => clearInterval(timer)
-  }, [onClose])
+  }, [onClose, paused])
 
   return (
     <div role="dialog" aria-modal="true" aria-label="Paiement réussi" className="fixed inset-0 max-sm:min-h-[100lvh] z-50 flex items-center justify-center p-4">
@@ -59,7 +68,14 @@ export function PaymentSuccessModal({ credits, kind = 'credits', onClose }: Paym
       />
 
       {/* Modal */}
-      <div className="relative w-full max-w-md glass-dark rounded-2xl p-5 sm:p-8 animate-modal-enter overflow-hidden">
+      <div
+        ref={panelRef}
+        onMouseEnter={() => setPaused(true)}
+        onMouseLeave={() => setPaused(false)}
+        onFocusCapture={() => setPaused(true)}
+        onBlurCapture={() => setPaused(false)}
+        className="relative w-full max-w-md glass-dark rounded-2xl p-5 sm:p-8 animate-modal-enter overflow-hidden"
+      >
         {/* Decorative glow effects - hidden on mobile for performance */}
         <div className="hidden sm:block absolute -top-20 -left-20 w-40 h-40 bg-success/20 rounded-full blur-[80px]" />
         <div className="hidden sm:block absolute -bottom-20 -right-20 w-40 h-40 bg-neon-purple/20 rounded-full blur-[80px]" />
@@ -67,6 +83,7 @@ export function PaymentSuccessModal({ credits, kind = 'credits', onClose }: Paym
         {/* Close button */}
         <button
           onClick={onClose}
+          aria-label="Fermer"
           className="absolute top-3 right-3 sm:top-4 sm:right-4 p-2 rounded-full text-white/50 hover:text-white hover:bg-white/10 transition-colors"
         >
           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -114,15 +131,18 @@ export function PaymentSuccessModal({ credits, kind = 'credits', onClose }: Paym
             {KIND_COPY[kind].cta}
           </button>
 
-          {/* Progress bar */}
-          <div className="mt-4 sm:mt-6 h-1 bg-white/10 rounded-full overflow-hidden">
-            <div
-              className="h-full bg-gradient-to-r from-neon-purple to-neon-pink transition-all duration-50"
-              style={{ width: `${progress}%` }}
-            />
-          </div>
+          {/* Barre de progression de l'auto-fermeture. Sous reduced-motion, on masque
+              la barre animée et on garde un simple texte (pas de mouvement non désactivable). */}
+          {!prefersReducedMotion && (
+            <div className="mt-4 sm:mt-6 h-1 bg-white/10 rounded-full overflow-hidden">
+              <div
+                className="h-full bg-gradient-to-r from-neon-purple to-neon-pink transition-all duration-50"
+                style={{ width: `${progress}%` }}
+              />
+            </div>
+          )}
           <p className="text-xs text-white/50 mt-2">
-            Fermeture automatique...
+            {paused ? 'Fermeture en pause' : 'Fermeture automatique...'}
           </p>
         </div>
       </div>

@@ -1,9 +1,17 @@
 'use client'
 
 import { ReactNode } from 'react'
+import dynamic from 'next/dynamic'
 import { CreditsProvider } from '@/contexts/CreditsContext'
 import { BadgeNotificationProvider } from '@/contexts/BadgeNotificationContext'
-import { BadgeNotificationContainer } from '@/components/notifications/BadgeNotification'
+
+// Lazy + client-only : BadgeNotificationContainer tire framer-motion. Statiquement
+// importé dans le layout (main), il chargeait framer (~40 KB gz) sur CHAQUE route
+// connectée. Il ne s'affiche qu'au déblocage d'un badge (événement rare) -> dynamic.
+const BadgeNotificationContainer = dynamic(
+  () => import('@/components/notifications/BadgeNotification').then((m) => ({ default: m.BadgeNotificationContainer })),
+  { ssr: false }
+)
 
 interface ClientProvidersProps {
   children: ReactNode

@@ -1,8 +1,9 @@
 'use client'
 
-import { useEffect, useState, useCallback, type ReactNode, type CSSProperties } from 'react'
+import { useEffect, useRef, useState, useCallback, type ReactNode, type CSSProperties } from 'react'
 import { createPortal } from 'react-dom'
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
+import { useModalA11y } from '@/hooks/useModalA11y'
 import { PixelSprite } from '@/components/collection/PixelSprite'
 import { BASE_HERO } from '@/components/collection/pixelHero'
 
@@ -55,6 +56,10 @@ export function SpotlightTour({
   const [mounted, setMounted] = useState(false)
   const [step, setStep] = useState(0)
   const [rect, setRect] = useState<Rect | null>(null)
+  const panelRef = useRef<HTMLDivElement>(null)
+  // Piège de focus + fermeture Échap (= « Passer ») + restauration du focus :
+  // le tour est un parcours obligatoire, il doit être navigable au clavier.
+  useModalA11y(open, onClose, panelRef)
 
   useEffect(() => setMounted(true), [])
   useEffect(() => {
@@ -198,6 +203,7 @@ export function SpotlightTour({
           <div className="pointer-events-none" style={{ ...wrapperStyle, transition: 'top .4s ease, left .4s ease' }}>
             <AnimatePresence mode="wait">
               <motion.div
+                ref={panelRef}
                 key={step}
                 initial={{ opacity: 0, scale: 0.94, y: 8 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}

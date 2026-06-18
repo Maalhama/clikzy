@@ -3,8 +3,9 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { X, Coins, Zap } from 'lucide-react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
 import { openChest, type ChestDrop } from '@/actions/collection'
+import { useModalA11y } from '@/hooks/useModalA11y'
 import { useSounds } from '@/hooks/useSounds'
 import { RARITY, bonusLabel, type Rarity } from './rarity'
 import { NeonChest } from './NeonChest'
@@ -45,6 +46,9 @@ export function CaseOpeningModal({
   const [drop, setDrop] = useState<ChestDrop | null>(null)
   const [unlocked, setUnlocked] = useState(false)
   const startedRef = useRef(false)
+  const panelRef = useRef<HTMLDivElement>(null)
+  const prefersReducedMotion = useReducedMotion()
+  useModalA11y(true, onClose, panelRef)
   const { playClick, playWin } = useSounds(true)
 
   const cr = CHEST_RARITY[chestRarity] ?? 'common'
@@ -90,7 +94,7 @@ export function CaseOpeningModal({
         )}
       </AnimatePresence>
 
-      <div className="relative w-full max-w-xl overflow-hidden rounded-2xl border border-white/10 bg-bg-secondary p-6">
+      <div ref={panelRef} className="relative w-full max-w-xl overflow-hidden rounded-2xl border border-white/10 bg-bg-secondary p-6">
         <button onClick={onClose} aria-label="Fermer" className="absolute top-3 right-3 z-20 text-white/55 hover:text-white">
           <X size={20} />
         </button>
@@ -127,8 +131,8 @@ export function CaseOpeningModal({
                     style={{ background: `radial-gradient(circle, ${rewardColor}AA, transparent 70%)` }}
                   />
                   <motion.div
-                    animate={{ y: [0, -6, 0] }}
-                    transition={{ duration: 2.4, repeat: Infinity, ease: 'easeInOut' }}
+                    animate={prefersReducedMotion ? undefined : { y: [0, -6, 0] }}
+                    transition={prefersReducedMotion ? undefined : { duration: 2.4, repeat: Infinity, ease: 'easeInOut' }}
                     className="rounded-2xl border bg-bg-primary/80 px-8 py-5 backdrop-blur-sm"
                     style={{ borderColor: `${rewardColor}88`, boxShadow: `0 0 40px -6px ${rewardColor}` }}
                   >
@@ -209,6 +213,8 @@ export function CaseOpeningModal({
                   ? { scale: 0.92, y: 8 }
                   : phase === 'opening'
                   ? { y: 0 }
+                  : prefersReducedMotion
+                  ? undefined
                   : { y: [0, -7, 0] }
               }
               transition={
@@ -218,6 +224,8 @@ export function CaseOpeningModal({
                   ? { duration: 0.4 }
                   : phase === 'opening'
                   ? { duration: 0.2 }
+                  : prefersReducedMotion
+                  ? undefined
                   : { duration: 3, repeat: Infinity, ease: 'easeInOut' }
               }
               className="relative"

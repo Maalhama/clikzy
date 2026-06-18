@@ -1,10 +1,11 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import Link from 'next/link'
 import { X, Trophy, Users, CalendarClock, Sparkles } from 'lucide-react'
 import { getJackpot, type JackpotState } from '@/actions/jackpot'
+import { useModalA11y } from '@/hooks/useModalA11y'
 import { PixelCrown } from '@/components/pixel/PixelIcon'
 
 function nextEighth(): { days: number; label: string } {
@@ -25,6 +26,9 @@ export function JackpotWidget({ variant }: { variant: 'inline' | 'pill' | 'stat'
   const [jp, setJp] = useState<JackpotState | null>(null)
   const [open, setOpen] = useState(false)
   const [display, setDisplay] = useState(0)
+  const panelRef = useRef<HTMLDivElement>(null)
+  const closeModal = useCallback(() => setOpen(false), [])
+  useModalA11y(open, closeModal, panelRef)
 
   useEffect(() => { getJackpot().then(setJp).catch(() => {}) }, [])
 
@@ -99,7 +103,7 @@ export function JackpotWidget({ variant }: { variant: 'inline' | 'pill' | 'stat'
           className="fixed inset-0 max-sm:min-h-[100lvh] z-[110] flex items-center justify-center bg-black/85 p-4 backdrop-blur-sm"
           onClick={() => setOpen(false)}
         >
-          <div className="relative w-full max-w-md overflow-hidden rounded-2xl border border-yellow-400/25 surface-3 p-6" onClick={(e) => e.stopPropagation()}>
+          <div ref={panelRef} className="relative w-full max-w-md overflow-hidden rounded-2xl border border-yellow-400/25 surface-3 p-6" onClick={(e) => e.stopPropagation()}>
             <button onClick={() => setOpen(false)} aria-label="Fermer" className="absolute right-3 top-3 text-white/55 hover:text-white"><X size={20} /></button>
             <div className="mb-4 flex flex-col items-center text-center">
               <span className="mb-3 flex h-14 w-14 items-center justify-center rounded-2xl border border-yellow-400/40 bg-yellow-400/10"><span className="h-7 w-7">{trophy}</span></span>

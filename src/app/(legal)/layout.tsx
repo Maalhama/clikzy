@@ -18,7 +18,7 @@ export default function LegalLayout({
       <header className="relative z-10 border-b border-white/10 bg-bg-primary/80 backdrop-blur-xl sticky top-0">
         <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
           <Link href="/" className="text-2xl font-black">
-            <span className="text-neon-purple">CLIK</span>
+            <span className="text-neon-purple">CLEEK</span>
             <span className="text-neon-pink">ZY</span>
           </Link>
           <Link

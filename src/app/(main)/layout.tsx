@@ -3,7 +3,7 @@ import { getCurrentUser } from '@/lib/auth/getCurrentUser'
 import { Header } from '@/components/layout/Header'
 import { ArenaAtmosphereLazy } from '@/components/ui/ArenaAtmosphereLazy'
 import { ClientProviders } from '@/components/providers/ClientProviders'
-import { InstallBanner } from '@/components/pwa/InstallBanner'
+import { InstallBannerLazy } from '@/components/pwa/InstallBannerLazy'
 import { AppFooter } from '@/components/layout/AppFooter'
 import { CosmeticsProvider } from '@/components/cosmetics/CosmeticsProvider'
 import type { Profile } from '@/types/database'
@@ -57,8 +57,8 @@ export default async function MainLayout({
         {/* Header */}
         <Header profile={profile} />
 
-        {/* PWA : bandeau d'installation fermable, juste sous le header */}
-        <InstallBanner />
+        {/* PWA : bandeau d'installation fermable, juste sous le header (lazy : framer hors baseline) */}
+        <InstallBannerLazy />
 
         {/* Main content (id ciblé par le lien d'évitement / skip link) */}
         <main id="main-content" className="flex-1 relative z-10">

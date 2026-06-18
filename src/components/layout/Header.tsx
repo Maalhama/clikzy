@@ -187,8 +187,14 @@ export function Header({ profile }: HeaderProps) {
 
   return (
     <>
-      <header className="fixed top-0 left-0 right-0 z-50">
-        {/* Fond verre */}
+      {/* Zone sûre iOS : le header est `position: fixed` (positionné par rapport au
+          viewport, PAS au padding du body), il faut donc porter env(safe-area-inset-top)
+          SUR le header lui-même, sinon en PWA standalone il passe sous la barre d'état. */}
+      <header
+        className="fixed top-0 left-0 right-0 z-50"
+        style={{ paddingTop: 'env(safe-area-inset-top)' }}
+      >
+        {/* Fond verre — couvre aussi la zone sûre (inset-0 inclut le padding top) */}
         <div className="absolute inset-0 bg-bg-primary/75 backdrop-blur-xl" />
 
         {/* Liseré bas animé */}
@@ -358,7 +364,8 @@ export function Header({ profile }: HeaderProps) {
             onClick={closeMenu}
             style={{
               position: 'fixed',
-              top: '3.5rem',
+              // Aligné sous le header (qui inclut désormais la zone sûre iOS).
+              top: 'calc(3.5rem + env(safe-area-inset-top))',
               left: 0,
               right: 0,
               bottom: 0,
@@ -374,7 +381,7 @@ export function Header({ profile }: HeaderProps) {
             className="overflow-y-auto"
             style={{
               position: 'fixed',
-              top: '3.5rem',
+              top: 'calc(3.5rem + env(safe-area-inset-top))',
               left: 0,
               bottom: 0,
               width: '17.5rem',

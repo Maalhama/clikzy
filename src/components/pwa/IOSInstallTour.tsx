@@ -1,8 +1,9 @@
 'use client'
 
-import { useState, useEffect, type ReactNode } from 'react'
+import { useState, useEffect, useRef, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
+import { useModalA11y } from '@/hooks/useModalA11y'
 import { PixelSprite } from '@/components/collection/PixelSprite'
 import { BASE_HERO } from '@/components/collection/pixelHero'
 import { usePWAInstall } from '@/hooks/usePWAInstall'
@@ -134,8 +135,11 @@ const INAPP_STEPS: Step[] = [
  */
 export function IOSInstallTour({ open, onClose }: { open: boolean; onClose: () => void }) {
   const { isInAppBrowser } = usePWAInstall()
+  const prefersReducedMotion = useReducedMotion()
   const [mounted, setMounted] = useState(false)
   const [step, setStep] = useState(0)
+  const panelRef = useRef<HTMLDivElement>(null)
+  useModalA11y(open, onClose, panelRef)
 
   useEffect(() => setMounted(true), [])
   useEffect(() => {
@@ -166,6 +170,7 @@ export function IOSInstallTour({ open, onClose }: { open: boolean; onClose: () =
           <div className="mt-[9vh] w-full max-w-sm px-4">
             <AnimatePresence mode="wait">
               <motion.div
+                ref={panelRef}
                 key={step}
                 initial={{ opacity: 0, scale: 0.94, y: 8 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -193,11 +198,11 @@ export function IOSInstallTour({ open, onClose }: { open: boolean; onClose: () =
                     <motion.div
                       className="absolute inset-0 -z-10 rounded-full blur-xl"
                       style={{ background: `${s.accent}45` }}
-                      animate={{ opacity: [0.4, 0.8, 0.4] }}
-                      transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+                      animate={prefersReducedMotion ? undefined : { opacity: [0.4, 0.8, 0.4] }}
+                      transition={prefersReducedMotion ? undefined : { duration: 3, repeat: Infinity, ease: 'easeInOut' }}
                       aria-hidden
                     />
-                    <motion.div animate={{ y: [0, -5, 0] }} transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}>
+                    <motion.div animate={prefersReducedMotion ? undefined : { y: [0, -5, 0] }} transition={prefersReducedMotion ? undefined : { duration: 3, repeat: Infinity, ease: 'easeInOut' }}>
                       <PixelSprite layers={[BASE_HERO]} size={58} className="drop-shadow-[0_6px_12px_rgba(0,0,0,0.5)]" />
                     </motion.div>
                     <div className="mt-0.5 text-center text-[0.55rem] font-bold uppercase tracking-[0.15em]" style={{ color: s.accent }}>
@@ -276,8 +281,8 @@ export function IOSInstallTour({ open, onClose }: { open: boolean; onClose: () =
                   strokeLinecap="round"
                   strokeLinejoin="round"
                   className="h-9 w-9 drop-shadow-[0_0_10px_#3CCBFF]"
-                  animate={{ y: [0, 12, 0] }}
-                  transition={{ duration: 1.1, repeat: Infinity, ease: 'easeInOut' }}
+                  animate={prefersReducedMotion ? undefined : { y: [0, 12, 0] }}
+                  transition={prefersReducedMotion ? undefined : { duration: 1.1, repeat: Infinity, ease: 'easeInOut' }}
                 >
                   <path d="M12 4v15M6 13l6 6 6-6" />
                 </motion.svg>

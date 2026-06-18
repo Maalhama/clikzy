@@ -1,10 +1,12 @@
 'use client'
 
+import { useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { RARITY_HEX, RARITY_LABEL } from '@/lib/cosmetics'
 import { createPortal } from 'react-dom'
 import { X, Zap, Coins, Sparkles, Dices } from 'lucide-react'
 import { motion } from 'framer-motion'
+import { useModalA11y } from '@/hooks/useModalA11y'
 import { CharacterAvatar } from '@/components/collection/CharacterAvatar'
 import { ItemIcon } from '@/components/collection/ItemIcon'
 import type { Collection } from '@/actions/collection'
@@ -28,6 +30,8 @@ export function LobbyCharacterModal({
   onClose: () => void
 }) {
   const router = useRouter()
+  const panelRef = useRef<HTMLDivElement>(null)
+  useModalA11y(true, onClose, panelRef)
   const count = SLOTS.filter((s) => equipment[s.key]).length
 
   if (typeof window === 'undefined') return null
@@ -40,6 +44,7 @@ export function LobbyCharacterModal({
       className="fixed inset-0 z-[100] flex items-center justify-center bg-black/85 p-4 backdrop-blur-sm max-sm:min-h-[100lvh]"
     >
       <motion.div
+        ref={panelRef}
         onClick={(e) => e.stopPropagation()}
         initial={{ opacity: 0, y: 24, scale: 0.96 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}

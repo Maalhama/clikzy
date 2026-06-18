@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useCallback, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
 import { Trophy, Zap, Sparkles } from 'lucide-react'
 import { SLOTS_SYMBOLS } from '@/types/miniGames'
 import { SlotGlyph } from './SlotGlyph'
@@ -50,6 +50,7 @@ function SpinningReel({
 }) {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [displaySymbols, setDisplaySymbols] = useState<number[]>([0, 1, 2])
+  const prefersReducedMotion = useReducedMotion()
 
   // Spin animation - cycle through symbols
   useEffect(() => {
@@ -96,10 +97,10 @@ function SpinningReel({
       {/* Symbols container */}
       <motion.div
         className="absolute inset-0 flex flex-col items-center justify-center"
-        animate={isSpinning && !isStopped ? { y: [0, -20, 0] } : {}}
-        transition={isSpinning && !isStopped ? { duration: 0.08, repeat: Infinity, ease: 'linear' } : {}}
+        animate={isSpinning && !isStopped && !prefersReducedMotion ? { y: [0, -20, 0] } : {}}
+        transition={isSpinning && !isStopped && !prefersReducedMotion ? { duration: 0.08, repeat: Infinity, ease: 'linear' } : {}}
         style={{
-          filter: isSpinning && !isStopped ? 'blur(2px)' : 'blur(0px)',
+          filter: isSpinning && !isStopped && !prefersReducedMotion ? 'blur(2px)' : 'blur(0px)',
           transition: 'filter 0.3s ease-out',
         }}
       >

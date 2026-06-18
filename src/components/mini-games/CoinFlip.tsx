@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
 import { Trophy, Sparkles, Zap } from 'lucide-react'
 import { useMiniGameSounds } from '@/hooks/mini-games/useMiniGameSounds'
 import { useMiniGameStateMachine } from '@/hooks/mini-games/useMiniGameStateMachine'
@@ -20,6 +20,7 @@ export default function CoinFlip({
   disabled = false,
 }: CoinFlipProps) {
   const [showWinCelebration, setShowWinCelebration] = useState(false)
+  const prefersReducedMotion = useReducedMotion()
 
   const { playTick, playWhoosh, playImpact, playWin, vibrate } = useMiniGameSounds()
 
@@ -253,8 +254,8 @@ export default function CoinFlip({
       <div className="text-center mb-3">
         {game.isPlaying && (
           <motion.p
-            animate={{ opacity: [1, 0.5, 1] }}
-            transition={{ duration: 0.5, repeat: Infinity }}
+            animate={prefersReducedMotion ? undefined : { opacity: [1, 0.5, 1] }}
+            transition={prefersReducedMotion ? undefined : { duration: 0.5, repeat: Infinity }}
             className="text-[#FFB800] text-base sm:text-lg font-bold"
           >
             La pièce tourne…

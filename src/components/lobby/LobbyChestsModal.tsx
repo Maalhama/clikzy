@@ -1,9 +1,10 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { X, Gift } from 'lucide-react'
 import { motion } from 'framer-motion'
+import { useModalA11y } from '@/hooks/useModalA11y'
 import { getCollection, claimDailyChest, type Collection, type ChestDrop } from '@/actions/collection'
 import { CaseOpeningModal } from '@/components/collection/CaseOpeningModal'
 import { NeonChest } from '@/components/collection/NeonChest'
@@ -20,6 +21,10 @@ export function LobbyChestsModal({ onClose }: { onClose: () => void }) {
   const [busy, setBusy] = useState(false)
   const [opening, setOpening] = useState<{ id: string; rarity: string } | null>(null)
   const [flash, setFlash] = useState<string | null>(null)
+  const panelRef = useRef<HTMLDivElement>(null)
+  // Le piège de focus de cette modale est désactivé quand l'ouverture de coffre
+  // (CaseOpeningModal) est ouverte par-dessus : elle gère son propre focus/Échap.
+  useModalA11y(!opening, onClose, panelRef)
 
   const load = useCallback(async () => {
     const res = await getCollection()
@@ -52,6 +57,7 @@ export function LobbyChestsModal({ onClose }: { onClose: () => void }) {
     <>
       <div role="dialog" aria-modal="true" aria-label="Tes coffres" className="fixed inset-0 max-sm:min-h-[100lvh] z-[90] flex items-center justify-center bg-black/85 p-4 backdrop-blur-sm">
         <motion.div
+          ref={panelRef}
           initial={{ opacity: 0, y: 24, scale: 0.96 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ type: 'spring', stiffness: 260, damping: 22 }}

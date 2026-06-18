@@ -1,7 +1,7 @@
 'use client'
 
 import React from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
 import { Trophy, X, Sparkles } from 'lucide-react'
 import { useBadgeNotification } from '@/contexts/BadgeNotificationContext'
 
@@ -41,6 +41,7 @@ const rarityLabels: Record<string, string> = {
 
 export function BadgeNotificationContainer() {
   const { notifications, dismissNotification } = useBadgeNotification()
+  const prefersReducedMotion = useReducedMotion()
 
   return (
     <div className="fixed top-4 right-4 z-[200] flex flex-col gap-3 pointer-events-none">
@@ -63,11 +64,11 @@ export function BadgeNotificationContainer() {
                 {/* Animated background gradient */}
                 <div className="absolute inset-0 overflow-hidden">
                   <motion.div
-                    animate={{
+                    animate={prefersReducedMotion ? undefined : {
                       rotate: [0, 360],
                       scale: [1, 1.2, 1],
                     }}
-                    transition={{
+                    transition={prefersReducedMotion ? undefined : {
                       duration: 8,
                       repeat: Infinity,
                       ease: 'linear',
@@ -107,15 +108,15 @@ export function BadgeNotificationContainer() {
                     {['legendary', 'epic'].includes(badge.rarity) && (
                       <>
                         <motion.div
-                          animate={{ opacity: [0, 1, 0], scale: [0.5, 1, 0.5] }}
-                          transition={{ duration: 1.5, repeat: Infinity, delay: 0 }}
+                          animate={prefersReducedMotion ? undefined : { opacity: [0, 1, 0], scale: [0.5, 1, 0.5] }}
+                          transition={prefersReducedMotion ? undefined : { duration: 1.5, repeat: Infinity, delay: 0 }}
                           className="absolute -top-1 -right-1"
                         >
                           <Sparkles size={12} className={colors.text} />
                         </motion.div>
                         <motion.div
-                          animate={{ opacity: [0, 1, 0], scale: [0.5, 1, 0.5] }}
-                          transition={{ duration: 1.5, repeat: Infinity, delay: 0.5 }}
+                          animate={prefersReducedMotion ? undefined : { opacity: [0, 1, 0], scale: [0.5, 1, 0.5] }}
+                          transition={prefersReducedMotion ? undefined : { duration: 1.5, repeat: Infinity, delay: 0.5 }}
                           className="absolute -bottom-1 -left-1"
                         >
                           <Sparkles size={10} className={colors.text} />

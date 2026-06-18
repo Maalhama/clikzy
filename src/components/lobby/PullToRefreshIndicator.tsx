@@ -1,7 +1,7 @@
 'use client'
 
 import { memo } from 'react'
-import { motion } from 'framer-motion'
+import { motion, useReducedMotion } from 'framer-motion'
 
 interface PullToRefreshIndicatorProps {
   pullDistance: number
@@ -14,6 +14,7 @@ export const PullToRefreshIndicator = memo(function PullToRefreshIndicator({
   isRefreshing,
   threshold = 80,
 }: PullToRefreshIndicatorProps) {
+  const prefersReducedMotion = useReducedMotion()
   if (pullDistance <= 0 && !isRefreshing) return null
 
   const progress = Math.min(pullDistance / threshold, 1)
@@ -45,8 +46,8 @@ export const PullToRefreshIndicator = memo(function PullToRefreshIndicator({
         {isRefreshing ? (
           // Spinning loader
           <motion.div
-            animate={{ rotate: 360 }}
-            transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+            animate={prefersReducedMotion ? undefined : { rotate: 360 }}
+            transition={prefersReducedMotion ? undefined : { duration: 1, repeat: Infinity, ease: 'linear' }}
           >
             <svg
               className="w-5 h-5 text-neon-purple"

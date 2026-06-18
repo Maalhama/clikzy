@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import Link from 'next/link'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
 import { useSounds } from '@/hooks/useSounds'
 import { useIsMobile } from '@/hooks/useIsMobile'
 
@@ -50,6 +50,7 @@ export function FloatingTimer({
   const productIndexRef = useRef(0)
   const isWaitingRef = useRef(false)
   const isMobile = useIsMobile()
+  const prefersReducedMotion = useReducedMotion()
 
   // Sounds
   const { playHeartbeat, stopAll: stopSounds } = useSounds(enabled && isVisible)
@@ -223,13 +224,13 @@ export function FloatingTimer({
         } : {
           opacity: 1,
           y: 0,
-          scale: isCritical && !isMobile ? [1, 1.02, 1] : 1,
+          scale: isCritical && !isMobile && !prefersReducedMotion ? [1, 1.02, 1] : 1,
         }}
         exit={isMobile ? { opacity: 0 } : { opacity: 0, y: 40 }}
         transition={isMobile ? { duration: 0.15 } : isEnding ? {
           duration: 0.4,
           ease: 'easeIn',
-        } : isCritical ? {
+        } : isCritical && !prefersReducedMotion ? {
           scale: {
             duration: 0.5,
             repeat: Infinity,
