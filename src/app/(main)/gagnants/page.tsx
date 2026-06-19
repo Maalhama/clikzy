@@ -20,6 +20,8 @@ const STATUS: Record<string, { label: string; cls: string }> = {
 export default async function GagnantsPage() {
   const winners = await getWinnersWall(60)
   const delivered = winners.filter((w) => w.shippingStatus === 'delivered' || w.shippingStatus === 'shipped').length
+  // Preuve « vérifiée » la plus forte : gagnants ayant partagé une photo (modérée) de leur lot reçu.
+  const withPhoto = winners.filter((w) => w.deliveryPhotoUrl).length
 
   return (
     <main className="relative z-10 mx-auto max-w-5xl px-4 py-8">
@@ -29,6 +31,9 @@ export default async function GagnantsPage() {
         <p className="mt-2 text-sm text-white/55">
           Ils ont cliqué en dernier, ils ont gagné, et on livre. {delivered > 0 && (
             <span className="font-semibold text-success">{delivered} lots déjà expédiés ou livrés.</span>
+          )}
+          {withPhoto > 0 && (
+            <span className="font-semibold text-neon-blue"> {withPhoto} photo{withPhoto > 1 ? 's' : ''} de lots reçus partagée{withPhoto > 1 ? 's' : ''}.</span>
           )}
         </p>
       </div>
