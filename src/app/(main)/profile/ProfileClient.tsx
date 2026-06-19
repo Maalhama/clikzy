@@ -12,6 +12,7 @@ import { ReferralSection } from '@/components/profile/ReferralSection'
 import { BadgesSection } from '@/components/profile/BadgesSection'
 import { BuyItNowSection } from '@/components/profile/BuyItNowSection'
 import { CreditHistorySection } from '@/components/profile/CreditHistorySection'
+import { SpendingLimitSection } from '@/components/profile/SpendingLimitSection'
 import { BuyItNowResultToast } from '@/components/profile/BuyItNowResultToast'
 import { PrivacyCard } from '@/components/profile/PrivacyCard'
 import { ResponsibleGamingCard } from '@/components/profile/ResponsibleGamingCard'
@@ -423,6 +424,9 @@ export function ProfileClient({ profile, wins, gamesPlayed, totalValueWon, gameH
 
         {/* Credit Movements (transparence "argent") */}
         <CreditHistorySection />
+
+        {/* Jeu responsable : limite de dépense auto-imposée */}
+        <SpendingLimitSection />
 
         {/* Play CTA */}
         <motion.div

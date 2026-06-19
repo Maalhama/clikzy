@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
+import { submitSupportTicket } from '@/actions/support'
 
 /**
  * Formulaire de contact support — seule partie interactive de /support.
@@ -16,7 +17,7 @@ export function SupportForm() {
   })
   const [isLoading, setIsLoading] = useState(false)
   const [success, setSuccess] = useState(false)
-  const [error] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(null)
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) {
     setFormData(prev => ({
@@ -28,15 +29,14 @@ export function SupportForm() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setIsLoading(true)
-
-    // Pré-remplit le client mail (pas d'API d'envoi pour l'instant).
-    const mailtoUrl = `mailto:support@cleekzy.com?subject=${encodeURIComponent(formData.subject)}&body=${encodeURIComponent(
-      `Nom: ${formData.name}\nEmail: ${formData.email}\n\n${formData.message}`
-    )}`
-    window.location.href = mailtoUrl
-
-    setSuccess(true)
+    setError(null)
+    const res = await submitSupportTicket(formData)
     setIsLoading(false)
+    if (!res.success) {
+      setError(res.error ?? 'Une erreur est survenue. Réessaie plus tard.')
+      return
+    }
+    setSuccess(true)
   }
 
   return (
@@ -55,8 +55,8 @@ export function SupportForm() {
               <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
             </svg>
           </div>
-          <h3 className="text-xl font-bold text-white mb-2">Ton client mail s&apos;est ouvert</h3>
-          <p className="text-white/60 mb-4">Vérifie ta messagerie et envoie le message pré-rempli à support@cleekzy.com : nous te répondrons sous 2 heures maximum.</p>
+          <h3 className="text-xl font-bold text-white mb-2">Message envoyé !</h3>
+          <p className="text-white/60 mb-4">Nous avons bien reçu ta demande et te répondrons par email dès que possible.</p>
           <button
             onClick={() => {
               setSuccess(false)

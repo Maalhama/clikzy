@@ -60,6 +60,21 @@ export async function createCheckoutSession(
     if (pack.monthlyLimit && alreadyThisMonth) {
       return { success: false, error: 'Ce pack est limité à un achat par mois — reviens le mois prochain.' }
     }
+
+    // Auto-limitation de dépense (#5 jeu responsable) : refuse l'achat si la limite
+    // mensuelle fixée par le joueur serait dépassée. Pré-check serveur (aide au joueur,
+    // pas anti-fraude) — n'altère pas grant_pack_credits. Estimation au prix de base.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: limitRow } = await (supabase as any)
+      .from('profiles').select('monthly_purchase_limit').eq('id', user.id).single()
+    const spendLimit = limitRow?.monthly_purchase_limit as number | null | undefined
+    if (spendLimit != null) {
+      const packPrice: Record<string, number> = Object.fromEntries(CREDIT_PACKS.map((p) => [p.id, p.price]))
+      const spent = ((monthState as { pack_id: string }[] | null) ?? []).reduce((s, r) => s + (packPrice[r.pack_id] ?? 0), 0)
+      if (spent + pack.price > spendLimit) {
+        return { success: false, error: `Limite mensuelle atteinte (${spendLimit} €). Ajuste-la dans « Jeu responsable » si besoin.` }
+      }
+    }
     // x2 sur le 1er achat de CE pack ce mois-ci. Affiché sur Stripe pour zéro doute au
     // paiement ; l'autorité reste grant_pack_credits (recalcul atomique au paiement).
     const x2Eligible = !alreadyThisMonth
