@@ -572,3 +572,42 @@ export async function adminDeleteComment(commentId: string): Promise<{ success: 
   revalidatePath('/admin')
   return { success: true }
 }
+
+export interface PendingDeliveryPhoto {
+  id: string
+  username: string
+  item_name: string
+  delivery_photo_url: string
+}
+
+/** Photos de livraison en attente de modération (admin). */
+export async function getPendingDeliveryPhotos(): Promise<PendingDeliveryPhoto[]> {
+  const { isAdmin } = await checkAdminStatus()
+  if (!isAdmin) return []
+  const supabase = createServiceClient()
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data } = await (supabase as any)
+    .from('winners')
+    .select('id, username, item_name, delivery_photo_url')
+    .not('delivery_photo_url', 'is', null)
+    .eq('delivery_photo_approved', false)
+    .order('won_at', { ascending: false })
+    .limit(50)
+  return (data ?? []) as PendingDeliveryPhoto[]
+}
+
+/** Approuver (publier) ou rejeter (effacer) une photo de livraison. */
+export async function setDeliveryPhotoApproval(winnerId: string, approved: boolean): Promise<{ success: boolean; error?: string }> {
+  const { isAdmin } = await checkAdminStatus()
+  if (!isAdmin) return { success: false, error: 'Non autorisé' }
+  const supabase = createServiceClient()
+  const patch = approved
+    ? { delivery_photo_approved: true }
+    : { delivery_photo_approved: false, delivery_photo_url: null }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { error } = await (supabase as any).from('winners').update(patch).eq('id', winnerId)
+  if (error) return { success: false, error: error.message }
+  revalidatePath('/admin')
+  revalidatePath('/gagnants')
+  return { success: true }
+}

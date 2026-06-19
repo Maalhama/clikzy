@@ -42,10 +42,19 @@ export default async function GagnantsPage() {
             return (
               <div key={w.id} className="panel panel-hover overflow-hidden p-3">
                 <div className="relative mb-2 aspect-square overflow-hidden rounded-xl bg-bg-primary/50">
-                  <Image src={w.itemImage} alt={w.itemName} fill sizes="200px" className="object-contain p-2" />
+                  {w.deliveryPhotoUrl ? (
+                    // Photo réelle du colis reçu (modérée).
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={w.deliveryPhotoUrl} alt={`${w.itemName} reçu par ${w.username}`} className="absolute inset-0 h-full w-full object-cover" />
+                  ) : (
+                    <Image src={w.itemImage} alt={w.itemName} fill sizes="200px" className="object-contain p-2" />
+                  )}
                   <span className={`absolute left-1.5 top-1.5 rounded-md border px-1.5 py-0.5 text-[0.55rem] font-semibold ${st.cls}`}>
                     {st.label}
                   </span>
+                  {w.deliveryPhotoUrl && (
+                    <span className="absolute right-1.5 top-1.5 rounded-md bg-success/90 px-1.5 py-0.5 text-[0.55rem] font-semibold text-white">Photo réelle</span>
+                  )}
                 </div>
                 <p className="truncate text-xs font-semibold text-white">{w.itemName}</p>
                 <div className="mt-0.5 flex items-center justify-between">

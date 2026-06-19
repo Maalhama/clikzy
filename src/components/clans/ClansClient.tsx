@@ -4,6 +4,7 @@ import { useState, useCallback } from 'react'
 import { Loader2, Shield, Crown, LogOut, Plus, Users } from 'lucide-react'
 import {
   getMyClan, getClanLeaderboard, createClan, joinClan, leaveClan,
+  kickClanMember, transferClanOwnership, disbandClan,
   type MyClan, type ClanRow,
 } from '@/actions/clans'
 
@@ -55,6 +56,24 @@ export function ClansClient({ initialMyClan, initialBoard }: { initialMyClan: My
     if (res.success) await refresh(); else setErr(res.error ?? 'Erreur')
     setBusy(false)
   }
+  const doKick = async (userId: string) => {
+    setBusy(true); setErr(null)
+    const res = await kickClanMember(userId)
+    if (res.success) await refresh(); else setErr(res.error ?? 'Erreur')
+    setBusy(false)
+  }
+  const doTransfer = async (userId: string) => {
+    setBusy(true); setErr(null)
+    const res = await transferClanOwnership(userId)
+    if (res.success) await refresh(); else setErr(res.error ?? 'Erreur')
+    setBusy(false)
+  }
+  const doDisband = async () => {
+    setBusy(true); setErr(null)
+    const res = await disbandClan()
+    if (res.success) await refresh(); else setErr(res.error ?? 'Erreur')
+    setBusy(false)
+  }
 
   if (loading) return <div className="flex justify-center py-12 text-white/55"><Loader2 className="h-6 w-6 animate-spin" /></div>
 
@@ -95,9 +114,16 @@ export function ClansClient({ initialMyClan, initialBoard }: { initialMyClan: My
                   {myClan.description && <p className="mt-0.5 text-sm text-white/55">{myClan.description}</p>}
                 </div>
               </div>
-              <button onClick={doLeave} disabled={busy} className="btn-arena-ghost shrink-0 px-3 py-2 text-xs disabled:opacity-60">
-                <LogOut className="h-3.5 w-3.5" /> Quitter
-              </button>
+              <div className="flex shrink-0 gap-2">
+                {myClan.myRole === 'owner' && (
+                  <button onClick={doDisband} disabled={busy} className="btn-arena-ghost px-3 py-2 text-xs text-danger disabled:opacity-60">
+                    Dissoudre
+                  </button>
+                )}
+                <button onClick={doLeave} disabled={busy} className="btn-arena-ghost px-3 py-2 text-xs disabled:opacity-60">
+                  <LogOut className="h-3.5 w-3.5" /> Quitter
+                </button>
+              </div>
             </div>
 
             {/* Stats du clan en tuiles */}
@@ -129,6 +155,12 @@ export function ClansClient({ initialMyClan, initialBoard }: { initialMyClan: My
                 {m.role === 'owner' && <Crown className="h-3.5 w-3.5 text-yellow-400" />}
                 <span className="text-[0.65rem] text-white/55">Niv. {m.level}</span>
                 <span className="stat-numeral text-xs text-white/70">{m.xp.toLocaleString('fr-FR')} XP</span>
+                {myClan.myRole === 'owner' && m.role !== 'owner' && (
+                  <span className="flex gap-1">
+                    <button onClick={() => doTransfer(m.userId)} disabled={busy} title="Nommer chef" className="rounded px-2 py-1 text-[0.65rem] text-yellow-400 hover:bg-white/10 disabled:opacity-50">Chef</button>
+                    <button onClick={() => doKick(m.userId)} disabled={busy} title="Exclure" className="rounded px-2 py-1 text-[0.65rem] text-danger hover:bg-white/10 disabled:opacity-50">Exclure</button>
+                  </span>
+                )}
               </div>
             ))}
           </div>
