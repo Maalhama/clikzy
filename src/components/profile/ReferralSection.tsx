@@ -19,8 +19,9 @@ export function ReferralSection({ referralCode, referralCount, creditsEarned, ha
   const [success, setSuccess] = useState(false)
   const [copied, setCopied] = useState(false)
 
+  // Landing d'invitation partageable (carte OG) plutôt que /register brut.
   const referralLink = referralCode
-    ? `${typeof window !== 'undefined' ? window.location.origin : ''}/register?ref=${referralCode}`
+    ? `${typeof window !== 'undefined' ? window.location.origin : ''}/invite/${referralCode}`
     : null
 
   async function handleCopyLink() {
