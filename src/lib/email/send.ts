@@ -5,6 +5,9 @@ import {
   shippingEmailHtml,
   vipPaymentFailedEmailHtml,
   streakReminderEmailHtml,
+  gaugeConvertedEmailHtml,
+  addressReminderEmailHtml,
+  checkoutReminderEmailHtml,
 } from './templates'
 import { unsubscribeUrl } from './unsubscribe'
 
@@ -192,6 +195,67 @@ export async function sendStreakReminderEmail(email: string, username: string, s
     return true
   } catch (err) {
     console.error('[EMAIL] Exception sending streak email:', err)
+    return false
+  }
+}
+
+export async function sendGaugeConvertedEmail(email: string, username: string, itemName: string, credits: number): Promise<boolean> {
+  if (!resend) return false
+  try {
+    const { error } = await resend.emails.send({
+      from: EMAIL_FROM,
+      to: email,
+      subject: `Tes crédits Cleekzy t'attendent (${credits})`,
+      html: gaugeConvertedEmailHtml(username, itemName, credits),
+    })
+    if (error) {
+      console.error('[EMAIL] Error sending gauge converted email:', error)
+      return false
+    }
+    return true
+  } catch (err) {
+    console.error('[EMAIL] Exception sending gauge converted email:', err)
+    return false
+  }
+}
+
+export async function sendAddressReminderEmail(email: string, username: string, itemName: string): Promise<boolean> {
+  if (!resend) return false
+  try {
+    const { error } = await resend.emails.send({
+      from: EMAIL_FROM,
+      to: email,
+      subject: `🎁 Renseigne ton adresse pour recevoir ${itemName}`,
+      html: addressReminderEmailHtml(username, itemName),
+    })
+    if (error) {
+      console.error('[EMAIL] Error sending address reminder email:', error)
+      return false
+    }
+    return true
+  } catch (err) {
+    console.error('[EMAIL] Exception sending address reminder email:', err)
+    return false
+  }
+}
+
+export async function sendCheckoutReminderEmail(email: string, username: string, userId?: string): Promise<boolean> {
+  if (!resend) return false
+  try {
+    const unsub = userId ? unsubscribeUrl(userId) ?? undefined : undefined
+    const { error } = await resend.emails.send({
+      from: EMAIL_FROM,
+      to: email,
+      subject: '🛒 Ta commande Cleekzy t\'attend',
+      html: checkoutReminderEmailHtml(username, unsub),
+    })
+    if (error) {
+      console.error('[EMAIL] Error sending checkout reminder email:', error)
+      return false
+    }
+    return true
+  } catch (err) {
+    console.error('[EMAIL] Exception sending checkout reminder email:', err)
     return false
   }
 }

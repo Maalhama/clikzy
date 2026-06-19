@@ -4,7 +4,6 @@ import { createClient } from '@/lib/supabase/server'
 import { createServiceClient } from '@/lib/supabase/service'
 import { checkAdminStatus } from '@/lib/auth/adminCheck'
 import { sendShippingEmail } from '@/lib/email'
-import { CREDIT_PACKS } from '@/lib/stripe/config'
 import { revalidatePath } from 'next/cache'
 import type { Profile, Game, Item, Winner } from '@/types/database'
 
@@ -25,6 +24,19 @@ export interface AdminUser extends Profile {
 
 export interface AdminGame extends Game {
   item?: Item
+}
+
+/**
+ * Revenu réellement encaissé via Stripe Checkout (somme exacte des montants payés,
+ * VIP -10% inclus, rachats multiples comptés). Source : table revenue_events alimentée
+ * par le webhook. Revenu BRUT (hors remboursements) depuis l'activation de la table.
+ */
+async function computeRevenueEstimate(sb: ReturnType<typeof createServiceClient>): Promise<number> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data } = await (sb as any).from('revenue_events').select('amount_cents')
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const cents = (data ?? []).reduce((s: number, r: any) => s + (r.amount_cents || 0), 0)
+  return Math.round(cents) / 100
 }
 
 // Get admin dashboard stats
@@ -57,7 +69,7 @@ export async function getAdminStats(): Promise<AdminStats | null> {
     activeGames: activeGamesResult.count || 0,
     totalWins: winsResult.count || 0,
     totalClicks,
-    totalRevenue: 0, // TODO: Calculate from Stripe
+    totalRevenue: await computeRevenueEstimate(supabase),
   }
 }
 
@@ -80,7 +92,7 @@ export async function getAdminHealth(): Promise<AdminHealth | null> {
   const supabase = createServiceClient()
   const sb = supabase
   const since7d = new Date(Date.now() - 7 * 86_400_000).toISOString()
-  const [usersRes, vipRes, signupRes, realClicksRes, botClicksRes, realClickers, packBuys, binBuys, giftBuys] =
+  const [usersRes, vipRes, signupRes, realClicksRes, botClicksRes, realClickers, packBuys, revenueEstimate] =
     await Promise.all([
       sb.from('profiles').select('*', { count: 'exact', head: true }),
       sb.from('profiles').select('*', { count: 'exact', head: true }).eq('is_vip', true),
@@ -88,22 +100,14 @@ export async function getAdminHealth(): Promise<AdminHealth | null> {
       sb.from('clicks').select('*', { count: 'exact', head: true }).eq('is_bot', false),
       sb.from('clicks').select('*', { count: 'exact', head: true }).eq('is_bot', true),
       sb.from('clicks').select('user_id').eq('is_bot', false).not('user_id', 'is', null),
-      sb.from('pack_purchases').select('user_id, pack_id'),
-      sb.from('buy_it_now_purchases').select('price_paid'),
-      sb.from('gift_codes').select('amount_paid'),
+      sb.from('pack_purchases').select('user_id'),
+      computeRevenueEstimate(sb),
     ])
   const totalUsers = usersRes.count ?? 0
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const realPlayers = new Set((realClickers.data ?? []).map((r: any) => r.user_id)).size
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const payers = new Set((packBuys.data ?? []).map((r: any) => r.user_id))
-  const packPrice: Record<string, number> = Object.fromEntries(CREDIT_PACKS.map((p) => [p.id, p.price]))
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const packRevenue = (packBuys.data ?? []).reduce((s: number, r: any) => s + (packPrice[r.pack_id] ?? 0), 0)
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const binRevenue = (binBuys.data ?? []).reduce((s: number, r: any) => s + Number(r.price_paid || 0), 0)
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const giftRevenue = (giftBuys.data ?? []).reduce((s: number, r: any) => s + Number(r.amount_paid || 0), 0) / 100
   return {
     totalUsers,
     realPlayers,
@@ -113,7 +117,7 @@ export async function getAdminHealth(): Promise<AdminHealth | null> {
     realClicks: realClicksRes.count ?? 0,
     botClicks: botClicksRes.count ?? 0,
     activeVips: vipRes.count ?? 0,
-    revenueEstimate: Math.round((packRevenue + binRevenue + giftRevenue) * 100) / 100,
+    revenueEstimate,
   }
 }
 
@@ -506,5 +510,115 @@ export async function updateShippingStatus(
   }
 
   revalidatePath('/admin')
+  return { success: true }
+}
+
+export interface ModerationComment {
+  id: string
+  username: string
+  content: string
+  created_at: string
+  game_id: string
+  reports: number
+}
+
+/** Derniers commentaires (non supprimés) avec leur nombre de signalements (admin). */
+export async function getModerationComments(limit = 50): Promise<ModerationComment[]> {
+  const { isAdmin } = await checkAdminStatus()
+  if (!isAdmin) return []
+  const supabase = createServiceClient()
+  // tables non typées (comments.deleted_at / comment_reports récentes)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: comments } = await (supabase as any)
+    .from('comments')
+    .select('id, username, content, created_at, game_id')
+    .is('deleted_at', null)
+    .order('created_at', { ascending: false })
+    .limit(limit)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: reports } = await (supabase as any).from('comment_reports').select('comment_id')
+  const counts: Record<string, number> = {}
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  for (const r of (reports ?? [])) counts[(r as any).comment_id] = (counts[(r as any).comment_id] ?? 0) + 1
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const out: ModerationComment[] = (comments ?? []).map((c: any) => ({
+    id: c.id,
+    username: c.username,
+    content: c.content,
+    created_at: c.created_at,
+    game_id: c.game_id,
+    reports: counts[c.id] ?? 0,
+  }))
+  out.sort((a, b) => b.reports - a.reports || (a.created_at < b.created_at ? 1 : -1))
+  return out
+}
+
+/** Suppression (soft-delete) d'un commentaire par un admin. */
+export async function adminDeleteComment(commentId: string): Promise<{ success: boolean; error?: string }> {
+  const { isAdmin } = await checkAdminStatus()
+  if (!isAdmin) return { success: false, error: 'Non autorisé' }
+  const supabase = createServiceClient()
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { error } = await (supabase as any)
+    .from('comments')
+    .update({ deleted_at: new Date().toISOString() })
+    .eq('id', commentId)
+  if (error) return { success: false, error: error.message }
+  revalidatePath('/admin')
+  return { success: true }
+}
+
+export interface PendingDeliveryPhoto {
+  id: string
+  username: string
+  item_name: string
+  delivery_photo_url: string
+}
+
+/** Photos de livraison en attente de modération (admin). */
+export async function getPendingDeliveryPhotos(): Promise<PendingDeliveryPhoto[]> {
+  const { isAdmin } = await checkAdminStatus()
+  if (!isAdmin) return []
+  const supabase = createServiceClient()
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data } = await (supabase as any)
+    .from('winners')
+    .select('id, username, item_name, delivery_photo_url')
+    .not('delivery_photo_url', 'is', null)
+    .eq('delivery_photo_approved', false)
+    .order('won_at', { ascending: false })
+    .limit(50)
+  const rows = (data ?? []) as PendingDeliveryPhoto[]
+  // delivery_photo_url = chemin (bucket privé) -> URL signée pour l'aperçu admin.
+  const paths = rows.map((r) => r.delivery_photo_url).filter(Boolean)
+  if (paths.length === 0) return rows
+  const { data: urls } = await supabase.storage.from('deliveries').createSignedUrls(paths, 3600)
+  const map: Record<string, string> = {}
+  for (const u of urls ?? []) {
+    if (u.path && u.signedUrl) map[u.path] = u.signedUrl
+  }
+  return rows.map((r) => ({ ...r, delivery_photo_url: map[r.delivery_photo_url] ?? r.delivery_photo_url }))
+}
+
+/** Approuver (publier) ou rejeter (effacer) une photo de livraison. */
+export async function setDeliveryPhotoApproval(winnerId: string, approved: boolean): Promise<{ success: boolean; error?: string }> {
+  const { isAdmin } = await checkAdminStatus()
+  if (!isAdmin) return { success: false, error: 'Non autorisé' }
+  const supabase = createServiceClient()
+  // Au rejet : supprime aussi le fichier du bucket privé (pas d'orphelin).
+  if (!approved) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: w } = await (supabase as any).from('winners').select('delivery_photo_url').eq('id', winnerId).single()
+    const path = w?.delivery_photo_url as string | null
+    if (path) await supabase.storage.from('deliveries').remove([path])
+  }
+  const patch = approved
+    ? { delivery_photo_approved: true }
+    : { delivery_photo_approved: false, delivery_photo_url: null }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { error } = await (supabase as any).from('winners').update(patch).eq('id', winnerId)
+  if (error) return { success: false, error: error.message }
+  revalidatePath('/admin')
+  revalidatePath('/gagnants')
   return { success: true }
 }

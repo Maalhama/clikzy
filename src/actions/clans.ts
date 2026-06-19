@@ -1,6 +1,7 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
+import { validateName } from '@/lib/validation/cleanName'
 
 export type ClanMember = { userId: string; username: string; level: number; xp: number; role: string }
 export type MyClan = {
@@ -18,6 +19,10 @@ const REASON: Record<string, string> = {
   tag_taken: 'Ce tag est déjà pris',
   not_found: 'Clan introuvable',
   not_in_clan: 'Tu n’es dans aucun clan',
+  not_owner: 'Seul le chef du clan peut faire ça',
+  not_in_your_clan: 'Ce joueur n’est pas dans ton clan',
+  cannot_kick_self: 'Tu ne peux pas t’exclure toi-même (quitte le clan)',
+  already_owner: 'Ce joueur est déjà le chef',
 }
 
 /** Clan du joueur courant (avec membres) ou null. */
@@ -79,6 +84,11 @@ async function callClanRpc(fn: string, args: Record<string, unknown>): Promise<R
 }
 
 export async function createClan(name: string, tag: string, description?: string) {
+  // Anti-usurpation + profanité sur le nom ET le tag (#4 audit)
+  const nameCheck = validateName(name, 'clan')
+  if (!nameCheck.ok) return { success: false, error: nameCheck.error }
+  const tagCheck = validateName(tag, 'clan')
+  if (!tagCheck.ok) return { success: false, error: tagCheck.error }
   return callClanRpc('create_clan', { p_name: name, p_tag: tag, p_desc: description ?? null })
 }
 export async function joinClan(clanId: string) {
@@ -86,4 +96,13 @@ export async function joinClan(clanId: string) {
 }
 export async function leaveClan() {
   return callClanRpc('leave_clan', {})
+}
+export async function kickClanMember(userId: string) {
+  return callClanRpc('kick_clan_member', { p_user_id: userId })
+}
+export async function transferClanOwnership(userId: string) {
+  return callClanRpc('transfer_clan_ownership', { p_user_id: userId })
+}
+export async function disbandClan() {
+  return callClanRpc('disband_clan', {})
 }

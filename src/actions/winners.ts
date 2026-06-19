@@ -1,6 +1,8 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
+import { createServiceClient } from '@/lib/supabase/service'
+import { revalidatePath } from 'next/cache'
 
 export interface WinnerData {
   id: string
@@ -83,6 +85,7 @@ export type WallWinner = {
   shippingStatus: string
   shippedAt: string | null
   deliveredAt: string | null
+  deliveryPhotoUrl: string | null
 }
 
 /** Mur public des gagnants avec suivi de livraison (preuve de confiance). */
@@ -93,6 +96,7 @@ export async function getWinnersWall(limit: number = 60): Promise<WallWinner[]> 
     .select(`
       id, username, item_name, item_value, won_at,
       shipping_status, shipped_at, delivered_at,
+      delivery_photo_url, delivery_photo_approved,
       profiles!winners_user_id_fkey ( username ),
       items!winners_item_id_fkey ( image_url )
     `)
@@ -102,6 +106,20 @@ export async function getWinnersWall(limit: number = 60): Promise<WallWinner[]> 
   if (error || !data) return []
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const rows = data as any[]
+
+  // Photos approuvées : bucket privé -> on génère des URLs signées (service_role).
+  const approvedPaths = rows
+    .filter((w) => w.delivery_photo_approved && w.delivery_photo_url)
+    .map((w) => w.delivery_photo_url as string)
+  const signed: Record<string, string> = {}
+  if (approvedPaths.length > 0) {
+    const svc = createServiceClient()
+    const { data: urls } = await svc.storage.from('deliveries').createSignedUrls(approvedPaths, 3600)
+    for (const u of urls ?? []) {
+      if (u.path && u.signedUrl) signed[u.path] = u.signedUrl
+    }
+  }
+
   const RANK: Record<string, number> = { delivered: 0, shipped: 1, processing: 2, address_needed: 3, pending: 4 }
   return rows
     .map((w) => ({
@@ -114,6 +132,77 @@ export async function getWinnersWall(limit: number = 60): Promise<WallWinner[]> 
       shippingStatus: w.shipping_status || 'pending',
       shippedAt: w.shipped_at ?? null,
       deliveredAt: w.delivered_at ?? null,
+      // URL signée seulement si la photo est approuvée (bucket privé).
+      deliveryPhotoUrl: (w.delivery_photo_approved && w.delivery_photo_url) ? (signed[w.delivery_photo_url] ?? null) : null,
     }))
     .sort((a, b) => (RANK[a.shippingStatus] ?? 5) - (RANK[b.shippingStatus] ?? 5))
+}
+
+export interface MyDeliveredWin {
+  id: string
+  itemName: string
+  deliveryPhotoUrl: string | null
+  approved: boolean
+}
+
+/** Lots reçus/expédiés du joueur connecté, pour joindre une photo (preuve de livraison). */
+export async function getMyDeliveredWins(): Promise<MyDeliveredWin[]> {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return []
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data } = await (supabase as any)
+    .from('winners')
+    .select('id, item_name, delivery_photo_url, delivery_photo_approved, shipping_status, won_at')
+    .eq('user_id', user.id)
+    .in('shipping_status', ['shipped', 'delivered'])
+    .order('won_at', { ascending: false })
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (data ?? []).map((w: any) => ({
+    id: w.id,
+    itemName: w.item_name,
+    deliveryPhotoUrl: w.delivery_photo_url ?? null,
+    approved: !!w.delivery_photo_approved,
+  }))
+}
+
+/** Le gagnant joint une photo de son colis (passe en modération avant affichage public). */
+export async function uploadDeliveryPhoto(winnerId: string, formData: FormData): Promise<{ success: boolean; error?: string }> {
+  const file = formData.get('photo') as File
+  if (!file || file.size === 0) return { success: false, error: 'Aucun fichier sélectionné' }
+  if (file.size > 4 * 1024 * 1024) return { success: false, error: 'Le fichier ne doit pas dépasser 4 Mo' }
+  if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
+    return { success: false, error: 'Format non supporté (JPG, PNG ou WebP)' }
+  }
+
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { success: false, error: 'Non authentifié' }
+
+  // Le lot doit appartenir au joueur ET être expédié/livré.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: win } = await (supabase as any).from('winners').select('id, user_id, shipping_status').eq('id', winnerId).single()
+  if (!win || win.user_id !== user.id) return { success: false, error: 'Lot introuvable' }
+  if (!['shipped', 'delivered'].includes(win.shipping_status)) {
+    return { success: false, error: 'Tu pourras ajouter une photo une fois ton lot expédié.' }
+  }
+
+  const ext = (file.name.split('.').pop() || 'jpg').toLowerCase()
+  // Bucket PRIVÉ 'deliveries' : on stocke le CHEMIN, pas une URL publique.
+  const path = `${winnerId}-${user.id.slice(0, 8)}.${ext}`
+  const { error: upErr } = await supabase.storage.from('deliveries').upload(path, file, { cacheControl: '3600', upsert: true })
+  if (upErr) {
+    console.error('[WINNERS] delivery photo upload error:', upErr.message)
+    return { success: false, error: "Erreur lors de l'envoi de la photo" }
+  }
+
+  // Écriture via service_role (winners en RLS) ; stocke le chemin + remet en modération.
+  const svc = createServiceClient()
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { error } = await (svc as any).from('winners')
+    .update({ delivery_photo_url: path, delivery_photo_approved: false }).eq('id', winnerId)
+  if (error) return { success: false, error: 'Erreur lors de la mise à jour' }
+
+  revalidatePath('/profile')
+  return { success: true }
 }

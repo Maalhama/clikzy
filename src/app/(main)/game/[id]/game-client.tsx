@@ -284,7 +284,14 @@ export function GameClient({
       return
     }
 
-    if (isPending || !hasCredits || !canClick) return
+    if (isPending || !canClick) return
+
+    // Plus de crédits : capter le pic d'intention en ouvrant directement l'achat
+    // (au lieu d'un clic « dans le vide » sans réaction).
+    if (!hasCredits) {
+      setShowCreditModal(true)
+      return
+    }
 
     // Check VIP for premium products
     if (isPremiumProduct && !isVip) {
