@@ -4,7 +4,6 @@ import { createClient } from '@/lib/supabase/server'
 import { createServiceClient } from '@/lib/supabase/service'
 import { checkAdminStatus } from '@/lib/auth/adminCheck'
 import { sendShippingEmail } from '@/lib/email'
-import { CREDIT_PACKS } from '@/lib/stripe/config'
 import { revalidatePath } from 'next/cache'
 import type { Profile, Game, Item, Winner } from '@/types/database'
 
@@ -27,21 +26,17 @@ export interface AdminGame extends Game {
   item?: Item
 }
 
-/** Revenu estimé (packs + rachat malin + cadeaux). Source unique partagée stats/santé. */
+/**
+ * Revenu réellement encaissé via Stripe Checkout (somme exacte des montants payés,
+ * VIP -10% inclus, rachats multiples comptés). Source : table revenue_events alimentée
+ * par le webhook. Revenu BRUT (hors remboursements) depuis l'activation de la table.
+ */
 async function computeRevenueEstimate(sb: ReturnType<typeof createServiceClient>): Promise<number> {
-  const [packBuys, binBuys, giftBuys] = await Promise.all([
-    sb.from('pack_purchases').select('pack_id'),
-    sb.from('buy_it_now_purchases').select('price_paid'),
-    sb.from('gift_codes').select('amount_paid'),
-  ])
-  const packPrice: Record<string, number> = Object.fromEntries(CREDIT_PACKS.map((p) => [p.id, p.price]))
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const packRevenue = (packBuys.data ?? []).reduce((s: number, r: any) => s + (packPrice[r.pack_id] ?? 0), 0)
+  const { data } = await (sb as any).from('revenue_events').select('amount_cents')
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const binRevenue = (binBuys.data ?? []).reduce((s: number, r: any) => s + Number(r.price_paid || 0), 0)
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const giftRevenue = (giftBuys.data ?? []).reduce((s: number, r: any) => s + Number(r.amount_paid || 0), 0) / 100
-  return Math.round((packRevenue + binRevenue + giftRevenue) * 100) / 100
+  const cents = (data ?? []).reduce((s: number, r: any) => s + (r.amount_cents || 0), 0)
+  return Math.round(cents) / 100
 }
 
 // Get admin dashboard stats
@@ -593,7 +588,16 @@ export async function getPendingDeliveryPhotos(): Promise<PendingDeliveryPhoto[]
     .eq('delivery_photo_approved', false)
     .order('won_at', { ascending: false })
     .limit(50)
-  return (data ?? []) as PendingDeliveryPhoto[]
+  const rows = (data ?? []) as PendingDeliveryPhoto[]
+  // delivery_photo_url = chemin (bucket privé) -> URL signée pour l'aperçu admin.
+  const paths = rows.map((r) => r.delivery_photo_url).filter(Boolean)
+  if (paths.length === 0) return rows
+  const { data: urls } = await supabase.storage.from('deliveries').createSignedUrls(paths, 3600)
+  const map: Record<string, string> = {}
+  for (const u of urls ?? []) {
+    if (u.path && u.signedUrl) map[u.path] = u.signedUrl
+  }
+  return rows.map((r) => ({ ...r, delivery_photo_url: map[r.delivery_photo_url] ?? r.delivery_photo_url }))
 }
 
 /** Approuver (publier) ou rejeter (effacer) une photo de livraison. */
@@ -601,6 +605,13 @@ export async function setDeliveryPhotoApproval(winnerId: string, approved: boole
   const { isAdmin } = await checkAdminStatus()
   if (!isAdmin) return { success: false, error: 'Non autorisé' }
   const supabase = createServiceClient()
+  // Au rejet : supprime aussi le fichier du bucket privé (pas d'orphelin).
+  if (!approved) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: w } = await (supabase as any).from('winners').select('delivery_photo_url').eq('id', winnerId).single()
+    const path = w?.delivery_photo_url as string | null
+    if (path) await supabase.storage.from('deliveries').remove([path])
+  }
   const patch = approved
     ? { delivery_photo_approved: true }
     : { delivery_photo_approved: false, delivery_photo_url: null }

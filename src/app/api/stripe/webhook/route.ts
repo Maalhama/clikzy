@@ -111,6 +111,26 @@ export async function handleStripeEvent(event: Stripe.Event): Promise<HandlerRes
 
     const userId = session.metadata?.userId
 
+    // Traçage du revenu réellement encaissé (montant payé, toutes catégories d'achat
+    // via Checkout). Idempotent par session (l'event lui-même est déjà dédupliqué).
+    if (session.amount_total && session.amount_total > 0) {
+      try {
+        const revDb = getSupabaseAdmin()
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        await (revDb as any).from('revenue_events').upsert(
+          {
+            session_id: session.id,
+            user_id: userId ?? null,
+            kind: session.metadata?.type ?? 'pack',
+            amount_cents: session.amount_total,
+          },
+          { onConflict: 'session_id', ignoreDuplicates: true },
+        )
+      } catch (e) {
+        console.error('[STRIPE] revenue_events insert échoué (non bloquant):', e)
+      }
+    }
+
     // Passe d'Arène (one-shot mensuel) : activation idempotente
     if (session.metadata?.type === 'battle_pass') {
       if (!userId) {

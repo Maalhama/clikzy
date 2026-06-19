@@ -106,6 +106,20 @@ export async function getWinnersWall(limit: number = 60): Promise<WallWinner[]> 
   if (error || !data) return []
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const rows = data as any[]
+
+  // Photos approuvées : bucket privé -> on génère des URLs signées (service_role).
+  const approvedPaths = rows
+    .filter((w) => w.delivery_photo_approved && w.delivery_photo_url)
+    .map((w) => w.delivery_photo_url as string)
+  const signed: Record<string, string> = {}
+  if (approvedPaths.length > 0) {
+    const svc = createServiceClient()
+    const { data: urls } = await svc.storage.from('deliveries').createSignedUrls(approvedPaths, 3600)
+    for (const u of urls ?? []) {
+      if (u.path && u.signedUrl) signed[u.path] = u.signedUrl
+    }
+  }
+
   const RANK: Record<string, number> = { delivered: 0, shipped: 1, processing: 2, address_needed: 3, pending: 4 }
   return rows
     .map((w) => ({
@@ -118,8 +132,8 @@ export async function getWinnersWall(limit: number = 60): Promise<WallWinner[]> 
       shippingStatus: w.shipping_status || 'pending',
       shippedAt: w.shipped_at ?? null,
       deliveredAt: w.delivered_at ?? null,
-      // Photo publique uniquement si approuvée par la modération.
-      deliveryPhotoUrl: w.delivery_photo_approved ? (w.delivery_photo_url ?? null) : null,
+      // URL signée seulement si la photo est approuvée (bucket privé).
+      deliveryPhotoUrl: (w.delivery_photo_approved && w.delivery_photo_url) ? (signed[w.delivery_photo_url] ?? null) : null,
     }))
     .sort((a, b) => (RANK[a.shippingStatus] ?? 5) - (RANK[b.shippingStatus] ?? 5))
 }
@@ -174,19 +188,19 @@ export async function uploadDeliveryPhoto(winnerId: string, formData: FormData):
   }
 
   const ext = (file.name.split('.').pop() || 'jpg').toLowerCase()
-  const path = `deliveries/${winnerId}-${user.id.slice(0, 8)}.${ext}`
-  const { error: upErr } = await supabase.storage.from('profiles').upload(path, file, { cacheControl: '3600', upsert: true })
+  // Bucket PRIVÉ 'deliveries' : on stocke le CHEMIN, pas une URL publique.
+  const path = `${winnerId}-${user.id.slice(0, 8)}.${ext}`
+  const { error: upErr } = await supabase.storage.from('deliveries').upload(path, file, { cacheControl: '3600', upsert: true })
   if (upErr) {
     console.error('[WINNERS] delivery photo upload error:', upErr.message)
     return { success: false, error: "Erreur lors de l'envoi de la photo" }
   }
-  const { data: { publicUrl } } = supabase.storage.from('profiles').getPublicUrl(path)
 
-  // Écriture via service_role (winners en RLS) ; remet en attente de modération.
+  // Écriture via service_role (winners en RLS) ; stocke le chemin + remet en modération.
   const svc = createServiceClient()
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { error } = await (svc as any).from('winners')
-    .update({ delivery_photo_url: publicUrl, delivery_photo_approved: false }).eq('id', winnerId)
+    .update({ delivery_photo_url: path, delivery_photo_approved: false }).eq('id', winnerId)
   if (error) return { success: false, error: 'Erreur lors de la mise à jour' }
 
   revalidatePath('/profile')
