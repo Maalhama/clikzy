@@ -1,10 +1,11 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, type FormEvent } from 'react'
+import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import type { AdminStats, AdminUser, AdminGame, BuyItNowOrder, GaugeWinOrder, AdminHealth } from '@/actions/admin'
 import type { Item, Winner } from '@/types/database'
-import { updateUserCredits, toggleUserAdmin, updateShippingStatus, updateBuyItNowShipping, updateGaugeWinShipping } from '@/actions/admin'
+import { updateUserCredits, toggleUserAdmin, updateShippingStatus, updateBuyItNowShipping, updateGaugeWinShipping, createItem } from '@/actions/admin'
 
 interface AdminDashboardProps {
   stats: AdminStats
@@ -334,8 +335,86 @@ function GamesTab({ games }: { games: AdminGame[] }) {
 
 // Items Tab
 function ItemsTab({ items }: { items: Item[] }) {
+  const router = useRouter()
+  const [name, setName] = useState('')
+  const [description, setDescription] = useState('')
+  const [imageUrl, setImageUrl] = useState('')
+  const [retailValue, setRetailValue] = useState('')
+  const [saving, setSaving] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  async function handleCreate(e: FormEvent) {
+    e.preventDefault()
+    setError(null)
+    setSaving(true)
+    const res = await createItem({
+      name: name.trim(),
+      description: description.trim() || undefined,
+      image_url: imageUrl.trim(),
+      retail_value: retailValue ? Number(retailValue) : undefined,
+    })
+    setSaving(false)
+    if (!res.success) {
+      setError(res.error || 'Erreur lors de la création du lot')
+      return
+    }
+    setName('')
+    setDescription('')
+    setImageUrl('')
+    setRetailValue('')
+    router.refresh()
+  }
+
   return (
-    <div className="rounded-xl bg-bg-secondary/50 border border-white/10 overflow-hidden">
+    <div className="space-y-4">
+      <form onSubmit={handleCreate} className="rounded-xl bg-bg-secondary/50 border border-white/10 p-4 space-y-3">
+        <h3 className="text-white font-semibold text-sm">Ajouter un lot</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <input
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="Nom du lot *"
+            className="px-3 py-2 rounded bg-bg-primary border border-white/20 text-white text-sm placeholder:text-white/40"
+          />
+          <input
+            value={retailValue}
+            onChange={(e) => setRetailValue(e.target.value)}
+            type="number"
+            min="0"
+            step="0.01"
+            placeholder="Valeur (€)"
+            className="px-3 py-2 rounded bg-bg-primary border border-white/20 text-white text-sm placeholder:text-white/40"
+          />
+          <input
+            value={imageUrl}
+            onChange={(e) => setImageUrl(e.target.value)}
+            placeholder="URL de l'image *"
+            className="px-3 py-2 rounded bg-bg-primary border border-white/20 text-white text-sm placeholder:text-white/40 md:col-span-2"
+          />
+          <input
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            placeholder="Description (optionnel)"
+            className="px-3 py-2 rounded bg-bg-primary border border-white/20 text-white text-sm placeholder:text-white/40 md:col-span-2"
+          />
+        </div>
+        {error && <p role="alert" className="text-red-400 text-xs">{error}</p>}
+        <div className="flex items-center gap-3">
+          <button
+            type="submit"
+            disabled={saving || !name.trim() || !imageUrl.trim()}
+            className="px-4 py-2 rounded-lg bg-neon-purple text-white text-sm font-medium disabled:opacity-50"
+          >
+            {saving ? 'Ajout…' : 'Ajouter le lot'}
+          </button>
+          {imageUrl.trim() && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={imageUrl} alt="" className="w-10 h-10 rounded object-contain bg-bg-primary" />
+          )}
+        </div>
+      </form>
+
+      <div className="rounded-xl bg-bg-secondary/50 border border-white/10 overflow-hidden">
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead className="bg-white/5">
@@ -380,6 +459,7 @@ function ItemsTab({ items }: { items: Item[] }) {
             ))}
           </tbody>
         </table>
+      </div>
       </div>
     </div>
   )

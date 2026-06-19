@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import dynamic from 'next/dynamic';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Trophy, Clock, ChevronRight, X, Sparkles, Coins } from 'lucide-react';
@@ -9,6 +9,7 @@ import confetti from 'canvas-confetti';
 import { WheelIcon, ScratchIcon, PachinkoIcon, SlotsIcon, CoinFlipIcon, DiceIcon, PixelCoin } from '@/components/pixel/PixelIcon';
 import { CreditPacksModal } from '@/components/modals/CreditPacksModal';
 import { FairnessPanel } from '@/components/mini-games/FairnessPanel'
+import { useModalA11y } from '@/hooks/useModalA11y'
 
 import { useCredits } from '@/contexts/CreditsContext';
 import { useCountdown } from '@/hooks/useCountdown';
@@ -158,6 +159,7 @@ export default function MiniGamesClient({ initialEligibility }: MiniGamesClientP
   const [result, setResult] = useState<GameResult | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [showCreditModal, setShowCreditModal] = useState(false);
+  const gamePanelRef = useRef<HTMLDivElement>(null);
 
   const hasEnoughCreditsFor = (gameType: MiniGameType) => credits >= PLAY_COSTS[gameType];
 
@@ -302,6 +304,11 @@ export default function MiniGamesClient({ initialEligibility }: MiniGamesClientP
     setPendingGame(null);
   };
 
+  // Accessibilité de la modale de jeu : focus trap + Échap. Comme le clic sur le fond,
+  // la fermeture clavier n'est permise qu'une fois le résultat affiché (ne pas annuler
+  // une partie payée en cours).
+  useModalA11y(!!activeGame, () => { if (result) closeModal(); }, gamePanelRef);
+
   // Get the target for the current game based on server result
   const getGameTarget = () => {
     if (!pendingGame) return 0;
@@ -396,6 +403,10 @@ export default function MiniGamesClient({ initialEligibility }: MiniGamesClientP
             />
 
             <motion.div
+              ref={gamePanelRef}
+              role="dialog"
+              aria-modal="true"
+              aria-label={GAME_CONFIG[activeGame].title}
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}

@@ -14,7 +14,7 @@ export function GameComments({ gameId, userId, itemName }: { gameId: string; use
 
   useEffect(() => {
     let active = true
-    const seeded = seedGameComments(gameId, itemName ?? '', 5, Date.now())
+    const seeded = seedGameComments(gameId, itemName ?? '', 9, Date.now())
     getGameComments(gameId).then((c) => {
       if (!active) return
       const seen = new Set(c.map((x) => x.id))

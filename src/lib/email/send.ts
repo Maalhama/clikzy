@@ -6,6 +6,7 @@ import {
   vipPaymentFailedEmailHtml,
   streakReminderEmailHtml,
 } from './templates'
+import { unsubscribeUrl } from './unsubscribe'
 
 export async function sendWelcomeEmail(email: string, username: string): Promise<boolean> {
   if (!resend) {
@@ -174,14 +175,15 @@ export async function sendVipPaymentFailedEmail(email: string, username: string)
   }
 }
 
-export async function sendStreakReminderEmail(email: string, username: string, streakDays: number): Promise<boolean> {
+export async function sendStreakReminderEmail(email: string, username: string, streakDays: number, userId?: string): Promise<boolean> {
   if (!resend) return false
   try {
+    const unsub = userId ? unsubscribeUrl(userId) ?? undefined : undefined
     const { error } = await resend.emails.send({
       from: EMAIL_FROM,
       to: email,
       subject: `🔥 Ta série de ${streakDays} jours t'attend`,
-      html: streakReminderEmailHtml(username, streakDays),
+      html: streakReminderEmailHtml(username, streakDays, unsub),
     })
     if (error) {
       console.error('[EMAIL] Error sending streak email:', error)
