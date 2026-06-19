@@ -31,6 +31,7 @@ import type { WinnerData } from '@/actions/winners'
 import { FloatingTimer } from '@/components/landing/widgets/FloatingTimer'
 import { useLobbyFilters } from '@/hooks/lobby/useLobbyFilters'
 import { useLobbyRealtime } from '@/hooks/lobby/useLobbyRealtime'
+import { touchLastActive } from '@/actions/activity'
 import { useLobbyBotSimulation } from '@/hooks/lobby/useLobbyBotSimulation'
 import { useFavorites } from '@/hooks/useFavorites'
 import { usePullToRefresh } from '@/hooks/usePullToRefresh'
@@ -186,6 +187,11 @@ export function LobbyClient({
     setBotComments(seedBotComments(initialGames, 14, Date.now()))
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  // Marque l'activité du jour (alimente la réactivation win-back). Throttlé côté DB.
+  useEffect(() => {
+    if (isLoggedIn) void touchLastActive()
+  }, [isLoggedIn])
 
   // Filters, sorting and pagination
   const {

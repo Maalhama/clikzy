@@ -16,6 +16,10 @@
     {
       "path": "/api/cron/shipping-reminder",
       "schedule": "0 10 * * *"
+    },
+    {
+      "path": "/api/cron/win-back",
+      "schedule": "30 9 * * *"
     }
   ]
 }

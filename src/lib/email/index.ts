@@ -10,6 +10,7 @@ export {
   sendGaugeConvertedEmail,
   sendAddressReminderEmail,
   sendCheckoutReminderEmail,
+  sendWinbackEmail,
 } from './send'
 export {
   welcomeEmailHtml,
