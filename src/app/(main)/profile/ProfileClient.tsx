@@ -54,6 +54,7 @@ interface ProfileClientProps {
     referralCount: number
     creditsEarned: number
     referredBy: string | null
+    milestonesClaimed: number
   }
   badges: {
     badge: Badge
@@ -418,6 +419,7 @@ export function ProfileClient({ profile, wins, gamesPlayed, totalValueWon, gameH
             referralCount={referralStats.referralCount}
             creditsEarned={referralStats.creditsEarned}
             hasReferrer={!!referralStats.referredBy}
+            milestonesClaimed={referralStats.milestonesClaimed}
           />
         </div>
 

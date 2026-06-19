@@ -66,5 +66,11 @@ export async function ensureGiftCodeForSession(sessionId: string): Promise<GiftI
       { onConflict: 'stripe_session', ignoreDuplicates: true }
     )
 
+  // Gift-to-unlock : bonus one-time au donneur de son 1er cadeau (idempotent côté RPC).
+  if (session.metadata.gifterId) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await (svc.rpc as any)('claim_gift_unlock_bonus', { p_user_id: session.metadata.gifterId }).catch(() => {})
+  }
+
   return { code, kind, credits, vipDays }
 }

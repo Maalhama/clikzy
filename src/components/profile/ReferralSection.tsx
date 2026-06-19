@@ -1,23 +1,47 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
-import { applyReferralCode } from '@/actions/referral'
+import { applyReferralCode, claimReferralMilestones } from '@/actions/referral'
 
 interface ReferralSectionProps {
   referralCode: string | null
   referralCount: number
   creditsEarned: number
   hasReferrer: boolean
+  milestonesClaimed: number
 }
 
-export function ReferralSection({ referralCode, referralCount, creditsEarned, hasReferrer }: ReferralSectionProps) {
+const MILESTONES = [
+  { n: 3, reward: 100 },
+  { n: 5, reward: 250 },
+  { n: 10, reward: 600 },
+]
+
+export function ReferralSection({ referralCode, referralCount, creditsEarned, hasReferrer, milestonesClaimed }: ReferralSectionProps) {
+  const router = useRouter()
   const [showApplyCode, setShowApplyCode] = useState(false)
   const [inputCode, setInputCode] = useState('')
   const [isApplying, setIsApplying] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
   const [copied, setCopied] = useState(false)
+  const [claiming, setClaiming] = useState(false)
+  const [claimMsg, setClaimMsg] = useState<string | null>(null)
+
+  const reachedMilestones = MILESTONES.filter((m) => referralCount >= m.n).length
+  const canClaimMilestone = reachedMilestones > milestonesClaimed
+
+  async function handleClaimMilestones() {
+    setClaiming(true)
+    setClaimMsg(null)
+    const res = await claimReferralMilestones()
+    setClaiming(false)
+    if (!res.success) { setClaimMsg(res.error ?? 'Erreur'); return }
+    setClaimMsg(`+${res.awarded} crédits récupérés !`)
+    router.refresh()
+  }
 
   // Landing d'invitation partageable (carte OG) plutôt que /register brut.
   const referralLink = referralCode
@@ -149,6 +173,35 @@ export function ReferralSection({ referralCode, referralCount, creditsEarned, ha
         <ShareIcon className="w-5 h-5" />
         Partager mon lien
       </button>
+
+      {/* Paliers de parrainage */}
+      <div className="mt-4 pt-4 border-t border-white/10">
+        <div className="text-white/50 text-xs mb-2">Récompenses de parrainage</div>
+        <div className="space-y-1.5">
+          {MILESTONES.map((m, i) => {
+            const done = milestonesClaimed > i
+            const ready = !done && referralCount >= m.n
+            return (
+              <div key={m.n} className="flex items-center justify-between text-sm">
+                <span className={done ? 'text-white/40 line-through' : 'text-white/80'}>{m.n} filleuls</span>
+                <span className={`font-bold ${done ? 'text-white/40' : ready ? 'text-success' : 'text-white/40'}`}>
+                  +{m.reward} cr{done ? ' ✓' : ready ? ' · prêt' : ''}
+                </span>
+              </div>
+            )
+          })}
+        </div>
+        {canClaimMilestone && (
+          <button
+            onClick={handleClaimMilestones}
+            disabled={claiming}
+            className="mt-3 w-full py-2.5 rounded-xl bg-success/20 text-success font-bold hover:bg-success/30 transition-colors disabled:opacity-50"
+          >
+            {claiming ? '…' : 'Réclamer mes récompenses'}
+          </button>
+        )}
+        {claimMsg && <p className="mt-2 text-xs text-white/60">{claimMsg}</p>}
+      </div>
 
       {/* Apply Code Section (if user hasn't been referred yet) */}
       {!hasReferrer && !success && (

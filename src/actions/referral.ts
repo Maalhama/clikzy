@@ -11,6 +11,7 @@ export interface ReferralStats {
   referralCount: number
   creditsEarned: number
   referredBy: string | null
+  milestonesClaimed: number
 }
 
 export interface ReferralResult {
@@ -34,7 +35,7 @@ export async function getReferralStats(): Promise<ReferralStats | null> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { data: profile } = await (supabase as any)
     .from('profiles')
-    .select('referral_code, referral_count, referral_credits_earned, referred_by')
+    .select('referral_code, referral_count, referral_credits_earned, referred_by, referral_milestones_claimed')
     .eq('id', user.id)
     .single()
 
@@ -47,7 +48,24 @@ export async function getReferralStats(): Promise<ReferralStats | null> {
     referralCount: profile.referral_count || 0,
     creditsEarned: profile.referral_credits_earned || 0,
     referredBy: profile.referred_by,
+    milestonesClaimed: profile.referral_milestones_claimed || 0,
   }
+}
+
+/** Réclame les récompenses de paliers de parrainage atteints (3/5/10 filleuls). */
+export async function claimReferralMilestones(): Promise<{ success: boolean; awarded?: number; error?: string }> {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { success: false, error: 'Non authentifié' }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data, error } = await (supabase.rpc as any)('claim_referral_milestones', { p_user_id: user.id })
+  if (error) return { success: false, error: 'Erreur lors de la réclamation.' }
+  const r = data as { ok?: boolean; awarded?: number; reason?: string } | null
+  if (!r?.ok) {
+    return { success: false, error: r?.reason === 'nothing_to_claim' ? 'Aucune récompense à réclamer pour l\'instant.' : 'Réclamation impossible.' }
+  }
+  revalidatePath('/profile')
+  return { success: true, awarded: r.awarded }
 }
 
 /**
