@@ -118,7 +118,12 @@ export function winnerEmailHtml(username: string, itemName: string, itemValue: n
 }
 
 // Base commune : logo + carte (couleur d'accent) + footer.
-function shell(accentRgba: string, accentBorder: string, inner: string): string {
+function shell(accentRgba: string, accentBorder: string, inner: string, unsubscribeUrl?: string): string {
+  const unsub = unsubscribeUrl
+    ? `<p style="color: rgba(255, 255, 255, 0.25); font-size: 11px; margin: 8px 0 0;">
+        Tu reçois cet email parce que tu joues sur Cleekzy. <a href="${unsubscribeUrl}" style="color: rgba(255, 255, 255, 0.4); text-decoration: underline;">Se désabonner de ces rappels</a>.
+      </p>`
+    : ''
   return `
 <!DOCTYPE html>
 <html>
@@ -140,6 +145,7 @@ function shell(accentRgba: string, accentBorder: string, inner: string): string 
       <p style="color: rgba(255, 255, 255, 0.3); font-size: 12px; margin: 0;">
         © 2026 Cleekzy. Le dernier clic gagne.
       </p>
+      ${unsub}
     </div>
   </div>
 </body>
@@ -192,7 +198,7 @@ export function vipPaymentFailedEmailHtml(username: string): string {
 }
 
 // Rappel série (streak) en danger
-export function streakReminderEmailHtml(username: string, streakDays: number): string {
+export function streakReminderEmailHtml(username: string, streakDays: number, unsubscribeUrl?: string): string {
   return shell(
     'linear-gradient(135deg, rgba(255, 122, 26, 0.1), rgba(194, 65, 12, 0.08))',
     'rgba(255, 122, 26, 0.3)',
@@ -204,5 +210,6 @@ export function streakReminderEmailHtml(username: string, streakDays: number): s
     </p>
     ${cta('https://cleekzy.com/lobby', 'Garder ma série →', 'linear-gradient(135deg, #FF7A1A, #C2410C)')}
     `,
+    unsubscribeUrl,
   )
 }

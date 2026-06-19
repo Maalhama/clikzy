@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
     // streak significative (>= 3 jours, sinon la perte est indolore).
     const { data: atRisk, error } = await supabase
       .from('profiles')
-      .select('id, username, streak_count, streak_last_day')
+      .select('id, username, streak_count, streak_last_day, marketing_opt_out')
       .gte('streak_count', MIN_STREAK)
       .lt('streak_last_day', parisToday)
       .limit(MAX_NOTIFICATIONS)
@@ -69,14 +69,17 @@ export async function GET(request: NextRequest) {
         .select('user_id')
         .in('user_id', ids)
       const withPush = new Set((subs ?? []).map((s: { user_id: string }) => s.user_id))
-      const emailTargets = users.filter((u) => !withPush.has(u.id)).slice(0, EMAIL_CAP)
+      // Exclut les joueurs qui se sont désabonnés des emails de rétention (opt-out RGPD).
+      const emailTargets = users
+        .filter((u) => !withPush.has(u.id) && !u.marketing_opt_out)
+        .slice(0, EMAIL_CAP)
       for (let i = 0; i < emailTargets.length; i += BATCH) {
         await Promise.allSettled(
           emailTargets.slice(i, i + BATCH).map(async (u) => {
             const { data: userRes } = await supabase.auth.admin.getUserById(u.id)
             const to = userRes?.user?.email
             if (!to) return
-            if (await sendStreakReminderEmail(to, u.username || 'Joueur', u.streak_count)) emailed += 1
+            if (await sendStreakReminderEmail(to, u.username || 'Joueur', u.streak_count, u.id)) emailed += 1
           }),
         )
       }

@@ -172,14 +172,18 @@ export function LobbyClient({
       }
     }, [updateGame, addClickNotification, games]),
     onBotComment: useCallback((c: CommentFeedItem) => {
-      setBotComments((prev) => [c, ...prev.filter((p) => p.id !== c.id)].slice(0, 20))
+      setBotComments((prev) => {
+        // Évite les doublons visibles dans le feed : ni le même id, ni un contenu déjà présent.
+        if (prev.some((p) => p.id === c.id || p.content === c.content)) return prev
+        return [c, ...prev].slice(0, 20)
+      })
     }, []),
     enabled: true,
   })
 
   // Seed initial des commentaires bots (client-only -> pas de mismatch SSR)
   useEffect(() => {
-    setBotComments(seedBotComments(initialGames, 9, Date.now()))
+    setBotComments(seedBotComments(initialGames, 14, Date.now()))
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
