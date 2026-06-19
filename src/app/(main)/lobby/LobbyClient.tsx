@@ -69,7 +69,7 @@ export function LobbyClient({
   const [botComments, setBotComments] = useState<CommentFeedItem[]>([])
 
   // Favorites
-  const { favorites, isFavorite, toggleFavorite } = useFavorites()
+  const { favorites, isFavorite, toggleFavorite } = useFavorites(isLoggedIn)
 
   // Credits context for refresh
   const creditsContext = useCreditsOptional()

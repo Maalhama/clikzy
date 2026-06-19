@@ -213,3 +213,51 @@ export function streakReminderEmailHtml(username: string, streakDays: number, un
     unsubscribeUrl,
   )
 }
+
+// Conversion d'une jauge abandonnée en avoir crédit (transactionnel : info sur le solde)
+export function gaugeConvertedEmailHtml(username: string, itemName: string, credits: number): string {
+  return shell(
+    'linear-gradient(135deg, rgba(155, 92, 255, 0.1), rgba(255, 79, 216, 0.08))',
+    'rgba(155, 92, 255, 0.3)',
+    `
+    <div style="text-align: center; margin-bottom: 16px;"><span style="font-size: 56px;">💜</span></div>
+    <h1 style="color: #9B5CFF; font-size: 26px; margin: 0 0 12px 0; text-align: center;">Ta progression est devenue des crédits</h1>
+    <p style="color: rgba(255, 255, 255, 0.7); font-size: 16px; line-height: 1.6; margin: 0 0 8px 0; text-align: center;">
+      ${username}, ta jauge sur <strong style="color:#ffffff;">${itemName}</strong> était inactive depuis un moment. Rien n'est perdu chez Cleekzy : on l'a convertie en <strong style="color:#9B5CFF;">${credits} crédits</strong> utilisables sur le lot de ton choix.
+    </p>
+    ${cta('https://cleekzy.com/lobby', 'Utiliser mes crédits →', 'linear-gradient(135deg, #9B5CFF, #FF4FD8)')}
+    `,
+  )
+}
+
+// Relance : gagnant qui n'a pas renseigné son adresse de livraison (transactionnel)
+export function addressReminderEmailHtml(username: string, itemName: string): string {
+  return shell(
+    'linear-gradient(135deg, rgba(60, 203, 255, 0.1), rgba(27, 110, 140, 0.08))',
+    'rgba(60, 203, 255, 0.3)',
+    `
+    <div style="text-align: center; margin-bottom: 16px;"><span style="font-size: 56px;">🎁</span></div>
+    <h1 style="color: #3CCBFF; font-size: 26px; margin: 0 0 12px 0; text-align: center;">Ton lot t'attend, ${username} !</h1>
+    <p style="color: rgba(255, 255, 255, 0.7); font-size: 16px; line-height: 1.6; margin: 0 0 8px 0; text-align: center;">
+      Tu as remporté <strong style="color:#ffffff;">${itemName}</strong> mais on n'a pas encore ton adresse de livraison. Renseigne-la pour qu'on te l'envoie au plus vite.
+    </p>
+    ${cta('https://cleekzy.com/profile', 'Renseigner mon adresse →', 'linear-gradient(135deg, #3CCBFF, #1B6E8C)')}
+    `,
+  )
+}
+
+// Relance panier abandonné (session de paiement expirée sans achat)
+export function checkoutReminderEmailHtml(username: string): string {
+  return shell(
+    'linear-gradient(135deg, rgba(155, 92, 255, 0.1), rgba(255, 79, 216, 0.08))',
+    'rgba(155, 92, 255, 0.3)',
+    `
+    <div style="text-align: center; margin-bottom: 16px;"><span style="font-size: 56px;">🛒</span></div>
+    <h1 style="color: #9B5CFF; font-size: 26px; margin: 0 0 12px 0; text-align: center;">Tu y étais presque, ${username} !</h1>
+    <p style="color: rgba(255, 255, 255, 0.7); font-size: 16px; line-height: 1.6; margin: 0 0 8px 0; text-align: center;">
+      Ta commande n'a pas été finalisée. Tes crédits t'attendent pour repartir à l'assaut des lots.
+    </p>
+    ${cta('https://cleekzy.com/lobby', 'Reprendre →', 'linear-gradient(135deg, #9B5CFF, #FF4FD8)')}
+    `,
+  )
+}

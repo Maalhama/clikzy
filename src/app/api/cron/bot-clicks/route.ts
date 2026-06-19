@@ -161,6 +161,8 @@ export async function GET(request: NextRequest) {
     console.log(`[CRON] Checking ${activeGames.length} games`)
 
     const results: Array<{ gameId: string; action: string }> = []
+    // Parties qui basculent en phase finale pendant ce run -> notif "ton favori..." après la boucle.
+    const enteredFinalPhase: Array<{ gameId: string; itemName: string }> = []
 
     for (const game of activeGames as GameData[]) {
       const timeLeft = game.end_time - now
@@ -184,6 +186,7 @@ export async function GET(request: NextRequest) {
         // Entrer en phase finale si nécessaire
         if (isInFinalPhase && game.status !== 'final_phase') {
           updates.status = 'final_phase'
+          enteredFinalPhase.push({ gameId: game.id, itemName: getItemName(game.item) })
         }
 
         // Toujours définir battle_start_time si en phase finale et pas encore défini
@@ -299,11 +302,32 @@ export async function GET(request: NextRequest) {
 
     const endedCount = results.filter(r => r.action === 'ended').length
 
+    // Notif « ton favori entre en phase finale » aux joueurs ayant ce jeu en favori.
+    let favNotified = 0
+    for (const fp of enteredFinalPhase) {
+      const { data: favs } = await supabase
+        .from('user_favorites')
+        .select('user_id')
+        .eq('game_id', fp.gameId)
+      for (const f of favs ?? []) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const uid = (f as any).user_id as string
+        await sendPushToUser(uid, {
+          title: 'Ton favori entre en phase finale !',
+          body: `${fp.itemName} : c'est le moment de te battre pour le remporter.`,
+          url: `/game/${fp.gameId}`,
+          tag: `fav-final-${fp.gameId}`,
+        }).catch((err) => console.error('[CRON] Failed to send favorite push:', err))
+        favNotified += 1
+      }
+    }
+
     return NextResponse.json({
       message: `Activated ${activatedCount}, checked ${results.length} games, ${endedCount} ended`,
       activated: activatedCount,
       processed: results.length,
       ended: endedCount,
+      favNotified,
       games: results
     })
 

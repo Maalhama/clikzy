@@ -286,6 +286,43 @@ export async function handleStripeEvent(event: Stripe.Event): Promise<HandlerRes
   }
 
   // Handle VIP subscription created/renewed
+  // Relance « panier abandonné » : la session de paiement a expiré sans achat (~24h).
+  // Push + email pour ramener le joueur (best-effort). NÉCESSITE d'abonner l'event
+  // checkout.session.expired sur l'endpoint Stripe. Email gaté sur l'opt-out marketing.
+  if (event.type === 'checkout.session.expired') {
+    const session = event.data.object as Stripe.Checkout.Session
+    const userId = session.metadata?.userId
+    if (!userId) return { status: 200, body: { received: true, skipped: 'no_user' } }
+    try {
+      const supabase = getSupabaseAdmin()
+      const { sendPushToUser } = await import('@/lib/push')
+      await sendPushToUser(userId, {
+        title: 'Ton achat t’attend',
+        body: 'Ta commande n’a pas été finalisée. Reprends là où tu t’es arrêté.',
+        url: '/lobby',
+        tag: 'checkout-abandoned',
+      })
+      const { data: prof } = await supabase
+        .from('profiles')
+        .select('username, marketing_opt_out')
+        .eq('id', userId)
+        .single()
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const p = prof as any
+      if (!p?.marketing_opt_out) {
+        const { data: userRes } = await supabase.auth.admin.getUserById(userId)
+        const to = userRes?.user?.email
+        if (to) {
+          const { sendCheckoutReminderEmail } = await import('@/lib/email')
+          await sendCheckoutReminderEmail(to, p?.username || 'Joueur')
+        }
+      }
+    } catch (e) {
+      console.error('[STRIPE] checkout.session.expired relance échouée:', e)
+    }
+    return { status: 200, body: { received: true, reminded: true } }
+  }
+
   if (event.type === 'customer.subscription.created' || event.type === 'customer.subscription.updated') {
     const subscription = event.data.object as Stripe.Subscription
 

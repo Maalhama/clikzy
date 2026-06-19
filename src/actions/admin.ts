@@ -27,6 +27,23 @@ export interface AdminGame extends Game {
   item?: Item
 }
 
+/** Revenu estimé (packs + rachat malin + cadeaux). Source unique partagée stats/santé. */
+async function computeRevenueEstimate(sb: ReturnType<typeof createServiceClient>): Promise<number> {
+  const [packBuys, binBuys, giftBuys] = await Promise.all([
+    sb.from('pack_purchases').select('pack_id'),
+    sb.from('buy_it_now_purchases').select('price_paid'),
+    sb.from('gift_codes').select('amount_paid'),
+  ])
+  const packPrice: Record<string, number> = Object.fromEntries(CREDIT_PACKS.map((p) => [p.id, p.price]))
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const packRevenue = (packBuys.data ?? []).reduce((s: number, r: any) => s + (packPrice[r.pack_id] ?? 0), 0)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const binRevenue = (binBuys.data ?? []).reduce((s: number, r: any) => s + Number(r.price_paid || 0), 0)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const giftRevenue = (giftBuys.data ?? []).reduce((s: number, r: any) => s + Number(r.amount_paid || 0), 0) / 100
+  return Math.round((packRevenue + binRevenue + giftRevenue) * 100) / 100
+}
+
 // Get admin dashboard stats
 export async function getAdminStats(): Promise<AdminStats | null> {
   const { isAdmin } = await checkAdminStatus()
@@ -57,7 +74,7 @@ export async function getAdminStats(): Promise<AdminStats | null> {
     activeGames: activeGamesResult.count || 0,
     totalWins: winsResult.count || 0,
     totalClicks,
-    totalRevenue: 0, // TODO: Calculate from Stripe
+    totalRevenue: await computeRevenueEstimate(supabase),
   }
 }
 
@@ -80,7 +97,7 @@ export async function getAdminHealth(): Promise<AdminHealth | null> {
   const supabase = createServiceClient()
   const sb = supabase
   const since7d = new Date(Date.now() - 7 * 86_400_000).toISOString()
-  const [usersRes, vipRes, signupRes, realClicksRes, botClicksRes, realClickers, packBuys, binBuys, giftBuys] =
+  const [usersRes, vipRes, signupRes, realClicksRes, botClicksRes, realClickers, packBuys, revenueEstimate] =
     await Promise.all([
       sb.from('profiles').select('*', { count: 'exact', head: true }),
       sb.from('profiles').select('*', { count: 'exact', head: true }).eq('is_vip', true),
@@ -88,22 +105,14 @@ export async function getAdminHealth(): Promise<AdminHealth | null> {
       sb.from('clicks').select('*', { count: 'exact', head: true }).eq('is_bot', false),
       sb.from('clicks').select('*', { count: 'exact', head: true }).eq('is_bot', true),
       sb.from('clicks').select('user_id').eq('is_bot', false).not('user_id', 'is', null),
-      sb.from('pack_purchases').select('user_id, pack_id'),
-      sb.from('buy_it_now_purchases').select('price_paid'),
-      sb.from('gift_codes').select('amount_paid'),
+      sb.from('pack_purchases').select('user_id'),
+      computeRevenueEstimate(sb),
     ])
   const totalUsers = usersRes.count ?? 0
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const realPlayers = new Set((realClickers.data ?? []).map((r: any) => r.user_id)).size
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const payers = new Set((packBuys.data ?? []).map((r: any) => r.user_id))
-  const packPrice: Record<string, number> = Object.fromEntries(CREDIT_PACKS.map((p) => [p.id, p.price]))
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const packRevenue = (packBuys.data ?? []).reduce((s: number, r: any) => s + (packPrice[r.pack_id] ?? 0), 0)
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const binRevenue = (binBuys.data ?? []).reduce((s: number, r: any) => s + Number(r.price_paid || 0), 0)
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const giftRevenue = (giftBuys.data ?? []).reduce((s: number, r: any) => s + Number(r.amount_paid || 0), 0) / 100
   return {
     totalUsers,
     realPlayers,
@@ -113,7 +122,7 @@ export async function getAdminHealth(): Promise<AdminHealth | null> {
     realClicks: realClicksRes.count ?? 0,
     botClicks: botClicksRes.count ?? 0,
     activeVips: vipRes.count ?? 0,
-    revenueEstimate: Math.round((packRevenue + binRevenue + giftRevenue) * 100) / 100,
+    revenueEstimate,
   }
 }
 

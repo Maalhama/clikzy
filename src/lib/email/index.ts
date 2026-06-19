@@ -7,6 +7,9 @@ export {
   sendStreakReminderEmail,
   sendAdminAlertEmail,
   sendPurchaseConfirmationEmail,
+  sendGaugeConvertedEmail,
+  sendAddressReminderEmail,
+  sendCheckoutReminderEmail,
 } from './send'
 export {
   welcomeEmailHtml,
