@@ -517,3 +517,58 @@ export async function updateShippingStatus(
   revalidatePath('/admin')
   return { success: true }
 }
+
+export interface ModerationComment {
+  id: string
+  username: string
+  content: string
+  created_at: string
+  game_id: string
+  reports: number
+}
+
+/** Derniers commentaires (non supprimés) avec leur nombre de signalements (admin). */
+export async function getModerationComments(limit = 50): Promise<ModerationComment[]> {
+  const { isAdmin } = await checkAdminStatus()
+  if (!isAdmin) return []
+  const supabase = createServiceClient()
+  // tables non typées (comments.deleted_at / comment_reports récentes)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: comments } = await (supabase as any)
+    .from('comments')
+    .select('id, username, content, created_at, game_id')
+    .is('deleted_at', null)
+    .order('created_at', { ascending: false })
+    .limit(limit)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: reports } = await (supabase as any).from('comment_reports').select('comment_id')
+  const counts: Record<string, number> = {}
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  for (const r of (reports ?? [])) counts[(r as any).comment_id] = (counts[(r as any).comment_id] ?? 0) + 1
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const out: ModerationComment[] = (comments ?? []).map((c: any) => ({
+    id: c.id,
+    username: c.username,
+    content: c.content,
+    created_at: c.created_at,
+    game_id: c.game_id,
+    reports: counts[c.id] ?? 0,
+  }))
+  out.sort((a, b) => b.reports - a.reports || (a.created_at < b.created_at ? 1 : -1))
+  return out
+}
+
+/** Suppression (soft-delete) d'un commentaire par un admin. */
+export async function adminDeleteComment(commentId: string): Promise<{ success: boolean; error?: string }> {
+  const { isAdmin } = await checkAdminStatus()
+  if (!isAdmin) return { success: false, error: 'Non autorisé' }
+  const supabase = createServiceClient()
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { error } = await (supabase as any)
+    .from('comments')
+    .update({ deleted_at: new Date().toISOString() })
+    .eq('id', commentId)
+  if (error) return { success: false, error: error.message }
+  revalidatePath('/admin')
+  return { success: true }
+}

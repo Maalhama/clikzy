@@ -1,11 +1,11 @@
 'use client'
 
-import { useState, type FormEvent } from 'react'
+import { useState, useEffect, type FormEvent } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
-import type { AdminStats, AdminUser, AdminGame, BuyItNowOrder, GaugeWinOrder, AdminHealth } from '@/actions/admin'
+import type { AdminStats, AdminUser, AdminGame, BuyItNowOrder, GaugeWinOrder, AdminHealth, ModerationComment } from '@/actions/admin'
 import type { Item, Winner } from '@/types/database'
-import { updateUserCredits, toggleUserAdmin, updateShippingStatus, updateBuyItNowShipping, updateGaugeWinShipping, createItem } from '@/actions/admin'
+import { updateUserCredits, toggleUserAdmin, updateShippingStatus, updateBuyItNowShipping, updateGaugeWinShipping, createItem, getModerationComments, adminDeleteComment } from '@/actions/admin'
 
 interface AdminDashboardProps {
   stats: AdminStats
@@ -18,7 +18,7 @@ interface AdminDashboardProps {
   health: AdminHealth | null
 }
 
-type Tab = 'overview' | 'health' | 'users' | 'games' | 'items' | 'winners' | 'buyitnow' | 'gaugewins'
+type Tab = 'overview' | 'health' | 'users' | 'games' | 'items' | 'winners' | 'buyitnow' | 'gaugewins' | 'moderation'
 
 export function AdminDashboard({ stats, users, games, items, winners, buyItNowOrders, gaugeWins, health }: AdminDashboardProps) {
   const [activeTab, setActiveTab] = useState<Tab>('overview')
@@ -32,6 +32,7 @@ export function AdminDashboard({ stats, users, games, items, winners, buyItNowOr
     { id: 'winners', label: 'Gagnants', icon: <TrophyIcon /> },
     { id: 'buyitnow', label: 'Rachat malin', icon: <GiftIcon /> },
     { id: 'gaugewins', label: 'Jauge gagnée', icon: <GiftIcon /> },
+    { id: 'moderation', label: 'Modération', icon: <UsersIcon /> },
   ]
 
   return (
@@ -84,6 +85,7 @@ export function AdminDashboard({ stats, users, games, items, winners, buyItNowOr
           {activeTab === 'winners' && <WinnersTab winners={winners} />}
           {activeTab === 'buyitnow' && <BuyItNowOrdersTab orders={buyItNowOrders} />}
           {activeTab === 'gaugewins' && <GaugeWinsTab wins={gaugeWins} />}
+          {activeTab === 'moderation' && <ModerationTab />}
         </motion.div>
       </main>
     </div>
@@ -796,5 +798,53 @@ function CloseIcon() {
     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
       <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
     </svg>
+  )
+}
+
+// Moderation Tab — derniers commentaires (signalés en tête), suppression soft-delete
+function ModerationTab() {
+  const [comments, setComments] = useState<ModerationComment[] | null>(null)
+  const [deleting, setDeleting] = useState<string | null>(null)
+
+  useEffect(() => {
+    getModerationComments(80).then(setComments).catch(() => setComments([]))
+  }, [])
+
+  async function handleDelete(id: string) {
+    setDeleting(id)
+    const res = await adminDeleteComment(id)
+    if (res.success) setComments((prev) => (prev ?? []).filter((c) => c.id !== id))
+    setDeleting(null)
+  }
+
+  if (comments === null) return <p className="py-6 text-center text-white/55">Chargement…</p>
+  if (comments.length === 0) return <p className="py-6 text-center text-white/55">Aucun commentaire à modérer.</p>
+
+  return (
+    <div className="rounded-xl bg-bg-secondary/50 border border-white/10 divide-y divide-white/5">
+      {comments.map((c) => (
+        <div key={c.id} className="flex items-start justify-between gap-3 p-4">
+          <div className="min-w-0">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-sm font-semibold text-white">{c.username}</span>
+              {c.reports > 0 && (
+                <span className="rounded-full bg-danger/20 px-2 py-0.5 text-xs font-medium text-danger">
+                  {c.reports} signalement{c.reports > 1 ? 's' : ''}
+                </span>
+              )}
+              <span className="text-xs text-white/35">{new Date(c.created_at).toLocaleString('fr-FR')}</span>
+            </div>
+            <p className="mt-1 break-words text-sm text-white/70">{c.content}</p>
+          </div>
+          <button
+            onClick={() => handleDelete(c.id)}
+            disabled={deleting === c.id}
+            className="flex-shrink-0 rounded-lg bg-danger/15 px-3 py-1.5 text-xs font-medium text-danger transition-colors hover:bg-danger/25 disabled:opacity-50"
+          >
+            {deleting === c.id ? '…' : 'Supprimer'}
+          </button>
+        </div>
+      ))}
+    </div>
   )
 }

@@ -6,6 +6,7 @@ import { redirect } from 'next/navigation'
 import { sendWelcomeEmail } from '@/lib/email'
 import { selfExcludedUntil, selfExclusionError } from '@/lib/selfExclusion'
 import { rateLimiters } from '@/lib/rateLimit'
+import { validateName } from '@/lib/validation/cleanName'
 
 // IP du client (les server actions ne passent pas par le proxy /api -> rate-limit ici).
 async function clientIp(): Promise<string> {
@@ -142,6 +143,12 @@ export async function signUp(formData: FormData): Promise<AuthResult> {
   // Check username format (alphanumeric + underscore only)
   if (!/^[a-zA-Z0-9_]+$/.test(username)) {
     return { success: false, error: 'Le pseudo ne peut contenir que des lettres, chiffres et underscores' }
+  }
+
+  // Anti-usurpation + profanité (#4 audit)
+  const nameCheck = validateName(username, 'pseudo')
+  if (!nameCheck.ok) {
+    return { success: false, error: nameCheck.error }
   }
 
   // Anti-flood d'inscriptions (par IP).

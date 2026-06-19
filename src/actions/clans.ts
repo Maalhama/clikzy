@@ -1,6 +1,7 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
+import { validateName } from '@/lib/validation/cleanName'
 
 export type ClanMember = { userId: string; username: string; level: number; xp: number; role: string }
 export type MyClan = {
@@ -79,6 +80,11 @@ async function callClanRpc(fn: string, args: Record<string, unknown>): Promise<R
 }
 
 export async function createClan(name: string, tag: string, description?: string) {
+  // Anti-usurpation + profanité sur le nom ET le tag (#4 audit)
+  const nameCheck = validateName(name, 'clan')
+  if (!nameCheck.ok) return { success: false, error: nameCheck.error }
+  const tagCheck = validateName(tag, 'clan')
+  if (!tagCheck.ok) return { success: false, error: tagCheck.error }
   return callClanRpc('create_clan', { p_name: name, p_tag: tag, p_desc: description ?? null })
 }
 export async function joinClan(clanId: string) {

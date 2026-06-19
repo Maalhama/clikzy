@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState, type FormEvent } from 'react'
-import { postComment, getGameComments, type GameComment } from '@/actions/comments'
+import { postComment, getGameComments, reportComment, type GameComment } from '@/actions/comments'
 import { avatarColor, timeAgo } from '@/components/comments/commentUtils'
 import { seedGameComments } from '@/lib/bots/commentGenerator'
 
@@ -11,6 +11,12 @@ export function GameComments({ gameId, userId, itemName }: { gameId: string; use
   const [sending, setSending] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
+  const [reported, setReported] = useState<Set<string>>(new Set())
+
+  const handleReport = async (id: string) => {
+    setReported((prev) => new Set(prev).add(id))
+    await reportComment(id)
+  }
 
   useEffect(() => {
     let active = true
@@ -114,6 +120,18 @@ export function GameComments({ gameId, userId, itemName }: { gameId: string; use
                   <span className="flex-shrink-0 text-[0.7rem] text-white/35">{timeAgo(c.created_at)}</span>
                 </div>
                 <p className="mt-0.5 break-words text-sm leading-relaxed text-white/70">{c.content}</p>
+                {userId && !c.id.startsWith('bot') && (
+                  reported.has(c.id) ? (
+                    <span className="mt-1 inline-block text-[0.7rem] text-white/30">Signalé</span>
+                  ) : (
+                    <button
+                      onClick={() => handleReport(c.id)}
+                      className="mt-1 text-[0.7rem] text-white/30 transition-colors hover:text-danger"
+                    >
+                      Signaler
+                    </button>
+                  )
+                )}
               </div>
             </li>
           ))}

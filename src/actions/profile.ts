@@ -2,6 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
+import { validateName } from '@/lib/validation/cleanName'
 
 export type ProfileResult = {
   success: boolean
@@ -23,6 +24,12 @@ export async function updateUsername(newUsername: string): Promise<ProfileResult
   // Check username format (alphanumeric + underscore only)
   if (!/^[a-zA-Z0-9_]+$/.test(newUsername)) {
     return { success: false, error: 'Le pseudo ne peut contenir que des lettres, chiffres et underscores' }
+  }
+
+  // Anti-usurpation + profanité (#4 audit)
+  const nameCheck = validateName(newUsername, 'pseudo')
+  if (!nameCheck.ok) {
+    return { success: false, error: nameCheck.error }
   }
 
   const supabase = await createClient()

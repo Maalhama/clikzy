@@ -67,6 +67,7 @@ export async function getGameComments(gameId: string): Promise<GameComment[]> {
       .from('comments')
       .select('id, username, content, created_at')
       .eq('game_id', gameId)
+      .is('deleted_at', null)
       .order('created_at', { ascending: false })
       .limit(50)
     if (error || !data) return []
@@ -99,5 +100,20 @@ export async function getRecentComments(limit = 20): Promise<CommentFeedItem[]> 
     return data as CommentFeedItem[]
   } catch {
     return []
+  }
+}
+
+/** Signaler un commentaire (joueur connecté). Idempotent par (commentaire, signaleur). */
+export async function reportComment(commentId: string, reason?: string): Promise<ActionResult> {
+  try {
+    const supabase = await createClient()
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data, error } = await (supabase.rpc as any)('report_comment', { p_comment_id: commentId, p_reason: reason ?? null })
+    if (error) return { success: false, error: 'Erreur lors du signalement.' }
+    const r = data as { ok?: boolean; error?: string } | null
+    if (!r?.ok) return { success: false, error: r?.error ?? 'Signalement impossible.' }
+    return { success: true }
+  } catch {
+    return { success: false, error: 'Erreur lors du signalement.' }
   }
 }
