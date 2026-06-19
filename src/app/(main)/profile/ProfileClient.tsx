@@ -15,6 +15,7 @@ import { CreditHistorySection } from '@/components/profile/CreditHistorySection'
 import { SpendingLimitSection } from '@/components/profile/SpendingLimitSection'
 import { DeliveryPhotoSection } from '@/components/profile/DeliveryPhotoSection'
 import { StreakFreezeCard } from '@/components/profile/StreakFreezeCard'
+import { WeeklyQuestsCard } from '@/components/profile/WeeklyQuestsCard'
 import { BuyItNowResultToast } from '@/components/profile/BuyItNowResultToast'
 import { PrivacyCard } from '@/components/profile/PrivacyCard'
 import { ResponsibleGamingCard } from '@/components/profile/ResponsibleGamingCard'
@@ -428,6 +429,9 @@ export function ProfileClient({ profile, wins, gamesPlayed, totalValueWon, gameH
 
         {/* Credit Movements (transparence "argent") */}
         <CreditHistorySection />
+
+        {/* Objectifs hebdomadaires */}
+        <WeeklyQuestsCard />
 
         {/* Série & gels (anti-churn streak) */}
         <StreakFreezeCard />

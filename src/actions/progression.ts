@@ -117,3 +117,43 @@ export async function claimQuest(key: string): Promise<ActionResult<{ xpReward: 
   }
   return { success: true, data: { xpReward: row.xp_reward, creditsReward: row.credits_reward } }
 }
+
+/** Objectifs hebdomadaires (statut + progression réelle). */
+export async function getWeeklyQuests(): Promise<DailyQuest[]> {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return []
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data } = await (supabase.rpc as any)('weekly_quests_status')
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return ((data as any[]) || []).map((q) => ({
+    key: q.key,
+    title: q.title,
+    description: q.description,
+    target: q.target,
+    xpReward: q.xp_reward,
+    creditsReward: q.credits_reward,
+    progress: q.progress,
+    claimed: !!q.claimed,
+    completed: q.progress >= q.target,
+  }))
+}
+
+/** Réclame une récompense d'objectif hebdomadaire (validée serveur). */
+export async function claimWeeklyQuest(key: string): Promise<ActionResult<{ xpReward: number; creditsReward: number }>> {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { success: false, error: 'Non authentifié' }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data, error } = await (supabase.rpc as any)('claim_weekly_quest', { p_quest_key: key })
+  if (error) return { success: false, error: 'Erreur' }
+  const row = Array.isArray(data) ? data[0] : data
+  if (!row?.ok) {
+    const msg =
+      row?.reason === 'already_claimed' ? 'Déjà récupéré'
+      : row?.reason === 'not_completed' ? 'Objectif non terminé'
+      : 'Indisponible'
+    return { success: false, error: msg }
+  }
+  return { success: true, data: { xpReward: row.xp_reward, creditsReward: row.credits_reward } }
+}
