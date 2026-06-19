@@ -1,8 +1,10 @@
 'use server'
 
+import { headers } from 'next/headers'
 import { createClient } from '@/lib/supabase/server'
 import { createServiceClient } from '@/lib/supabase/service'
 import { sendAdminAlertEmail } from '@/lib/email'
+import { checkRateLimit } from '@/lib/rateLimit'
 
 // Tickets de support (#8 audit). Stocke la demande + alerte l'équipe par email.
 // Lie l'user_id si le visiteur est connecté.
@@ -25,6 +27,14 @@ export async function submitSupportTicket(input: {
 
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
+
+  // Anti-spam : 3 tickets / minute par utilisateur (ou par IP si anonyme). Évite le
+  // flood de la table + des alertes email. Fail-closed.
+  const ip = (await headers()).get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown'
+  const rl = await checkRateLimit(`support:${user?.id ?? ip}`, 3, 60_000, true)
+  if (!rl.success) {
+    return { success: false, error: 'Trop de demandes. Réessaie dans une minute.' }
+  }
 
   const svc = createServiceClient()
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

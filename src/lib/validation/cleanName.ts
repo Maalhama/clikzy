@@ -4,11 +4,13 @@
 
 const RESERVED_EXACT = [
   'admin', 'administrateur', 'staff', 'root', 'system', 'systeme',
-  'modo', 'moderateur', 'moderator', 'help', 'contact', 'officiel', 'official',
+  'modo', 'moderateur', 'moderator', 'help', 'contact', 'officiel', 'official', 'support',
 ]
 
 // Sous-chaînes interdites (usurpation d'identité de la marque/équipe).
-const RESERVED_SUBSTRING = ['cleekzy', 'support', 'moderat', 'officiel']
+// 'support' n'est PAS ici (faux positifs « supporter/supporteur ») : il est en exact,
+// et l'usurpation type « Cleekzy_Support » est déjà couverte par 'cleekzy'.
+const RESERVED_SUBSTRING = ['cleekzy', 'moderat', 'officiel']
 
 const PROFANITY = /(connard|conard|salope|salaud|encul\w*|\bfdp\b|\bntm\b|nique\s*ta|\bpd\b|n[ée]gre|bougnoule|\bpute|\bbite\b|couille)/i
 

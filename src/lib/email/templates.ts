@@ -246,8 +246,9 @@ export function addressReminderEmailHtml(username: string, itemName: string): st
   )
 }
 
-// Relance panier abandonné (session de paiement expirée sans achat)
-export function checkoutReminderEmailHtml(username: string): string {
+// Relance panier abandonné (session de paiement expirée sans achat) — email marketing :
+// porte un lien de désabonnement.
+export function checkoutReminderEmailHtml(username: string, unsubscribeUrl?: string): string {
   return shell(
     'linear-gradient(135deg, rgba(155, 92, 255, 0.1), rgba(255, 79, 216, 0.08))',
     'rgba(155, 92, 255, 0.3)',
@@ -259,5 +260,6 @@ export function checkoutReminderEmailHtml(username: string): string {
     </p>
     ${cta('https://cleekzy.com/lobby', 'Reprendre →', 'linear-gradient(135deg, #9B5CFF, #FF4FD8)')}
     `,
+    unsubscribeUrl,
   )
 }

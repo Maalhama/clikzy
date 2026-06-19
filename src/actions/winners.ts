@@ -165,10 +165,13 @@ export async function uploadDeliveryPhoto(winnerId: string, formData: FormData):
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { success: false, error: 'Non authentifié' }
 
-  // Le lot doit appartenir au joueur.
+  // Le lot doit appartenir au joueur ET être expédié/livré.
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data: win } = await (supabase as any).from('winners').select('id, user_id').eq('id', winnerId).single()
+  const { data: win } = await (supabase as any).from('winners').select('id, user_id, shipping_status').eq('id', winnerId).single()
   if (!win || win.user_id !== user.id) return { success: false, error: 'Lot introuvable' }
+  if (!['shipped', 'delivered'].includes(win.shipping_status)) {
+    return { success: false, error: 'Tu pourras ajouter une photo une fois ton lot expédié.' }
+  }
 
   const ext = (file.name.split('.').pop() || 'jpg').toLowerCase()
   const path = `deliveries/${winnerId}-${user.id.slice(0, 8)}.${ext}`

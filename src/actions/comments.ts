@@ -35,6 +35,8 @@ const POST_ERRORS: Record<string, string> = {
   too_fast: 'Doucement ! Attends quelques secondes avant de recommenter.',
   empty: 'Écris quelque chose avant d’envoyer.',
   not_authenticated: 'Connecte-toi pour commenter.',
+  no_links: 'Les liens ne sont pas autorisés dans les commentaires.',
+  inappropriate: 'Ton message contient des termes interdits.',
 }
 
 /** Poste un commentaire (le serveur valide que le joueur a cliqué dans la partie). */

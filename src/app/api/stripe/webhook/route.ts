@@ -314,7 +314,7 @@ export async function handleStripeEvent(event: Stripe.Event): Promise<HandlerRes
         const to = userRes?.user?.email
         if (to) {
           const { sendCheckoutReminderEmail } = await import('@/lib/email')
-          await sendCheckoutReminderEmail(to, p?.username || 'Joueur')
+          await sendCheckoutReminderEmail(to, p?.username || 'Joueur', userId)
         }
       }
     } catch (e) {

@@ -298,16 +298,18 @@ export default function MiniGamesClient({ initialEligibility }: MiniGamesClientP
     }
   };
 
-  const closeModal = () => {
+  const closeModal = useCallback(() => {
     setActiveGame(null);
     setResult(null);
     setPendingGame(null);
-  };
+  }, []);
 
   // Accessibilité de la modale de jeu : focus trap + Échap. Comme le clic sur le fond,
   // la fermeture clavier n'est permise qu'une fois le résultat affiché (ne pas annuler
-  // une partie payée en cours).
-  useModalA11y(!!activeGame, () => { if (result) closeModal(); }, gamePanelRef);
+  // une partie payée en cours). Handler mémoïsé : sinon useModalA11y se re-câblerait à
+  // chaque render et volerait le focus pendant la partie.
+  const handleGameModalClose = useCallback(() => { if (result) closeModal() }, [result, closeModal]);
+  useModalA11y(!!activeGame, handleGameModalClose, gamePanelRef);
 
   // Get the target for the current game based on server result
   const getGameTarget = () => {
