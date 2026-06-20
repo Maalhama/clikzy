@@ -2,7 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { createServiceClient } from '@/lib/supabase/service'
-import { GAME_CONSTANTS, GAUGE_ENABLED, GAUGE_MULTIPLIER } from '@/lib/constants'
+import { GAME_CONSTANTS, GAUGE_ENABLED, GAUGE_MULTIPLIER, WIN_LIMIT_PER_WEEK, WIN_LIMIT_PER_ITEM_YEAR } from '@/lib/constants'
 import { checkAndAwardBadges, type Badge } from '@/actions/badges'
 import { checkClickFraud, auditLog } from '@/lib/security'
 import { rateLimiters } from '@/lib/rateLimit'
@@ -103,6 +103,23 @@ export async function clickGame(gameId: string): Promise<ActionResult<{ newEndTi
   // gagné le joueur n'est plus éligible. Seul point d'entrée du clic -> gate ici.
   if (game.beginners_only && (profile.total_wins ?? 0) > 0) {
     return { success: false, error: 'Enchère réservée aux débutants (joueurs sans victoire).' }
+  }
+
+  // Limites de gains « équité » (Lot G — confiance / jeu responsable) : blocage de
+  // PARTICIPATION au-delà de 8 gains/semaine ou 12/an sur un même produit. On ne
+  // déclenche la requête de comptage QUE pour les gros gagnants : avec moins de
+  // WIN_LIMIT_PER_WEEK victoires totales, aucun plafond ne peut être atteint -> le
+  // clic du joueur normal n'est jamais ralenti. La fonction utilise auth.uid()
+  // (pas de user_id spoofable) et ne touche pas end_game.
+  if ((profile.total_wins ?? 0) >= WIN_LIMIT_PER_WEEK) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: limitReason } = await (supabase.rpc as any)('win_limit_block', { p_item_id: game.item_id })
+    if (limitReason === 'week') {
+      return { success: false, error: `Limite équité atteinte : ${WIN_LIMIT_PER_WEEK} gains/semaine maximum. Reviens la semaine prochaine.` }
+    }
+    if (limitReason === 'item') {
+      return { success: false, error: `Limite équité : ${WIN_LIMIT_PER_ITEM_YEAR} gains/an sur ce produit. Laisse la place aux autres joueurs.` }
+    }
   }
 
   // Calculate new end time if in final phase

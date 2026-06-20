@@ -59,6 +59,18 @@ export function GameRules({ className = '', beginnersOnly = false }: { className
             <p className="text-white/50 text-xs">Quand il reste moins d&apos;1min30, chaque clic remet le timer à 1min30</p>
           </div>
         </div>
+        {/* Limites de gains « équité » : plafonds PUBLICS, identiques pour tous (Lot G — confiance) */}
+        <div className="flex items-start gap-3">
+          <div className="w-7 h-7 rounded-lg bg-neon-blue/20 border border-neon-blue/30 flex items-center justify-center flex-shrink-0">
+            <svg className="w-4 h-4 text-neon-blue" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+            </svg>
+          </div>
+          <div>
+            <p className="text-white text-sm font-medium">Limites d&apos;équité</p>
+            <p className="text-white/50 text-xs">Maximum 8 gains par semaine et 12 par an sur un même produit — chacun sa chance</p>
+          </div>
+        </div>
       </div>
     </div>
   )

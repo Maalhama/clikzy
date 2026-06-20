@@ -213,6 +213,47 @@ describe('Game Actions', () => {
       expect(mockServiceSupabase.rpc).toHaveBeenCalledWith('perform_click', expect.any(Object))
     })
 
+    it('should block a heavy winner who hit the weekly win limit', async () => {
+      mockSupabase.auth.getUser.mockResolvedValue({
+        data: { user: { id: 'user-1' } },
+      })
+
+      const mockSelect = vi.fn().mockReturnThis()
+      const mockEq = vi.fn().mockReturnThis()
+      const mockSingle = vi.fn()
+        .mockResolvedValueOnce({
+          data: {
+            credits: 10,
+            earned_credits: 5,
+            username: 'testuser',
+            total_clicks: 10,
+            total_wins: 9, // >= WIN_LIMIT_PER_WEEK -> on interroge win_limit_block
+          },
+        })
+        .mockResolvedValueOnce({
+          data: {
+            id: 'game-1',
+            status: 'active',
+            end_time: Date.now() + 60000,
+            total_clicks: 50,
+            beginners_only: false,
+            item_id: 'item-1',
+            item: { name: 'iPhone' },
+          },
+        })
+
+      mockSupabase.from.mockReturnValue({ select: mockSelect })
+      mockSelect.mockReturnValue({ eq: mockEq })
+      mockEq.mockReturnValue({ single: mockSingle, maybeSingle: vi.fn().mockResolvedValue({ data: null }) })
+      mockSupabase.rpc.mockResolvedValue({ data: 'week' })
+
+      const result = await clickGame('game-1')
+
+      expect(result.success).toBe(false)
+      expect(result.error).toContain('semaine')
+      expect(mockServiceSupabase.rpc).not.toHaveBeenCalled()
+    })
+
     it('should successfully process a click via the perform_click RPC', async () => {
       // Depuis I5, le clic est ATOMIQUE : un seul appel RPC perform_click
       // (déduction + insertion + maj partie). Plus d'insert/update côté TS.
