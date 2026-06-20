@@ -13,7 +13,7 @@ type GameWithItem = Game & {
   item: Item
 }
 
-type ProfileCredits = Pick<Profile, 'credits' | 'earned_credits' | 'username' | 'total_clicks'>
+type ProfileCredits = Pick<Profile, 'credits' | 'earned_credits' | 'username' | 'total_clicks' | 'total_wins'>
 
 type ActionResult<T = void> = {
   success: boolean
@@ -65,7 +65,7 @@ export async function clickGame(gameId: string): Promise<ActionResult<{ newEndTi
   // Get user profile to check credits (both daily and earned)
   const { data: profileData } = await supabase
     .from('profiles')
-    .select('credits, earned_credits, username, total_clicks')
+    .select('credits, earned_credits, username, total_clicks, total_wins')
     .eq('id', user.id)
     .single()
 
@@ -96,6 +96,13 @@ export async function clickGame(gameId: string): Promise<ActionResult<{ newEndTi
 
   if (game.status !== 'active' && game.status !== 'final_phase') {
     return { success: false, error: 'Cette partie n\'accepte plus de clics' }
+  }
+
+  // Enchère « débutants » (Lot G — confiance) : réservée aux joueurs sans aucune
+  // victoire. total_wins est un compteur PERMANENT (jamais reset), donc une fois
+  // gagné le joueur n'est plus éligible. Seul point d'entrée du clic -> gate ici.
+  if (game.beginners_only && (profile.total_wins ?? 0) > 0) {
+    return { success: false, error: 'Enchère réservée aux débutants (joueurs sans victoire).' }
   }
 
   // Calculate new end time if in final phase
