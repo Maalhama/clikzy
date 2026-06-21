@@ -16,6 +16,7 @@ import { SpendingLimitSection } from '@/components/profile/SpendingLimitSection'
 import { DeliveryPhotoSection } from '@/components/profile/DeliveryPhotoSection'
 import { StreakFreezeCard } from '@/components/profile/StreakFreezeCard'
 import { FirstPackGuaranteeCard } from '@/components/profile/FirstPackGuaranteeCard'
+import { LoyaltyRankCard } from '@/components/profile/LoyaltyRankCard'
 import { WeeklyQuestsCard } from '@/components/profile/WeeklyQuestsCard'
 import { BuyItNowResultToast } from '@/components/profile/BuyItNowResultToast'
 import { PrivacyCard } from '@/components/profile/PrivacyCard'
@@ -406,6 +407,9 @@ export function ProfileClient({ profile, wins, gamesPlayed, totalValueWon, gameH
         <div className="mt-8">
           <ProgressionCard />
         </div>
+
+        {/* Rang de fidélité (statut gratuit basé sur les clics cumulés) */}
+        <LoyaltyRankCard totalClicks={profile.total_clicks || 0} />
 
         {/* Rachat malin — racheter les enchères perdues à prix réduit */}
         <BuyItNowResultToast />
