@@ -438,6 +438,7 @@ export type Database = {
       games: {
         Row: {
           battle_start_time: string | null
+          beginners_only: boolean
           created_at: string | null
           end_time: number | null
           ended_at: string | null
@@ -455,6 +456,7 @@ export type Database = {
         }
         Insert: {
           battle_start_time?: string | null
+          beginners_only?: boolean
           created_at?: string | null
           end_time?: number | null
           ended_at?: string | null
@@ -472,6 +474,7 @@ export type Database = {
         }
         Update: {
           battle_start_time?: string | null
+          beginners_only?: boolean
           created_at?: string | null
           end_time?: number | null
           ended_at?: string | null

@@ -1,6 +1,6 @@
 // Bloc « Règles du jeu » partagé entre les layouts mobile et desktop de la page de jeu
 // (contenu identique ; seul le conteneur externe diffère -> prop className). Anti-duplication.
-export function GameRules({ className = '' }: { className?: string }) {
+export function GameRules({ className = '', beginnersOnly = false }: { className?: string; beginnersOnly?: boolean }) {
   return (
     <div className={`overflow-hidden ${className}`}>
       <div className="px-4 py-3 border-b border-white/10">
@@ -12,6 +12,20 @@ export function GameRules({ className = '' }: { className?: string }) {
         </div>
       </div>
       <div className="p-4 space-y-3">
+        {/* Enchère « débutants » : réservée aux joueurs sans victoire (Lot G — confiance) */}
+        {beginnersOnly && (
+          <div className="flex items-start gap-3 rounded-lg bg-neon-blue/10 border border-neon-blue/25 p-2.5">
+            <div className="w-7 h-7 rounded-lg bg-neon-blue/20 border border-neon-blue/30 flex items-center justify-center flex-shrink-0">
+              <svg className="w-4 h-4 text-neon-blue" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 3c-3.5 0-6 2.5-6 6 0 2 1 3.5 2.5 5C10 15.5 11 17 11 19h2c0-2 1-3.5 2.5-5C17 12.5 18 11 18 9c0-3.5-2.5-6-6-6z" />
+              </svg>
+            </div>
+            <div>
+              <p className="text-white text-sm font-medium">Enchère débutants</p>
+              <p className="text-white/50 text-xs">Réservée aux joueurs sans aucune victoire — une vraie première chance face aux habitués</p>
+            </div>
+          </div>
+        )}
         <div className="flex items-start gap-3">
           <div className="w-7 h-7 rounded-lg bg-neon-purple/20 border border-neon-purple/30 flex items-center justify-center flex-shrink-0">
             <svg className="w-4 h-4 text-neon-purple" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -43,6 +57,18 @@ export function GameRules({ className = '' }: { className?: string }) {
           <div>
             <p className="text-white text-sm font-medium">Phase finale</p>
             <p className="text-white/50 text-xs">Quand il reste moins d&apos;1min30, chaque clic remet le timer à 1min30</p>
+          </div>
+        </div>
+        {/* Limites de gains « équité » : plafonds PUBLICS, identiques pour tous (Lot G — confiance) */}
+        <div className="flex items-start gap-3">
+          <div className="w-7 h-7 rounded-lg bg-neon-blue/20 border border-neon-blue/30 flex items-center justify-center flex-shrink-0">
+            <svg className="w-4 h-4 text-neon-blue" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+            </svg>
+          </div>
+          <div>
+            <p className="text-white text-sm font-medium">Limites d&apos;équité</p>
+            <p className="text-white/50 text-xs">Maximum 8 gains par semaine et 12 par an sur un même produit — chacun sa chance</p>
           </div>
         </div>
       </div>

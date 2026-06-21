@@ -14,6 +14,10 @@ import { BuyItNowSection } from '@/components/profile/BuyItNowSection'
 import { CreditHistorySection } from '@/components/profile/CreditHistorySection'
 import { SpendingLimitSection } from '@/components/profile/SpendingLimitSection'
 import { DeliveryPhotoSection } from '@/components/profile/DeliveryPhotoSection'
+import { StreakFreezeCard } from '@/components/profile/StreakFreezeCard'
+import { FirstPackGuaranteeCard } from '@/components/profile/FirstPackGuaranteeCard'
+import { LoyaltyRankCard } from '@/components/profile/LoyaltyRankCard'
+import { WeeklyQuestsCard } from '@/components/profile/WeeklyQuestsCard'
 import { BuyItNowResultToast } from '@/components/profile/BuyItNowResultToast'
 import { PrivacyCard } from '@/components/profile/PrivacyCard'
 import { ResponsibleGamingCard } from '@/components/profile/ResponsibleGamingCard'
@@ -53,6 +57,7 @@ interface ProfileClientProps {
     referralCount: number
     creditsEarned: number
     referredBy: string | null
+    milestonesClaimed: number
   }
   badges: {
     badge: Badge
@@ -403,6 +408,9 @@ export function ProfileClient({ profile, wins, gamesPlayed, totalValueWon, gameH
           <ProgressionCard />
         </div>
 
+        {/* Rang de fidélité (statut gratuit basé sur les clics cumulés) */}
+        <LoyaltyRankCard totalClicks={profile.total_clicks || 0} />
+
         {/* Rachat malin — racheter les enchères perdues à prix réduit */}
         <BuyItNowResultToast />
         <div className="mt-8 mb-6"><BuyItNowSection /></div>
@@ -417,6 +425,7 @@ export function ProfileClient({ profile, wins, gamesPlayed, totalValueWon, gameH
             referralCount={referralStats.referralCount}
             creditsEarned={referralStats.creditsEarned}
             hasReferrer={!!referralStats.referredBy}
+            milestonesClaimed={referralStats.milestonesClaimed}
           />
         </div>
 
@@ -425,6 +434,15 @@ export function ProfileClient({ profile, wins, gamesPlayed, totalValueWon, gameH
 
         {/* Credit Movements (transparence "argent") */}
         <CreditHistorySection />
+
+        {/* Garantie 1er pack (crédit-back si jamais gagné) — ne s'affiche que si pertinent */}
+        <FirstPackGuaranteeCard />
+
+        {/* Objectifs hebdomadaires */}
+        <WeeklyQuestsCard />
+
+        {/* Série & gels (anti-churn streak) */}
+        <StreakFreezeCard />
 
         {/* Jeu responsable : limite de dépense auto-imposée */}
         <SpendingLimitSection />

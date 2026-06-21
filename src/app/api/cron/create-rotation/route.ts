@@ -13,6 +13,10 @@ const CRON_SECRET = process.env.CRON_SECRET
 
 // Configuration
 const GAMES_PER_ROTATION = 18
+// Enchères « débutants » (Lot G — confiance) : N parties par rotation réservées aux
+// joueurs sans victoire. selectedItems étant déjà mélangé, on marque simplement les N
+// premières -> ~1/6 de l'offre réservée aux nouveaux, le reste ouvert à tous.
+const BEGINNERS_ONLY_PER_ROTATION = 3
 const MAX_RETRIES = 3
 const RETRY_DELAY_MS = 2000 // 2 secondes, doublé à chaque retry
 
@@ -100,13 +104,14 @@ async function executeWithRetry(
     // (~1 toutes les 5 min) au lieu de toutes ensemble. La bataille finale (30min-1h59)
     // ajoute encore de la dispersion par-dessus.
     const STAGGER_MAX_MS = 90 * 60 * 1000 // 90 min
-    const games = selectedItems.map((item: { id: string }) => ({
+    const games = selectedItems.map((item: { id: string }, i: number) => ({
       item_id: item.id,
       status: 'waiting' as const,
       start_time: utcStartTime.toISOString(),
       end_time: utcStartTime.getTime() + DEFAULT_GAME_DURATION + Math.floor(Math.random() * STAGGER_MAX_MS),
       initial_duration: DEFAULT_GAME_DURATION,
       total_clicks: 0,
+      beginners_only: i < BEGINNERS_ONLY_PER_ROTATION,
     }))
 
     const { data: createdGames, error: createError } = await supabase

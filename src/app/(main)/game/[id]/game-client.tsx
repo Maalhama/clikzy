@@ -794,7 +794,7 @@ export function GameClient({
           </div>
 
           {/* Règles du jeu (mobile) */}
-          <GameRules className="mt-6 panel" />
+          <GameRules className="mt-6 panel" beginnersOnly={!!game.beginners_only} />
 
         </div>
 
@@ -1129,7 +1129,7 @@ export function GameClient({
               <GameClicksFeed clicks={recentClicks} />
 
               {/* Règles du jeu (desktop) */}
-              <GameRules className="rounded-xl bg-bg-secondary/30 border border-white/10" />
+              <GameRules className="rounded-xl bg-bg-secondary/30 border border-white/10" beginnersOnly={!!game.beginners_only} />
             </div>
           </div>
 

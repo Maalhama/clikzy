@@ -21,6 +21,13 @@ export const GAUGE_MULTIPLIER = 2
 // cron convert-abandoned-gauges. DOIT rester aligné avec le défaut p_days de la RPC.
 export const GAUGE_ABANDON_DAYS = 90
 
+// Limites de gains « équité » (Lot G — confiance / jeu responsable). Plafonnent les
+// gains d'un même joueur pour laisser leur chance aux autres ET réduire le risque
+// légal. Blocage de PARTICIPATION (gate dans clickGame) — ne touche PAS end_game.
+// DOIVENT rester alignées avec la fonction SQL win_limit_block.
+export const WIN_LIMIT_PER_WEEK = 8        // max gains sur 7 jours glissants
+export const WIN_LIMIT_PER_ITEM_YEAR = 12  // max gains sur un même produit / 365 jours
+
 // Game statuses
 export const GAME_STATUS = {
   WAITING: 'waiting',

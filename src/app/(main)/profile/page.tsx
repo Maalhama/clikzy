@@ -74,7 +74,7 @@ export default async function ProfilePage() {
       totalValueWon={totalValueWon}
       gameHistory={gameHistory}
       historyStats={historyStats}
-      referralStats={referralStats || { referralCode: null, referralCount: 0, creditsEarned: 0, referredBy: null }}
+      referralStats={referralStats || { referralCode: null, referralCount: 0, creditsEarned: 0, referredBy: null, milestonesClaimed: 0 }}
       badges={badges}
       badgeStats={badgeStats}
       shippingAddress={shippingAddress}

@@ -246,6 +246,23 @@ export function addressReminderEmailHtml(username: string, itemName: string): st
   )
 }
 
+// Réactivation d'un joueur inactif (win-back) — email marketing : lien de désabonnement.
+export function winbackEmailHtml(username: string, credits: number, unsubscribeUrl?: string): string {
+  return shell(
+    'linear-gradient(135deg, rgba(155, 92, 255, 0.1), rgba(255, 79, 216, 0.08))',
+    'rgba(155, 92, 255, 0.3)',
+    `
+    <div style="text-align: center; margin-bottom: 16px;"><span style="font-size: 56px;">👋</span></div>
+    <h1 style="color: #9B5CFF; font-size: 26px; margin: 0 0 12px 0; text-align: center;">Tu nous manques, ${username} !</h1>
+    <p style="color: rgba(255, 255, 255, 0.7); font-size: 16px; line-height: 1.6; margin: 0 0 8px 0; text-align: center;">
+      On t'a offert <strong style="color:#9B5CFF;">${credits} crédits</strong> pour revenir tenter de remporter des lots. À tout de suite !
+    </p>
+    ${cta('https://cleekzy.com/lobby', 'Récupérer mes crédits →', 'linear-gradient(135deg, #9B5CFF, #FF4FD8)')}
+    `,
+    unsubscribeUrl,
+  )
+}
+
 // Relance panier abandonné (session de paiement expirée sans achat) — email marketing :
 // porte un lien de désabonnement.
 export function checkoutReminderEmailHtml(username: string, unsubscribeUrl?: string): string {

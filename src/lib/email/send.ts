@@ -8,6 +8,7 @@ import {
   gaugeConvertedEmailHtml,
   addressReminderEmailHtml,
   checkoutReminderEmailHtml,
+  winbackEmailHtml,
 } from './templates'
 import { unsubscribeUrl } from './unsubscribe'
 
@@ -256,6 +257,27 @@ export async function sendCheckoutReminderEmail(email: string, username: string,
     return true
   } catch (err) {
     console.error('[EMAIL] Exception sending checkout reminder email:', err)
+    return false
+  }
+}
+
+export async function sendWinbackEmail(email: string, username: string, credits: number, userId?: string): Promise<boolean> {
+  if (!resend) return false
+  try {
+    const unsub = userId ? unsubscribeUrl(userId) ?? undefined : undefined
+    const { error } = await resend.emails.send({
+      from: EMAIL_FROM,
+      to: email,
+      subject: `👋 ${credits} crédits t'attendent sur Cleekzy`,
+      html: winbackEmailHtml(username, credits, unsub),
+    })
+    if (error) {
+      console.error('[EMAIL] Error sending winback email:', error)
+      return false
+    }
+    return true
+  } catch (err) {
+    console.error('[EMAIL] Exception sending winback email:', err)
     return false
   }
 }
