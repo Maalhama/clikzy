@@ -15,6 +15,7 @@ import { CreditHistorySection } from '@/components/profile/CreditHistorySection'
 import { SpendingLimitSection } from '@/components/profile/SpendingLimitSection'
 import { DeliveryPhotoSection } from '@/components/profile/DeliveryPhotoSection'
 import { StreakFreezeCard } from '@/components/profile/StreakFreezeCard'
+import { FirstPackGuaranteeCard } from '@/components/profile/FirstPackGuaranteeCard'
 import { WeeklyQuestsCard } from '@/components/profile/WeeklyQuestsCard'
 import { BuyItNowResultToast } from '@/components/profile/BuyItNowResultToast'
 import { PrivacyCard } from '@/components/profile/PrivacyCard'
@@ -429,6 +430,9 @@ export function ProfileClient({ profile, wins, gamesPlayed, totalValueWon, gameH
 
         {/* Credit Movements (transparence "argent") */}
         <CreditHistorySection />
+
+        {/* Garantie 1er pack (crédit-back si jamais gagné) — ne s'affiche que si pertinent */}
+        <FirstPackGuaranteeCard />
 
         {/* Objectifs hebdomadaires */}
         <WeeklyQuestsCard />
